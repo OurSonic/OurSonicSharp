@@ -1,0 +1,61 @@
+﻿objects
+	assets[]
+		frames[]
+			offsetX
+			offsetY
+			hurt sonic map
+			collision map
+			image
+			palette			
+	key
+	info
+		x
+		y
+		xflip
+		yflip
+		xsp
+		ysp
+		subdata
+	pieces 
+		asset index
+		frame index
+		collided
+		xflip
+		yflip
+	pieceLayouts
+		pieces[]
+
+	init:function(level,sonic)
+	tick:function(level,sonic)
+	onHurtSonic:function(level,sonic)
+	onCollide:function(level,sonic,sensor)
+		sonic.isball
+		sonic.istouching && sonic.isspindash
+
+projectile
+	x
+	y
+	xsp
+	ysp
+	assets[]
+		frames[]
+			hurt sonic map
+			collision map
+	init:function(level,sonic)
+	tick:function(level,sonic)
+	onHurtSonic:function(level,sonic)
+	onCollide:function(level,sonic,sensor)
+		sonic.isball
+		sonic.istouching && sonic.isspindash
+	 
+
+events
+	tick:function(level,sonic,state)  ;only when triggered
+	triggered:bool
+	state
+	trigger(level,sonic,state)
+
+level
+	events[name]
+	objects
+		
