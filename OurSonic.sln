@@ -1,7 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OurSonic", "OurSonic.csproj", "{307520E3-6453-44EC-A835-632CD4DE4D4D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OurSonic", "OurSonic\OurSonic.csproj", "{307520E3-6453-44EC-A835-632CD4DE4D4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Build", "Build\Build.csproj", "{DC50CFD9-989B-4F0F-A141-2FB783F3BD38}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +15,10 @@ Global
 		{307520E3-6453-44EC-A835-632CD4DE4D4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{307520E3-6453-44EC-A835-632CD4DE4D4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{307520E3-6453-44EC-A835-632CD4DE4D4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC50CFD9-989B-4F0F-A141-2FB783F3BD38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC50CFD9-989B-4F0F-A141-2FB783F3BD38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC50CFD9-989B-4F0F-A141-2FB783F3BD38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC50CFD9-989B-4F0F-A141-2FB783F3BD38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
