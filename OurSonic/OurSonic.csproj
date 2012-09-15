@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{307520E3-6453-44EC-A835-632CD4DE4D4D}</ProjectGuid>
+    <ProjectGuid>{3222B6FB-15F6-4217-8ECD-193BCFCE7D60}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OurSonic</RootNamespace>
@@ -32,15 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Drawing\TileChunk.cs" />
-    <Compile Include="Drawing\TileItem.cs" />
-    <Compile Include="Drawing\TilePiece.cs" />
-    <Compile Include="Drawing\Tile.cs" />
-    <Compile Include="SonicManager.cs" />
-    <Compile Include="SonicEngine.cs" />
-    <Compile Include="Sonic.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -48,17 +39,31 @@
       <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.1.2.5.5\tools\Assemblies\mscorlib.dll</HintPath>
     </Reference>
     <Reference Include="Script.jQuery">
-      <HintPath>packages\Saltarelle.jQuery.1.2.5.3\lib\Script.jQuery.dll</HintPath>
+      <HintPath>..\packages\Saltarelle.jQuery.1.2.5.3\lib\Script.jQuery.dll</HintPath>
     </Reference>
     <Reference Include="Script.jQuery.UI">
-      <HintPath>packages\Saltarelle.jQuery.UI.1.2.5\lib\Script.jQuery.UI.dll</HintPath>
+      <HintPath>..\packages\Saltarelle.jQuery.UI.1.2.5\lib\Script.jQuery.UI.dll</HintPath>
     </Reference>
     <Reference Include="Script.Linq">
-      <HintPath>packages\Saltarelle.Linq.1.2.5\lib\Script.Linq.dll</HintPath>
+      <HintPath>..\packages\Saltarelle.Linq.1.2.5\lib\Script.Linq.dll</HintPath>
     </Reference>
     <Reference Include="Script.Web">
-      <HintPath>packages\Saltarelle.Web.1.2.5.1\lib\Script.Web.dll</HintPath>
+      <HintPath>..\packages\Saltarelle.Web.1.2.5.1\lib\Script.Web.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CommonWebLibraries.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="Drawing\Tile.cs" />
+    <Compile Include="Drawing\TileChunk.cs" />
+    <Compile Include="Drawing\TileItem.cs" />
+    <Compile Include="Drawing\TilePiece.cs" />
+    <Compile Include="Help.cs" />
+    <Compile Include="Page.cs" />
+    <Compile Include="Sonic.cs" />
+    <Compile Include="SonicEngine.cs" />
+    <Compile Include="SonicManager.cs" />
+    <Compile Include="UiManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
