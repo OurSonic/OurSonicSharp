@@ -19,9 +19,19 @@ namespace OurSonic.Drawing
 
         public int Palette { get; set; }
 
-        public Tile(int?[][] colors)
+        public Tile(List<List<int>> colors)
         {
-            Colors = colors;
+            int?[][] fm = new int?[colors.Count][];
+
+            for (int i = 0; i < colors.Count; i++)
+            {
+                for (int j = 0; j < colors[i].Count; j++)
+                {
+                    fm[i][j] = colors[i][j];
+                }
+            }
+
+            Colors = fm;
             Sprites = new List<int>();
             CurPaletteIndexes = null;
         }
@@ -32,6 +42,8 @@ namespace OurSonic.Drawing
 
         protected int?[][] Colors { get; set; }
         protected bool ShowOutline { get; set; }
+
+        public int Index { get; set; }
 
         public void Draw(CanvasContext2D canvas, Point pos, Point scale, bool xflip, bool yflip, int palette, int layer, int animationFrame)
         {

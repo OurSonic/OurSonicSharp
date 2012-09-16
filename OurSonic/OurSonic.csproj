@@ -65,6 +65,7 @@
     <Compile Include="Drawing\TilePiece.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GameState.cs" />
+    <Compile Include="HeightMask.cs" />
     <Compile Include="Help.cs" />
     <Compile Include="ObjectManager.cs" />
     <Compile Include="Page.cs" />

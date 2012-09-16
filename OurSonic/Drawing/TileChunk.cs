@@ -8,9 +8,8 @@ namespace OurSonic.Drawing
 {
     public class TileChunk
     {
-        public TileChunk(TilePiece[][] tilePieces)
-        {
-            TilePieces = tilePieces;
+        public TileChunk(/*TilePiece[][] tilePieces*/)
+        { 
             HLayers = new bool[0][];
             Sprites = new List<string>();
             isOnlyBackground = null;
@@ -23,7 +22,7 @@ namespace OurSonic.Drawing
 
         protected bool[][] HLayers { get; set; }
 
-        protected TilePiece[][] TilePieces { get; set; }
+        public TilePiece[][] TilePieces { get; set; }
 
         public TilePiece GetBlock(int x, int y)
         {
@@ -131,9 +130,8 @@ namespace OurSonic.Drawing
             }
         }
 
-        protected Animation[] Animated { get; set; }
+        public List<Animation> Animated { get; set; }
 
-
- 
+        public int Index { get; set; }
     }
 }

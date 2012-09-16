@@ -155,6 +155,11 @@ namespace OurSonic
             var ctx = (CanvasContext2D)canvas.GetContext("2d");
             return new CanvasInformation(ctx, jQuery.FromElement(canvas));
         }
+
+        public static string DecodeString(string lvl)
+        {
+            return null;
+        }
     }
 }
 

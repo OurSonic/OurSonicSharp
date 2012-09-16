@@ -13,21 +13,18 @@ namespace OurSonic.Drawing
         private int cy;
         protected JsDictionary<string, CanvasElement> Image { get; set; }
         protected object HeightMask { get; set; }
-        protected Tile[] Tiles { get; set; }
+        public List<Tile> Tiles { get; set; }
 
         private int[][] drawInfo = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 0, 1 }, new[] { 1, 1 } };
 
         private int[][] drawOrder = new[] { new[] { 3, 2, 1, 0 }, new[] { 1, 0, 3, 2 }, new[] { 2, 3, 0, 1 }, new[] { 0, 1, 2, 3 } };
 
-        public TilePiece(object heightMask, Tile[] tiles)
+        public TilePiece()
         {
-            HeightMask = heightMask;
             cx = 8 * SonicManager.Instance.Scale.X * 2;
             cy = 8 * SonicManager.Instance.Scale.Y * 2;
             Image = new JsDictionary<string, CanvasElement>();
-            Tiles = tiles;
-
-        }
+       }
 
 
         public int Block { get; set; }
@@ -166,7 +163,8 @@ namespace OurSonic.Drawing
         } 
 
         protected int AnimationFrame { get; set; }
-  
+
+        public int Index { get; set; }
     }
 
     public enum RotationMode

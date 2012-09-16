@@ -42,6 +42,10 @@ namespace OurSonic
         {
 
         }
+
+        public void UpdateTitle(string decoding)
+        {
+        }
     }
 
     public class UIManagerData

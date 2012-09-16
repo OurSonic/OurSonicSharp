@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Html;
 using System.Html.Media.Graphics;
+using System.Text.RegularExpressions;
 using OurSonic.Drawing;
 using jQueryApi;
 
@@ -38,8 +40,8 @@ namespace OurSonic
 
             WindowLocation = Constants.DefaultWindowLocation(1, mainCanvas, Scale);
             BigWindowLocation = Constants.DefaultWindowLocation(1, mainCanvas, Scale);
-            BigWindowLocation.Width = (int) (BigWindowLocation.Width*1.8);
-            BigWindowLocation.Height = (int) (BigWindowLocation.Height*1.8);
+            BigWindowLocation.Width = (int)(BigWindowLocation.Width * 1.8);
+            BigWindowLocation.Height = (int)(BigWindowLocation.Height * 1.8);
 
             Animations = new List<Animation>();
             AnimationInstances = new List<AnimationInstance>();
@@ -50,8 +52,8 @@ namespace OurSonic
             ActiveRings = new List<Ring>();
             ForceResize = resize;
             Background = null;
-            ScreenOffset = new Point(mainCanvas.DomCanvas.GetWidth()/2 - WindowLocation.Width*Scale.X/2,
-                                     mainCanvas.DomCanvas.GetHeight()/2 - WindowLocation.Height*Scale.Y/2);
+            ScreenOffset = new Point(mainCanvas.DomCanvas.GetWidth() / 2 - WindowLocation.Width * Scale.X / 2,
+                                     mainCanvas.DomCanvas.GetHeight() / 2 - WindowLocation.Height * Scale.Y / 2);
 
             UIManager = new UIManager(this, mainCanvas, Scale);
             //UIManager.ObjectFrameworkArea.Populate(new LevelObject("Somekey"));
@@ -91,12 +93,13 @@ namespace OurSonic
         protected SpriteLoader SpriteLoader { get; set; }
 
         public static SonicManager Instance;
+        private string myStatus;
 
 
         public bool OnClick(jQueryEvent elementEvent)
         {
-            var e = new Point(elementEvent.ClientX/Scale.X/RealScale.X/WindowLocation.X,
-                              elementEvent.ClientY/Scale.Y/RealScale.Y + WindowLocation.Y);
+            var e = new Point(elementEvent.ClientX / Scale.X / RealScale.X / WindowLocation.X,
+                              elementEvent.ClientY / Scale.Y / RealScale.Y + WindowLocation.Y);
 
             if (elementEvent.Button == 0)
             {
@@ -108,13 +111,13 @@ namespace OurSonic
                         return false;
                         break;
                     case ClickState.PlaceChunk:
-                        ex = e.X/128;
-                        ey = e.Y/128;
+                        ex = e.X / 128;
+                        ey = e.Y / 128;
                         TileChunk ch = SonicLevel.Chunks[SonicLevel.ChunkMap[ex][ey]];
-                        TilePiece tp = ch.GetBlock(e.X - ex*128, e.Y - ey*128);
+                        TilePiece tp = ch.GetBlock(e.X - ex * 128, e.Y - ey * 128);
                         if (tp != null)
                         {
-                            TilePiece tpc = ch.GetTilePiece(e.X - ex*128, e.Y - ey*128);
+                            TilePiece tpc = ch.GetTilePiece(e.X - ex * 128, e.Y - ey * 128);
                             UIManager.Data.Indexes.TPIndex = SonicLevel.Blocks.IndexOf(tp);
                             UIManager.Data.ModifyTilePieceArea.TilePiece = tp;
                             UIManager.Data.SolidTileArea.Visible = true;
@@ -212,7 +215,7 @@ namespace OurSonic
                     waitingForTickContinue = true;
                     waitingForDrawContinue = false;
                 }
-                if (SonicToon.X > 128*SonicLevel.LevelWidth)
+                if (SonicToon.X > 128 * SonicLevel.LevelWidth)
                 {
                     SonicToon.X = 0;
                 }
@@ -236,12 +239,21 @@ namespace OurSonic
             SpriteLoader = new SpriteLoader(completed, update);
             var spriteStep = SpriteLoader.AddStep("Sprites", (i, done) =>
                                                                  {
-                                                                     var sp = i*200;
+                                                                     var sp = i * 200;
                                                                      ci[sp] = Help.LoadSprite(spriteLocations[i],
                                                                                               jd =>
-                                                                                                  {
-                                                                                                      ci[jd.Me().Tag*200 +scale.X*100 +scale.Y] =Help.ScaleSprite(jd, scale,jc =>done());
-                                                                                                  });
+                                                                                              {
+                                                                                                  ci[
+                                                                                                      jd.Me().Tag *
+                                                                                                      200 +
+                                                                                                      scale.X * 100 +
+                                                                                                      scale.Y] =
+                                                                                                      Help.
+                                                                                                          ScaleSprite
+                                                                                                          (jd, scale,
+                                                                                                           jc =>
+                                                                                                           done());
+                                                                                              });
                                                                  });
             /*
 
@@ -688,65 +700,65 @@ namespace OurSonic
                 }
                 canvas.Translate(ScreenOffset.X, ScreenOffset.Y);
                 canvas.FillStyle = "#000000";
-                canvas.FillRect(0, 0, WindowLocation.Width*Scale.X, WindowLocation.Height*Scale.Y);
+                canvas.FillRect(0, 0, WindowLocation.Width * Scale.X, WindowLocation.Height * Scale.Y);
 
-                WindowLocation.X = SonicToon.X*WindowLocation.Width/2;
-                WindowLocation.Y = SonicToon.Y*WindowLocation.Height/2;
+                WindowLocation.X = SonicToon.X * WindowLocation.Width / 2;
+                WindowLocation.Y = SonicToon.Y * WindowLocation.Height / 2;
 
-                BigWindowLocation.X = SonicToon.X*BigWindowLocation.Width/2;
-                BigWindowLocation.Y = SonicToon.Y*BigWindowLocation.Height/2;
+                BigWindowLocation.X = SonicToon.X * BigWindowLocation.Width / 2;
+                BigWindowLocation.Y = SonicToon.Y * BigWindowLocation.Height / 2;
                 if (Background != null)
                 {
                     int wOffset = WindowLocation.X;
-                    int bw = Background.Width/Scale.X;
-                    int movex = (wOffset/bw)*bw;
-                    Background.Draw(canvas, new Point(-WindowLocation.X*Scale.X + movex, -WindowLocation.Y/4*Scale.Y),
+                    int bw = Background.Width / Scale.X;
+                    int movex = (wOffset / bw) * bw;
+                    Background.Draw(canvas, new Point(-WindowLocation.X * Scale.X + movex, -WindowLocation.Y / 4 * Scale.Y),
                                     Scale, wOffset);
                     Background.Draw(canvas,
-                                    new Point(-WindowLocation.X*Scale.X + movex + Background.Width,
-                                              -WindowLocation.Y/4*Scale.Y), Scale, wOffset);
+                                    new Point(-WindowLocation.X * Scale.X + movex + Background.Width,
+                                              -WindowLocation.Y / 4 * Scale.Y), Scale, wOffset);
                 }
             }
             if (WindowLocation.X < 0) WindowLocation.X = 0;
-            if (WindowLocation.X > 128*SonicLevel.LevelWidth - WindowLocation.Width)
-                WindowLocation.X = 128*SonicLevel.LevelWidth - WindowLocation.Width;
+            if (WindowLocation.X > 128 * SonicLevel.LevelWidth - WindowLocation.Width)
+                WindowLocation.X = 128 * SonicLevel.LevelWidth - WindowLocation.Width;
             var offs = new List<Point>();
-            int w1 = WindowLocation.Width/128;
-            int h1 = WindowLocation.Height/128;
+            int w1 = WindowLocation.Width / 128;
+            int h1 = WindowLocation.Height / 128;
             for (int i = -1; i < w1; i++)
                 for (int j = -1; j < h1; j++)
                     offs.Add(new Point(i, j));
 
 
-            var bounds = new IntersectingRectangle(-32, -32, WindowLocation.Width*Scale.X + 32,
-                                                   WindowLocation.Height*Scale.Y + 32, Constants.Intersects);
+            var bounds = new IntersectingRectangle(-32, -32, WindowLocation.Width * Scale.X + 32,
+                                                   WindowLocation.Height * Scale.Y + 32, Constants.Intersects);
             if (SonicLevel.Chunks != null && SonicLevel.Chunks.Count > 0)
             {
-                if (SonicLevel.PaletteItems[0])
+                if (SonicLevel.PaletteItems[0]!=null)
                 {
-                    for (int k = 0; k < SonicLevel.PaletteItems[0].length; k++)
+                    for (int k = 0; k < SonicLevel.PaletteItems[0].Count; k++)
                     {
-                        dynamic pal = SonicLevel.PaletteItems[0][k];
+                        var pal = SonicLevel.PaletteItems[0][k];
                         for (int j = 0; j < pal.TotalLength; j += pal.SkipIndex)
                         {
-                            if (DrawTickCount%(pal.TotalLength + pal.SkipIndex) == j)
+                            if (DrawTickCount % (pal.TotalLength + pal.SkipIndex) == j)
                             {
-                                SonicLevel.palAn[k] = j/pal.SkipIndex;
+                                SonicLevel.palAn[k] = j / pal.SkipIndex;
                             }
                         }
 
-                        for (int m = 0; m < pal.Pieces.length; m++)
+                        for (int m = 0; m < pal.Pieces.Count; m++)
                         {
-                            dynamic mj = pal.Pieces[m];
-                            SonicLevel.Palette[mj.PaletteIndex][mj.PaletteOffset/2] =
-                                pal.Palette[SonicLevel.palAn[k]*(pal.Pieces.length*2) + 0 + (mj.PaletteMultiply)];
-                            SonicLevel.Palette[mj.PaletteIndex][mj.PaletteOffset/2 + 1] =
-                                pal.Palette[SonicLevel.palAn[k]*(pal.Pieces.length*2) + 1 + (mj.PaletteMultiply)];
+                            var mj = pal.Pieces[m];
+                            SonicLevel.Palette[mj.PaletteIndex][mj.PaletteOffset / 2] =
+                                pal.Palette[SonicLevel.palAn[k] * (pal.Pieces.Count * 2) + 0 + (mj.PaletteMultiply)];
+                            SonicLevel.Palette[mj.PaletteIndex][mj.PaletteOffset / 2 + 1] =
+                                pal.Palette[SonicLevel.palAn[k] * (pal.Pieces.Count * 2) + 1 + (mj.PaletteMultiply)];
                         }
                     }
                 }
-                int fxP = (WindowLocation.X + 128)/128;
-                int fyP = (WindowLocation.Y + 128)/128;
+                int fxP = (WindowLocation.X + 128) / 128;
+                int fyP = (WindowLocation.Y + 128) / 128;
                 foreach (Point off in offs)
                 {
                     int _xP = fxP + off.X;
@@ -763,15 +775,15 @@ namespace OurSonic
                         anni.AnimatedTick();
                     if (chunk == null)
                         continue;
-                    var pos = new Point(_xP*128*Scale.X, _yPreal*128*Scale.Y);
-                    var posj = new Point(pos.X - WindowLocation.X*Scale.X, pos.Y - WindowLocation.Y*Scale.Y);
+                    var pos = new Point(_xP * 128 * Scale.X, _yPreal * 128 * Scale.Y);
+                    var posj = new Point(pos.X - WindowLocation.X * Scale.X, pos.Y - WindowLocation.Y * Scale.Y);
                     if (!chunk.IsEmpty())
                         chunk.Draw(canvas, posj, Scale, 0, bounds);
                     if (false && CurrentGameState == GameState.Editing)
                     {
                         canvas.StrokeStyle = "#DD0033";
                         canvas.LineWidth = 3;
-                        canvas.StrokeRect(posj.X, posj.Y, 128*Scale.X, 128*Scale.Y);
+                        canvas.StrokeRect(posj.X, posj.Y, 128 * Scale.X, 128 * Scale.Y);
                     }
                 }
                 foreach (var r in SonicLevel.Rings)
@@ -794,7 +806,7 @@ namespace OurSonic
                 {
                     if (o.Dead || BigWindowLocation.Intersects(new Point(o.X, o.Y)))
                     {
-                        o.Draw(canvas, (o.X - WindowLocation.X)*Scale.X, (o.Y - WindowLocation.Y)*Scale.Y, Scale,
+                        o.Draw(canvas, (o.X - WindowLocation.X) * Scale.X, (o.Y - WindowLocation.Y) * Scale.Y, Scale,
                                ShowHeightMap);
                     }
                 }
@@ -816,8 +828,8 @@ namespace OurSonic
                     SonicToon.Draw(canvas, Scale);
                     if (WindowLocation.X < 0) WindowLocation.X = 0;
                     if (WindowLocation.Y < 0) WindowLocation.Y = 0;
-                    if (WindowLocation.X > 128*SonicLevel.LevelWidth - WindowLocation.Width)
-                        WindowLocation.X = 128*SonicLevel.LevelWidth - WindowLocation.Width;
+                    if (WindowLocation.X > 128 * SonicLevel.LevelWidth - WindowLocation.Width)
+                        WindowLocation.X = 128 * SonicLevel.LevelWidth - WindowLocation.Width;
                     //if (WindowLocation.Y > 128 * SonicLevel.LevelHeight - WindowLocation.Height)
                     //    WindowLocation.Y = 128 * SonicLevel.LevelHeight - WindowLocation.Height;
                 }
@@ -832,8 +844,8 @@ namespace OurSonic
                     TileChunk chunk = SonicLevel.Chunks[SonicLevel.ChunkMap[_xP][_yP]];
                     if (chunk == null)
                         continue;
-                    var pos = new Point(_xP*128*Scale.X, _yPreal*128*Scale.Y);
-                    var posj = new Point(pos.X - WindowLocation.X*Scale.X, pos.Y - WindowLocation.Y*Scale.Y);
+                    var pos = new Point(_xP * 128 * Scale.X, _yPreal * 128 * Scale.Y);
+                    var posj = new Point(pos.X - WindowLocation.X * Scale.X, pos.Y - WindowLocation.Y * Scale.Y);
                     if (!chunk.IsEmpty() && !chunk.OnlyBackground())
                     {
                         chunk.Draw(canvas, posj, Scale, 1, bounds);
@@ -842,7 +854,7 @@ namespace OurSonic
                     {
                         canvas.StrokeStyle = "#DD0033";
                         canvas.LineWidth = 3;
-                        canvas.StrokeRect(posj.X, posj.Y, 128*Scale.X, 128*Scale.Y);
+                        canvas.StrokeRect(posj.X, posj.Y, 128 * Scale.X, 128 * Scale.Y);
                     }
 
                     if (ShowHeightMap)
@@ -901,7 +913,7 @@ namespace OurSonic
                     {
                         canvas.StrokeStyle = "#DD0033";
                         canvas.LineWidth = 3;
-                        canvas.StrokeRect(posj.X, posj.Y, 128*Scale.X, 128*Scale.Y);
+                        canvas.StrokeRect(posj.X, posj.Y, 128 * Scale.X, 128 * Scale.Y);
                     }
                 }
             }
@@ -912,5 +924,488 @@ namespace OurSonic
                 SonicToon.DrawUI(canvas, new Point(ScreenOffset.X, ScreenOffset.Y), Scale);
             }
         }
+
+        public void Load(string lvl, CanvasElement mainCanvas)
+        {
+            Loading = true;
+            Status = "Decoding";
+            var sonicLevel = jQuery.ParseJsonData<SonicLevelData>(Help.DecodeString(lvl));
+            Status = "Determining Level Information";
+
+            if (SonicLevel.Chunks == null)
+                SonicLevel.Chunks = new List<TileChunk>();
+            if (SonicLevel.Blocks == null)
+                SonicLevel.Blocks = new List<TilePiece>();
+            if (SonicLevel.Tiles == null)
+                SonicLevel.Tiles = new List<Tile>();
+            if (SonicLevel.Rings == null)
+                SonicLevel.Rings = new JsDictionary<string, Ring>();
+
+            SonicLevel.LevelWidth = sonicLevel.ForegroundWidth;
+            SonicLevel.LevelHeight = sonicLevel.ForegroundHeight;
+            var mf = decodeNumeric(sonicLevel.Foreground);
+
+            sonicLevel.ChunkMap = new List<List<int>>();
+            for (int q = 0; q < sonicLevel.ForegroundWidth; q++)
+            {
+                sonicLevel.ChunkMap[q] = new List<int>();
+                for (int r = 0; r < sonicLevel.ForegroundHeight; r++)
+                {
+                    sonicLevel.ChunkMap[q][r] = mf[q + r*sonicLevel.ForegroundWidth];
+
+                }
+            }
+            sonicLevel.BGChunkMap = new List<List<int>>();
+            for (int q = 0; q < sonicLevel.BackgroundWidth; q++)
+            {
+                sonicLevel.BGChunkMap[q] = new List<int>();
+                for (int r = 0; r < sonicLevel.BackgroundHeight; r++)
+                {
+                    sonicLevel.BGChunkMap[q][r] = mf[q + r*sonicLevel.BackgroundWidth];
+
+                }
+            }
+            /*
+        for (l = 0; l < sonicManager.SonicLevel.Objects.length; l++) {
+            o = sonicManager.SonicLevel.Objects[l];
+            _H.ObjectParse(o, (function (r) {
+                return function (rq) {
+                    sonicManager.SonicLevel.Objects[r] = rq;
+                };
+            })(l));
+        }*/
+            for (int l = 0; l < sonicLevel.Objects.Length; l++)
+            {
+                SonicLevel.Objects[l] = new SonicObject(sonicLevel.Objects[l]);
+                SonicLevel.Objects[l].Index = l;
+            }
+
+            var objectKeys = new JsDictionary<string, object>();
+            /*
+        var objectKeys = [];
+        for (l = 0; l < sonicManager.SonicLevel.Objects.length; l++) {
+            o = sonicManager.SonicLevel.Objects[l].key;
+
+            if (JSLINQ(objectKeys).Count(function (p) { return p == o; }) == 0) {
+                objectKeys.push(o);
+            }
+        }
+
+
+
+        OurSonic.SonicLevels.getObjects(objectKeys, function (objects) {
+            window.CachedObjects = [];
+            for (l = 0; l < sonicManager.SonicLevel.Objects.length; l++) {
+                o = sonicManager.SonicLevel.Objects[l].key;
+                if (window.CachedObjects[o]) {
+                    sonicManager.SonicLevel.Objects[l].setObjectData(window.CachedObjects[o]);
+                    continue;
+                }
+                var d = JSLINQ(objects).First(function (p) { return p.key == o; });
+                if (!d) {
+                    sonicManager.SonicLevel.Objects[l].setObjectData(new LevelObject(o));
+                    continue;
+                }
+
+                var dr = _H.extend(new LevelObject(""), jQuery.parseJSON(d.value));
+                dr = sonicManager.objectManager.extendObject(dr);
+
+                for (var n = 0; n < dr.assets.length; n++) {
+                    for (var s = 0; s < dr.assets[n].frames.length; s++) {
+                        dr.assets[n].frames[s].hurtSonicMap.length = dr.assets[n].frames[s].width;
+                        dr.assets[n].frames[s].collisionMap.length = dr.assets[n].frames[s].width;
+                        for (var t = 0; t < dr.assets[n].frames[s].hurtSonicMap.length; t++) {
+                            dr.assets[n].frames[s].hurtSonicMap[t].length = dr.assets[n].frames[s].height;
+                            dr.assets[n].frames[s].collisionMap[t].length = dr.assets[n].frames[s].height;
+
+                        }
+                    }
+                }
+
+                window.CachedObjects[o] = dr;
+                sonicManager.SonicLevel.Objects[l].setObjectData(dr);
+
+            }
+
+        });
+
+*/
+
+            /*    var jm = [];
+                    jm[0] = [];
+                    jm[1] = [];
+                    jm[2] = [];
+                    jm[3] = [];
+                    for (var qc = 0; qc < sonicManager.SonicLevel.Palette.length;qc++ ) {
+                    jm[_H.floor(qc / 16)][qc % 16] = sonicManager.SonicLevel.Palette[qc];
+                    }
+                    sonicManager.SonicLevel.Palette=jm;*/
+
+            SonicLevel.CurPaletteIndex = 0;
+            SonicLevel.palAn = new List<int>();
+            SonicLevel.CurHeightMap = true;
+            for (int j = 0; j < sonicLevel.Tiles.Count; j++)
+            {
+                var fc = sonicLevel.Tiles[j];
+                var tiles = decodeNumeric(fc);
+                var mj = new List<int>();
+
+                for (int i = 0; i < tiles.Length; i++)
+                {
+                   // var value = sonicLevel.Tiles[j][i];
+                   // mj.Add(value >> 4);
+                  //  mj.Add(value & 0xF);
+                }
+                var mfc = new List<List<int>>();
+                for (int o = 0; o < 8; o++)
+                {
+                    mfc[o] = new List<int>();
+                }
+                for (int n = 0; n < mf.Length; n++)
+                {
+                    mfc[n%8][n/8] = mf[n];
+                }
+
+                SonicLevel.Tiles[j] = new Tile(mfc);
+                SonicLevel.Tiles[j].Index = j;
+
+
+            }
+var acs = SonicLevel.AnimatedChunks = new List<TileChunk>();
+            /*
+                    
+                    if (sonicManager.SonicLevel.AnimatedFiles) {
+                        for (jc = 0; jc < sonicManager.SonicLevel.AnimatedFiles.length; jc++) {
+                            var fcc = sonicManager.SonicLevel.AnimatedFiles[jc];
+                            for (j = 0; j < fcc.length; j++) {
+                                fc = fcc[j];
+                                fcc[j] = decodeNumeric(fc);
+
+                                mj = [];
+                                for (l = 0; l < fcc[j].length; l++) {
+                                    value = fcc[j][l];
+                                    mj.push(value >> 4);
+                                    mj.push(value & 0xF);
+                                }
+                                fcc[j] = { colors: mj };
+                                td = fcc[j];
+                                mf = [];
+                                for (o = 0; o < 8; o++) {
+                                    mf[o] = [];
+                                }
+                                for (n = 0; n < td.colors.length; n++) {
+                                    mf[n % 8][_H.floor(n / 8)] = td.colors[n];
+                                }
+                                td.colors = mf;
+                                td.index = "A" + j + "_" + jc;
+                                fcc[j] = _H.extend(new Tile(), td);
+
+                            }
+                        }
+                    }
+             */
+
+            for (int j = 0; j < sonicLevel.Blocks.Count; j++)
+            {
+                var fc = sonicLevel.Blocks[j];
+                var mj = new TilePiece();
+                mj.Index = j;
+                mj.Tiles = new List<Tile>();
+                
+                for (int p = 0; p < fc.Count; p++)
+                {
+                    mj.Tiles.Add(fc[p]);
+                }
+
+                SonicLevel.Blocks[j] = mj;
+
+            }
+
+            SonicLevel.Angles = decodeNumeric(sonicLevel.Angles);
+
+            SonicLevel.CollisionIndexes1 = decodeNumeric(sonicLevel.CollisionIndexes1);
+            SonicLevel.CollisionIndexes2 = decodeNumeric(sonicLevel.CollisionIndexes2);
+
+            for (int i = 0; i < sonicLevel.HeightMaps.Count; i++)
+            {
+                var b1 = true;
+                var b2 = true;
+                for (int m = 0; m < sonicLevel.HeightMaps[i].Count; m++)
+                {
+                    if (b1 && sonicLevel.HeightMaps[i][m] != 0)
+                    {
+                        b1 = false;
+                    }
+
+                    if (b2 && sonicLevel.HeightMaps[i][m] != 16)
+                    {
+                        b2 = false;
+                    }
+                }
+                if (b1)
+                {
+                    SonicLevel.HeightMaps[i] = 0;
+
+                }
+                else if (b2)
+                {
+                    SonicLevel.HeightMaps[i] = 1;
+                }
+                else
+                {
+                    SonicLevel.HeightMaps[i] = new HeightMask(sonicLevel.HeightMaps[i]);
+                    
+                }
+
+            }
+
+            for (int j = 0; j < sonicLevel.Chunks.Count; j++)
+            {
+                var fc = sonicLevel.Chunks[j];
+                var mj = new TileChunk();
+                mj.Index = j;
+                mj.TilePieces=new TilePiece[8][];
+                for (int i = 0; i < 8; i++)
+                {
+                    mj.TilePieces[i] = new TilePiece[8];
+                }
+                for (int p = 0; p < fc.Length; p++)
+                {
+                    mj.TilePieces[p % 8][p / 8] = fc.Me()[p];
+                }
+                SonicLevel.Chunks[j] = mj;
+                mj.Animated = new List<Animation>();
+
+                for (int ic = 0; ic < mj.TilePieces.Length; ic++)
+                {
+                    for (int jc = 0; jc < mj.TilePieces[ic].Length; jc++)
+                    {
+                        var r = mj.TilePieces[ic][jc];
+                        var pm = SonicLevel.Blocks[r.Block];
+                        if (pm != null)
+                        {
+                            for (int ci = 0; ci < pm.Tiles.Count; ci++)
+                            {
+                                var mjc = pm.Tiles[ci];
+                                if (SonicLevel.Tiles[mjc._Tile]!=null)
+                                {
+                                    var fa = containsAnimatedTile(mjc._Tile);
+                                    if (fa != null)
+                                    {
+                                        mj.Animated[jc*8 + ic] = fa;
+                                        acs[j] = mj;
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+
+
+            /*for (je = 0; je < fc.angleMap1.length; je++) {
+            for (jc = 0; jc < fc.angleMap1[je].length; jc++) {
+            fc.angleMap1[je][jc] = parseInt(fc.angleMap1[je][jc], 16);
+            }
+            }
+            for (je = 0; je < fc.angleMap2.length; je++) {
+            for (jc = 0; jc < fc.angleMap2[je].length; jc++) {
+            fc.angleMap2[je][jc] = parseInt(fc.angleMap2[je][jc], 16);
+            }
+            }
+
+
+            for (je = 0; je < fc.heightMap1.length; je++) {
+            for (jc = 0; jc < fc.heightMap1[je].length; jc++) {
+            fc.heightMap1[je][jc] = sonicManager.SonicLevel.HeightMaps[fc.heightMap1[je][jc]];
+            }
+            }
+
+            for (je = 0; je < fc.heightMap2.length; je++) {
+            for (jc = 0; jc < fc.heightMap2[je].length; jc++) {
+            fc.heightMap2[je][jc] = sonicManager.SonicLevel.HeightMaps[fc.heightMap2[je][jc]];
+            }
+            }*/
+
+            }
+            
+
+        if (SonicLevel.PaletteItems[0]!=null) {
+            for (var k = 0; k < sonicLevel.PaletteItems[0].Count; k++) {
+                var pal = sonicLevel.PaletteItems[0][k];
+                SonicLevel.PaletteItems[0][k] = pal;
+                pal.Palette = (List<string>)Script.Eval(pal.Palette.Me());
+
+                //below this is bad
+                if (pal.TotalLength == 0)
+                    pal.TotalLength = pal.Palette.Count;
+                if (pal.SkipIndex == 0)
+                    pal.SkipIndex = pal.Palette.Count / 8;
+                //^
+            }
+        }
+
+
+            SonicLevel = sonicLevel.Translate();
+
+
+            /* 
+
+              
+        for (var kd = 0; kd < sonicManager.SonicLevel.Blocks.length; kd++) {
+            var dj = sonicManager.SonicLevel.Blocks[kd];
+            dj.animatedFrames = [];
+
+            for (var i = 0; i < dj.tiles.length; i++) {
+                var mj = dj.tiles[i];
+                if (sonicManager.SonicLevel.Tiles[mj.Tile]) {
+
+                    var pl = JSLINQ(sonicManager.SonicLevel.Tiles[mj.Tile].getAllPaletteIndexes());
+
+
+                    if (sonicManager.SonicLevel.PaletteItems[0]) {
+                        for (var k = 0; k < sonicManager.SonicLevel.PaletteItems[0].length; k++) {
+                            var pal = sonicManager.SonicLevel.PaletteItems[0][k];
+
+
+                            for (var m = 0; m < pal.Pieces.length; m++) {
+                                var mje = pal.Pieces[m];
+
+                                if (mj.Palette == mje.PaletteIndex) {
+                                    if (pl.Any(function (J) {
+                                        return J == mje.PaletteOffset / 2 || J == mje.PaletteOffset / 2 + 1;
+                                    })) {
+                                        dj.animatedFrames.push(k);
+                                    }
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+
+            }
+        }
+
+
+        var finished = function () {
+            sonicManager.uiManager.levelManagerArea.visible = true;
+            sonicManager.loading = false;
+            sonicManager.uiManager.modifyTC.tileChunk = sonicManager.SonicLevel.Chunks[0];
+            sonicManager.uiManager.modifyTilePieceArea.tilePiece = sonicManager.uiManager.modifyTP.tilePiece = sonicManager.SonicLevel.Blocks[0];
+
+        };
+
+        //        var inds = sonicManager.inds = { r:0,t: 0, tp: 0, tc: 0, total: (sonicManager.SonicLevel.Chunks.length * 2 + sonicManager.SonicLevel.Blocks.length * 5 + sonicManager.SonicLevel.Tiles.length), done: false };
+
+        sonicManager.CACHING = true;
+        sonicManager.preLoadSprites(scale, function () {
+            //          inds.r = 1;
+            sonicManager.CACHING = false;
+            finished();
+
+            sonicManager.uiManager.updateTitle("Level Loaded");
+            sonicManager.forceResize();
+
+
+            var dl = _H.getQueryString();
+            if (dl["run"]) {
+                setTimeout(sonicManager.uiManager.runSonic, 1000);
+            }
+
+        }, sonicManager.uiManager.updateTitle);
+
+
+        /*
+        var scal = scale;
+        for (j = 0; j < sonicManager.SonicLevel.Tiles.length; j++) {
+        fc = sonicManager.SonicLevel.Tiles[j];
+        fc.cacheImage(mainCanvas, scal, function (j) {
+        inds.t++;
+        var done1 = function (c) {
+        inds.tp++;
+        if (inds.tp == sonicManager.SonicLevel.Blocks.length * 5) {
+
+        var done2 = function (c2) {
+        inds.tc++;
+
+        finished();
+        };
+
+        for (j = 0; j < sonicManager.SonicLevel.Chunks.length; j++) {
+        fc = sonicManager.SonicLevel.Chunks[j];
+        fc.cacheImage(mainCanvas, scal, 1, done2);
+        fc.cacheImage(mainCanvas, scal, 2, done2);
+        }
+        }
+        };
+        if (inds.t == sonicManager.SonicLevel.Tiles.length) {
+        for (j = 0; j < sonicManager.SonicLevel.Blocks.length; j++) {
+        fc = sonicManager.SonicLevel.Blocks[j];
+        fc.cacheImage(mainCanvas, scal, 0, done1);
+        fc.cacheImage(mainCanvas, scal, 1, done1);
+        fc.cacheImage(mainCanvas, scal, 2, done1);
+        fc.cacheImage(mainCanvas, scal, 3, done1);
+        fc.cacheImage(mainCanvas, scal, 4, done1);
+        }
+        }
+        });
+        }#1#
+
+*/
+        }
+
+        private Animation containsAnimatedTile(int tile)
+        {
+            return null;
+        }
+
+        private static string[] base64chars =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".Split("");
+
+        private static JsDictionary<string, int> base64Inv;
+
+        static SonicManager()
+        {
+            base64Inv = new JsDictionary<string, int>();
+            for (var i = 0; i < base64chars.Length; i++)
+            {
+                base64Inv[base64chars[i]] = i;
+            }
+        }
+
+
+        private int[] decodeNumeric(string s)
+        {
+            s = s.Replace(new Regex("[^" + base64chars.Join("") + "=]", "g"), "");
+            var p = s.CharAt(s.Length - 1) == "=" ? (s.CharAt(s.Length - 2) == "=" ? "AA" : "A") : "";
+            var r = new List<int>();
+            s = s.Substr(0, s.Length - p.Length) + p;
+            for (int c = 0; c < s.Length; c += 4)
+            {
+                var n = (base64Inv[s.CharAt(c)] << 18) + (base64Inv[s.CharAt(c + 1)] << 12) +
+                        (base64Inv[s.CharAt(c + 2)] << 6) + base64Inv[s.CharAt(c + 3)];
+
+                r.Add((n >> 16) & 255);
+                r.Add((n >> 8) & 255);
+                r.Add(n & 255);
+            }
+            return (int[])r.Slice(0, r.Count - 1);
+
+        }
+
+        protected string Status
+        {
+            get { return myStatus; }
+            set
+            {
+                UIManager.UpdateTitle(value);
+                myStatus = value;
+            }
+        }
+
+
     }
 }
