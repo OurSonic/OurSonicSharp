@@ -1,16 +1,17 @@
 using System.Collections.Generic;
+using System.Html;
 
 namespace OurSonic
 {
     public class SpriteCache
     {
-        public List<string> Rings { get; set; }
-        public List<string> TileChunks { get; set; }
-        public List<string> Tilepieces { get; set; }
-        public List<string> Tiles { get; set; }
-        public List<string> SonicSprites { get; set; }
-        public List<string> HeightMaps { get; set; }
-        public List<string> HeightMapChunks { get; set; }
+        public List<ImageElement> Rings { get; set; }
+        public List<ImageElement> TileChunks { get; set; }
+        public List<ImageElement> Tilepieces { get; set; }
+        public List<ImageElement> Tiles { get; set; }
+        public List<ImageElement> SonicSprites { get; set; }
+        public List<ImageElement> HeightMaps { get; set; }
+        public List<ImageElement> HeightMapChunks { get; set; }
 
         public SpriteCacheIndexes Indexes { get; set; }
     }

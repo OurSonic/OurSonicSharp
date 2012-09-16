@@ -17,7 +17,11 @@ namespace OurSonic
         public List<SonicObject> Objects { get; set; }
         public dynamic PaletteItems { get; set; }//todo::: no idea
         public dynamic[] Palette { get; set; }//todo::: no idea
-        public List<int> palAn { get; set; }//todo:: no ides
+        public List<int> palAn { get; set; }
+
+        public Point[] StartPositions { get; set; }
+
+//todo:: no ides
 
         public SonicLevel()
         {

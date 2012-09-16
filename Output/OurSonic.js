@@ -72,68 +72,58 @@ OurSonic.ClickState = function() {
 OurSonic.ClickState.prototype = { dragging: 0, placeChunk: 1, placeRing: 2, placeObject: 3 };
 OurSonic.ClickState.registerEnum('OurSonic.ClickState', false);
 ////////////////////////////////////////////////////////////////////////////////
+// OurSonic.Color
+OurSonic.Color = function(r, g, b) {
+	this.$1$RField = 0;
+	this.$1$GField = 0;
+	this.$1$BField = 0;
+	this.set_r(r);
+	this.set_g(g);
+	this.set_b(b);
+};
+OurSonic.Color.prototype = {
+	get_r: function() {
+		return this.$1$RField;
+	},
+	set_r: function(value) {
+		this.$1$RField = value;
+	},
+	get_g: function() {
+		return this.$1$GField;
+	},
+	set_g: function(value) {
+		this.$1$GField = value;
+	},
+	get_b: function() {
+		return this.$1$BField;
+	},
+	set_b: function(value) {
+		this.$1$BField = value;
+	}
+};
+////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Constants
 OurSonic.Constants = function() {
 };
-OurSonic.Constants.defaultWindowLocation = function(state, uiCanvas, scale) {
-	//todo:: next
-	//
-	//            switch (state)
-	//
-	//            {
-	//
-	//            case 0:
-	//
-	//            //   return { x= 0, y= 0, width= canvas.canvas.width / scale.x, height= canvas.canvas.height / scale.y, intersects= _H.intersects };
-	//
-	//            return new IntersectingRectangle { X = 0,Y = 0,Width = 320, Height = 224, Intersects = _H.intersects };
-	//
-	//            case 1:
-	//
-	//            var x = 0;
-	//
-	//            var y = 0;
-	//
-	//            if (sonicManager.SonicLevel && sonicManager.SonicLevel.StartPositions &&
-	//
-	//            sonicManager.SonicLevel.StartPositions[0])
-	//
-	//            {
-	//
-	//            x = sonicManager.SonicLevel.StartPositions[0].X - 128*2;
-	//
-	//            y = sonicManager.SonicLevel.StartPositions[0].Y - 128*2;
-	//
-	//            }
-	//
-	//            
-	//
-	//            return
-	//
-	//            new
-	//
-	//            IntersectingRectangle
-	//
-	//            {
-	//
-	//            X = x,
-	//
-	//            Y = y,
-	//
-	//            Width = canvas.canvas.width,
-	//
-	//            Height = canvas.canvas.height,
-	//
-	//            Intersects = _H.intersects
-	//
-	//            };
-	//
-	//            }
+OurSonic.Constants.defaultWindowLocation = function(state, canvas, scale) {
+	switch (state) {
+		case 0: {
+			return OurSonic.IntersectingRectangle.$ctor(0, 0, 320, 224, OurSonic.Constants.intersects);
+		}
+		case 1: {
+			var x = 0;
+			var y = 0;
+			if (ss.isValue(OurSonic.SonicManager.instance.get_sonicLevel()) && ss.isValue(OurSonic.SonicManager.instance.get_sonicLevel().get_startPositions()) && ss.isValue(OurSonic.SonicManager.instance.get_sonicLevel().get_startPositions()[0])) {
+				x = OurSonic.SonicManager.instance.get_sonicLevel().get_startPositions()[0].x - 256;
+				y = OurSonic.SonicManager.instance.get_sonicLevel().get_startPositions()[0].y - 256;
+			}
+			return OurSonic.IntersectingRectangle.$ctor(x, y, canvas.domCanvas.width(), canvas.domCanvas.height(), OurSonic.Constants.intersects);
+		}
+	}
 	return null;
 };
-OurSonic.Constants.intersects = function(arg) {
-	//            return this.x < p.x && this.x + this.width > p.x && this.y < p.y && this.y + this.height > p.y;
-	return false;
+OurSonic.Constants.intersects = function(rect, p) {
+	return rect.x < p.x && rect.x + rect.width > p.x && rect.y < p.y && rect.y + rect.height > p.y;
 };
 Type.registerNamespace('OurSonic.Drawing');
 ////////////////////////////////////////////////////////////////////////////////
@@ -683,6 +673,10 @@ OurSonic.Drawing.TilePiece.prototype = {
 };
 Type.registerNamespace('OurSonic');
 ////////////////////////////////////////////////////////////////////////////////
+// OurSonic.Extensions
+OurSonic.Extensions = function() {
+};
+////////////////////////////////////////////////////////////////////////////////
 // OurSonic.GameState
 OurSonic.GameState = function() {
 };
@@ -699,17 +693,73 @@ OurSonic.Help.mod = function(j, n) {
 	return (j % n + n) % n;
 };
 OurSonic.Help.scaleSprite = function(image, scale, complete) {
-	//     var data = _H.getImageData(sprite);
-	//     var colors = [];
-	//     for (var f = 0; f < data.length; f += 4) {
-	//     colors.push(_H.colorObjectFromData(data, f));
-	//     }
-	//     var d = this.defaultCanvas().context.createImageData(sprite.width * scale.x, sprite.height * scale.y);
-	//     _H.setDataFromColors(d.data, colors, scale, sprite.width, { r: 0, g: 0, b: 0 });
-	//     return _H.loadSprite(_H.getBase64Image(d), complete);
-	return null;
+	var data = OurSonic.Help.getImageData(image);
+	var colors = [];
+	for (var f = 0; f < data.length; f++) {
+		colors.add(OurSonic.Help.$colorObjectFromData(data, f));
+	}
+	var d = OurSonic.Help.defaultCanvas(0, 0).context.createImageData(image.width * scale.x, image.height * scale.y);
+	OurSonic.Help.$setDataFromColors(d.data, colors, scale, image.width, new OurSonic.Color(0, 0, 0));
+	return OurSonic.Help.loadSprite(OurSonic.Help.$getBase64Image(d), complete);
 };
-OurSonic.Help.scaleCSImage = function(image, scale, complete) {
+OurSonic.Help.$setDataFromColors = function(data, colors, scale, width, transparent) {
+	for (var i = 0; i < colors.length; i++) {
+		var curX = i % width;
+		var curY = ss.Int32.div(i, width);
+		var g = colors[i];
+		var isTrans = false;
+		if (ss.isValue(transparent)) {
+			if (g.get_r() === transparent.get_r() && g.get_g() === transparent.get_g() && g.get_b() === transparent.get_b()) {
+				isTrans = true;
+			}
+		}
+		for (var j = 0; j < scale.x; j++) {
+			for (var k = 0; k < scale.y; k++) {
+				var x = curX * scale.x + j;
+				var y = curY * scale.y + k;
+				var c = (x + y * (scale.x * width)) * 4;
+				if (isTrans) {
+					data[c + 0] = 0;
+					data[c + 1] = 0;
+					data[c + 2] = 0;
+					data[c + 3] = 0;
+					continue;
+				}
+				data[c] = g.get_r();
+				data[c + 1] = g.get_g();
+				data[c + 2] = g.get_b();
+				data[c + 3] = 255;
+			}
+		}
+	}
+};
+OurSonic.Help.$getBase64Image = function(data) {
+	// Create an empty canvas element
+	var canvas = document.createElement('canvas');
+	canvas.width = data.width;
+	canvas.height = data.height;
+	// Copy the image contents to the canvas
+	var ctx = canvas.getContext('2d');
+	ctx.putImageData(data, 0, 0);
+	var dataURL = canvas.toDataURL('image/png');
+	return Type.cast(dataURL, String);
+};
+OurSonic.Help.$colorObjectFromData = function(data, c) {
+	var r = ss.Nullable.unbox(Type.cast(data[c], ss.Int32));
+	var g = ss.Nullable.unbox(Type.cast(data[c + 1], ss.Int32));
+	var b = ss.Nullable.unbox(Type.cast(data[c + 2], ss.Int32));
+	return new OurSonic.Color(r, g, b);
+};
+OurSonic.Help.getImageData = function(image) {
+	var canvas = document.createElement('canvas');
+	canvas.width = image.width;
+	canvas.height = image.height;
+	var ctx = canvas.getContext('2d');
+	ctx.drawImage(image, 0, 0);
+	var data = ctx.getImageData(0, 0, image.width, image.height);
+	return data.data;
+};
+OurSonic.Help.scaleCsSImage = function(image, scale, complete) {
 	// var df = image.bytes;
 	// var colors = [];
 	// for (var f = 0; f < df.length; f += 1) {
@@ -722,19 +772,23 @@ OurSonic.Help.scaleCSImage = function(image, scale, complete) {
 	// return _H.loadSprite(_H.getBase64Image(d), complete);
 	return null;
 };
-OurSonic.Help.loadSprite = function(spriteLocation, action) {
-	//   var sprite1 = new Image();
-	//   
-	//   sprite1.onload = function () {
-	//   sprite1.loaded = true;
-	//   if (complete) complete(sprite1);
-	//   };
-	//   sprite1.src = src;
-	//   return sprite1;
-	return null;
+OurSonic.Help.loadSprite = function(src, complete) {
+	var sprite1 = new Image();
+	sprite1.addEventListener('onload', function(e) {
+		sprite1.loaded = true;
+		if (ss.isValue(complete)) {
+			complete(sprite1);
+		}
+	}, false);
+	sprite1.src = src;
+	return sprite1;
 };
-OurSonic.Help.defaultCanvas = function(cx, cy) {
-	return null;
+OurSonic.Help.defaultCanvas = function(w, h) {
+	var canvas = document.createElement('canvas');
+	canvas.width = w;
+	canvas.height = h;
+	var ctx = canvas.getContext('2d');
+	return new OurSonic.CanvasInformation(ctx, $(canvas));
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.IntersectingRectangle
@@ -743,21 +797,10 @@ OurSonic.IntersectingRectangle = function() {
 OurSonic.IntersectingRectangle.$ctor = function(x, y, width, height, intersects) {
 	var $this = OurSonic.Rectangle.$ctor(x, y, width, height);
 	$this.intersects = null;
-	$this.intersects = intersects;
+	$this.intersects = function(a) {
+		return intersects($this, a);
+	};
 	return $this;
-};
-////////////////////////////////////////////////////////////////////////////////
-// OurSonic.LoadSpriteImage
-OurSonic.LoadSpriteImage = function() {
-	this.$1$TagField = 0;
-};
-OurSonic.LoadSpriteImage.prototype = {
-	get_tag: function() {
-		return this.$1$TagField;
-	},
-	set_tag: function(value) {
-		this.$1$TagField = value;
-	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.ObjectManager
@@ -1214,6 +1257,7 @@ OurSonic.SonicLevel = function() {
 	this.$1$PaletteItemsField = null;
 	this.$1$PaletteField = null;
 	this.$1$palAnField = null;
+	this.$1$StartPositionsField = null;
 	this.set_tiles([]);
 	this.set_blocks([]);
 	this.set_chunks([]);
@@ -1295,6 +1339,12 @@ OurSonic.SonicLevel.prototype = {
 	},
 	set_palAn: function(value) {
 		this.$1$palAnField = value;
+	},
+	get_startPositions: function() {
+		return this.$1$StartPositionsField;
+	},
+	set_startPositions: function(value) {
+		this.$1$StartPositionsField = value;
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
@@ -1659,7 +1709,7 @@ OurSonic.SonicManager.prototype = {
 		var spriteStep = this.get_spriteLoader().addStep('Sprites', function(i, done) {
 			var sp = i * 200;
 			ci[sp] = OurSonic.Help.loadSprite(spriteLocations[i], function(jd) {
-				ci[jd.get_tag() * 200 + scale.x * 100 + scale.y] = OurSonic.Help.scaleSprite(jd, scale, function(jc) {
+				ci[ss.Nullable.unbox(Type.cast(jd.Tag * 200 + scale.x * 100 + scale.y, ss.Int32))] = OurSonic.Help.scaleSprite(jd, scale, function(jc) {
 					done();
 				});
 			});
@@ -3907,13 +3957,14 @@ OurSonic.Animation.registerClass('OurSonic.Animation', Object);
 OurSonic.AnimationFrame.registerClass('OurSonic.AnimationFrame', Object);
 OurSonic.AnimationInstance.registerClass('OurSonic.AnimationInstance', Object);
 OurSonic.CanvasInformation.registerClass('OurSonic.CanvasInformation', Object);
+OurSonic.Color.registerClass('OurSonic.Color', Object);
 OurSonic.Constants.registerClass('OurSonic.Constants', Object);
 OurSonic.Drawing.Tile.registerClass('OurSonic.Drawing.Tile', Object);
 OurSonic.Drawing.TileChunk.registerClass('OurSonic.Drawing.TileChunk', Object);
 OurSonic.Drawing.TileItem.registerClass('OurSonic.Drawing.TileItem', Object);
 OurSonic.Drawing.TilePiece.registerClass('OurSonic.Drawing.TilePiece', Object);
+OurSonic.Extensions.registerClass('OurSonic.Extensions', Object);
 OurSonic.Help.registerClass('OurSonic.Help', Object);
-OurSonic.LoadSpriteImage.registerClass('OurSonic.LoadSpriteImage', Object);
 OurSonic.ObjectManager.registerClass('OurSonic.ObjectManager', Object);
 OurSonic.Page.registerClass('OurSonic.Page', Object);
 OurSonic.Point.registerClass('OurSonic.Point', Object);

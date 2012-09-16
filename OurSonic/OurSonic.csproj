@@ -56,12 +56,14 @@
     <Compile Include="AnimationInstance.cs" />
     <Compile Include="CanvasInformation.cs" />
     <Compile Include="ClickState.cs" />
+    <Compile Include="Color.cs" />
     <Compile Include="CommonWebLibraries.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Drawing\Tile.cs" />
     <Compile Include="Drawing\TileChunk.cs" />
     <Compile Include="Drawing\TileItem.cs" />
     <Compile Include="Drawing\TilePiece.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="Help.cs" />
     <Compile Include="ObjectManager.cs" />

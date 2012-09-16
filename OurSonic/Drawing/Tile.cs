@@ -66,10 +66,7 @@ namespace OurSonic.Drawing
                     {
                         continue;
                     }
-                    var m =
-                        SonicManager.Instance.SonicLevel.Palette[
-                            (palette + SonicManager.Instance.IndexedPalette) %
-                            SonicManager.Instance.SonicLevel.Palette.Length][gj];
+                    var m = SonicManager.Instance.SonicLevel.Palette[(palette + SonicManager.Instance.IndexedPalette) % SonicManager.Instance.SonicLevel.Palette.Length][gj];
                     if (j.Context.FillStyle != "#" + m)
                         j.Context.FillStyle = "#" + m;
 

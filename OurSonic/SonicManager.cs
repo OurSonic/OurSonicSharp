@@ -240,15 +240,7 @@ namespace OurSonic
                                                                      ci[sp] = Help.LoadSprite(spriteLocations[i],
                                                                                               jd =>
                                                                                                   {
-                                                                                                      ci[
-                                                                                                          jd.Tag*200 +
-                                                                                                          scale.X*100 +
-                                                                                                          scale.Y] =
-                                                                                                          Help.
-                                                                                                              ScaleSprite
-                                                                                                              (jd, scale,
-                                                                                                               jc =>
-                                                                                                               done());
+                                                                                                      ci[jd.Me().Tag*200 +scale.X*100 +scale.Y] =Help.ScaleSprite(jd, scale,jc =>done());
                                                                                                   });
                                                                  });
             /*

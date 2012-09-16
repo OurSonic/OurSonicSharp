@@ -6,54 +6,37 @@ namespace OurSonic
 {
     public class Constants
     {
-        public static IntersectingRectangle DefaultWindowLocation(int state, CanvasInformation uiCanvas, Point scale)
+        public static IntersectingRectangle DefaultWindowLocation(int state, CanvasInformation canvas, Point scale)
         {
-
-            //todo:: next
-/*
             switch (state)
             {
                 case 0:
-                    //   return { x= 0, y= 0, width= canvas.canvas.width / scale.x, height= canvas.canvas.height / scale.y, intersects= _H.intersects };
-                    return new IntersectingRectangle { X = 0,Y = 0,Width = 320, Height = 224, Intersects = _H.intersects };
+                    return new IntersectingRectangle(0, 0, 320, 224, Intersects);
                 case 1:
                     var x = 0;
                     var y = 0;
-                    if (sonicManager.SonicLevel && sonicManager.SonicLevel.StartPositions &&
-                        sonicManager.SonicLevel.StartPositions[0])
+                    if(SonicManager.Instance.SonicLevel!=null && SonicManager.Instance.SonicLevel.StartPositions!=null && SonicManager.Instance.SonicLevel.StartPositions[0]!=null)
                     {
-                        x = sonicManager.SonicLevel.StartPositions[0].X - 128*2;
-                        y = sonicManager.SonicLevel.StartPositions[0].Y - 128*2;
+                        x = SonicManager.Instance.SonicLevel.StartPositions[0].X - 128 * 2;
+                        y = SonicManager.Instance.SonicLevel.StartPositions[0].Y - 128 * 2;
                     }
-
-                    return
-                        new
-                           IntersectingRectangle
-                           {
-                                X = x,
-                                Y = y,
-                                Width = canvas.canvas.width,
-                                Height = canvas.canvas.height,
-                                Intersects = _H.intersects
-                            };
+                    return new IntersectingRectangle(x, y, canvas.DomCanvas.GetWidth(), canvas.DomCanvas.GetHeight(),Intersects);
             }
-*/
             return null;
         }
 
-        public static bool Intersects(Point arg)
-        {
-//            return this.x < p.x && this.x + this.width > p.x && this.y < p.y && this.y + this.height > p.y;
-            return false;
+        public static bool Intersects(IntersectingRectangle rect,Point p)
+        { 
+            return rect.X < p.X && rect.X + rect.Width > p.X && rect.Y < p.Y && rect.Y + rect.Height > p.Y;
         }
     }
     [Serializable]
     public class IntersectingRectangle : Rectangle
     {
-        public IntersectingRectangle(int x, int y, int width, int height, Func<Point, bool> intersects)
+        public IntersectingRectangle(int x, int y, int width, int height, Func<IntersectingRectangle, Point, bool> intersects)
             : base(x, y, width, height)
         {
-            Intersects = intersects;
+            Intersects = (a) => intersects(this,a);
         }
 
         public Func<Point, bool> Intersects { get; set; }
