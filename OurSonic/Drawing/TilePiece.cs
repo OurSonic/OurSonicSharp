@@ -1,180 +1,179 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq; 
+using System.Html;
+using System.Html.Media.Graphics;
+using System.Linq;
 
 namespace OurSonic.Drawing
 {
     public class TilePiece
     {
+        private int cx;
+        private int cy;
+        protected JsDictionary<string, CanvasElement> Image { get; set; }
+        protected object HeightMask { get; set; }
+        protected Tile[] Tiles { get; set; }
+
+        private int[][] drawInfo = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 0, 1 }, new[] { 1, 1 } };
+
+        private int[][] drawOrder = new[] { new[] { 3, 2, 1, 0 }, new[] { 1, 0, 3, 2 }, new[] { 2, 3, 0, 1 }, new[] { 0, 1, 2, 3 } };
+
         public TilePiece(object heightMask, Tile[] tiles)
         {
-        }
+            HeightMask = heightMask;
+            cx = 8 * SonicManager.Instance.Scale.X * 2;
+            cy = 8 * SonicManager.Instance.Scale.Y * 2;
+            Image = new JsDictionary<string, CanvasElement>();
+            Tiles = tiles;
 
-/*
-        var drawInfo = [[0, 0], [1, 0], [0, 1], [1, 1]];
-var drawOrder = [[3, 2, 1, 0], [1, 0, 3, 2], [2, 3, 0, 1], [0, 1, 2, 3]];
-function TilePiece(heightMask, tiles) {
-    this.tiles = tiles;
-
-    this.click = function (x, y, state) {
-
-
-        //sonicManager.SonicLevel.Tiles[this.tiles[_H.floor(x / 8) + _H.floor(y / 8) * 2]].changeColor(x % 8, y % 8, new Color(0, 0, 0));
-
-
-
-    };
-    this.mouseOver = function (x, y) {
-        //sonicManager.SonicLevel.Tiles[this.tiles[_H.floor(x / 8) + _H.floor(y / 8) * 2]].tempColor(x % 8, y % 8, new Color(122, 5, 122));
-    };
-    this.onlyBackground = function () {
-        for (var i = 0; i < this.tiles.length; i++) {
-            var mj = this.tiles[i];
-            if (sonicManager.SonicLevel.Tiles[mj.Tile]) {
-                if (mj.Priority == true) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    };
-    this.drawUI = function (canvas, position, scale, xflip, yflip) {
-        var drawOrderIndex = 0;
-        if (xflip) {
-            if (yflip) {
-                drawOrderIndex = 0;
-            } else {
-                drawOrderIndex = 1;
-            }
-        } else {
-            if (yflip) {
-                drawOrderIndex = 2;
-
-            } else {
-                drawOrderIndex = 3;
-            }
-        }
-        for (var i = 0; i < this.tiles.length; i++) {
-            var mj = sonicManager.SonicLevel.Tiles[this.tiles[i].Tile];
-            if (mj) {
-                var df = drawInfo[drawOrder[drawOrderIndex][i]];
-                TilePiece.__position.x = position.x + df[0] * 8 * scale.x;
-                TilePiece.__position.y = position.y + df[1] * 8 * scale.y;
-                mj.drawUI(canvas, TilePiece.__position, scale, (xflip^ mj.XFlip), (yflip^mj.YFlip), mj.Palette);
-
-
-            }
-            /* canvas.lineWidth = 2;
-            canvas.strokeStyle = "#D142AA";
-            canvas.strokeRect(position.x, position.y, 16 * scale.x, 16 * scale.y);#1#
         }
 
 
-        //canvas.fillStyle = "#FFFFFF";
-        //canvas.fillText(sonicManager.SonicLevel.Blocks.indexOf(this), position.x + 8 * scale.x, position.y + 8 * scale.y);
+        public int Block { get; set; }
 
+        public bool XFlip { get; set; }
+        public bool YFlip { get; set; }
 
-        return true;
-    };
-
-    var cx = 8 * window.sonicManager.scale.x * 2;
-    var cy = 8 * window.sonicManager.scale.y * 2;
-    this.image = [];
-
-    this.getCache = function (layer, scale, drawOrder, animationFrame, palAn) {
-        //return false;
-        var val = ((drawOrder + 1)) + (scale.x * 10) + ((!animationFrame ? 0 : animationFrame) * 1000) + ((layer + 1) * 10000);
-
-        for (var i = 0;  i < this.animatedFrames.length; i+=1) {
-            val += palAn[this.animatedFrames[i]] + " ";
-        }
-        if (!this.image[val]) return undefined;
-        if (this.image[val].image && this.image[val].image.loaded)
-            return this.image[val].image;
-        return this.image[val].canvas;
-
-    };
-    this.setCache = function (layer, scale, drawOrder, animationFrame, palAn, image) {
-        //   return;
-        var val = ((drawOrder + 1) ) + (scale.x * 10) + ((!animationFrame ? 0 : animationFrame) * 1000) + ((layer + 1) * 10000);
-
-        for (var i = 0; i < this.animatedFrames.length; i+=1) {
-            val += palAn[this.animatedFrames[i]] + " ";
-        }
-        //var img = new Image();
-        //img.src = image.toDataURL();
-        //img.onload = function () { img.loaded = true; }
-        image.loaded = true;
-        this.image[val] = { canvas: image, image: image };
-
-    };
-    this.draw = function (canvas, position, scale, layer, xflip, yflip, animationFrame, bounds) {
-
-        if (bounds && !bounds.intersects(position)) {
-            return true;
-        }
-        var drawOrderIndex = 0;
-        if (xflip) {
-            if (yflip) {
-                drawOrderIndex = 0;
-            } else {
-                drawOrderIndex = 1;
-            }
-        } else {
-            if (yflip) {
-                drawOrderIndex = 2;
-
-            } else {
-                drawOrderIndex = 3;
-            }
-        }
-        var fd = this.getCache(layer, scale, drawOrderIndex, animationFrame, sonicManager.SonicLevel.palAn);
-        if (!fd) {
-            var ac = _H.defaultCanvas(cx, cy);
-            var sX=8 * scale.x;
-            var sY=8 * scale.y;
-            for (var i = 0; i < this.tiles.length; i++) {
-                var mj = this.tiles[i];
-                if (sonicManager.SonicLevel.Tiles[mj.Tile]) {
-                    if (mj.Priority == layer) {
-                        var _xf = (xflip^ mj.XFlip);
-                        var _yf = (yflip^mj.YFlip);
-                        var df = drawInfo[drawOrder[drawOrderIndex][i]];
-                        TilePiece.__position.x = df[0] * sX;
-                        TilePiece.__position.y = df[1] * sY;
-                        sonicManager.SonicLevel.Tiles[mj.Tile].draw(ac.context, TilePiece.__position, scale, _xf, _yf, mj.Palette, layer, animationFrame);
+        public bool OnlyBackground()
+        {
+            foreach (var mj in Tiles)
+            {
+                if (SonicManager.Instance.SonicLevel.Tiles[mj._Tile] != null)
+                {
+                    if (mj.Priority)
+                    {
+                        return false;
                     }
                 }
+                
             }
-            fd = ac.canvas;
-            this.setCache(layer, scale, drawOrderIndex, animationFrame, sonicManager.SonicLevel.palAn, fd);
-
+            return true;
         }
-        this.drawIt(canvas, fd, position);
-        return true;
-    };
-    this.drawIt = function (canvas, fd, position) {
-        canvas.drawImage(fd, position.x, position.y);
 
-    };
-    this.equals = function (tp) {
-        for (var i = 0; i < this.tiles.length; i++) {
+        public void DrawUI(CanvasContext2D canvas, Point position, Point scale, bool xflip,bool yflip)
+        {
+            /*                var drawOrderIndex = 0;
+                            if (xflip) {
+                                if (yflip) {
+                                    drawOrderIndex = 0;
+                                } else {
+                                    drawOrderIndex = 1;
+                                }
+                            } else {
+                                if (yflip) {
+                                    drawOrderIndex = 2;
 
-            if (tp[i] != this.tiles[i])
-                return false;
+                                } else {
+                                    drawOrderIndex = 3;
+                                }
+                            }
+                            for (var i = 0; i < this.tiles.length; i++) {
+                                var mj = sonicManager.SonicLevel.Tiles[this.tiles[i].Tile];
+                                if (mj) {
+                                    var df = drawInfo[drawOrder[drawOrderIndex][i]];
+                                    TilePiece.__position.x = position.x + df[0] * 8 * scale.x;
+                                    TilePiece.__position.y = position.y + df[1] * 8 * scale.y;
+                                    mj.drawUI(canvas, TilePiece.__position, scale, (xflip^ mj.XFlip), (yflip^mj.YFlip), mj.Palette);
+
+
+                                }
+                                /* canvas.lineWidth = 2;
+                                canvas.strokeStyle = "#D142AA";
+                                canvas.strokeRect(position.x, position.y, 16 * scale.x, 16 * scale.y);#1#
+                            }
+
+
+                            //canvas.fillStyle = "#FFFFFF";
+                            //canvas.fillText(sonicManager.SonicLevel.Blocks.indexOf(this), position.x + 8 * scale.x, position.y + 8 * scale.y);
+
+
+                            return true;
+            */            
         }
-        return true;
-    };
 
-}
-TilePiece.__position = { x: 0, y: 0 };
+        public bool Draw(CanvasContext2D canvas, Point position, Point scale, int layer, bool xFlip, bool yFlip, int animatedIndex, IntersectingRectangle bounds)
+        {
+            if (! bounds.Intersects(position))
+            {
+                return true;
+            }
+            var drawOrderIndex = 0;
 
 
-RotationMode = {
-    Floor: 134,
-    RightWall: 224,
-    Ceiling: 314,
-    LeftWall: 44
-}*/
+            drawOrderIndex = xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3);
+            var fd = GetCache(layer, scale, drawOrderIndex, AnimationFrame, SonicManager.Instance.SonicLevel.palAn);
+            if (fd == null)
+            {
+                var ac = Help.DefaultCanvas(cx, cy);
+                var sX = 8 * scale.X;
+                var sY = 8*scale.Y;
+                var i = 0;
+
+                foreach (var mj in Tiles)
+                {
+                    if (SonicManager.Instance.SonicLevel.Tiles[mj._Tile] != null)
+                    {
+                        if (mj.Priority == (layer==1))
+                        {
+                            var _xf = xFlip ^ mj.XFlip;
+                            var _yf = yFlip ^ mj.YFlip;
+                            var df = drawInfo[drawOrder[drawOrderIndex][i]];
+                            SonicManager.Instance.SonicLevel.Tiles[mj._Tile].Draw(ac.Context, new Point(df[0] * sX, df[1] * sY),scale,_xf,_yf,mj.Palette,layer,AnimationFrame);
+                        }
+                    }
+                    i++;
+                }
+                fd = (CanvasElement) ac.DomCanvas[0];
+                SetCache(layer, scale, drawOrderIndex, AnimationFrame, SonicManager.Instance.SonicLevel.palAn, fd);
+
+            }
+            DrawIt(canvas, fd, position);
+            return true; 
+        }
+
+        private void SetCache(int layer, Point scale, int drawOrder, int animationFrame, List<int> palAn, CanvasElement image)
+        {
+
+            string val = ((drawOrder + 1) + (scale.X * 10) + (animationFrame * 1000) + ((layer + 1) * 10000)).ToString();
+            foreach (var animatedFrame in AnimatedFrames)
+            {
+                val += palAn[animatedFrame] + " ";
+            }
+            Image[val] = image; 
+        }
+
+        protected List<int> AnimatedFrames { get; set; }
+
+        private void DrawIt(CanvasContext2D canvas, CanvasElement fd, Point position)
+        {
+            canvas.DrawImage(fd, position.X, position.Y);
+        }
+
+        private CanvasElement GetCache(int layer, Point scale, int drawOrder, int animationFrame, List<int> palAn)
+        {
+            string val = ((drawOrder + 1) + (scale.X * 10) + (animationFrame * 1000) + ((layer + 1) * 10000)).ToString();
+            foreach (var animatedFrame in AnimatedFrames)
+            {
+                val += palAn[animatedFrame] + " ";
+            }
+
+
+
+            if (Image[val]==null) return null;
+            return Image[val];
+             
+        } 
+
+        protected int AnimationFrame { get; set; }
+  
+    }
+
+    public enum RotationMode
+    {
+        Floor = 134,
+        RightWall = 224,
+        Ceiling = 314,
+        LeftWall = 44
     }
 }

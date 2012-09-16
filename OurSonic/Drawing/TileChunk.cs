@@ -8,153 +8,132 @@ namespace OurSonic.Drawing
 {
     public class TileChunk
     {
-        public TileChunk(TilePiece[] tilePieces)
+        public TileChunk(TilePiece[][] tilePieces)
         {
+            TilePieces = tilePieces;
+            HLayers = new bool[0][];
+            Sprites = new List<string>();
+            isOnlyBackground = null;
         }
+
+        protected bool? isOnlyBackground { get; set; }
+        protected bool? empty { get; set; }
+
+        protected List<string> Sprites { get; set; }
+
+        protected bool[][] HLayers { get; set; }
+
+        protected TilePiece[][] TilePieces { get; set; }
 
         public TilePiece GetBlock(int x, int y)
         {
-            return null;
+            return SonicManager.Instance.SonicLevel.Blocks[TilePieces[x / 16][y / 16].Block];
         }
 
         public TilePiece GetTilePiece(int x, int y)
         {
-            return null;
+            return TilePieces[x / 16][y / 16];
         }
 
-        public void AnimatedTick()
+
+        public bool OnlyBackground()
         {
+            if (isOnlyBackground == null)
+            {
+                for (int i = 0; i < TilePieces.Length; i++)
+                {
+                    for (int j = 0; j < TilePieces[i].Length; j++)
+                    {
+                        var r = TilePieces[i][j];
+                        var pm = SonicManager.Instance.SonicLevel.Blocks[r.Block];
+                        if (pm != null)
+                        {
+                            if (!pm.OnlyBackground())
+                            {
+                                return (isOnlyBackground = false).Value;
+                            }
+                        }
+                    }
+                }
+                isOnlyBackground = true;
+            }
+            return isOnlyBackground.Value;
+
         }
 
         public bool IsEmpty()
         {
-            return false;
+            if (empty == null)
+            {
+                for (int i = 0; i < TilePieces.Length; i++)
+                {
+                    for (int j = 0; j < TilePieces[i].Length; j++)
+                    {
+                        var r = TilePieces[i][j];
+                        if (r.Block != 0)
+                        {
+                            return (empty = false).Value;
+                        }
+                    }
+                }
+                empty = true;
+            }
+            return empty.Value;
         }
 
-        public void Draw(CanvasContext2D canvas, Point position, Point scale, int state, IntersectingRectangle bounds)
+        public void Draw(CanvasContext2D canvas, Point position, Point scale, int layer, IntersectingRectangle bounds)
         {
+
+            canvas.Save();
+
+            var len1 = TilePieces.Length;
+            var len2 = TilePieces[0].Length;
+
+            var lX = 16 * scale.X;
+            var lY = 16 * scale.Y;
+            for (int i = 0; i < len1; i++)
+            {
+                for (int j = 0; j < len2; j++)
+                {
+                    var r = TilePieces[i][j];
+                    var pm = SonicManager.Instance.SonicLevel.Blocks[r.Block];
+                    if (pm != null)
+                    {
+                        int animatedIndex=0;
+                        if (Animated!=null && Animated[j * len1 + i] != null)
+                        {
+                            animatedIndex = Animated[j*len1 + i].LastAnimatedIndex;
+                        }
+                        pm.Draw(canvas, new Point(position.X + i*lX,position.Y+j*lY),scale,layer,r.XFlip,r.YFlip,animatedIndex,bounds);
+                        //canvas.StrokeStyle = "#FFF";
+                        //canvas.StrokeRect(position.X + i * 16 * scale.X, position.Y + j * 16 * scale.Y, scale.X * 16, scale.Y * 16);
+                    }
+                }
+            }
+
+            canvas.Restore();
         }
 
-        public bool OnlyBackground()
+        public void AnimatedTick()
         {
-            return false;
-        }
-
-
-
-/*
-
-          this.tilePieces = tilePieces;
-    this.hLayer = [[]];
-    this.sprites = [];
-    this.getTilePiece = function (x, y) {
-        return this.tilePieces[_H.floor((x / 16))][_H.floor((y / 16))];
-    };
-    this.getBlock = function (x, y) {
-        return sonicManager.SonicLevel.Blocks[this.tilePieces[_H.floor((x / 16))][_H.floor((y / 16))].Block];
-    };
-    this.isOnlyBackground = undefined;
-    this.empty = undefined;
-    this.onlyBackground = function () {
-        if (this.isOnlyBackground == false) return false;
-        if (this.isOnlyBackground == true) return true;
-        for (var i = 0; i < this.tilePieces.length; i++) {
-            for (var j = 0; j < this.tilePieces[i].length; j++) {
-                var r = this.tilePieces[i][j];
-                var pm = sonicManager.SonicLevel.Blocks[r.Block];
-                if (pm) {
-                    if (!pm.onlyBackground()) {
-                        return this.isOnlyBackground = false;
+            foreach (var anni in Animated)
+            {
+                if (anni.LastAnimatedFrame == null)
+                {
+                    anni.LastAnimatedFrame = 0;
+                    anni.LastAnimatedIndex = 0;
+                    if (anni.Frames[anni.LastAnimatedIndex].Ticks == 0 || (SonicManager.Instance.DrawTickCount - anni.LastAnimatedFrame) >= ((anni.AutomatedTiming > 0) ? anni.AutomatedTiming : anni.Frames[anni.LastAnimatedIndex].Ticks))
+                    {
+                        anni.LastAnimatedFrame = SonicManager.Instance.DrawTickCount;
+                        anni.LastAnimatedIndex = (anni.LastAnimatedIndex + 1)%anni.Frames.Length;
                     }
                 }
             }
         }
-        this.isOnlyBackground = true;
-        return true;
-    };
-    this.isEmpty = function () {
-        if (this.empty == false) return false;
-        if (this.empty == true) return true;
-        for (var i = 0; i < this.tilePieces.length; i++) {
-            for (var j = 0; j < this.tilePieces[i].length; j++) {
-                var r = this.tilePieces[i][j];
-                if (r.Block != 0) {
-                    return this.empty = false;
-                }
-            }
-        }
-        this.empty = true;
-        return true;
-    }; 
-    this.animatedTick = function () {
-     
 
-        for (var an in this.animated) {
-            var anni = this.animated[an];
+        protected Animation[] Animated { get; set; }
 
-            if (anni.lastAnimatedFrame == undefined) {
-                anni.lastAnimatedFrame = 0;
-                anni.lastAnimatedIndex = 0;
-            }
-            
 
-            if (anni.Frames[anni.lastAnimatedIndex].Ticks == 0 ||
-            (sonicManager.drawTickCount - anni.lastAnimatedFrame) >= ((anni.AutomatedTiming > 0)
-                ? anni.AutomatedTiming
-                : anni.Frames[anni.lastAnimatedIndex].Ticks)) {
-                anni.lastAnimatedFrame = sonicManager.drawTickCount;
-                anni.lastAnimatedIndex = (anni.lastAnimatedIndex + 1) % anni.Frames.length;
-            }
-
-        }
-
-        
-    };
-    this.draw = function (canvas, position, scale, layer, bounds) {
-
-        var fd;
-        if (false && (fd = sonicManager.SpriteCache.tileChunks[layer + " " + this.index + " " + scale.y + " " + scale.x + " " + ((animationFrame != undefined) ? animationFrame : '-')])) {
-            if (fd == 1) return false;
-            canvas.drawImage(fd, position.x, position.y);
-
-            /*  if (this.animated) {
-
-            for (var i = 0; i < this.tilePieces.length; i++) {
-            for (var j = 0; j < this.tilePieces[i].length; j++) {
-            var r = this.tilePieces[i][j];
-            var pm = sonicManager.SonicLevel.Blocks[r.Block];
-            if (pm) {
-            pm.draw(canvas, { x: position.x + i * 16 * scale.x, y: position.y + j * 16 * scale.y }, scale, layer, r.XFlip, r.YFlip, true, animationFrame);
-            }
-            }
-            }
-            }#1#
-        } else {
-            _H.save(canvas);
-            var len1 = this.tilePieces.length;
-            var len2 = this.tilePieces[0].length;
-            var lX = 16 * scale.x;
-            var lY = 16 * scale.y;
-            for (var i = 0; i < len1; i++) {
-            for (var j = 0; j < len2; j++) {
-                var r = this.tilePieces[i][j];
-                var pm = sonicManager.SonicLevel.Blocks[r.Block];
-                if (pm) {
-                    TileChunk.__position.x = position.x + i * lX;
-                    TileChunk.__position.y = position.y + j * lY;
-
-                    pm.draw(canvas, TileChunk.__position, scale, layer, r.XFlip, r.YFlip, (this.animated[j * 8 + i] != undefined) ? (this.animated[j * 8 + i].lastAnimatedIndex) : (0), bounds);
-                    //canvas.strokeStyle = "#FFF";
-                    //canvas.strokeRect(position.x + i * 16 * scale.x, position.y + j * 16 * scale.y, scale.x * 16, scale.y * 16);
-                }
-            }
-            }
-            _H.restore(canvas);
-        }
-
-        return true;
-    };
-*/
-
+ 
     }
 }

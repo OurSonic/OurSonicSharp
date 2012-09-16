@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Html;
 using System.Linq;
 using System.Text;
 using System.Runtime.CompilerServices;
@@ -57,6 +58,11 @@ namespace OurSonic
                    };
                    sprite1.src = src;
                    return sprite1;*/
+           return null;
+       }
+
+       public static CanvasInformation DefaultCanvas(int cx, int cy)
+       {
            return null;
        }
     }

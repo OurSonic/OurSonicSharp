@@ -27,5 +27,17 @@ namespace OurSonic
     };
 }*/
 
+        public int LastAnimatedIndex { get; set; }
+
+        public int? LastAnimatedFrame { get; set; }
+
+        public AnimationFrame[] Frames { get; set; }
+
+        public int AutomatedTiming { get; set; }
+    }
+
+    public class AnimationFrame
+    {
+        public decimal Ticks { get; set; }
     }
 }

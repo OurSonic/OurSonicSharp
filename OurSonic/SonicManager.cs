@@ -12,43 +12,18 @@ namespace OurSonic
         private readonly CanvasInformation mainCanvas;
         private readonly SonicEngine myEngine;
         private readonly ObjectManager objectManager;
-        private int drawTickCount;
+        public int DrawTickCount;
+        private int imageLength;
         private object sonicSprites;
         private int tickCount;
         private bool waitingForDrawContinue;
         private bool waitingForTickContinue;
-        private int imageLength;
-
-        public GameState CurrentGameState { get; set; }
-
-        public IntersectingRectangle BigWindowLocation { get; set; }
-        public UIManager UIManager { get; set; }
-        public Sonic SonicToon { get; set; }
-        public Point Scale { get; set; }
-        public IntersectingRectangle WindowLocation { get; set; }
-        public Point RealScale { get; set; }
-        public bool InHaltMode { get; set; }
-        public int IndexedPalette { get; set; }
-        public List<Animation> Animations { get; set; }
-        public List<AnimationInstance> AnimationInstances { get; set; }
-        public Ring GoodRing { get; set; }
-        public bool ShowHeightMap { get; set; }
-        public Point ScreenOffset { get; set; }
-        public List<Ring> ActiveRings { get; set; }
-        public Action ForceResize { get; set; }
-        public SonicBackground Background { get; set; }
-        public ClickState ClickState { get; set; }
-        public SonicLevel SonicLevel { get; set; }
-        protected List<SonicObject> InFocusObjects { get; set; }
-        protected bool Loading { get; set; }
-        protected SpriteCache SpriteCache { get; set; }
-        protected SpriteLoader SpriteLoader { get; set; }
-
 
         public SonicManager(SonicEngine engine, CanvasInformation gameCanvas, Action resize)
         {
-            myEngine = engine;
+            Instance = this;
 
+            myEngine = engine;
             myEngine.canvasWidth = jQuery.Window.GetWidth();
             myEngine.canvasHeight = jQuery.Window.GetHeight();
 
@@ -83,13 +58,39 @@ namespace OurSonic
 
             ClickState = ClickState.Dragging;
             tickCount = 0;
-            drawTickCount = 0;
+            DrawTickCount = 0;
             InHaltMode = false;
             waitingForTickContinue = false;
             waitingForDrawContinue = false;
             SonicLevel = new SonicLevel();
         }
 
+        public GameState CurrentGameState { get; set; }
+
+        public IntersectingRectangle BigWindowLocation { get; set; }
+        public UIManager UIManager { get; set; }
+        public Sonic SonicToon { get; set; }
+        public Point Scale { get; set; }
+        public IntersectingRectangle WindowLocation { get; set; }
+        public Point RealScale { get; set; }
+        public bool InHaltMode { get; set; }
+        public int IndexedPalette { get; set; }
+        public List<Animation> Animations { get; set; }
+        public List<AnimationInstance> AnimationInstances { get; set; }
+        public Ring GoodRing { get; set; }
+        public bool ShowHeightMap { get; set; }
+        public Point ScreenOffset { get; set; }
+        public List<Ring> ActiveRings { get; set; }
+        public Action ForceResize { get; set; }
+        public SonicBackground Background { get; set; }
+        public ClickState ClickState { get; set; }
+        public SonicLevel SonicLevel { get; set; }
+        protected List<SonicObject> InFocusObjects { get; set; }
+        protected bool Loading { get; set; }
+        protected SpriteCache SpriteCache { get; set; }
+        protected SpriteLoader SpriteLoader { get; set; }
+
+        public static SonicManager Instance;
 
 
         public bool OnClick(jQueryEvent elementEvent)
@@ -221,7 +222,7 @@ namespace OurSonic
         public void PreloadSprites(Point scale, Action completed, Action<string> update)
         {
             SpriteCache = new SpriteCache();
-            var ci=SpriteCache.Rings;
+            var ci = SpriteCache.Rings;
             var inj = 0;
             var spriteLocations = new List<string>();
 
@@ -233,14 +234,23 @@ namespace OurSonic
             int md = 0;
             var ind_ = SpriteCache.Indexes;
             SpriteLoader = new SpriteLoader(completed, update);
-            var spriteStep=SpriteLoader.AddStep("Sprites",(i,done)=>
-                                                              {
-                                                                  var sp = i*200;
-                                                                  ci[sp]=Help.LoadSprite(spriteLocations[i],jd=>
-                                                                                                                {
-                                                                                                                    ci[jd.Tag*200+scale.X*100+scale.Y]=Help.ScaleSprite(jd,scale,jc=>done());
-                                                                                                                });
-                                                              });
+            var spriteStep = SpriteLoader.AddStep("Sprites", (i, done) =>
+                                                                 {
+                                                                     var sp = i*200;
+                                                                     ci[sp] = Help.LoadSprite(spriteLocations[i],
+                                                                                              jd =>
+                                                                                                  {
+                                                                                                      ci[
+                                                                                                          jd.Tag*200 +
+                                                                                                          scale.X*100 +
+                                                                                                          scale.Y] =
+                                                                                                          Help.
+                                                                                                              ScaleSprite
+                                                                                                              (jd, scale,
+                                                                                                               jc =>
+                                                                                                               done());
+                                                                                                  });
+                                                                 });
             /*
 
 
@@ -459,7 +469,7 @@ namespace OurSonic
 
 
                         if (md.animated) {
-                        sonicManager.drawTickCount = 0;
+                        sonicManager.DrawTickCount = 0;
                         sonicManager.CACHING = false;
                         for (var c = 0; c < md.animated.Frames.length; c++) {
                         var frame = md.animated.Frames[c];
@@ -659,7 +669,7 @@ namespace OurSonic
                 }
             }
             canvas.Save();
-            drawTickCount++;
+            DrawTickCount++;
             if (SpriteLoader != null && !SpriteLoader.Tick() || Loading)
             {
                 canvas.FillStyle = "white";
@@ -727,7 +737,7 @@ namespace OurSonic
                         dynamic pal = SonicLevel.PaletteItems[0][k];
                         for (int j = 0; j < pal.TotalLength; j += pal.SkipIndex)
                         {
-                            if (drawTickCount%(pal.TotalLength + pal.SkipIndex) == j)
+                            if (DrawTickCount%(pal.TotalLength + pal.SkipIndex) == j)
                             {
                                 SonicLevel.palAn[k] = j/pal.SkipIndex;
                             }

@@ -16,8 +16,8 @@ namespace OurSonic
         public List<TilePiece> Blocks { get; set; }
         public List<SonicObject> Objects { get; set; }
         public dynamic PaletteItems { get; set; }//todo::: no idea
-        public dynamic Palette { get; set; }//todo::: no idea
-        public dynamic palAn { get; set; }//todo:: no ides
+        public dynamic[] Palette { get; set; }//todo::: no idea
+        public List<int> palAn { get; set; }//todo:: no ides
 
         public SonicLevel()
         {
