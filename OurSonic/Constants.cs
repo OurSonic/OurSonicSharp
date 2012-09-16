@@ -8,6 +8,8 @@ namespace OurSonic
     {
         public static IntersectingRectangle DefaultWindowLocation(int state, CanvasInformation uiCanvas, Point scale)
         {
+
+            //todo:: next
 /*
             switch (state)
             {

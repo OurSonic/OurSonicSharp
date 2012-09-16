@@ -95,6 +95,8 @@ namespace OurSonic
                                             }
 
                                         });
+
+
             
             /*
     KeyboardJS.bind.key("o", function () {
@@ -205,6 +207,17 @@ namespace OurSonic
 
 
             fullscreenMode = true;
+
+
+            Window.AddEventListener("onresize", e => resizeCanvas());
+            jQuery.Document.Resize(e => resizeCanvas());
+
+            sonicManager = new SonicManager(this, gameCanvas, resizeCanvas);
+            sonicManager.IndexedPalette = 0;
+            Window.SetInterval(GameDraw, 1000 / 60);
+            Window.SetInterval(UIDraw, 1000 / 20);
+            this.resizeCanvas();
+
         }
   
         public void resizeCanvas()
@@ -239,14 +252,7 @@ namespace OurSonic
                                    : new Point(0, 0);
             gameCanvas.DomCanvas.CSS("left", screenOffset.X .ToPx());
             gameCanvas.DomCanvas.CSS("top", screenOffset.Y.ToPx());
-            Window.AddEventListener("onresize",e=>resizeCanvas());
-            jQuery.Document.Resize(e => resizeCanvas());
-
-            sonicManager = new SonicManager(this,gameCanvas, resizeCanvas);
-            sonicManager.IndexedPalette = 0;
-            Window.SetInterval(GameDraw, 1000 / 60);
-            Window.SetInterval(UIDraw, 1000 / 20);
-            this.resizeCanvas();
+        
         }
         public void Clear()
         {

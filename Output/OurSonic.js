@@ -88,16 +88,17 @@ OurSonic.Constants.defaultWindowLocation = function(state, uiCanvas, scale) {
 	return null;
 };
 OurSonic.Constants.intersects = function(arg) {
+	//            return this.x < p.x && this.x + this.width > p.x && this.y < p.y && this.y + this.height > p.y;
 	return false;
 };
 Type.registerNamespace('OurSonic.Drawing');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Drawing.Tile
-OurSonic.Drawing.Tile = function() {
+OurSonic.Drawing.Tile = function(colors) {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Drawing.TileChunk
-OurSonic.Drawing.TileChunk = function() {
+OurSonic.Drawing.TileChunk = function(tilePieces) {
 };
 OurSonic.Drawing.TileChunk.prototype = {
 	getBlock: function(x, y) {
@@ -123,7 +124,7 @@ OurSonic.Drawing.TileItem = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Drawing.TilePiece
-OurSonic.Drawing.TilePiece = function() {
+OurSonic.Drawing.TilePiece = function(heightMask, tiles) {
 };
 Type.registerNamespace('OurSonic');
 ////////////////////////////////////////////////////////////////////////////////
@@ -142,10 +143,39 @@ OurSonic.Help.toPx = function(number) {
 OurSonic.Help.mod = function(j, n) {
 	return (j % n + n) % n;
 };
-OurSonic.Help.scaleSprite = function(jd, scale, func) {
+OurSonic.Help.scaleSprite = function(image, scale, complete) {
+	//     var data = _H.getImageData(sprite);
+	//     var colors = [];
+	//     for (var f = 0; f < data.length; f += 4) {
+	//     colors.push(_H.colorObjectFromData(data, f));
+	//     }
+	//     var d = this.defaultCanvas().context.createImageData(sprite.width * scale.x, sprite.height * scale.y);
+	//     _H.setDataFromColors(d.data, colors, scale, sprite.width, { r: 0, g: 0, b: 0 });
+	//     return _H.loadSprite(_H.getBase64Image(d), complete);
+	return null;
+};
+OurSonic.Help.scaleCSImage = function(image, scale, complete) {
+	// var df = image.bytes;
+	// var colors = [];
+	// for (var f = 0; f < df.length; f += 1) {
+	// colors.push(image.palette[df[f]]);
+	// }
+	// var dc = this.defaultCanvas();
+	// var d = dc.context.createImageData(image.width * scale.x, image.height * scale.y);
+	// _H.setDataFromColorsNew(d.data, colors, scale, image.width, { r: 0, g: 0, b: 0 });
+	// 
+	// return _H.loadSprite(_H.getBase64Image(d), complete);
 	return null;
 };
 OurSonic.Help.loadSprite = function(spriteLocation, action) {
+	//   var sprite1 = new Image();
+	//   
+	//   sprite1.onload = function () {
+	//   sprite1.loaded = true;
+	//   if (complete) complete(sprite1);
+	//   };
+	//   sprite1.src = src;
+	//   return sprite1;
 	return null;
 };
 ////////////////////////////////////////////////////////////////////////////////
@@ -540,6 +570,17 @@ OurSonic.SonicEngine = function() {
 	//
 	//    });
 	this.$fullscreenMode = true;
+	window.addEventListener('onresize', Function.mkdel(this, function(e2) {
+		this.resizeCanvas();
+	}));
+	$(document).resize(Function.mkdel(this, function(e3) {
+		this.resizeCanvas();
+	}));
+	this.$sonicManager = new OurSonic.SonicManager(this, this.$gameCanvas, Function.mkdel(this, this.resizeCanvas));
+	this.$sonicManager.set_indexedPalette(0);
+	window.setInterval(Function.mkdel(this, this.gameDraw), 16);
+	window.setInterval(Function.mkdel(this, this.uiDraw), 50);
+	this.resizeCanvas();
 };
 OurSonic.SonicEngine.prototype = {
 	$handleScroll: function(jQueryEvent) {
@@ -583,17 +624,6 @@ OurSonic.SonicEngine.prototype = {
 		var screenOffset = (ss.isValue(this.$sonicManager.get_sonicToon()) ? OurSonic.Point.$ctor(ss.Int32.div(this.canvasWidth, 2) - ss.Int32.div(this.$sonicManager.get_windowLocation().width * this.$sonicManager.get_scale().x * this.$sonicManager.get_realScale().x, 2), ss.Int32.div(this.canvasHeight, 2) - ss.Int32.div(this.$sonicManager.get_windowLocation().height * this.$sonicManager.get_scale().y * this.$sonicManager.get_realScale().y, 2)) : OurSonic.Point.$ctor(0, 0));
 		this.$gameCanvas.domCanvas.css('left', OurSonic.Help.toPx(screenOffset.x));
 		this.$gameCanvas.domCanvas.css('top', OurSonic.Help.toPx(screenOffset.y));
-		window.addEventListener('onresize', Function.mkdel(this, function(e) {
-			this.resizeCanvas();
-		}));
-		$(document).resize(Function.mkdel(this, function(e1) {
-			this.resizeCanvas();
-		}));
-		this.$sonicManager = new OurSonic.SonicManager(this, this.$gameCanvas, Function.mkdel(this, this.resizeCanvas));
-		this.$sonicManager.set_indexedPalette(0);
-		window.setInterval(Function.mkdel(this, this.gameDraw), 16);
-		window.setInterval(Function.mkdel(this, this.uiDraw), 50);
-		this.resizeCanvas();
 	},
 	clear: function() {
 		this.$gameCanvas.domCanvas.width(this.$gameCanvas.domCanvas.width());
@@ -3343,4 +3373,4 @@ OurSonic.UIManager.registerClass('OurSonic.UIManager', Object);
 OurSonic.UIManagerData.registerClass('OurSonic.UIManagerData', Object);
 OurSonic.UIManagerDataIndexes.registerClass('OurSonic.UIManagerDataIndexes', Object);
 OurSonic.IntersectingRectangle.registerClass('OurSonic.IntersectingRectangle');
-new OurSonic.Page();
+$(function(){new OurSonic.Page();});
