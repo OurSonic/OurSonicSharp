@@ -6,7 +6,7 @@ namespace OurSonic
 {
     public class Constants
     {
-        public static IntersectingRectangle DefaultWindowLocation(int state, CanvasContext uiCanvas, Point scale)
+        public static IntersectingRectangle DefaultWindowLocation(int state, CanvasInformation uiCanvas, Point scale)
         {
 /*
             switch (state)
@@ -37,6 +37,12 @@ namespace OurSonic
             }
 */
             return null;
+        }
+
+        public static bool Intersects(Point arg)
+        {
+//            return this.x < p.x && this.x + this.width > p.x && this.y < p.y && this.y + this.height > p.y;
+            return false;
         }
     }
     [Serializable]

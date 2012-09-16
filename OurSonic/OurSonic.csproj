@@ -52,17 +52,29 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Animation.cs" />
+    <Compile Include="AnimationInstance.cs" />
+    <Compile Include="CanvasInformation.cs" />
+    <Compile Include="ClickState.cs" />
     <Compile Include="CommonWebLibraries.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Drawing\Tile.cs" />
     <Compile Include="Drawing\TileChunk.cs" />
     <Compile Include="Drawing\TileItem.cs" />
     <Compile Include="Drawing\TilePiece.cs" />
+    <Compile Include="GameState.cs" />
     <Compile Include="Help.cs" />
+    <Compile Include="ObjectManager.cs" />
     <Compile Include="Page.cs" />
+    <Compile Include="Ring.cs" />
     <Compile Include="Sonic.cs" />
+    <Compile Include="SonicBackground.cs" />
     <Compile Include="SonicEngine.cs" />
+    <Compile Include="SonicLevel.cs" />
     <Compile Include="SonicManager.cs" />
+    <Compile Include="SonicObject.cs" />
+    <Compile Include="SpriteCache.cs" />
+    <Compile Include="SpriteLoader.cs" />
     <Compile Include="UiManager.cs" />
   </ItemGroup>
   <ItemGroup>

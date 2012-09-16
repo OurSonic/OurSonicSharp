@@ -10,50 +10,48 @@ namespace OurSonic
 {
     public class SonicEngine
     {
-        private void handleScroll(ElementEvent elementEvent)
+        private void handleScroll(jQueryEvent jQueryEvent)
         {
-            elementEvent.PreventDefault();
+            jQueryEvent.PreventDefault();
 
-            sonicManager.UIManager.OnMouseScroll(elementEvent);
+            sonicManager.UIManager.OnMouseScroll(jQueryEvent);
 
         }
 
-        private ElementEvent lastMouseMove;
+        private jQueryEvent lastMouseMove;
 
-        private void canvasMouseMove(ElementEvent elementEvent)
+        private void canvasMouseMove(jQueryEvent queryEvent)
         {
-            elementEvent.PreventDefault();
+            queryEvent.PreventDefault();
             Document.Body.Style.Cursor = "default";
-            lastMouseMove = elementEvent;
-            if (sonicManager.UIManager.OnMouseMove(elementEvent)) return ;
+            lastMouseMove = queryEvent;
+            if (sonicManager.UIManager.OnMouseMove(queryEvent)) return;
 
             return ;
 
         }
-        private void canvasOnClick(ElementEvent elementEvent)
+        private void canvasOnClick(jQueryEvent queryEvent)
         {
-            elementEvent.PreventDefault();
-            if (sonicManager.UIManager.OnClick(elementEvent)) return;
-            if (sonicManager.OnClick(elementEvent)) return;
+            queryEvent.PreventDefault();
+            if (sonicManager.UIManager.OnClick(queryEvent)) return;
+            if (sonicManager.OnClick(queryEvent)) return;
             sonicManager.UIManager.dragger.Click(/*elementEvent*/);
         }
 
 
-        private void canvasMouseUp(ElementEvent elementEvent)
+        private void canvasMouseUp(jQueryEvent queryEvent)
         {
-            elementEvent.PreventDefault();
+            queryEvent.PreventDefault();
             sonicManager.UIManager.OnMouseUp(lastMouseMove);
 
         }
 
         private string gameCanvasName = "gameLayer";
-        private string uiCanvasName = "uiLayer";
-        private jQueryObject gameCanvasItem;
-        private CanvasContext2D gameCanvas;
-        private jQueryObject uiCanvasItem;
-        private CanvasContext2D uiCanvas;
-        private int canvasWidth;
-        private int canvasHeight;
+        private string uiCanvasName = "uiLayer"; 
+        private CanvasInformation gameCanvas; 
+        private CanvasInformation uiCanvas;
+        public int canvasWidth;
+        public int canvasHeight;
 
         private SonicManager sonicManager; 
         private bool fullscreenMode;
@@ -61,26 +59,33 @@ namespace OurSonic
 
         public SonicEngine()
         {
-            gameCanvasItem = jQuery.Select(string.Format("#{0}", gameCanvasName));
-            gameCanvas = (CanvasContext2D) gameCanvasItem[0].As<CanvasElement>().GetContext(Rendering.Render2D);
-            uiCanvasItem = jQuery.Select(string.Format("#{0}", uiCanvasName));
-            uiCanvas = (CanvasContext2D) uiCanvasItem[0].As<CanvasElement>().GetContext(Rendering.Render2D);
+
+
+            var gameCanvasItem = jQuery.Select(string.Format("#{0}", gameCanvasName));
+            gameCanvas =new CanvasInformation((CanvasContext2D) gameCanvasItem[0].As<CanvasElement>().GetContext(Rendering.Render2D),gameCanvasItem);
+            var uiCanvasItem = jQuery.Select(string.Format("#{0}", uiCanvasName));
+            uiCanvas = new CanvasInformation((CanvasContext2D)uiCanvasItem[0].As<CanvasElement>().GetContext(Rendering.Render2D),uiCanvasItem);
+
             canvasWidth = 0;
             canvasHeight = 0;
 
 
-            var element = uiCanvasItem[0];
-            element.AddEventListener("DOMMouseScroll", handleScroll, false);
-            element.AddEventListener("mousewheel", handleScroll, false);
+            var element = uiCanvas.DomCanvas[0];
 
-            element.AddEventListener("touchmove", canvasMouseMove, false);
-            element.AddEventListener("touchstart", canvasOnClick, false);
-            element.AddEventListener("touchend", canvasMouseUp, false);
+            uiCanvas.DomCanvas.MouseDown(canvasOnClick);
+            uiCanvas.DomCanvas.MouseUp(canvasMouseUp);
+            uiCanvas.DomCanvas.MouseMove(canvasMouseMove);
 
-            element.AddEventListener("mousemove", canvasMouseMove, false);
-            element.AddEventListener("mousedown", canvasOnClick, false);
-            element.AddEventListener("mouseup", canvasMouseUp, false);
-            element.AddEventListener("contextmenu", (e) => e.PreventDefault(), false);
+            uiCanvas.DomCanvas.Bind("touchstart", canvasOnClick);
+            uiCanvas.DomCanvas.Bind("touchend", canvasMouseUp);
+            uiCanvas.DomCanvas.Bind("touchmove", canvasMouseMove);
+
+            uiCanvas.DomCanvas.Bind("DOMMouseScroll", handleScroll);
+            uiCanvas.DomCanvas.Bind("mousewheel", handleScroll);
+            uiCanvas.DomCanvas.Bind("contextmenu", (e) => e.PreventDefault());
+
+
+             
 
             jQuery.Document.Keydown(e =>
                                         {
@@ -209,16 +214,16 @@ namespace OurSonic
             sonicManager.WindowLocation = Constants.DefaultWindowLocation(sonicManager.SonicToon == null ? 1 : 0,uiCanvas, sonicManager.Scale);
             sonicManager.RealScale = !fullscreenMode ? new Point(1, 1) : new Point(canvasWidth / 320 / sonicManager.Scale.X, canvasHeight / 224 / sonicManager.Scale.Y);
 
-            gameCanvasItem.Attribute("width", (sonicManager.WindowLocation.Width *
+            gameCanvas.DomCanvas.Attribute("width", (sonicManager.WindowLocation.Width *
                                                (sonicManager.SonicToon != null
                                                     ? sonicManager.Scale.X * sonicManager.RealScale.X
                                                     : 1)) .ToPx());
-            gameCanvasItem.Attribute("height", (sonicManager.WindowLocation.Height *
+            gameCanvas.DomCanvas.Attribute("height", (sonicManager.WindowLocation.Height *
                                                (sonicManager.SonicToon != null
                                                     ? sonicManager.Scale.Y * sonicManager.RealScale.Y
                                                     : 1)).ToPx());
-            uiCanvasItem.Attribute("width", canvasWidth.ToPx());
-            uiCanvasItem.Attribute("height", canvasHeight.ToPx());
+            uiCanvas.DomCanvas.Attribute("width", canvasWidth.ToPx());
+            uiCanvas.DomCanvas.Attribute("height", canvasHeight.ToPx());
 
 
 //TODO::            that.uiCanvas.goodWidth = that.canvasWidth;
@@ -232,26 +237,20 @@ namespace OurSonic
                                                sonicManager.WindowLocation.Height*sonicManager.Scale.Y*
                                                sonicManager.RealScale.Y/2)
                                    : new Point(0, 0);
-            gameCanvasItem.CSS("left", screenOffset.X .ToPx());
-            gameCanvasItem.CSS("top", screenOffset.Y.ToPx());
+            gameCanvas.DomCanvas.CSS("left", screenOffset.X .ToPx());
+            gameCanvas.DomCanvas.CSS("top", screenOffset.Y.ToPx());
             Window.AddEventListener("onresize",e=>resizeCanvas());
             jQuery.Document.Resize(e => resizeCanvas());
 
-            sonicManager = new SonicManager(gameCanvas, resizeCanvas);
+            sonicManager = new SonicManager(this,gameCanvas, resizeCanvas);
             sonicManager.IndexedPalette = 0;
-            Window.SetInterval(() =>
-            {
-                GameDraw();
-            }, 1000 / 60);
-            Window.SetInterval(() =>
-            {
-                UIDraw();
-            }, 1000 / 20);
+            Window.SetInterval(GameDraw, 1000 / 60);
+            Window.SetInterval(UIDraw, 1000 / 20);
             this.resizeCanvas();
         }
         public void Clear()
         {
-            gameCanvasItem.Width(gameCanvasItem.GetWidth());
+            gameCanvas.DomCanvas.Width(gameCanvas.DomCanvas.GetWidth());
         }
 
         public void GameDraw()
@@ -261,7 +260,7 @@ namespace OurSonic
             {
                 Clear();
             }
-            sonicManager.Draw(gameCanvas);
+            sonicManager.Draw(gameCanvas.Context);
         }
         public void UIDraw()
         {
@@ -270,7 +269,7 @@ namespace OurSonic
             {
                 Clear();
             }
-            sonicManager.UIManager.Draw(gameCanvas);
+            sonicManager.UIManager.Draw(uiCanvas.Context);
         }
          
     }
