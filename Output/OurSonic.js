@@ -4282,406 +4282,391 @@ OurSonic.SonicManager.prototype = {
 				//^
 			}
 		}
-		this.set_sonicLevel(sonicLevel.translate());
-		// 
+		//
+		//              for (var kd = 0; kd < sonicLevel.Blocks.Count; kd++) {
+		//
+		//              var dj = sonicLevel.Blocks[kd];
+		//
+		//              dj.animatedFrames = [];
 		//
 		//              
-		//        for (var kd = 0; kd < sonicManager.SonicLevel.Blocks.length; kd++) {
-		// 
+		//
+		//              for (var i = 0; i < dj.tiles.length; i++) {
+		//
+		//              var mj = dj.tiles[i];
+		//
+		//              if (sonicManager.SonicLevel.Tiles[mj.Tile]) {
 		//
 		//              
-		//        var dj = sonicManager.SonicLevel.Blocks[kd];
-		// 
+		//
+		//              var pl = JSLINQ(sonicManager.SonicLevel.Tiles[mj.Tile].getAllPaletteIndexes());
 		//
 		//              
-		//        dj.animatedFrames = [];
-		// 
 		//
 		//              
-		//        
-		// 
+		//
+		//              if (sonicManager.SonicLevel.PaletteItems[0]) {
+		//
+		//              for (var k = 0; k < sonicManager.SonicLevel.PaletteItems[0].length; k++) {
+		//
+		//              var pal = sonicManager.SonicLevel.PaletteItems[0][k];
 		//
 		//              
-		//        for (var i = 0; i < dj.tiles.length; i++) {
-		// 
 		//
 		//              
-		//        var mj = dj.tiles[i];
-		// 
+		//
+		//              for (var m = 0; m < pal.Pieces.length; m++) {
+		//
+		//              var mje = pal.Pieces[m];
 		//
 		//              
-		//        if (sonicManager.SonicLevel.Tiles[mj.Tile]) {
-		// 
+		//
+		//              if (mj.Palette == mje.PaletteIndex) {
+		//
+		//              if (pl.Any(function (J) {
+		//
+		//              return J == mje.PaletteOffset / 2 || J == mje.PaletteOffset / 2 + 1;
+		//
+		//              })) {
+		//
+		//              dj.animatedFrames.push(k);
+		//
+		//              }
+		//
+		//              }
+		//
+		//              }
 		//
 		//              
-		//        
-		// 
+		//
+		//              }
 		//
 		//              
-		//        var pl = JSLINQ(sonicManager.SonicLevel.Tiles[mj.Tile].getAllPaletteIndexes());
-		// 
+		//
+		//              }
+		//
+		//              }
 		//
 		//              
-		//        
+		//
+		//              }
+		//
+		//              }
+		//  SonicLevel = sonicLevel.Translate();
 		// 
 		//
-		//              
-		//        
-		// 
+		//               
 		//
-		//              
-		//        if (sonicManager.SonicLevel.PaletteItems[0]) {
-		// 
-		//
-		//              
-		//        for (var k = 0; k < sonicManager.SonicLevel.PaletteItems[0].length; k++) {
-		// 
-		//
-		//              
-		//        var pal = sonicManager.SonicLevel.PaletteItems[0][k];
-		// 
-		//
-		//              
-		//        
-		// 
-		//
-		//              
-		//        
-		// 
-		//
-		//              
-		//        for (var m = 0; m < pal.Pieces.length; m++) {
-		// 
-		//
-		//              
-		//        var mje = pal.Pieces[m];
-		// 
-		//
-		//              
-		//        
-		// 
-		//
-		//              
-		//        if (mj.Palette == mje.PaletteIndex) {
-		// 
-		//
-		//              
-		//        if (pl.Any(function (J) {
-		// 
-		//
-		//              
-		//        return J == mje.PaletteOffset / 2 || J == mje.PaletteOffset / 2 + 1;
-		// 
-		//
-		//              
-		//        })) {
-		// 
-		//
-		//              
-		//        dj.animatedFrames.push(k);
-		// 
-		//
-		//              
-		//        }
-		// 
-		//
-		//              
-		//        }
-		// 
-		//
-		//              
-		//        }
-		// 
-		//
-		//              
-		//        
-		// 
-		//
-		//              
-		//        }
-		// 
-		//
-		//              
-		//        
-		// 
-		//
-		//              
-		//        }
-		// 
-		//
-		//              
-		//        }
-		// 
-		//
-		//              
-		//        
-		// 
-		//
-		//              
-		//        }
-		// 
-		//
-		//              
-		//        }
-		// 
-		//
-		//              
-		//        
-		// 
-		//
-		//              
-		//        
-		// 
-		//
-		//              
 		//        var finished = function () {
 		// 
 		//
-		//              
+		//               
+		//
 		//        sonicManager.uiManager.levelManagerArea.visible = true;
 		// 
 		//
-		//              
+		//               
+		//
 		//        sonicManager.loading = false;
 		// 
 		//
-		//              
+		//               
+		//
 		//        sonicManager.uiManager.modifyTC.tileChunk = sonicManager.SonicLevel.Chunks[0];
 		// 
 		//
-		//              
+		//               
+		//
 		//        sonicManager.uiManager.modifyTilePieceArea.tilePiece = sonicManager.uiManager.modifyTP.tilePiece = sonicManager.SonicLevel.Blocks[0];
 		// 
 		//
-		//              
+		//               
+		//
 		//        
 		// 
 		//
-		//              
+		//               
+		//
 		//        };
 		// 
 		//
-		//              
+		//               
+		//
 		//        
 		// 
 		//
-		//              
+		//               
+		//
 		//        //        var inds = sonicManager.inds = { r:0,t: 0, tp: 0, tc: 0, total: (sonicManager.SonicLevel.Chunks.length * 2 + sonicManager.SonicLevel.Blocks.length * 5 + sonicManager.SonicLevel.Tiles.length), done: false };
 		// 
 		//
-		//              
+		//               
+		//
 		//        
 		// 
 		//
-		//              
+		//               
+		//
 		//        sonicManager.CACHING = true;
 		// 
 		//
-		//              
+		//               
+		//
 		//        sonicManager.preLoadSprites(scale, function () {
 		// 
 		//
-		//              
+		//               
+		//
 		//        //          inds.r = 1;
 		// 
 		//
-		//              
+		//               
+		//
 		//        sonicManager.CACHING = false;
 		// 
 		//
-		//              
+		//               
+		//
 		//        finished();
 		// 
 		//
-		//              
+		//               
+		//
 		//        
 		// 
 		//
-		//              
+		//               
+		//
 		//        sonicManager.uiManager.updateTitle("Level Loaded");
 		// 
 		//
-		//              
+		//               
+		//
 		//        sonicManager.forceResize();
 		// 
 		//
-		//              
+		//               
+		//
 		//        
 		// 
 		//
-		//              
+		//               
+		//
 		//        
 		// 
 		//
-		//              
+		//               
+		//
 		//        var dl = _H.getQueryString();
 		// 
 		//
-		//              
+		//               
+		//
 		//        if (dl["run"]) {
 		// 
 		//
-		//              
+		//               
+		//
 		//        setTimeout(sonicManager.uiManager.runSonic, 1000);
 		// 
 		//
-		//              
+		//               
+		//
 		//        }
 		// 
 		//
-		//              
+		//               
+		//
 		//        
 		// 
 		//
-		//              
+		//               
+		//
 		//        }, sonicManager.uiManager.updateTitle);
 		// 
 		//
-		//              
+		//               
+		//
 		//        
 		// 
 		//
-		//              
+		//               
+		//
 		//        
 		// 
 		//
-		//              
+		//               
+		//
 		//        /*
 		// 
 		//
-		//              
+		//               
+		//
 		//        var scal = scale;
 		// 
 		//
-		//              
+		//               
+		//
 		//        for (j = 0; j < sonicManager.SonicLevel.Tiles.length; j++) {
 		// 
 		//
-		//              
+		//               
+		//
 		//        fc = sonicManager.SonicLevel.Tiles[j];
 		// 
 		//
-		//              
+		//               
+		//
 		//        fc.cacheImage(mainCanvas, scal, function (j) {
 		// 
 		//
-		//              
+		//               
+		//
 		//        inds.t++;
 		// 
 		//
-		//              
+		//               
+		//
 		//        var done1 = function (c) {
 		// 
 		//
-		//              
+		//               
+		//
 		//        inds.tp++;
 		// 
 		//
-		//              
+		//               
+		//
 		//        if (inds.tp == sonicManager.SonicLevel.Blocks.length * 5) {
 		// 
 		//
-		//              
+		//               
+		//
 		//        
 		// 
 		//
-		//              
+		//               
+		//
 		//        var done2 = function (c2) {
 		// 
 		//
-		//              
+		//               
+		//
 		//        inds.tc++;
 		// 
 		//
-		//              
+		//               
+		//
 		//        
 		// 
 		//
-		//              
+		//               
+		//
 		//        finished();
 		// 
 		//
-		//              
+		//               
+		//
 		//        };
 		// 
 		//
-		//              
+		//               
+		//
 		//        
 		// 
 		//
-		//              
+		//               
+		//
 		//        for (j = 0; j < sonicManager.SonicLevel.Chunks.length; j++) {
 		// 
 		//
-		//              
+		//               
+		//
 		//        fc = sonicManager.SonicLevel.Chunks[j];
 		// 
 		//
-		//              
+		//               
+		//
 		//        fc.cacheImage(mainCanvas, scal, 1, done2);
 		// 
 		//
-		//              
+		//               
+		//
 		//        fc.cacheImage(mainCanvas, scal, 2, done2);
 		// 
 		//
-		//              
+		//               
+		//
 		//        }
 		// 
 		//
-		//              
+		//               
+		//
 		//        }
 		// 
 		//
-		//              
+		//               
+		//
 		//        };
 		// 
 		//
-		//              
+		//               
+		//
 		//        if (inds.t == sonicManager.SonicLevel.Tiles.length) {
 		// 
 		//
-		//              
+		//               
+		//
 		//        for (j = 0; j < sonicManager.SonicLevel.Blocks.length; j++) {
 		// 
 		//
-		//              
+		//               
+		//
 		//        fc = sonicManager.SonicLevel.Blocks[j];
 		// 
 		//
-		//              
+		//               
+		//
 		//        fc.cacheImage(mainCanvas, scal, 0, done1);
 		// 
 		//
-		//              
+		//               
+		//
 		//        fc.cacheImage(mainCanvas, scal, 1, done1);
 		// 
 		//
-		//              
+		//               
+		//
 		//        fc.cacheImage(mainCanvas, scal, 2, done1);
 		// 
 		//
-		//              
+		//               
+		//
 		//        fc.cacheImage(mainCanvas, scal, 3, done1);
 		// 
 		//
-		//              
+		//               
+		//
 		//        fc.cacheImage(mainCanvas, scal, 4, done1);
 		// 
 		//
-		//              
+		//               
+		//
 		//        }
 		// 
 		//
-		//              
+		//               
+		//
 		//        }
 		// 
 		//
-		//              
+		//               
+		//
 		//        });
 		// 
 		//
-		//              
+		//               
+		//
 		//        }#1#
 	},
 	$containsAnimatedTile: function(tile) {

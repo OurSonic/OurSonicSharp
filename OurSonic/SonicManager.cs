@@ -1245,16 +1245,9 @@ var acs = SonicLevel.AnimatedChunks = new List<TileChunk>();
                 //^
             }
         }
-
-
-            SonicLevel = sonicLevel.Translate();
-
-
-            /* 
-
-              
-        for (var kd = 0; kd < sonicManager.SonicLevel.Blocks.length; kd++) {
-            var dj = sonicManager.SonicLevel.Blocks[kd];
+/*
+              for (var kd = 0; kd < sonicLevel.Blocks.Count; kd++) {
+            var dj = sonicLevel.Blocks[kd];
             dj.animatedFrames = [];
 
             for (var i = 0; i < dj.tiles.length; i++) {
@@ -1287,8 +1280,14 @@ var acs = SonicLevel.AnimatedChunks = new List<TileChunk>();
                 }
 
             }
-        }
+        }*/
 
+          //  SonicLevel = sonicLevel.Translate();
+
+
+            /* 
+
+               
 
         var finished = function () {
             sonicManager.uiManager.levelManagerArea.visible = true;

@@ -25,6 +25,8 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Output", "Output\", "{50600
 		VWDPort = "49247"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OurSonicNode", "OurSonicNode\OurSonicNode.csproj", "{1F57228D-11FC-49D8-AB36-7B026D5FE5DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{50600C4F-4CCD-4AE7-A1EF-C3D183ED232E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50600C4F-4CCD-4AE7-A1EF-C3D183ED232E}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{50600C4F-4CCD-4AE7-A1EF-C3D183ED232E}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{1F57228D-11FC-49D8-AB36-7B026D5FE5DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F57228D-11FC-49D8-AB36-7B026D5FE5DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F57228D-11FC-49D8-AB36-7B026D5FE5DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F57228D-11FC-49D8-AB36-7B026D5FE5DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
