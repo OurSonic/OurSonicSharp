@@ -508,6 +508,50 @@ OurSonic.Drawing.TileChunk.prototype = {
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Drawing.TileItem
 OurSonic.Drawing.TileItem = function() {
+	this.$1$_TileField = 0;
+	this.$1$PriorityField = false;
+	this.$1$XFlipField = false;
+	this.$1$YFlipField = false;
+	this.$1$PaletteField = 0;
+	this.$1$IndexField = 0;
+};
+OurSonic.Drawing.TileItem.prototype = {
+	get__Tile: function() {
+		return this.$1$_TileField;
+	},
+	set__Tile: function(value) {
+		this.$1$_TileField = value;
+	},
+	get_priority: function() {
+		return this.$1$PriorityField;
+	},
+	set_priority: function(value) {
+		this.$1$PriorityField = value;
+	},
+	get_xFlip: function() {
+		return this.$1$XFlipField;
+	},
+	set_xFlip: function(value) {
+		this.$1$XFlipField = value;
+	},
+	get_yFlip: function() {
+		return this.$1$YFlipField;
+	},
+	set_yFlip: function(value) {
+		this.$1$YFlipField = value;
+	},
+	get_palette: function() {
+		return this.$1$PaletteField;
+	},
+	set_palette: function(value) {
+		this.$1$PaletteField = value;
+	},
+	get_index: function() {
+		return this.$1$IndexField;
+	},
+	set_index: function(value) {
+		this.$1$IndexField = value;
+	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Drawing.TilePiece
@@ -727,24 +771,7 @@ OurSonic.HeightMask = function(heightMap) {
 };
 OurSonic.HeightMask.op_Implicit = function(d) {
 	var m = ((d === 0) ? 0 : 16);
-	var $t1 = [];
-	$t1.add(m);
-	$t1.add(m);
-	$t1.add(m);
-	$t1.add(m);
-	$t1.add(m);
-	$t1.add(m);
-	$t1.add(m);
-	$t1.add(m);
-	$t1.add(m);
-	$t1.add(m);
-	$t1.add(m);
-	$t1.add(m);
-	$t1.add(m);
-	$t1.add(m);
-	$t1.add(m);
-	$t1.add(m);
-	return new OurSonic.HeightMask($t1);
+	return new OurSonic.HeightMask([m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m]);
 	//16 m's
 };
 ////////////////////////////////////////////////////////////////////////////////
@@ -1393,6 +1420,7 @@ OurSonic.SonicLevel = function() {
 	this.$1$CollisionIndexes2Field = null;
 	this.$1$HeightMapsField = null;
 	this.$1$AnimatedChunksField = null;
+	this.$1$BGChunkMapField = null;
 	this.set_tiles([]);
 	this.set_blocks([]);
 	this.set_chunks([]);
@@ -1516,127 +1544,12 @@ OurSonic.SonicLevel.prototype = {
 	},
 	set_animatedChunks: function(value) {
 		this.$1$AnimatedChunksField = value;
-	}
-};
-////////////////////////////////////////////////////////////////////////////////
-// OurSonic.SonicLevelData
-OurSonic.SonicLevelData = function() {
-	this.$1$BGChunkMapField = null;
-	this.$1$ChunksField = null;
-	this.$1$TilesField = null;
-	this.$1$BlocksField = null;
-	this.$1$ForegroundWidthField = 0;
-	this.$1$ForegroundHeightField = 0;
-	this.$1$ForegroundField = null;
-	this.$1$ChunkMapField = null;
-	this.$1$BackgroundWidthField = 0;
-	this.$1$BackgroundHeightField = 0;
-	this.$1$ObjectsField = null;
-	this.$1$AnglesField = null;
-	this.$1$CollisionIndexes1Field = null;
-	this.$1$CollisionIndexes2Field = null;
-	this.$1$HeightMapsField = null;
-	this.$1$PaletteItemsField = null;
-};
-OurSonic.SonicLevelData.prototype = {
+	},
 	get_bgChunkMap: function() {
 		return this.$1$BGChunkMapField;
 	},
 	set_bgChunkMap: function(value) {
 		this.$1$BGChunkMapField = value;
-	},
-	get_chunks: function() {
-		return this.$1$ChunksField;
-	},
-	set_chunks: function(value) {
-		this.$1$ChunksField = value;
-	},
-	get_tiles: function() {
-		return this.$1$TilesField;
-	},
-	set_tiles: function(value) {
-		this.$1$TilesField = value;
-	},
-	get_blocks: function() {
-		return this.$1$BlocksField;
-	},
-	set_blocks: function(value) {
-		this.$1$BlocksField = value;
-	},
-	get_foregroundWidth: function() {
-		return this.$1$ForegroundWidthField;
-	},
-	set_foregroundWidth: function(value) {
-		this.$1$ForegroundWidthField = value;
-	},
-	get_foregroundHeight: function() {
-		return this.$1$ForegroundHeightField;
-	},
-	set_foregroundHeight: function(value) {
-		this.$1$ForegroundHeightField = value;
-	},
-	get_foreground: function() {
-		return this.$1$ForegroundField;
-	},
-	set_foreground: function(value) {
-		this.$1$ForegroundField = value;
-	},
-	get_chunkMap: function() {
-		return this.$1$ChunkMapField;
-	},
-	set_chunkMap: function(value) {
-		this.$1$ChunkMapField = value;
-	},
-	get_backgroundWidth: function() {
-		return this.$1$BackgroundWidthField;
-	},
-	set_backgroundWidth: function(value) {
-		this.$1$BackgroundWidthField = value;
-	},
-	get_backgroundHeight: function() {
-		return this.$1$BackgroundHeightField;
-	},
-	set_backgroundHeight: function(value) {
-		this.$1$BackgroundHeightField = value;
-	},
-	get_objects: function() {
-		return this.$1$ObjectsField;
-	},
-	set_objects: function(value) {
-		this.$1$ObjectsField = value;
-	},
-	get_angles: function() {
-		return this.$1$AnglesField;
-	},
-	set_angles: function(value) {
-		this.$1$AnglesField = value;
-	},
-	get_collisionIndexes1: function() {
-		return this.$1$CollisionIndexes1Field;
-	},
-	set_collisionIndexes1: function(value) {
-		this.$1$CollisionIndexes1Field = value;
-	},
-	get_collisionIndexes2: function() {
-		return this.$1$CollisionIndexes2Field;
-	},
-	set_collisionIndexes2: function(value) {
-		this.$1$CollisionIndexes2Field = value;
-	},
-	get_heightMaps: function() {
-		return this.$1$HeightMapsField;
-	},
-	set_heightMaps: function(value) {
-		this.$1$HeightMapsField = value;
-	},
-	get_paletteItems: function() {
-		return this.$1$PaletteItemsField;
-	},
-	set_paletteItems: function(value) {
-		this.$1$PaletteItemsField = value;
-	},
-	translate: function() {
-		return null;
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
@@ -3910,6 +3823,29 @@ OurSonic.SonicManager.prototype = {
 			this.get_sonicToon().drawUI(canvas, OurSonic.Point.$ctor(this.get_screenOffset().x, this.get_screenOffset().y), this.get_scale());
 		}
 	},
+	$containsAnimatedTile: function(tile) {
+		return null;
+	},
+	$decodeNumeric: function(s) {
+		s = s.replace(new RegExp('[^' + OurSonic.SonicManager.$base64chars.join('') + '=]', 'g'), '');
+		var p = ((s.charAt(s.length - 1) === '=') ? ((s.charAt(s.length - 2) === '=') ? 'AA' : 'A') : '');
+		var r = [];
+		s = s.substr(0, s.length - p.length) + p;
+		for (var c = 0; c < s.length; c += 4) {
+			var n = (OurSonic.SonicManager.$base64Inv[s.charAt(c)] << 18) + (OurSonic.SonicManager.$base64Inv[s.charAt(c + 1)] << 12) + (OurSonic.SonicManager.$base64Inv[s.charAt(c + 2)] << 6) + OurSonic.SonicManager.$base64Inv[s.charAt(c + 3)];
+			r.add(n >> 16 & 255);
+			r.add(n >> 8 & 255);
+			r.add(n & 255);
+		}
+		return Type.cast(r.slice(0, r.length - 1), Array);
+	},
+	get_status: function() {
+		return this.$myStatus;
+	},
+	set_status: function(value) {
+		this.get_uiManager().updateTitle(value);
+		this.$myStatus = value;
+	},
 	load: function(lvl, mainCanvas) {
 		this.set_loading(true);
 		this.set_status('Decoding');
@@ -3929,21 +3865,8 @@ OurSonic.SonicManager.prototype = {
 		}
 		this.get_sonicLevel().set_levelWidth(sonicLevel.get_foregroundWidth());
 		this.get_sonicLevel().set_levelHeight(sonicLevel.get_foregroundHeight());
-		var mf = this.$decodeNumeric(sonicLevel.get_foreground());
-		sonicLevel.set_chunkMap([]);
-		for (var q = 0; q < sonicLevel.get_foregroundWidth(); q++) {
-			sonicLevel.get_chunkMap()[q] = [];
-			for (var r = 0; r < sonicLevel.get_foregroundHeight(); r++) {
-				sonicLevel.get_chunkMap()[q][r] = mf[q + r * sonicLevel.get_foregroundWidth()];
-			}
-		}
-		sonicLevel.set_bgChunkMap([]);
-		for (var q1 = 0; q1 < sonicLevel.get_backgroundWidth(); q1++) {
-			sonicLevel.get_bgChunkMap()[q1] = [];
-			for (var r1 = 0; r1 < sonicLevel.get_backgroundHeight(); r1++) {
-				sonicLevel.get_bgChunkMap()[q1][r1] = mf[q1 + r1 * sonicLevel.get_backgroundWidth()];
-			}
-		}
+		this.get_sonicLevel().set_chunkMap(sonicLevel.get_foreground());
+		this.get_sonicLevel().set_bgChunkMap(sonicLevel.get_background());
 		//
 		//        for (l = 0; l < sonicManager.SonicLevel.Objects.length; l++) {
 		//
@@ -4071,19 +3994,19 @@ OurSonic.SonicManager.prototype = {
 		this.get_sonicLevel().set_curHeightMap(true);
 		for (var j = 0; j < sonicLevel.get_tiles().length; j++) {
 			var fc = sonicLevel.get_tiles()[j];
-			var tiles = this.$decodeNumeric(fc);
+			var tiles = fc;
 			var mj = [];
 			for (var i = 0; i < tiles.length; i++) {
-				// var value = sonicLevel.Tiles[j][i];
-				// mj.Add(value >> 4);
-				//  mj.Add(value & 0xF);
+				var value = sonicLevel.get_tiles()[j][i];
+				mj.add(value >> 4);
+				mj.add(value & 15);
 			}
 			var mfc = [];
 			for (var o = 0; o < 8; o++) {
 				mfc[o] = [];
 			}
-			for (var n = 0; n < mf.length; n++) {
-				mfc[n % 8][ss.Int32.div(n, 8)] = mf[n];
+			for (var n = 0; n < mj.length; n++) {
+				mfc[n % 8][ss.Int32.div(n, 8)] = mj[n];
 			}
 			this.get_sonicLevel().get_tiles()[j] = new OurSonic.Drawing.Tile(mfc);
 			this.get_sonicLevel().get_tiles()[j].set_index(j);
@@ -4184,13 +4107,21 @@ OurSonic.SonicManager.prototype = {
 			mj1.set_index(j1);
 			mj1.set_tiles([]);
 			for (var p = 0; p < fc1.length; p++) {
-				mj1.get_tiles().add(fc1[p]);
+				var $t3 = mj1.get_tiles();
+				var $t2 = new OurSonic.Drawing.TileItem();
+				$t2.set__Tile(fc1[p].get_tile());
+				$t2.set_index(p);
+				$t2.set_palette(fc1[p].get_palette());
+				$t2.set_priority(fc1[p].get_priority());
+				$t2.set_xFlip(fc1[p].get_xFlip());
+				$t2.set_yFlip(fc1[p].get_yFlip());
+				$t3.add($t2);
 			}
 			this.get_sonicLevel().get_blocks()[j1] = mj1;
 		}
-		this.get_sonicLevel().set_angles(this.$decodeNumeric(sonicLevel.get_angles()));
-		this.get_sonicLevel().set_collisionIndexes1(this.$decodeNumeric(sonicLevel.get_collisionIndexes1()));
-		this.get_sonicLevel().set_collisionIndexes2(this.$decodeNumeric(sonicLevel.get_collisionIndexes2()));
+		this.get_sonicLevel().set_angles(sonicLevel.get_angles());
+		this.get_sonicLevel().set_collisionIndexes1(sonicLevel.get_collisionIndexes1());
+		this.get_sonicLevel().set_collisionIndexes2(sonicLevel.get_collisionIndexes2());
 		for (var i1 = 0; i1 < sonicLevel.get_heightMaps().length; i1++) {
 			var b1 = true;
 			var b2 = true;
@@ -4227,8 +4158,8 @@ OurSonic.SonicManager.prototype = {
 			mj2.set_animated([]);
 			for (var ic = 0; ic < mj2.get_tilePieces().length; ic++) {
 				for (var jc = 0; jc < mj2.get_tilePieces()[ic].length; jc++) {
-					var r2 = mj2.get_tilePieces()[ic][jc];
-					var pm = this.get_sonicLevel().get_blocks()[r2.get_block()];
+					var r = mj2.get_tilePieces()[ic][jc];
+					var pm = this.get_sonicLevel().get_blocks()[r.get_block()];
 					if (ss.isValue(pm)) {
 						for (var ci = 0; ci < pm.get_tiles().length; ci++) {
 							var mjc = pm.get_tiles()[ci];
@@ -4267,91 +4198,108 @@ OurSonic.SonicManager.prototype = {
 			//}
 			//}
 		}
-		if (ss.isValue(this.get_sonicLevel().get_paletteItems()[0])) {
-			for (var k = 0; k < sonicLevel.get_paletteItems()[0].length; k++) {
-				var pal = sonicLevel.get_paletteItems()[0][k];
-				this.get_sonicLevel().get_paletteItems()[0][k] = pal;
-				pal.set_palette(Type.cast(eval(Type.cast(pal.get_palette(), String)), Array));
-				//below this is bad
-				if (pal.get_totalLength() === 0) {
-					pal.set_totalLength(pal.get_palette().length);
-				}
-				if (pal.get_skipIndex() === 0) {
-					pal.set_skipIndex(ss.Int32.div(pal.get_palette().length, 8));
-				}
-				//^
-			}
-		}
 		//
-		//              for (var kd = 0; kd < sonicLevel.Blocks.Count; kd++) {
+		//            if (SonicLevel.PaletteItems[0] != null)
 		//
-		//              var dj = sonicLevel.Blocks[kd];
+		//            {
 		//
-		//              dj.animatedFrames = [];
+		//            for (var k = 0; k < sonicLevel.PaletteItems[0].Count; k++)
 		//
-		//              
+		//            {
 		//
-		//              for (var i = 0; i < dj.tiles.length; i++) {
+		//            var pal = sonicLevel.PaletteItems[0][k];
 		//
-		//              var mj = dj.tiles[i];
+		//            SonicLevel.PaletteItems[0][k] = pal;
 		//
-		//              if (sonicManager.SonicLevel.Tiles[mj.Tile]) {
+		//            pal.Palette = (List<string>)Script.Eval(pal.Palette.Me());
 		//
-		//              
+		//            
 		//
-		//              var pl = JSLINQ(sonicManager.SonicLevel.Tiles[mj.Tile].getAllPaletteIndexes());
+		//            //below this is bad
 		//
-		//              
+		//            if (pal.TotalLength == 0)
 		//
-		//              
+		//            pal.TotalLength = pal.Palette.Count;
 		//
-		//              if (sonicManager.SonicLevel.PaletteItems[0]) {
+		//            if (pal.SkipIndex == 0)
 		//
-		//              for (var k = 0; k < sonicManager.SonicLevel.PaletteItems[0].length; k++) {
+		//            pal.SkipIndex = pal.Palette.Count / 8;
 		//
-		//              var pal = sonicManager.SonicLevel.PaletteItems[0][k];
+		//            //^
 		//
-		//              
+		//            }
 		//
-		//              
+		//            }
 		//
-		//              for (var m = 0; m < pal.Pieces.length; m++) {
+		//                          for (var kd = 0; kd < sonicLevel.Blocks.Count; kd++) {
 		//
-		//              var mje = pal.Pieces[m];
+		//                          var dj = sonicLevel.Blocks[kd];
 		//
-		//              
+		//                          dj.animatedFrames = [];
 		//
-		//              if (mj.Palette == mje.PaletteIndex) {
+		//                          
 		//
-		//              if (pl.Any(function (J) {
+		//                          for (var i = 0; i < dj.tiles.length; i++) {
 		//
-		//              return J == mje.PaletteOffset / 2 || J == mje.PaletteOffset / 2 + 1;
+		//                          var mj = dj.tiles[i];
 		//
-		//              })) {
+		//                          if (sonicManager.SonicLevel.Tiles[mj.Tile]) {
 		//
-		//              dj.animatedFrames.push(k);
+		//                          
 		//
-		//              }
+		//                          var pl = JSLINQ(sonicManager.SonicLevel.Tiles[mj.Tile].getAllPaletteIndexes());
 		//
-		//              }
+		//                          
 		//
-		//              }
+		//                          
 		//
-		//              
+		//                          if (sonicManager.SonicLevel.PaletteItems[0]) {
 		//
-		//              }
+		//                          for (var k = 0; k < sonicManager.SonicLevel.PaletteItems[0].length; k++) {
 		//
-		//              
+		//                          var pal = sonicManager.SonicLevel.PaletteItems[0][k];
 		//
-		//              }
+		//                          
 		//
-		//              }
+		//                          
 		//
-		//              
+		//                          for (var m = 0; m < pal.Pieces.length; m++) {
 		//
-		//              }
+		//                          var mje = pal.Pieces[m];
 		//
-		//              }
+		//                          
+		//
+		//                          if (mj.Palette == mje.PaletteIndex) {
+		//
+		//                          if (pl.Any(function (J) {
+		//
+		//                          return J == mje.PaletteOffset / 2 || J == mje.PaletteOffset / 2 + 1;
+		//
+		//                          })) {
+		//
+		//                          dj.animatedFrames.push(k);
+		//
+		//                          }
+		//
+		//                          }
+		//
+		//                          }
+		//
+		//                          
+		//
+		//                          }
+		//
+		//                          
+		//
+		//                          }
+		//
+		//                          }
+		//
+		//                          
+		//
+		//                          }
+		//
+		//                          }
 		//  SonicLevel = sonicLevel.Translate();
 		// 
 		//
@@ -4668,34 +4616,11 @@ OurSonic.SonicManager.prototype = {
 		//               
 		//
 		//        }#1#
-	},
-	$containsAnimatedTile: function(tile) {
-		return null;
-	},
-	$decodeNumeric: function(s) {
-		s = s.replace(new RegExp('[^' + OurSonic.SonicManager.$base64chars.join('') + '=]', 'g'), '');
-		var p = ((s.charAt(s.length - 1) === '=') ? ((s.charAt(s.length - 2) === '=') ? 'AA' : 'A') : '');
-		var r = [];
-		s = s.substr(0, s.length - p.length) + p;
-		for (var c = 0; c < s.length; c += 4) {
-			var n = (OurSonic.SonicManager.$base64Inv[s.charAt(c)] << 18) + (OurSonic.SonicManager.$base64Inv[s.charAt(c + 1)] << 12) + (OurSonic.SonicManager.$base64Inv[s.charAt(c + 2)] << 6) + OurSonic.SonicManager.$base64Inv[s.charAt(c + 3)];
-			r.add(n >> 16 & 255);
-			r.add(n >> 8 & 255);
-			r.add(n & 255);
-		}
-		return Type.cast(r.slice(0, r.length - 1), Array);
-	},
-	get_status: function() {
-		return this.$myStatus;
-	},
-	set_status: function(value) {
-		this.get_uiManager().updateTitle(value);
-		this.$myStatus = value;
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.SonicObject
-OurSonic.SonicObject = function(s) {
+OurSonic.SonicObject = function(entry) {
 	this.$1$XField = 0;
 	this.$1$YField = 0;
 	this.$1$DeadField = false;
@@ -5059,7 +4984,6 @@ OurSonic.Sonic.registerClass('OurSonic.Sonic', Object);
 OurSonic.SonicBackground.registerClass('OurSonic.SonicBackground', Object);
 OurSonic.SonicEngine.registerClass('OurSonic.SonicEngine', Object);
 OurSonic.SonicLevel.registerClass('OurSonic.SonicLevel', Object);
-OurSonic.SonicLevelData.registerClass('OurSonic.SonicLevelData', Object);
 OurSonic.SonicManager.registerClass('OurSonic.SonicManager', Object);
 OurSonic.SonicObject.registerClass('OurSonic.SonicObject', Object);
 OurSonic.SpriteCache.registerClass('OurSonic.SpriteCache', Object);

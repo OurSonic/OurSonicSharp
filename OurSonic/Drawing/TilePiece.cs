@@ -13,7 +13,7 @@ namespace OurSonic.Drawing
         private int cy;
         protected JsDictionary<string, CanvasElement> Image { get; set; }
         protected object HeightMask { get; set; }
-        public List<Tile> Tiles { get; set; }
+        public List<TileItem> Tiles { get; set; }
 
         private int[][] drawInfo = new[] { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 0, 1 }, new[] { 1, 1 } };
 

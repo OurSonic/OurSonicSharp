@@ -32,6 +32,8 @@ namespace OurSonic
 
         public List<TileChunk> AnimatedChunks { get; set; }
 
+        public int[][] BGChunkMap { get; set; }
+
 
 //todo:: no ides
 
@@ -48,40 +50,7 @@ namespace OurSonic
         }
     }
 
-    public class SonicLevelData
-    {
-        public List<List<int>> BGChunkMap { get; set; }
-        public List<string> Chunks { get; set; }
-        public List<string> Tiles { get; set; }
-        public List<List<Tile>> Blocks { get; set; }
-
-        public int ForegroundWidth { get; set; }
-        public int ForegroundHeight { get; set; }
-
-        public string Foreground { get; set; }
-
-        public List<List<int>> ChunkMap { get; set; }
-
-        public int BackgroundWidth{ get; set; }
-        public int BackgroundHeight { get; set; }
-
-        public string[] Objects { get; set; }
-
-        public string Angles { get; set; }
-
-        public string CollisionIndexes1 { get; set; }
-        public string CollisionIndexes2 { get; set; }
-
-        public List<List<int>> HeightMaps { get; set; }
-
-        public List<List<PaletteItem>> PaletteItems { get; set; }
-
-        public SonicLevel Translate()
-        {
-            return null;
-        }
-    }
-
+ 
     public class PaletteItem
     {
         public List<string> Palette { get; set; }

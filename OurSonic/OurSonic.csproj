@@ -32,26 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib">
-      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.1.2.5.5\tools\Assemblies\mscorlib.dll</HintPath>
-    </Reference>
-    <Reference Include="Script.jQuery">
-      <HintPath>..\packages\Saltarelle.jQuery.1.2.5.3\lib\Script.jQuery.dll</HintPath>
-    </Reference>
-    <Reference Include="Script.jQuery.UI">
-      <HintPath>..\packages\Saltarelle.jQuery.UI.1.2.5\lib\Script.jQuery.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="Script.Linq">
-      <HintPath>..\packages\Saltarelle.Linq.1.2.5\lib\Script.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="Script.Web">
-      <HintPath>..\packages\Saltarelle.Web.1.2.5.1\lib\Script.Web.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Animation.cs" />
     <Compile Include="AnimationInstance.cs" />
     <Compile Include="CanvasInformation.cs" />
@@ -75,6 +55,7 @@
     <Compile Include="SonicEngine.cs" />
     <Compile Include="SonicLevel.cs" />
     <Compile Include="SonicManager.cs" />
+    <Compile Include="SonicManager.load.cs" />
     <Compile Include="SonicObject.cs" />
     <Compile Include="SpriteCache.cs" />
     <Compile Include="SpriteLoader.cs" />
@@ -83,8 +64,34 @@
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.2.5.14\tools\Saltarelle.Compiler.targets')" />
-  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.1.2.5.14\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.2.5.14\tools\Saltarelle.Compiler.targets')" />
+  <ItemGroup>
+    <ProjectReference Include="..\OurSonicModels\OurSonicModels.csproj">
+      <Project>{D16CB407-F890-4670-8DB6-37DF76880297}</Project>
+      <Name>OurSonicModels</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib">
+      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.1.2.5.7\tools\Assemblies\mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="Script.jQuery, Version=1.2.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Saltarelle.jQuery.1.2.5.4\lib\Script.jQuery.dll</HintPath>
+    </Reference>
+    <Reference Include="Script.jQuery.UI, Version=1.2.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Saltarelle.jQuery.UI.1.2.5.1\lib\Script.jQuery.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Script.Linq, Version=1.2.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Saltarelle.Linq.1.2.5.1\lib\Script.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="Script.Web, Version=1.2.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Saltarelle.Web.1.2.5.2\lib\Script.Web.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.2.5.15\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.1.2.5.15\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.2.5.15\tools\Saltarelle.Compiler.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

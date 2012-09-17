@@ -1,10 +1,11 @@
 using System.Html.Media.Graphics;
+using OurSonicModels;
 
 namespace OurSonic
 {
     public class SonicObject
     {
-        public SonicObject(string s)
+        public SonicObject(SLDataObjectEntry entry)
         {
         }
 
