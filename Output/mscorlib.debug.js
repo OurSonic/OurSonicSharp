@@ -1858,7 +1858,7 @@ ss.IEnumerator = function IEnumerator$() { };
 ss.IEnumerator.prototype = {
     get_current: null,
     moveNext: null,
-    reset: null
+    reset: null,dispose:null
 }
 
 ss.IEnumerator.registerInterface('IEnumerator');
@@ -2093,6 +2093,8 @@ ss.ArrayEnumerator.prototype = {
     },
     reset: function ArrayEnumerator$reset() {
         this._index = -1;
+    }, dispose: function ArrayEnumerator$dispose() {
+        
     },
 	get_current: function ArrayEnumerator$get_current() {
 		if (this._index < 0 || this._index >= this._array.length)
@@ -2118,6 +2120,8 @@ ss.ObjectEnumerator.prototype = {
     },
     reset: function ObjectEnumerator$reset() {
         this._index = -1;
+    },dispose: function ArrayEnumerator$dispose() {
+        
     },
 	get_current: function ObjectEnumerator$get_current() {
 		if (this._index < 0 || this._index >= this._keys.length)
@@ -2204,7 +2208,9 @@ ss.Dictionary$2 = function Dictionary$2$(TKey, TValue) {
 		},
 		clear: function Dictionary$2$clear() {
 			Object.clearKeys(this._o);
-		}
+		},dispose: function ArrayEnumerator$dispose() {
+        
+    },
 	};
 	$type.registerGenericClassInstance($type, ss.Dictionary$2, [TKey, TValue], function() { return null }, function() { return [ ss.IDictionary, ss.IEnumerable ] });
 	return $type;

@@ -158,7 +158,7 @@ namespace OurSonic
 
         public static string DecodeString(string lvl)
         {
-            return null;
+            return lvl;
         }
     }
 }

@@ -16,7 +16,7 @@ namespace OurSonic
         public List<TilePiece> Blocks { get; set; }
         public List<SonicObject> Objects { get; set; }
         public List<List<PaletteItem>> PaletteItems { get; set; }
-        public dynamic[] Palette { get; set; }//todo::: no idea
+        public string[][] Palette { get; set; }
         public List<int> palAn { get; set; }
 
         public Point[] StartPositions { get; set; }
@@ -53,7 +53,7 @@ namespace OurSonic
  
     public class PaletteItem
     {
-        public List<string> Palette { get; set; }
+        public string[] Palette { get; set; }
         public int SkipIndex { get; set; }
         public int TotalLength { get; set; }
         public List<PaletteItemPieces> Pieces { get; set; }

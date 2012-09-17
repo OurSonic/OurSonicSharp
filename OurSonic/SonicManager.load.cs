@@ -12,6 +12,7 @@ namespace OurSonic
     {
         public void Load(string lvl, CanvasElement mainCanvas)
         {
+            
             Loading = true;
             Status = "Decoding";
             var sonicLevel = jQuery.ParseJsonData<SLData>(Help.DecodeString(lvl));
@@ -39,6 +40,8 @@ namespace OurSonic
                 };
             })(l));
         }*/
+            SonicLevel.Objects = new List<SonicObject>();
+
             for (int l = 0; l < sonicLevel.Objects.Length; l++)
             {
                 SonicLevel.Objects[l] = new SonicObject(sonicLevel.Objects[l]);
@@ -109,25 +112,27 @@ namespace OurSonic
             SonicLevel.CurPaletteIndex = 0;
             SonicLevel.palAn = new List<int>();
             SonicLevel.CurHeightMap = true;
+            SonicLevel.Tiles = new List<Tile>();
+
              
             for (int j = 0; j < sonicLevel.Tiles.Length; j++)
             {
                 var fc = sonicLevel.Tiles[j];
                 var tiles = fc;
-                var mj = new List<int>();
+                var mj = new int[0];
 
                 for (int i = 0; i < tiles.Length; i++)
                 {
                     var value = sonicLevel.Tiles[j][i];
-                     mj.Add(value >> 4);
-                      mj.Add(value & 0xF);
+                    mj[i] = (value >> 4);
+                    mj[i] = (value & 0xF);
                 }
-                var mfc = new List<List<int>>();
+                var mfc = new int[8][];
                 for (int o = 0; o < 8; o++)
                 {
-                    mfc[o] = new List<int>();
+                    mfc[o] = new int[8];
                 }
-                for (int n = 0; n < mj.Count; n++)
+                for (int n = 0; n < mj.Length; n++)
                 {
                     mfc[n % 8][n / 8] = mj[n];
                 }
@@ -170,6 +175,7 @@ namespace OurSonic
                         }
                     }
              */
+            SonicLevel.Blocks = new List<TilePiece>();
 
             for (int j = 0; j < sonicLevel.Blocks.Length; j++)
             {
@@ -199,6 +205,7 @@ namespace OurSonic
 
             SonicLevel.CollisionIndexes1 = sonicLevel.CollisionIndexes1;
             SonicLevel.CollisionIndexes2 = sonicLevel.CollisionIndexes2;
+            SonicLevel.HeightMaps = new List<HeightMask>();
 
             for (int i = 0; i < sonicLevel.HeightMaps.Length; i++)
             {
@@ -232,7 +239,8 @@ namespace OurSonic
                 }
 
             }
-
+            SonicLevel.Chunks = new List<TileChunk>();
+            
             for (int j = 0; j < sonicLevel.Chunks.Length; j++)
             {
                 var fc = sonicLevel.Chunks[j];
@@ -245,7 +253,7 @@ namespace OurSonic
                 }
                 for (int p = 0; p < fc.Length; p++)
                 {
-                    mj.TilePieces[p % 8][p / 8] = fc.Me()[p];
+                    mj.TilePieces[p % 8][p / 8] = new TilePiece() { Index = p, Block = fc[p].Block, XFlip = fc[p].XFlip, YFlip = fc[p].YFlip};
                 }
                 SonicLevel.Chunks[j] = mj;
                 mj.Animated = new List<Animation>();
@@ -303,7 +311,34 @@ namespace OurSonic
                 }*/
 
             }
+            SonicLevel.Palette = sonicLevel.Palette;
 
+            SonicLevel.PaletteItems = new List<List<PaletteItem>>();
+            if (sonicLevel.PaletteItems[0] != null)
+            {
+                SonicLevel.PaletteItems[0] = new List<PaletteItem>();
+
+                for (int k = 0; k < sonicLevel.PaletteItems[0].Length; k++)
+                {
+                    AnimatedPaletteItem pal = sonicLevel.PaletteItems[0][k];
+                    SonicLevel.PaletteItems[0][k] = new PaletteItem()
+                                                        {
+                                                            Palette = (string[])Script.Eval(pal.Palette),
+                                                            SkipIndex = pal.SkipIndex,
+                                                            TotalLength = pal.TotalLength,
+                                                            Pieces =
+                                                                pal.Pieces.Map(
+                                                                    a =>
+                                                                    new PaletteItemPieces()
+                                                                        {
+                                                                            PaletteIndex = a.PaletteIndex,
+                                                                            PaletteMultiply = a.PaletteMultiply,
+                                                                            PaletteOffset = a.PaletteOffset
+                                                                        })
+                                                        };
+
+                }
+            }
 
 /*
             if (SonicLevel.PaletteItems[0] != null)

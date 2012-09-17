@@ -19,19 +19,10 @@ namespace OurSonic.Drawing
 
         public int Palette { get; set; }
 
-        public Tile(List<List<int>> colors)
+        public Tile(int[][] colors)
         {
-            int?[][] fm = new int?[colors.Count][];
 
-            for (int i = 0; i < colors.Count; i++)
-            {
-                for (int j = 0; j < colors[i].Count; j++)
-                {
-                    fm[i][j] = colors[i][j];
-                }
-            }
-
-            Colors = fm;
+            Colors = colors;
             Sprites = new List<int>();
             CurPaletteIndexes = null;
         }
@@ -40,7 +31,7 @@ namespace OurSonic.Drawing
 
         protected List<int> Sprites { get; set; }
 
-        protected int?[][] Colors { get; set; }
+        protected int[][] Colors { get; set; }
         protected bool ShowOutline { get; set; }
 
         public int Index { get; set; }
@@ -98,6 +89,8 @@ namespace OurSonic.Drawing
 
         private bool CheckGood(CanvasContext2D canvas, Point pos, Point scale, bool xflip, bool yflip, int palette, int layer, int animationFrame)
         {
+            return false;
+
             if (index[0] != 'A')
             {
                 if (willAnimate == null) return false;

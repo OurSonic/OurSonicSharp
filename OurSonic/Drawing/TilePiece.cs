@@ -131,6 +131,7 @@ namespace OurSonic.Drawing
 
         private void SetCache(int layer, Point scale, int drawOrder, int animationFrame, List<int> palAn, CanvasElement image)
         {
+            return;
 
             string val = ((drawOrder + 1) + (scale.X * 10) + (animationFrame * 1000) + ((layer + 1) * 10000)).ToString();
             foreach (var animatedFrame in AnimatedFrames)
@@ -149,6 +150,7 @@ namespace OurSonic.Drawing
 
         private CanvasElement GetCache(int layer, Point scale, int drawOrder, int animationFrame, List<int> palAn)
         {
+            return null;
             string val = ((drawOrder + 1) + (scale.X * 10) + (animationFrame * 1000) + ((layer + 1) * 10000)).ToString();
             foreach (var animatedFrame in AnimatedFrames)
             {

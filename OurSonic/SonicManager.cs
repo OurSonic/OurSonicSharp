@@ -675,7 +675,7 @@ namespace OurSonic
             }
             canvas.Save();
             DrawTickCount++;
-            if (SpriteLoader != null && !SpriteLoader.Tick() || Loading)
+            if (false && (SpriteLoader != null && !SpriteLoader.Tick() || Loading))
             {
                 canvas.FillStyle = "white";
                 canvas.FillText(
@@ -772,7 +772,7 @@ namespace OurSonic
                     int ind = SonicLevel.ChunkMap[_xP][_yP];
                     TileChunk chunk = SonicLevel.Chunks[ind];
                     TileChunk anni = SonicLevel.Chunks[ind];
-                    if (anni != null)
+                    if (false && anni != null)
                         anni.AnimatedTick();
                     if (chunk == null)
                         continue;
