@@ -6,7 +6,7 @@ namespace OurSonic.Drawing
 {
     public class Tile
     {
-        private int[] index;
+        private string index;
         private Animation willAnimate;
         [IntrinsicProperty]
         public int _Tile { get; set; }
@@ -98,61 +98,61 @@ namespace OurSonic.Drawing
                                int animationFrame)
         {
             return false;
-
-            if (index[0] != 'A') {
+/*
+            if (index.CharAt(0) != "A") {
                 if (willAnimate == null) return false;
                 var an = willAnimate;
+                var anin = an.AnimationTileIndex;
+                var ind = animationFrame;
+                var frame = an.Frames[ind];
+                if (frame == null) {
+                    frame = an.Frames[0];
+                }
+                var file = SonicManager.Instance.SonicLevel.AnimatedFiles[an.AnimationFile];
+                var va = file[frame.StartingTileIndex + ( index - anin )];
+                if (va != null) {
+
+                    if (canvas.FillStyle != "rbga(255,255,255,255)")
+                        canvas.FillStyle = "rbga(255,255,255,255)";
+                    va.Draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
+                    return true;
+                }
+                return false;
             }
+            for (int i = 0; i < SonicManager.Instance.SonicLevel.Animations.Count; i++) {
+                var an = SonicManager.Instance.SonicLevel.Animations[i];
+                var anin = an.AnimationTileIndex;
+                var num = an.NumberOfTiles;
+                if (this.index > anin && this.index < anin + num) {
+                    willAnimate = an;
+                    var ind = animationFrame;
+                    var frame = an.Frames[ind];
+                    if (frame == null) {
+                        frame = an.Frames[0];
+                    }
+                    var file = SonicManager.Instance.SonicLevel.AnimatedFiles[an.AnimationFile];
+                    var va = file[frame.StartingTileIndex + (index - anin)];
+                    if (va != null) {
+
+                        if (canvas.FillStyle != "rbga(255,255,255,255)")
+                            canvas.FillStyle = "rbga(255,255,255,255)";
+                        va.Draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
+                        return true;
+                    }
+ 
+                }
+            }
+            willAnimate = null;
             return false;
 
-            /*
-                            if (this.index[0] != 'A') {
-                                if (this.willAnimate === false) return false;
-
-                                if (this.willAnimate != undefined) {
-                                    var an = this.willAnimate;
-                                    var anin = an.AnimationTileIndex;
-
-                                    if (sonicManager.CACHING) return true;
-
-                                    var ind = animationFrame;
-
-                                    var frame = an.Frames[ind];
-                                    if (!frame) frame = an.Frames[0];
-                                    var file = sonicManager.SonicLevel.AnimatedFiles[an.AnimationFile];
-                                    var va = file[frame.StartingTileIndex + (this.index - anin)];
-                                    if (va) {
-                                        if (canvas.fillStyle != "rbga(255,255,255,255)")
-                                            canvas.fillStyle = "rbga(255,255,255,255)";
-                                        va.draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
-                                        return true;
-                                    }
-                                    return false;
-                                }
-                                for (var i = 0; i < sonicManager.SonicLevel.Animations.length; i++) {
-                                    var an = sonicManager.SonicLevel.Animations[i];
-                                    var anin = an.AnimationTileIndex;
-                                    var num = an.NumberOfTiles;
-                                    if (this.index >= anin && this.index < anin + num) {
-                                        if (sonicManager.CACHING) return true;
-                                        this.willAnimate = an;
-                                        var ind = animationFrame;
-                                        var frame = an.Frames[ind];
-                                        if (!frame) frame = an.Frames[0];
-                                        var file = sonicManager.SonicLevel.AnimatedFiles[an.AnimationFile];
-                                        var va = file[frame.StartingTileIndex + (this.index - anin)];
-                                        if (va) {
-                                            if (canvas.fillStyle != "rbga(255,255,255,255)")
-                                                canvas.fillStyle = "rbga(255,255,255,255)";
-                                            va.draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
-                                            return true;
-                                        }
+            /* 
 
                                     }
                                 }
                                 this.willAnimate = false;
                             }
-                            return false;*/
+                            return false;#1#
+*/
         }
 
         private void ChangeColor(int x, int y, int color)

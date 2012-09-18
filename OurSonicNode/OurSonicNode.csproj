@@ -35,6 +35,7 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compress.cs" />
     <Compile Include="Server.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -47,6 +48,32 @@
     <Reference Include="Script.Linq, Version=1.2.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
       <HintPath>..\packages\Saltarelle.Linq.1.2.5.1\lib\Script.Linq.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NodeLibraries\Fibers\Fibers.csproj">
+      <Project>{48C25DF7-AFC5-4AC0-B11A-535DEF87076D}</Project>
+      <Name>Fibers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NodeLibraries\MongoDB\MongoDB.csproj">
+      <Project>{EAC709D8-477C-41F5-93E9-1C39C3C5E5A9}</Project>
+      <Name>MongoDB</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NodeLibraries\NodeJS\NodeJS.csproj">
+      <Project>{79800429-B885-4F5E-9A3B-48E50390214A}</Project>
+      <Name>NodeJS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NodeLibraries\Redis\Redis.csproj">
+      <Project>{5214FA01-BBBF-425F-B77D-1F6DA7AEB4ED}</Project>
+      <Name>Redis</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NodeLibraries\SocketIO\SocketIO.csproj">
+      <Project>{BD7C6F4F-3798-4C32-9EE1-306CF197F81E}</Project>
+      <Name>SocketIO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OurSonic\OurSonic.csproj">
+      <Project>{3222B6FB-15F6-4217-8ECD-193BCFCE7D60}</Project>
+      <Name>OurSonic</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.2.5.15\tools\Saltarelle.Compiler.targets')" />
   <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.1.2.5.15\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.2.5.15\tools\Saltarelle.Compiler.targets')" />

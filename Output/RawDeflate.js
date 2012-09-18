@@ -6,6 +6,16 @@
 *
 */
 
+
+var $_top;
+
+if(typeof global != 'undefined'){
+$_top=global;
+}else{
+$_top=this;
+}
+
+
 (function (global) {
 
     if (global.Base64) return;
@@ -126,7 +136,7 @@
     
 
 
-})(this);
+})($_top);
    
 
 
@@ -1799,7 +1809,7 @@
  global.RawDeflate = {};
     global.RawDeflate.deflate = zip_deflate;
 
-})(this);
+})($_top);
 
 
 /*
@@ -2553,26 +2563,8 @@
   global.RawInflate= {};
     global.RawInflate.inflate = zip_inflate;
 
-})(this);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var $_top=this;
+})($_top);
+ 
 
 function Compressor() {
     var CompressText = function (str) {

@@ -1,10 +1,15 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using OurSonic.Drawing;
+using OurSonicModels;
 namespace OurSonic
 {
     public class SonicLevel
     {
+        [PreserveCase]
+        public List<Animation> Animations { get; set; }
+        [IntrinsicProperty]
+        public int[][][] AnimatedFiles { get; set; }
         [IntrinsicProperty]
         public int[][] ChunkMap { get; set; }
         [IntrinsicProperty]

@@ -168,6 +168,8 @@ namespace OurSonicModels
     public class SLDataAnimation
     {
         [PreserveCase]
+        public int AutomatedTiming { get; set; }
+        [PreserveCase]
         public int AnimationFile { get; set; }
         [PreserveCase]
         public int AnimationTileIndex { get; set; }

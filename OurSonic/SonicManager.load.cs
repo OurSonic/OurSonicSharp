@@ -132,6 +132,7 @@ namespace OurSonic
                 SonicLevel.Tiles[j].Index = j;
             }
             var acs = SonicLevel.AnimatedChunks = new List<TileChunk>();
+
             /*
                     
                     if (sonicManager.SonicLevel.AnimatedFiles) {
@@ -187,7 +188,20 @@ namespace OurSonic
             }
 
             SonicLevel.Angles = sonicLevel.Angles;
-
+            SonicLevel.AnimatedFiles = sonicLevel.AnimatedFiles;
+            SonicLevel.Animations =
+                    new List<Animation>(
+                            sonicLevel.Animations.Map(
+                                    a =>
+                                    new Animation() {
+                                                            AnimationFile = a.AnimationFile,
+                                                            AnimationTileIndex = a.AnimationTileIndex,
+                                                            AutomatedTiming = a.AutomatedTiming,
+                                                            NumberOfTiles = a.NumberOfTiles,
+                                                            Frames =
+                                                                    (AnimationFrame[])
+                                                                    a.Frames.Map(b => new AnimationFrame() {Ticks = b.Ticks, StartingTileIndex = b.StartingTileIndex}).Slice(0)
+                                                    }));
             SonicLevel.CollisionIndexes1 = sonicLevel.CollisionIndexes1;
             SonicLevel.CollisionIndexes2 = sonicLevel.CollisionIndexes2;
             SonicLevel.HeightMaps = new List<HeightMask>();
@@ -238,7 +252,7 @@ namespace OurSonic
                             for (int ci = 0; ci < pm.Tiles.Count; ci++) {
                                 var mjc = pm.Tiles[ci];
                                 if (SonicLevel.Tiles[mjc._Tile] != null) {
-                                    var fa = containsAnimatedTile(mjc._Tile);
+                                    var fa = containsAnimatedTile(mjc._Tile,sonicLevel);
                                     if (fa != null) {
                                         mj.Animated[jc * 8 + ic] = fa;
                                         acs[j] = mj;

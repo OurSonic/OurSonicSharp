@@ -5,6 +5,7 @@ using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using OurSonic.Drawing;
+using OurSonicModels;
 using jQueryApi;
 namespace OurSonic
 {
@@ -23,7 +24,7 @@ namespace OurSonic
         private object sonicSprites;
         private int tickCount;
         private bool waitingForDrawContinue;
-        private bool waitingForTickContinue;
+        private bool waitingForTickContinue; 
         [IntrinsicProperty]
         public GameState CurrentGameState { get; set; }
         [IntrinsicProperty]
@@ -114,7 +115,7 @@ namespace OurSonic
 
             Animations = new List<Animation>();
             AnimationInstances = new List<AnimationInstance>();
-            jQuery.GetJson("Content/sprites/explosion.js", data => Animations.Add(new Animation("explosion", data)));
+            //jQuery.GetJson("Content/sprites/explosion.js", data => Animations.Add(new Animation("explosion", data)));
 
             ShowHeightMap = false;
             GoodRing = new Ring(false);
@@ -909,8 +910,30 @@ namespace OurSonic
                 SonicToon.DrawUI(canvas, new Point(ScreenOffset.X, ScreenOffset.Y), Scale);
         }
 
-        private Animation containsAnimatedTile(int tile)
+        private Animation containsAnimatedTile(int tile,SLData sonLevel)
         {
+            for (int index = 0; index < sonLevel.Animations.Count; index++) {
+                var an = sonLevel.Animations[index];
+                var anin = an.AnimationTileIndex;
+                var num = an.NumberOfTiles;
+                if (index >= anin && index < anin + num) {
+                    return new Animation() { AnimationFile = an .AnimationFile,AutomatedTiming=an.AutomatedTiming};
+                } 
+            }
+            return null;
+
+            /*
+             
+        for (var i = 0; i < sonicManager.SonicLevel.Animations.length; i++) {
+            var an = sonicManager.SonicLevel.Animations[i];
+            var anin = an.AnimationTileIndex;
+            var num = an.NumberOfTiles;
+            if (index >= anin && index < anin + num) {
+                return an;
+            }
+        }
+        return undefined;
+             */
             return null;
         }
 

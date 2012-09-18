@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 namespace OurSonic
 {
     public class Animation
@@ -22,15 +23,28 @@ namespace OurSonic
             (x - this.images[jv].width / 2) * scale.x, (y - this.images[jv].height / 2) * scale.y);
         canvas.restore();
     };
-}*/
+}*/ 
+        [IntrinsicProperty]
+        public int AnimationFile { get; set; }
+        [IntrinsicProperty]
+        public int NumberOfTiles { get; set; }
+        [IntrinsicProperty]
         public int LastAnimatedIndex { get; set; }
+        [IntrinsicProperty]
         public int? LastAnimatedFrame { get; set; }
+        [IntrinsicProperty]
+        public int AnimationTileIndex { get; set; }
+        [IntrinsicProperty]
         public AnimationFrame[] Frames { get; set; }
+        [IntrinsicProperty]
         public int AutomatedTiming { get; set; }
-        public Animation(string name, object data) {}
+        public Animation() { }
     }
     public class AnimationFrame
     {
+        [IntrinsicProperty]
         public decimal Ticks { get; set; }
+        [IntrinsicProperty]
+        public int StartingTileIndex { get; set; }
     }
 }
