@@ -9,8 +9,7 @@ namespace OurSonic.Drawing
         private int cx;
         private int cy;
         private int[][] drawInfo = new[] {new[] {0, 0}, new[] {1, 0}, new[] {0, 1}, new[] {1, 1}};
-        private int[][] drawOrder = new[]
-                                    {new[] {3, 2, 1, 0}, new[] {1, 0, 3, 2}, new[] {2, 3, 0, 1}, new[] {0, 1, 2, 3}};
+        private int[][] drawOrder = new[] {new[] {3, 2, 1, 0}, new[] {1, 0, 3, 2}, new[] {2, 3, 0, 1}, new[] {0, 1, 2, 3}};
         [IntrinsicProperty]
         protected JsDictionary<string, CanvasElement> Image { get; set; }
         [IntrinsicProperty]
@@ -39,8 +38,9 @@ namespace OurSonic.Drawing
 
         public bool OnlyBackground()
         {
+            var tiles = SonicManager.Instance.SonicLevel.Tiles;
             foreach (var mj in Tiles) {
-                if (SonicManager.Instance.SonicLevel.Tiles[mj._Tile] != null) {
+                if (tiles[mj._Tile] != null) {
                     if (mj.Priority)
                         return false;
                 }
@@ -95,11 +95,8 @@ namespace OurSonic.Drawing
                          int layer,
                          bool xFlip,
                          bool yFlip,
-                         int animatedIndex,
-                         IntersectingRectangle bounds)
+                         int animatedIndex)
         {
-            if (! bounds.Intersects(position))
-                return true;
             var drawOrderIndex = 0;
 
             drawOrderIndex = xFlip ? ( yFlip ? 0 : 1 ) : ( yFlip ? 2 : 3 );
@@ -110,16 +107,17 @@ namespace OurSonic.Drawing
                 var sY = 8 * scale.Y;
                 var i = 0;
 
+                var localPoint = new Point(0, 0);
+                var tiles = SonicManager.Instance.SonicLevel.Tiles;
                 foreach (var mj in Tiles) {
-                    if (SonicManager.Instance.SonicLevel.Tiles[mj._Tile] != null) {
+                    if (tiles[mj._Tile] != null) {
                         if (mj.Priority == ( layer == 1 )) {
                             var _xf = xFlip ^ mj.XFlip;
                             var _yf = yFlip ^ mj.YFlip;
                             var df = drawInfo[drawOrder[drawOrderIndex][i]];
-                            SonicManager.Instance.SonicLevel.Tiles[mj._Tile].Draw(ac.Context,
-                                                                                  new Point(df[0] * sX, df[1] * sY), scale,
-                                                                                  _xf, _yf, mj.Palette, layer,
-                                                                                  AnimationFrame);
+                            localPoint.X = df[0] * sX;
+                            localPoint.Y = df[1] * sY;
+                            tiles[mj._Tile].Draw(ac.Context, localPoint, scale, _xf, _yf, mj.Palette, layer, AnimationFrame);
                         }
                     }
                     i++;
@@ -137,15 +135,14 @@ namespace OurSonic.Drawing
                               int animationFrame,
                               List<int> palAn,
                               CanvasElement image)
-        { 
-
-            string val = ( ( drawOrder + 1 ) + ( scale.X * 10 ) + ( animationFrame * 1000 ) + ( ( layer + 1 ) * 10000 ) ).ToString();
-            if (AnimatedFrames != null) {
+        {
+            dynamic val = ( ( drawOrder + 1 ) + ( scale.X * 10 ) + ( animationFrame * 1000 ) + ( ( layer + 1 ) * 10000 ) );
+            if ((dynamic) AnimatedFrames) {
                 foreach (var animatedFrame in AnimatedFrames) {
                     val += palAn[animatedFrame] + " ";
                 }
             }
-            Image[val] = image;
+            ( (dynamic) Image )[val] = image;
         }
 
         private void DrawIt(CanvasContext2D canvas, CanvasElement fd, Point position)
@@ -155,14 +152,15 @@ namespace OurSonic.Drawing
 
         private CanvasElement GetCache(int layer, Point scale, int drawOrder, int animationFrame, List<int> palAn)
         {
-            string val = ( ( drawOrder + 1 ) + ( scale.X * 10 ) + ( animationFrame * 1000 ) + ( ( layer + 1 ) * 10000 ) ).ToString();
-            if (AnimatedFrames != null) {
+            dynamic val = ( ( drawOrder + 1 ) + ( scale.X * 10 ) + ( animationFrame * 1000 ) + ( ( layer + 1 ) * 10000 ) );
+            if ((dynamic) AnimatedFrames) {
                 foreach (var animatedFrame in AnimatedFrames) {
                     val += palAn[animatedFrame] + " ";
                 }
             }
-            if (Image[val] == null) return null;
-            return Image[val];
+
+            if (!( (dynamic) Image )[val]) return null;
+            return Extensions.Me<CanvasElement>(( ( (dynamic) Image )[val] ));
         }
     }
     public enum RotationMode

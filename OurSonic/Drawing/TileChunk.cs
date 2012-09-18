@@ -40,10 +40,14 @@ namespace OurSonic.Drawing
         public bool OnlyBackground()
         {
             if (isOnlyBackground == null) {
-                for (int i = 0; i < TilePieces.Length; i++) {
-                    for (int j = 0; j < TilePieces[i].Length; j++) {
+                var blocks = SonicManager.Instance.SonicLevel.Blocks;
+
+                var tpl = TilePieces.Length;
+                var tph = TilePieces[0].Length;
+                for (int i = 0; i < tpl; i++) {
+                    for (int j = 0; j < tph; j++) {
                         var r = TilePieces[i][j];
-                        var pm = SonicManager.Instance.SonicLevel.Blocks[r.Block];
+                        var pm = blocks[r.Block];
                         if (pm != null) {
                             if (!pm.OnlyBackground())
                                 return ( isOnlyBackground = false ).Value;
@@ -58,8 +62,10 @@ namespace OurSonic.Drawing
         public bool IsEmpty()
         {
             if (empty == null) {
-                for (int i = 0; i < TilePieces.Length; i++) {
-                    for (int j = 0; j < TilePieces[i].Length; j++) {
+                var tpl = TilePieces.Length;
+                var tph = TilePieces[0].Length;
+                for (int i = 0; i < tpl; i++) {
+                    for (int j = 0; j < tph; j++) {
                         var r = TilePieces[i][j];
                         if (r.Block != 0)
                             return ( empty = false ).Value;
@@ -79,16 +85,54 @@ namespace OurSonic.Drawing
 
             var lX = 16 * scale.X;
             var lY = 16 * scale.Y;
+            var localPoint = new Point(0, 0);
+
+            var check = false;
+
+            /*var RectB = new Rectangle(position.X, position.Y, len1 * lX, len2 * lY);
+            var RectA = bounds;
+            if (RectA.X < RectB.X+RectB.Width && RectA.X+RectA.Width > RectB.X+RectB.Width &&
+                RectA.Y < RectB.Y + RectB.Height && RectA.Y + RectA.Height > RectB.Y + RectB.Height) {
+                check = true;
+            }*/
+            /*
+
+        localPoint.X = position.X;
+            localPoint.Y = position.Y;
+            if (bounds.Intersects(localPoint)) {
+                localPoint.X = position.X+len1*lX;
+                localPoint.Y = position.Y;
+                if (bounds.Intersects(localPoint))
+                {
+                    localPoint.X = position.X;
+                    localPoint.Y = position.Y + len2 * lY;
+                    if (bounds.Intersects(localPoint))
+                    {
+                        localPoint.X = position.X + len1 * lX;
+                        localPoint.Y = position.Y + len2 * lY;
+                        if (bounds.Intersects(localPoint)) {
+                            check = false;
+                        }
+                    }
+                }   
+            } 
+*/
+
+            var blocks = SonicManager.Instance.SonicLevel.Blocks;
             for (int i = 0; i < len1; i++) {
                 for (int j = 0; j < len2; j++) {
                     var r = TilePieces[i][j];
-                    var pm = SonicManager.Instance.SonicLevel.Blocks[r.Block];
-                    if (pm != null) {
+                    var pm = blocks[r.Block];
+                    if ((dynamic) pm) {
                         int animatedIndex = 0;
-                        if (Animated != null && Animated[j * len1 + i] != null)
+                        if ((dynamic) Animated && (dynamic) ( Animated[j * len1 + i] ))
                             animatedIndex = Animated[j * len1 + i].LastAnimatedIndex;
-                        pm.Draw(canvas, new Point(position.X + i * lX, position.Y + j * lY), scale, layer, r.XFlip, r.YFlip,
-                                animatedIndex, bounds);
+
+                        localPoint.X = position.X + i * lX;
+                        localPoint.Y = position.Y + j * lY;
+                        if (check && !bounds.Intersects(localPoint))
+                            continue;
+                        pm.Draw(canvas, localPoint, scale, layer, r.XFlip, r.YFlip, animatedIndex);
                         //canvas.StrokeStyle = "#FFF";
                         //canvas.StrokeRect(position.X + i * 16 * scale.X, position.Y + j * 16 * scale.Y, scale.X * 16, scale.Y * 16);
                     }

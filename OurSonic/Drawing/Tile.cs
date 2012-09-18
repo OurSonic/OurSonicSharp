@@ -62,16 +62,16 @@ namespace OurSonic.Drawing
                 oPos.Y = -Colors.Length * scale.Y;
                 j.Context.Scale(1, -1);
             }
+            var palette_ = SonicManager.Instance.SonicLevel.Palette;
+            int indexed = SonicManager.Instance.IndexedPalette;
 
             for (int i = 0; i < Colors.Length; i++) {
                 for (int jf = 0; jf < Colors[i].Length; jf++) {
                     var gj = Colors[i][jf];
-                    if (gj == null)
-                        continue;
                     var m =
-                            SonicManager.Instance.SonicLevel.Palette[
-                                    ( palette + SonicManager.Instance.IndexedPalette ) %
-                                    SonicManager.Instance.SonicLevel.Palette.Length][gj];
+                            palette_[
+                                    ( palette + indexed ) %
+                                    palette_.Length][gj];
                     if (j.Context.FillStyle != "#" + m)
                         j.Context.FillStyle = "#" + m;
 
@@ -97,24 +97,21 @@ namespace OurSonic.Drawing
                                int layer,
                                int animationFrame)
         {
-            return false;
-/*
-            if (index.CharAt(0) != "A") {
+            dynamic index_ = index;
+
+            if (index_ && index_[0] != "A") {
                 if (willAnimate == null) return false;
                 var an = willAnimate;
                 var anin = an.AnimationTileIndex;
                 var ind = animationFrame;
                 var frame = an.Frames[ind];
-                if (frame == null) {
-                    frame = an.Frames[0];
-                }
+                if (frame == null) frame = an.Frames[0];
                 var file = SonicManager.Instance.SonicLevel.AnimatedFiles[an.AnimationFile];
-                var va = file[frame.StartingTileIndex + ( index - anin )];
+                var va = file[frame.StartingTileIndex + ( index_ - anin )];
                 if (va != null) {
-
                     if (canvas.FillStyle != "rbga(255,255,255,255)")
                         canvas.FillStyle = "rbga(255,255,255,255)";
-                    va.Draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
+                    //   va.Draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
                     return true;
                 }
                 return false;
@@ -123,23 +120,19 @@ namespace OurSonic.Drawing
                 var an = SonicManager.Instance.SonicLevel.Animations[i];
                 var anin = an.AnimationTileIndex;
                 var num = an.NumberOfTiles;
-                if (this.index > anin && this.index < anin + num) {
+                if (index_ > anin && index_ < anin + num) {
                     willAnimate = an;
                     var ind = animationFrame;
                     var frame = an.Frames[ind];
-                    if (frame == null) {
-                        frame = an.Frames[0];
-                    }
+                    if (frame == null) frame = an.Frames[0];
                     var file = SonicManager.Instance.SonicLevel.AnimatedFiles[an.AnimationFile];
-                    var va = file[frame.StartingTileIndex + (index - anin)];
+                    var va = file[frame.StartingTileIndex + ( index_ - anin )];
                     if (va != null) {
-
                         if (canvas.FillStyle != "rbga(255,255,255,255)")
                             canvas.FillStyle = "rbga(255,255,255,255)";
-                        va.Draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
+                        // va.Draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
                         return true;
                     }
- 
                 }
             }
             willAnimate = null;
@@ -147,12 +140,12 @@ namespace OurSonic.Drawing
 
             /* 
 
-                                    }
-                                }
-                                this.willAnimate = false;
-                            }
-                            return false;#1#
-*/
+                                                }
+                                            }
+                                            this.willAnimate = false;
+                                        }
+                                        return false;#1#
+            */
         }
 
         private void ChangeColor(int x, int y, int color)

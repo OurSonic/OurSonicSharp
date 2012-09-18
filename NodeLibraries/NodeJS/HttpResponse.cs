@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-
 namespace NodeJSLibrary
 {
     [IgnoreNamespace]
@@ -7,18 +6,12 @@ namespace NodeJSLibrary
     public class HttpResponse
     {
         [ScriptName("end")]
-        public void End()
-        {
-        }
+        public void End() {}
 
         [ScriptName("writeHead")]
-        public void WriteHead(int code, object httpResponseHeader)
-        {
-        }
+        public void WriteHead(int code, object httpResponseHeader) {}
 
         [ScriptName("end")]
-        public void End(string s)
-        {
-        }
+        public void End(string s) {}
     }
 }

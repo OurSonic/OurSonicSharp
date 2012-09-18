@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-
 namespace NodeJSLibrary
 {
     [IgnoreNamespace]
@@ -8,8 +7,6 @@ namespace NodeJSLibrary
     public class Util : NodeModule
     {
         [ScriptName("print")]
-        public void Print(string s)
-        {
-        }
+        public void Print(string s) {}
     }
 }

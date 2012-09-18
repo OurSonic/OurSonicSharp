@@ -1,6 +1,5 @@
 using System.Runtime.CompilerServices;
 using NodeJSLibrary;
-
 namespace SocketIONodeLibrary
 {
     [IgnoreNamespace]

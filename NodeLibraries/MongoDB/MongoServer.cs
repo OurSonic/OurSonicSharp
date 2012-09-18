@@ -1,10 +1,7 @@
 using System.Runtime.CompilerServices;
-
 namespace MongoDB
 {
     [IgnoreNamespace]
     [Imported(IsRealType = true)]
-    public class MongoServer
-    {
-    }
+    public class MongoServer {}
 }

@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.CompilerServices;
-
 namespace NodeJSLibrary
 {
     [IgnoreNamespace]
@@ -11,6 +10,9 @@ namespace NodeJSLibrary
         [IntrinsicProperty]
         [ScriptAlias("process")]
         public static Process Process { get; set; }
+        [ScriptAlias("console")]
+        [IntrinsicProperty]
+        public static Console Console { get; set; }
 
         [IgnoreGenericArguments]
         [ScriptAlias("require")]
@@ -20,33 +22,19 @@ namespace NodeJSLibrary
         }
 
         [ScriptAlias("require")]
-        public static void Require(string name)
-        {
-        }
+        public static void Require(string name) {}
 
         [ScriptAlias("setInterval")]
-        public static void SetInterval(Action pollGateways, int poll)
-        {
-        }
+        public static void SetInterval(Action pollGateways, int poll) {}
 
         [ScriptAlias("setTimeout")]
-        public static void SetTimeout(Action pollGateways, int poll)
-        {
-        }
-
-        [ScriptAlias("console")]
-        [IntrinsicProperty]
-        public static Console Console { get; set; }
+        public static void SetTimeout(Action pollGateways, int poll) {}
     }
-    
     [IgnoreNamespace]
     [Imported(IsRealType = true)]
     [IgnoreGenericArguments]
     public class Console
     {
-        public void Log(string log)
-        {
-            
-        }
+        public void Log(string log) {}
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Html;
 using System.Html.Media.Graphics;
-using CommonWebLibraries;
 using jQueryApi;
 namespace OurSonic
 {
@@ -260,7 +259,7 @@ namespace OurSonic
 
         public void Clear(CanvasInformation canv)
         {
-            canv.DomCanvas[0].Me().width = (gameCanvas.DomCanvas.GetWidth());
+            canv.DomCanvas[0].Me().width = ( gameCanvas.DomCanvas.GetWidth() );
         }
 
         public void GameDraw()

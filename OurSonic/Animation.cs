@@ -23,7 +23,7 @@ namespace OurSonic
             (x - this.images[jv].width / 2) * scale.x, (y - this.images[jv].height / 2) * scale.y);
         canvas.restore();
     };
-}*/ 
+}*/
         [IntrinsicProperty]
         public int AnimationFile { get; set; }
         [IntrinsicProperty]
@@ -38,7 +38,7 @@ namespace OurSonic
         public AnimationFrame[] Frames { get; set; }
         [IntrinsicProperty]
         public int AutomatedTiming { get; set; }
-        public Animation() { }
+        public Animation() {}
     }
     public class AnimationFrame
     {

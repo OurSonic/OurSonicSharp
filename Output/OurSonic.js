@@ -78,7 +78,7 @@ OurSonic.Constants = function() {
 OurSonic.Constants.defaultWindowLocation = function(state, canvas, scale) {
 	switch (state) {
 		case 0: {
-			return OurSonic.IntersectingRectangle.$ctor(0, 0, 320, 224, OurSonic.Constants.intersects);
+			return OurSonic.IntersectingRectangle.$ctor(0, 0, 320, 224);
 		}
 		case 1: {
 			var x = 0;
@@ -87,13 +87,10 @@ OurSonic.Constants.defaultWindowLocation = function(state, canvas, scale) {
 				x = OurSonic.SonicManager.instance.sonicLevel.startPositions[0].x - 256;
 				y = OurSonic.SonicManager.instance.sonicLevel.startPositions[0].y - 256;
 			}
-			return OurSonic.IntersectingRectangle.$ctor(x, y, canvas.domCanvas.width(), canvas.domCanvas.height(), OurSonic.Constants.intersects);
+			return OurSonic.IntersectingRectangle.$ctor(x, y, canvas.domCanvas.width(), canvas.domCanvas.height());
 		}
 	}
 	return null;
-};
-OurSonic.Constants.intersects = function(rect, p) {
-	return rect.x < p.x && rect.x + rect.width > p.x && rect.y < p.y && rect.y + rect.height > p.y;
 };
 Type.registerNamespace('OurSonic.Drawing');
 ////////////////////////////////////////////////////////////////////////////////
@@ -141,13 +138,12 @@ OurSonic.Drawing.Tile.prototype = {
 			oPos.y = -this.colors.length * scale.y;
 			j.context.scale(1, -1);
 		}
+		var palette_ = OurSonic.SonicManager.instance.sonicLevel.palette;
+		var indexed = OurSonic.SonicManager.instance.indexedPalette;
 		for (var i = 0; i < this.colors.length; i++) {
 			for (var jf = 0; jf < this.colors[i].length; jf++) {
 				var gj = this.colors[i][jf];
-				if (ss.Nullable.eq(gj, null)) {
-					continue;
-				}
-				var m = OurSonic.SonicManager.instance.sonicLevel.palette[(palette + OurSonic.SonicManager.instance.indexedPalette) % OurSonic.SonicManager.instance.sonicLevel.palette.length][gj];
+				var m = palette_[(palette + indexed) % palette_.length][gj];
 				if (!ss.referenceEquals(j.context.fillStyle, '#' + m)) {
 					j.context.fillStyle = '#' + m;
 				}
@@ -163,113 +159,68 @@ OurSonic.Drawing.Tile.prototype = {
 		}
 	},
 	$checkGood: function(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame) {
+		var index_ = this.$index;
+		if (!!(index_ && index_[0] !== 'A')) {
+			if (ss.isNullOrUndefined(this.$willAnimate)) {
+				return false;
+			}
+			var an = this.$willAnimate;
+			var anin = an.animationTileIndex;
+			var ind = animationFrame;
+			var frame = an.frames[ind];
+			if (ss.isNullOrUndefined(frame)) {
+				frame = an.frames[0];
+			}
+			var file = OurSonic.SonicManager.instance.sonicLevel.animatedFiles[an.animationFile];
+			var va = file[ss.Nullable.unbox(Type.cast(frame.startingTileIndex + (index_ - anin), ss.Int32))];
+			if (ss.isValue(va)) {
+				if (canvas.fillStyle !== 'rbga(255,255,255,255)') {
+					canvas.fillStyle = 'rbga(255,255,255,255)';
+				}
+				//   va.Draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
+				return true;
+			}
+			return false;
+		}
+		for (var i = 0; i < OurSonic.SonicManager.instance.sonicLevel.get_Animations().length; i++) {
+			var an1 = OurSonic.SonicManager.instance.sonicLevel.get_Animations()[i];
+			var anin1 = an1.animationTileIndex;
+			var num = an1.numberOfTiles;
+			if (!!(index_ > anin1 && index_ < anin1 + num)) {
+				this.$willAnimate = an1;
+				var ind1 = animationFrame;
+				var frame1 = an1.frames[ind1];
+				if (ss.isNullOrUndefined(frame1)) {
+					frame1 = an1.frames[0];
+				}
+				var file1 = OurSonic.SonicManager.instance.sonicLevel.animatedFiles[an1.animationFile];
+				var va1 = file1[ss.Nullable.unbox(Type.cast(frame1.startingTileIndex + (index_ - anin1), ss.Int32))];
+				if (ss.isValue(va1)) {
+					if (canvas.fillStyle !== 'rbga(255,255,255,255)') {
+						canvas.fillStyle = 'rbga(255,255,255,255)';
+					}
+					// va.Draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
+					return true;
+				}
+			}
+		}
+		this.$willAnimate = null;
 		return false;
+		// 
 		//
-		//            if (index.CharAt(0) != "A") {
+		//                                                }
+		// 
 		//
-		//            if (willAnimate == null) return false;
+		//                                                }
+		// 
 		//
-		//            var an = willAnimate;
+		//                                                this.willAnimate = false;
+		// 
 		//
-		//            var anin = an.AnimationTileIndex;
+		//                                                }
+		// 
 		//
-		//            var ind = animationFrame;
-		//
-		//            var frame = an.Frames[ind];
-		//
-		//            if (frame == null) {
-		//
-		//            frame = an.Frames[0];
-		//
-		//            }
-		//
-		//            var file = SonicManager.Instance.SonicLevel.AnimatedFiles[an.AnimationFile];
-		//
-		//            var va = file[frame.StartingTileIndex + ( index - anin )];
-		//
-		//            if (va != null) {
-		//
-		//            
-		//
-		//            if (canvas.FillStyle != "rbga(255,255,255,255)")
-		//
-		//            canvas.FillStyle = "rbga(255,255,255,255)";
-		//
-		//            va.Draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
-		//
-		//            return true;
-		//
-		//            }
-		//
-		//            return false;
-		//
-		//            }
-		//
-		//            for (int i = 0; i < SonicManager.Instance.SonicLevel.Animations.Count; i++) {
-		//
-		//            var an = SonicManager.Instance.SonicLevel.Animations[i];
-		//
-		//            var anin = an.AnimationTileIndex;
-		//
-		//            var num = an.NumberOfTiles;
-		//
-		//            if (this.index > anin && this.index < anin + num) {
-		//
-		//            willAnimate = an;
-		//
-		//            var ind = animationFrame;
-		//
-		//            var frame = an.Frames[ind];
-		//
-		//            if (frame == null) {
-		//
-		//            frame = an.Frames[0];
-		//
-		//            }
-		//
-		//            var file = SonicManager.Instance.SonicLevel.AnimatedFiles[an.AnimationFile];
-		//
-		//            var va = file[frame.StartingTileIndex + (index - anin)];
-		//
-		//            if (va != null) {
-		//
-		//            
-		//
-		//            if (canvas.FillStyle != "rbga(255,255,255,255)")
-		//
-		//            canvas.FillStyle = "rbga(255,255,255,255)";
-		//
-		//            va.Draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
-		//
-		//            return true;
-		//
-		//            }
-		//
-		//            
-		//
-		//            }
-		//
-		//            }
-		//
-		//            willAnimate = null;
-		//
-		//            return false;
-		//
-		//            
-		//
-		//            /*
-		//
-		//            
-		//
-		//            }
-		//
-		//            }
-		//
-		//            this.willAnimate = false;
-		//
-		//            }
-		//
-		//            return false;#1#
+		//                                                return false;#1#
 	},
 	$changeColor: function(x, y, color) {
 		this.colors[x][y] = color;
@@ -299,10 +250,13 @@ OurSonic.Drawing.TileChunk.prototype = {
 	},
 	onlyBackground: function() {
 		if (ss.Nullable.eq(this.isOnlyBackground, null)) {
-			for (var i = 0; i < this.tilePieces.length; i++) {
-				for (var j = 0; j < this.tilePieces[i].length; j++) {
+			var blocks = OurSonic.SonicManager.instance.sonicLevel.blocks;
+			var tpl = this.tilePieces.length;
+			var tph = this.tilePieces[0].length;
+			for (var i = 0; i < tpl; i++) {
+				for (var j = 0; j < tph; j++) {
 					var r = this.tilePieces[i][j];
-					var pm = OurSonic.SonicManager.instance.sonicLevel.blocks[r.block];
+					var pm = blocks[r.block];
 					if (ss.isValue(pm)) {
 						if (!pm.onlyBackground()) {
 							return ss.Nullable.unbox(this.isOnlyBackground = false);
@@ -316,8 +270,10 @@ OurSonic.Drawing.TileChunk.prototype = {
 	},
 	isEmpty: function() {
 		if (ss.Nullable.eq(this.empty, null)) {
-			for (var i = 0; i < this.tilePieces.length; i++) {
-				for (var j = 0; j < this.tilePieces[i].length; j++) {
+			var tpl = this.tilePieces.length;
+			var tph = this.tilePieces[0].length;
+			for (var i = 0; i < tpl; i++) {
+				for (var j = 0; j < tph; j++) {
 					var r = this.tilePieces[i][j];
 					if (r.block !== 0) {
 						return ss.Nullable.unbox(this.empty = false);
@@ -334,16 +290,87 @@ OurSonic.Drawing.TileChunk.prototype = {
 		var len2 = this.tilePieces[0].length;
 		var lX = 16 * scale.x;
 		var lY = 16 * scale.y;
+		var localPoint = { x: 0, y: 0 };
+		var check = false;
+		//var RectB = new Rectangle(position.X, position.Y, len1 * lX, len2 * lY);
+		//var RectA = bounds;
+		//if (RectA.X < RectB.X+RectB.Width && RectA.X+RectA.Width > RectB.X+RectB.Width &&
+		//RectA.Y < RectB.Y + RectB.Height && RectA.Y + RectA.Height > RectB.Y + RectB.Height) {
+		//check = true;
+		//}
+		//
+		//
+		//        localPoint.X = position.X;
+		//
+		//
+		//        localPoint.Y = position.Y;
+		//
+		//
+		//        if (bounds.Intersects(localPoint)) {
+		//
+		//
+		//        localPoint.X = position.X+len1*lX;
+		//
+		//
+		//        localPoint.Y = position.Y;
+		//
+		//
+		//        if (bounds.Intersects(localPoint))
+		//
+		//
+		//        {
+		//
+		//
+		//        localPoint.X = position.X;
+		//
+		//
+		//        localPoint.Y = position.Y + len2 * lY;
+		//
+		//
+		//        if (bounds.Intersects(localPoint))
+		//
+		//
+		//        {
+		//
+		//
+		//        localPoint.X = position.X + len1 * lX;
+		//
+		//
+		//        localPoint.Y = position.Y + len2 * lY;
+		//
+		//
+		//        if (bounds.Intersects(localPoint)) {
+		//
+		//
+		//        check = false;
+		//
+		//
+		//        }
+		//
+		//
+		//        }
+		//
+		//
+		//        }
+		//
+		//
+		//        }
+		var blocks = OurSonic.SonicManager.instance.sonicLevel.blocks;
 		for (var i = 0; i < len1; i++) {
 			for (var j = 0; j < len2; j++) {
 				var r = this.tilePieces[i][j];
-				var pm = OurSonic.SonicManager.instance.sonicLevel.blocks[r.block];
-				if (ss.isValue(pm)) {
+				var pm = blocks[r.block];
+				if (!!pm) {
 					var animatedIndex = 0;
-					if (ss.isValue(this.animated) && ss.isValue(this.animated[j * len1 + i])) {
+					if (!!(this.animated && this.animated[j * len1 + i])) {
 						animatedIndex = this.animated[j * len1 + i].lastAnimatedIndex;
 					}
-					pm.draw(canvas, { x: position.x + i * lX, y: position.y + j * lY }, scale, layer, r.xFlip, r.yFlip, animatedIndex, bounds);
+					localPoint.x = position.x + i * lX;
+					localPoint.y = position.y + j * lY;
+					if (check && !OurSonic.IntersectingRectangle.intersects(bounds, localPoint)) {
+						continue;
+					}
+					pm.draw(canvas, localPoint, scale, layer, r.xFlip, r.yFlip, animatedIndex);
 					//canvas.StrokeStyle = "#FFF";
 					//canvas.StrokeRect(position.X + i * 16 * scale.X, position.Y + j * 16 * scale.Y, scale.X * 16, scale.Y * 16);
 				}
@@ -403,11 +430,12 @@ OurSonic.Drawing.TilePiece = function() {
 };
 OurSonic.Drawing.TilePiece.prototype = {
 	onlyBackground: function() {
+		var tiles = OurSonic.SonicManager.instance.sonicLevel.tiles;
 		var $t1 = this.tiles.getEnumerator();
 		try {
 			while ($t1.moveNext()) {
 				var mj = $t1.get_current();
-				if (ss.isValue(OurSonic.SonicManager.instance.sonicLevel.tiles[mj._Tile])) {
+				if (ss.isValue(tiles[mj._Tile])) {
 					if (mj.priority) {
 						return false;
 					}
@@ -457,10 +485,7 @@ OurSonic.Drawing.TilePiece.prototype = {
 		//                
 		//                return true;
 	},
-	draw: function(canvas, position, scale, layer, xFlip, yFlip, animatedIndex, bounds) {
-		if (!bounds.intersects(position)) {
-			return true;
-		}
+	draw: function(canvas, position, scale, layer, xFlip, yFlip, animatedIndex) {
 		var drawOrderIndex = 0;
 		drawOrderIndex = (xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3));
 		var fd = this.$getCache(layer, scale, drawOrderIndex, this.animationFrame, OurSonic.SonicManager.instance.sonicLevel.palAn);
@@ -469,16 +494,20 @@ OurSonic.Drawing.TilePiece.prototype = {
 			var sX = 8 * scale.x;
 			var sY = 8 * scale.y;
 			var i = 0;
+			var localPoint = { x: 0, y: 0 };
+			var tiles = OurSonic.SonicManager.instance.sonicLevel.tiles;
 			var $t1 = this.tiles.getEnumerator();
 			try {
 				while ($t1.moveNext()) {
 					var mj = $t1.get_current();
-					if (ss.isValue(OurSonic.SonicManager.instance.sonicLevel.tiles[mj._Tile])) {
+					if (ss.isValue(tiles[mj._Tile])) {
 						if (mj.priority === (layer === 1)) {
 							var _xf = xFlip ^ mj.xFlip;
 							var _yf = yFlip ^ mj.yFlip;
 							var df = this.$drawInfo[this.$drawOrder[drawOrderIndex][i]];
-							OurSonic.SonicManager.instance.sonicLevel.tiles[mj._Tile].draw(ac.context, { x: df[0] * sX, y: df[1] * sY }, scale, _xf, _yf, mj.palette, layer, this.animationFrame);
+							localPoint.x = df[0] * sX;
+							localPoint.y = df[1] * sY;
+							tiles[mj._Tile].draw(ac.context, localPoint, scale, _xf, _yf, mj.palette, layer, this.animationFrame);
 						}
 					}
 					i++;
@@ -494,8 +523,8 @@ OurSonic.Drawing.TilePiece.prototype = {
 		return true;
 	},
 	$setCache: function(layer, scale, drawOrder, animationFrame, palAn, image) {
-		var val = (drawOrder + 1 + scale.x * 10 + animationFrame * 1000 + (layer + 1) * 10000).toString();
-		if (ss.isValue(this.animatedFrames)) {
+		var val = drawOrder + 1 + scale.x * 10 + animationFrame * 1000 + (layer + 1) * 10000;
+		if (!!this.animatedFrames) {
 			var $t1 = this.animatedFrames.getEnumerator();
 			try {
 				while ($t1.moveNext()) {
@@ -513,8 +542,8 @@ OurSonic.Drawing.TilePiece.prototype = {
 		canvas.drawImage(fd, position.x, position.y);
 	},
 	$getCache: function(layer, scale, drawOrder, animationFrame, palAn) {
-		var val = (drawOrder + 1 + scale.x * 10 + animationFrame * 1000 + (layer + 1) * 10000).toString();
-		if (ss.isValue(this.animatedFrames)) {
+		var val = drawOrder + 1 + scale.x * 10 + animationFrame * 1000 + (layer + 1) * 10000;
+		if (!!this.animatedFrames) {
 			var $t1 = this.animatedFrames.getEnumerator();
 			try {
 				while ($t1.moveNext()) {
@@ -526,7 +555,7 @@ OurSonic.Drawing.TilePiece.prototype = {
 				$t1.dispose();
 			}
 		}
-		if (ss.isNullOrUndefined(this.image[val])) {
+		if (!!!this.image[val]) {
 			return null;
 		}
 		return this.image[val];
@@ -667,9 +696,11 @@ OurSonic.Help.decodeString = function(lvl) {
 // OurSonic.IntersectingRectangle
 OurSonic.IntersectingRectangle = function() {
 };
-OurSonic.IntersectingRectangle.$ctor = function(x, y, width, height, intersects) {
+OurSonic.IntersectingRectangle.intersects = function($this, p) {
+	return $this.x < p.x && $this.x + $this.width > p.x && $this.y < p.y && $this.y + $this.height > p.y;
+};
+OurSonic.IntersectingRectangle.$ctor = function(x, y, width, height) {
 	var $this = {};
-	$this.intersects = null;
 	$this.width = 0;
 	$this.height = 0;
 	$this.x = 0;
@@ -678,9 +709,6 @@ OurSonic.IntersectingRectangle.$ctor = function(x, y, width, height, intersects)
 	$this.y = y;
 	$this.width = width;
 	$this.height = height;
-	$this.intersects = function(a) {
-		return intersects($this, a);
-	};
 	return $this;
 };
 ////////////////////////////////////////////////////////////////////////////////
@@ -1286,12 +1314,15 @@ OurSonic.SonicManager.prototype = {
 		return false;
 	},
 	$tickObjects: function() {
+		var localPoint = { x: 0, y: 0 };
 		this.inFocusObjects = [];
 		var $t1 = this.sonicLevel.objects.getEnumerator();
 		try {
 			while ($t1.moveNext()) {
 				var obj = $t1.get_current();
-				if (this.bigWindowLocation.intersects({ x: obj.x, y: obj.y })) {
+				localPoint.x = obj.x;
+				localPoint.y = obj.y;
+				if (OurSonic.IntersectingRectangle.intersects(this.bigWindowLocation, localPoint)) {
 					this.inFocusObjects.add(obj);
 					obj.tick(obj, this.sonicLevel, this.sonicToon);
 				}
@@ -2963,6 +2994,7 @@ OurSonic.SonicManager.prototype = {
 			}
 		}
 		canvas.save();
+		var localPoint = { x: 0, y: 0 };
 		this.drawTickCount++;
 		if (false && (ss.isValue(this.spriteLoader) && !this.spriteLoader.tick() || this.loading)) {
 			canvas.fillStyle = 'white';
@@ -2970,7 +3002,8 @@ OurSonic.SonicManager.prototype = {
 			canvas.restore();
 			return;
 		}
-		this.screenOffset = { x: 0, y: 0 };
+		this.screenOffset.x = 0;
+		this.screenOffset.y = 0;
 		if (this.currentGameState === 0) {
 			canvas.scale(this.realScale.x, this.realScale.y);
 			if (this.sonicToon.ticking) {
@@ -2991,8 +3024,12 @@ OurSonic.SonicManager.prototype = {
 				var wOffset = this.windowLocation.x;
 				var bw = ss.Int32.div(this.background.width, this.scale.x);
 				var movex = ss.Int32.div(wOffset, bw) * bw;
-				this.background.draw(canvas, { x: -this.windowLocation.x * this.scale.x + movex, y: ss.Int32.div(-this.windowLocation.y, 4) * this.scale.y }, this.scale, wOffset);
-				this.background.draw(canvas, { x: -this.windowLocation.x * this.scale.x + movex + this.background.width, y: ss.Int32.div(-this.windowLocation.y, 4) * this.scale.y }, this.scale, wOffset);
+				localPoint.x = -this.windowLocation.x * this.scale.x + movex;
+				localPoint.y = ss.Int32.div(-this.windowLocation.y, 4) * this.scale.y;
+				this.background.draw(canvas, localPoint, this.scale, wOffset);
+				localPoint.x = -this.windowLocation.x * this.scale.x + movex + this.background.width;
+				localPoint.y = ss.Int32.div(-this.windowLocation.y, 4) * this.scale.y;
+				this.background.draw(canvas, localPoint, this.scale, wOffset);
 			}
 		}
 		if (this.windowLocation.x < 0) {
@@ -3009,7 +3046,7 @@ OurSonic.SonicManager.prototype = {
 				offs.add({ x: i, y: j });
 			}
 		}
-		var bounds = OurSonic.IntersectingRectangle.$ctor(-32, -32, this.windowLocation.width * this.scale.x + 32, this.windowLocation.height * this.scale.y + 32, OurSonic.Constants.intersects);
+		var bounds = OurSonic.IntersectingRectangle.$ctor(-32, -32, this.windowLocation.width * this.scale.x + 32, this.windowLocation.height * this.scale.y + 32);
 		if (ss.isValue(this.sonicLevel.chunks) && this.sonicLevel.chunks.length > 0) {
 			if (ss.isValue(this.sonicLevel.paletteItems[0])) {
 				for (var k = 0; k < this.sonicLevel.paletteItems[0].length; k++) {
@@ -3048,15 +3085,15 @@ OurSonic.SonicManager.prototype = {
 					if (ss.isNullOrUndefined(chunk)) {
 						continue;
 					}
-					var pos = { x: _xP * 128 * this.scale.x, y: _yPreal * 128 * this.scale.y };
-					var posj = { x: pos.x - this.windowLocation.x * this.scale.x, y: pos.y - this.windowLocation.y * this.scale.y };
+					localPoint.x = _xP * 128 * this.scale.x - this.windowLocation.x * this.scale.x;
+					localPoint.y = _yPreal * 128 * this.scale.y - this.windowLocation.y * this.scale.y;
 					if (!chunk.isEmpty()) {
-						chunk.draw(canvas, posj, this.scale, 0, bounds);
+						chunk.draw(canvas, localPoint, this.scale, 0, bounds);
 					}
 					if (false && this.currentGameState === 1) {
 						canvas.strokeStyle = '#DD0033';
 						canvas.lineWidth = 3;
-						canvas.strokeRect(posj.x, posj.y, 128 * this.scale.x, 128 * this.scale.y);
+						canvas.strokeRect(localPoint.x, localPoint.y, 128 * this.scale.x, 128 * this.scale.y);
 					}
 				}
 			}
@@ -3098,7 +3135,9 @@ OurSonic.SonicManager.prototype = {
 			try {
 				while ($t3.moveNext()) {
 					var o = $t3.get_current();
-					if (o.dead || this.bigWindowLocation.intersects({ x: o.x, y: o.y })) {
+					localPoint.x = o.x;
+					localPoint.y = o.y;
+					if (o.dead || OurSonic.IntersectingRectangle.intersects(this.bigWindowLocation, localPoint)) {
 						o.draw(canvas, (o.x - this.windowLocation.x) * this.scale.x, (o.y - this.windowLocation.y) * this.scale.y, this.scale, this.showHeightMap);
 					}
 				}
@@ -3118,7 +3157,9 @@ OurSonic.SonicManager.prototype = {
 			}
 			for (var i1 = this.activeRings.length - 1; i1 >= 0; i1--) {
 				var ac = this.activeRings[i1];
-				ac.draw(canvas, { x: ac.x - this.windowLocation.x, y: ac.y - this.windowLocation.y }, this.scale);
+				localPoint.x = ac.x - this.windowLocation.x;
+				localPoint.y = ac.y - this.windowLocation.y;
+				ac.draw(canvas, localPoint, this.scale);
 				if (ac.tickCount > 256) {
 					this.activeRings.remove(ac);
 				}
@@ -3152,15 +3193,15 @@ OurSonic.SonicManager.prototype = {
 					if (ss.isNullOrUndefined(chunk1)) {
 						continue;
 					}
-					var pos1 = { x: _xP1 * 128 * this.scale.x, y: _yPreal1 * 128 * this.scale.y };
-					var posj1 = { x: pos1.x - this.windowLocation.x * this.scale.x, y: pos1.y - this.windowLocation.y * this.scale.y };
+					localPoint.x = _xP1 * 128 * this.scale.x - this.windowLocation.x * this.scale.x;
+					localPoint.y = _yPreal1 * 128 * this.scale.y - this.windowLocation.y * this.scale.y;
 					if (!chunk1.isEmpty() && !chunk1.onlyBackground()) {
-						chunk1.draw(canvas, posj1, this.scale, 1, bounds);
+						chunk1.draw(canvas, localPoint, this.scale, 1, bounds);
 					}
 					if (false && this.currentGameState === 1) {
 						canvas.strokeStyle = '#DD0033';
 						canvas.lineWidth = 3;
-						canvas.strokeRect(posj1.x, posj1.y, 128 * this.scale.x, 128 * this.scale.y);
+						canvas.strokeRect(localPoint.x, localPoint.y, 128 * this.scale.x, 128 * this.scale.y);
 					}
 					if (this.showHeightMap) {
 						//
@@ -3263,7 +3304,7 @@ OurSonic.SonicManager.prototype = {
 					if (this.currentGameState === 1) {
 						canvas.strokeStyle = '#DD0033';
 						canvas.lineWidth = 3;
-						canvas.strokeRect(posj1.x, posj1.y, 128 * this.scale.x, 128 * this.scale.y);
+						canvas.strokeRect(localPoint.x, localPoint.y, 128 * this.scale.x, 128 * this.scale.y);
 					}
 				}
 			}

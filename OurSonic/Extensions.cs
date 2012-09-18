@@ -8,5 +8,12 @@ namespace OurSonic
         {
             return o;
         }
+
+        [InlineCode("{o}")]
+        [IgnoreGenericArguments]
+        public static T Me<T>(this object o)
+        {
+            return default( T );
+        }
     }
 }

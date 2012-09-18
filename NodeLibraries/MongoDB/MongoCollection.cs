@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-
 namespace MongoDB
 {
     [IgnoreNamespace]
@@ -7,8 +6,6 @@ namespace MongoDB
     public class MongoCollection
     {
         [ScriptName("insert")]
-        public void Insert(object gmo)
-        {
-        }
+        public void Insert(object gmo) {}
     }
 }

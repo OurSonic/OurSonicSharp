@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-
 namespace SocketIONodeLibrary
 {
     [IgnoreNamespace]
@@ -10,8 +9,6 @@ namespace SocketIONodeLibrary
         private SocketNamespace sockets;
 
         [ScriptName("set")]
-        public void Set(string option, int value)
-        {
-        }
+        public void Set(string option, int value) {}
     }
 }

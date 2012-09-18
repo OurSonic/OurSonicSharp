@@ -18,7 +18,6 @@ OurSonicNode.Compress = function() {
 						var fm = (new Compressor()).CompressText(content);
 						var imj = (__dirname + this.s1.$ + '\\' + this.s3.$).replaceAll('.js', '.min.js');
 						fs.writeFile(imj, fm, function(a, b) {
-							console.log('aa');
 						});
 					}));
 				}

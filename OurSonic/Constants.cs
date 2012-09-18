@@ -8,7 +8,7 @@ namespace OurSonic
         {
             switch (state) {
                 case GameState.Playing:
-                    return new IntersectingRectangle(0, 0, 320, 224, Intersects);
+                    return new IntersectingRectangle(0, 0, 320, 224);
                 case GameState.Editing:
                     var x = 0;
                     var y = 0;
@@ -17,33 +17,30 @@ namespace OurSonic
                         x = SonicManager.Instance.SonicLevel.StartPositions[0].X - 128 * 2;
                         y = SonicManager.Instance.SonicLevel.StartPositions[0].Y - 128 * 2;
                     }
-                    return new IntersectingRectangle(x, y, canvas.DomCanvas.GetWidth(), canvas.DomCanvas.GetHeight(), Intersects);
+                    return new IntersectingRectangle(x, y, canvas.DomCanvas.GetWidth(), canvas.DomCanvas.GetHeight());
             }
             return null;
-        }
-
-        public static bool Intersects(IntersectingRectangle rect, Point p)
-        {
-            return rect.X < p.X && rect.X + rect.Width > p.X && rect.Y < p.Y && rect.Y + rect.Height > p.Y;
         }
     }
     [Serializable]
     public class IntersectingRectangle
     {
-        public Func<Point, bool> Intersects { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
 
-        public IntersectingRectangle(int x, int y, int width, int height, Func<IntersectingRectangle, Point, bool> intersects)
+        public IntersectingRectangle(int x, int y, int width, int height)
         {
             X = x;
             Y = y;
             Width = width;
             Height = height;
+        }
 
-            Intersects = (a) => intersects(this, a);
+        public bool Intersects(Point p)
+        {
+            return X < p.X && X + Width > p.X && Y < p.Y && Y + Height > p.Y;
         }
     }
     [Serializable]
