@@ -1,31 +1,20 @@
 using System.Html.Media.Graphics;
+using System.Runtime.CompilerServices;
 using OurSonicModels;
-
 namespace OurSonic
 {
     public class SonicObject
     {
-        public SonicObject(SLDataObjectEntry entry)
-        {
-        }
-
+        [IntrinsicProperty]
         public int X { get; set; }
+        [IntrinsicProperty]
         public int Y { get; set; }
-
+        [IntrinsicProperty]
         public bool Dead { get; set; }
-
-        public int Index
-        {
-            get { return 0; }
-            set { }
-        }
-
-        public void Tick(SonicObject sonicObject, SonicLevel sonicLevel, Sonic sonicToon)
-        {
-        }
-
-        public void Draw(CanvasContext2D canvas, int x, int y, Point scale, bool showHeightMap)
-        {
-        }
+        [IntrinsicProperty]
+        public int Index { get; set; }
+        public SonicObject(SLDataObjectEntry entry) {}
+        public void Tick(SonicObject sonicObject, SonicLevel sonicLevel, Sonic sonicToon) {}
+        public void Draw(CanvasContext2D canvas, int x, int y, Point scale, bool showHeightMap) {}
     }
 }

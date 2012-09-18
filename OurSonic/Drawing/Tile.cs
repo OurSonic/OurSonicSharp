@@ -1,47 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Html;
 using System.Html.Media.Graphics;
-using System.Linq;
-using System.Text;
-
+using System.Runtime.CompilerServices;
 namespace OurSonic.Drawing
 {
     public class Tile
     {
         private int[] index;
         private Animation willAnimate;
+        [IntrinsicProperty]
         public int _Tile { get; set; }
+        [IntrinsicProperty]
         public bool Priority { get; set; }
-
+        [IntrinsicProperty]
         public bool XFlip { get; set; }
+        [IntrinsicProperty]
         public bool YFlip { get; set; }
-
+        [IntrinsicProperty]
         public int Palette { get; set; }
+        [IntrinsicProperty]
+        protected int[] CurPaletteIndexes { get; set; }
+        [IntrinsicProperty]
+        protected List<int> Sprites { get; set; }
+        [IntrinsicProperty]
+        protected int[][] Colors { get; set; }
+        [IntrinsicProperty]
+        protected bool ShowOutline { get; set; }
+        [IntrinsicProperty]
+        public int Index { get; set; }
 
         public Tile(int[][] colors)
         {
-
             Colors = colors;
             Sprites = new List<int>();
             CurPaletteIndexes = null;
         }
 
-        protected int[] CurPaletteIndexes { get; set; }
-
-        protected List<int> Sprites { get; set; }
-
-        protected int[][] Colors { get; set; }
-        protected bool ShowOutline { get; set; }
-
-        public int Index { get; set; }
-
-        public void Draw(CanvasContext2D canvas, Point pos, Point scale, bool xflip, bool yflip, int palette, int layer, int animationFrame)
+        public void Draw(CanvasContext2D canvas,
+                         Point pos,
+                         Point scale,
+                         bool xflip,
+                         bool yflip,
+                         int palette,
+                         int layer,
+                         int animationFrame)
         {
             if (CheckGood(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame))
-            {
                 return;
-            }
             var cx = Colors.Length * scale.X;
             var cy = Colors.Length * scale.Y;
             var j = Help.DefaultCanvas(cx, cy);
@@ -49,57 +54,56 @@ namespace OurSonic.Drawing
             if (pos.X < 0 || pos.Y < 0)
                 return;
             var oPos = new Point(0, 0);
-            if (xflip)
-            {
+            if (xflip) {
                 oPos.X = -Colors.Length * scale.X;
                 j.Context.Scale(-1, 1);
             }
-            if (yflip)
-            {
+            if (yflip) {
                 oPos.Y = -Colors.Length * scale.Y;
                 j.Context.Scale(1, -1);
             }
 
-            for (int i = 0; i < Colors.Length; i++)
-            {
-                for (int jf = 0; jf < Colors[i].Length; jf++)
-                {
+            for (int i = 0; i < Colors.Length; i++) {
+                for (int jf = 0; jf < Colors[i].Length; jf++) {
                     var gj = Colors[i][jf];
                     if (gj == null)
-                    {
                         continue;
-                    }
-                    var m = SonicManager.Instance.SonicLevel.Palette[(palette + SonicManager.Instance.IndexedPalette) % SonicManager.Instance.SonicLevel.Palette.Length][gj];
+                    var m =
+                            SonicManager.Instance.SonicLevel.Palette[
+                                    ( palette + SonicManager.Instance.IndexedPalette ) %
+                                    SonicManager.Instance.SonicLevel.Palette.Length][gj];
                     if (j.Context.FillStyle != "#" + m)
                         j.Context.FillStyle = "#" + m;
 
-                    j.Context.FillRect(oPos.X + (i * scale.X), oPos.Y + jf * scale.Y, scale.X, scale.Y);
+                    j.Context.FillRect(oPos.X + ( i * scale.X ), oPos.Y + jf * scale.Y, scale.X, scale.Y);
                 }
             }
             var fd = j.DomCanvas;
-            canvas.DrawImage((CanvasElement)fd[0], pos.X, pos.Y);
+            canvas.DrawImage((CanvasElement) fd[0], pos.X, pos.Y);
 
-            if (ShowOutline)
-            {
+            if (ShowOutline) {
                 canvas.StrokeStyle = "#DD0033";
                 canvas.LineWidth = 3;
                 canvas.StrokeRect(pos.X, pos.Y, 8 * scale.X, 8 * scale.Y);
             }
         }
 
-        private bool CheckGood(CanvasContext2D canvas, Point pos, Point scale, bool xflip, bool yflip, int palette, int layer, int animationFrame)
+        private bool CheckGood(CanvasContext2D canvas,
+                               Point pos,
+                               Point scale,
+                               bool xflip,
+                               bool yflip,
+                               int palette,
+                               int layer,
+                               int animationFrame)
         {
             return false;
 
-            if (index[0] != 'A')
-            {
+            if (index[0] != 'A') {
                 if (willAnimate == null) return false;
                 var an = willAnimate;
-
             }
             return false;
-
-
 
             /*
                             if (this.index[0] != 'A') {
@@ -150,12 +154,13 @@ namespace OurSonic.Drawing
                             }
                             return false;*/
         }
+
         private void ChangeColor(int x, int y, int color)
         {
             Colors[x][y] = color;
             Sprites = new List<int>();
-
         }
+
         /* 
          
             this.getAllPaletteIndexes = function () {

@@ -1,11 +1,11 @@
 using System;
-
 namespace OurSonic
 {
     public class SpriteLoader
-    { 
+    {
         public SpriteLoader(Action completed, Action<string> update)
-        {            /*
+        {
+            /*
    var that = this;
     this.stepIndex = 0;
     this.steps = [];
@@ -48,7 +48,6 @@ namespace OurSonic
         this.steps[stepIndex].iterations.push(index);
     };
  */
-
         }
 
         public bool Tick()
@@ -61,8 +60,5 @@ namespace OurSonic
             return null;
         }
     }
-
-    public class SpriteLoaderStep
-    {
-    }
+    public class SpriteLoaderStep {}
 }

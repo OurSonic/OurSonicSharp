@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Html;
-using System.Linq;
-using System.Text;
+﻿using System.Html;
 using System.Runtime.CompilerServices;
-
-
 namespace CommonWebLibraries
 {
     [IgnoreNamespace]
@@ -18,12 +12,12 @@ namespace CommonWebLibraries
         {
             return null;
         }
+
         [ScriptName("DecompressText")]
         public string DecompressText(string txt)
         {
             return null;
         }
-
     }
     [IgnoreNamespace]
     [Imported(IsRealType = true)]

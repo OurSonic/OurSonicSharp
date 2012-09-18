@@ -1,28 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Html.Media.Graphics;
-using System.Linq;
-using System.Text;
-
+using System.Runtime.CompilerServices;
 namespace OurSonic.Drawing
 {
     public class TileChunk
     {
-        public TileChunk(/*TilePiece[][] tilePieces*/)
-        { 
+        [IntrinsicProperty]
+        protected bool? isOnlyBackground { get; set; }
+        [IntrinsicProperty]
+        protected bool? empty { get; set; }
+        [IntrinsicProperty]
+        protected List<string> Sprites { get; set; }
+        [IntrinsicProperty]
+        protected bool[][] HLayers { get; set; }
+        [IntrinsicProperty]
+        public TilePiece[][] TilePieces { get; set; }
+        [IntrinsicProperty]
+        public List<Animation> Animated { get; set; }
+        [IntrinsicProperty]
+        public int Index { get; set; }
+
+        public TileChunk( /*TilePiece[][] tilePieces*/)
+        {
             HLayers = new bool[0][];
             Sprites = new List<string>();
             isOnlyBackground = null;
         }
-
-        protected bool? isOnlyBackground { get; set; }
-        protected bool? empty { get; set; }
-
-        protected List<string> Sprites { get; set; }
-
-        protected bool[][] HLayers { get; set; }
-
-        public TilePiece[][] TilePieces { get; set; }
 
         public TilePiece GetBlock(int x, int y)
         {
@@ -34,45 +37,32 @@ namespace OurSonic.Drawing
             return TilePieces[x / 16][y / 16];
         }
 
-
         public bool OnlyBackground()
         {
-            if (isOnlyBackground == null)
-            {
-                for (int i = 0; i < TilePieces.Length; i++)
-                {
-                    for (int j = 0; j < TilePieces[i].Length; j++)
-                    {
+            if (isOnlyBackground == null) {
+                for (int i = 0; i < TilePieces.Length; i++) {
+                    for (int j = 0; j < TilePieces[i].Length; j++) {
                         var r = TilePieces[i][j];
                         var pm = SonicManager.Instance.SonicLevel.Blocks[r.Block];
-                        if (pm != null)
-                        {
+                        if (pm != null) {
                             if (!pm.OnlyBackground())
-                            {
-                                return (isOnlyBackground = false).Value;
-                            }
+                                return ( isOnlyBackground = false ).Value;
                         }
                     }
                 }
                 isOnlyBackground = true;
             }
             return isOnlyBackground.Value;
-
         }
 
         public bool IsEmpty()
         {
-            if (empty == null)
-            {
-                for (int i = 0; i < TilePieces.Length; i++)
-                {
-                    for (int j = 0; j < TilePieces[i].Length; j++)
-                    {
+            if (empty == null) {
+                for (int i = 0; i < TilePieces.Length; i++) {
+                    for (int j = 0; j < TilePieces[i].Length; j++) {
                         var r = TilePieces[i][j];
                         if (r.Block != 0)
-                        {
-                            return (empty = false).Value;
-                        }
+                            return ( empty = false ).Value;
                     }
                 }
                 empty = true;
@@ -82,7 +72,6 @@ namespace OurSonic.Drawing
 
         public void Draw(CanvasContext2D canvas, Point position, Point scale, int layer, IntersectingRectangle bounds)
         {
-
             canvas.Save();
 
             var len1 = TilePieces.Length;
@@ -90,20 +79,16 @@ namespace OurSonic.Drawing
 
             var lX = 16 * scale.X;
             var lY = 16 * scale.Y;
-            for (int i = 0; i < len1; i++)
-            {
-                for (int j = 0; j < len2; j++)
-                {
+            for (int i = 0; i < len1; i++) {
+                for (int j = 0; j < len2; j++) {
                     var r = TilePieces[i][j];
                     var pm = SonicManager.Instance.SonicLevel.Blocks[r.Block];
-                    if (pm != null)
-                    {
-                        int animatedIndex=0;
-                        if (Animated!=null && Animated[j * len1 + i] != null)
-                        {
-                            animatedIndex = Animated[j*len1 + i].LastAnimatedIndex;
-                        }
-                        pm.Draw(canvas, new Point(position.X + i*lX,position.Y+j*lY),scale,layer,r.XFlip,r.YFlip,animatedIndex,bounds);
+                    if (pm != null) {
+                        int animatedIndex = 0;
+                        if (Animated != null && Animated[j * len1 + i] != null)
+                            animatedIndex = Animated[j * len1 + i].LastAnimatedIndex;
+                        pm.Draw(canvas, new Point(position.X + i * lX, position.Y + j * lY), scale, layer, r.XFlip, r.YFlip,
+                                animatedIndex, bounds);
                         //canvas.StrokeStyle = "#FFF";
                         //canvas.StrokeRect(position.X + i * 16 * scale.X, position.Y + j * 16 * scale.Y, scale.X * 16, scale.Y * 16);
                     }
@@ -115,23 +100,18 @@ namespace OurSonic.Drawing
 
         public void AnimatedTick()
         {
-            foreach (var anni in Animated)
-            {
-                if (anni.LastAnimatedFrame == null)
-                {
+            foreach (var anni in Animated) {
+                if (anni.LastAnimatedFrame == null) {
                     anni.LastAnimatedFrame = 0;
                     anni.LastAnimatedIndex = 0;
-                    if (anni.Frames[anni.LastAnimatedIndex].Ticks == 0 || (SonicManager.Instance.DrawTickCount - anni.LastAnimatedFrame) >= ((anni.AutomatedTiming > 0) ? anni.AutomatedTiming : anni.Frames[anni.LastAnimatedIndex].Ticks))
-                    {
+                    if (anni.Frames[anni.LastAnimatedIndex].Ticks == 0 ||
+                        ( SonicManager.Instance.DrawTickCount - anni.LastAnimatedFrame ) >=
+                        ( ( anni.AutomatedTiming > 0 ) ? anni.AutomatedTiming : anni.Frames[anni.LastAnimatedIndex].Ticks )) {
                         anni.LastAnimatedFrame = SonicManager.Instance.DrawTickCount;
-                        anni.LastAnimatedIndex = (anni.LastAnimatedIndex + 1)%anni.Frames.Length;
+                        anni.LastAnimatedIndex = ( anni.LastAnimatedIndex + 1 ) % anni.Frames.Length;
                     }
                 }
             }
         }
-
-        public List<Animation> Animated { get; set; }
-
-        public int Index { get; set; }
     }
 }

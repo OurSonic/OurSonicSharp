@@ -2,10 +2,7 @@ namespace OurSonic
 {
     public class Animation
     {
-        public Animation(string name, object data)
-        {
-        }
-     /*   function Animation(name, images) {
+        /*   function Animation(name, images) {
     this.images = images;
     this.name = name;
     this.draw = function (canvas, x, y, scale, animationIndex) {
@@ -26,16 +23,12 @@ namespace OurSonic
         canvas.restore();
     };
 }*/
-
         public int LastAnimatedIndex { get; set; }
-
         public int? LastAnimatedFrame { get; set; }
-
         public AnimationFrame[] Frames { get; set; }
-
         public int AutomatedTiming { get; set; }
+        public Animation(string name, object data) {}
     }
-
     public class AnimationFrame
     {
         public decimal Ticks { get; set; }

@@ -2,7 +2,7 @@ namespace OurSonic
 {
     public enum GameState
     {
-        Editing,
-        Playing
+        Playing = 0,
+        Editing = 1
     }
 }

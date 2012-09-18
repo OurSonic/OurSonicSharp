@@ -2,12 +2,7 @@ namespace OurSonic
 {
     public class ObjectManager
     {
-        public ObjectManager(SonicManager sonicManager)
-        {
-        }
-
-        public void Init()
-        {
-        }
+        public ObjectManager(SonicManager sonicManager) {}
+        public void Init() {}
     }
 }

@@ -1,34 +1,102 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Html;
 using System.Html.Media.Graphics;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using OurSonic.Drawing;
-using OurSonicModels;
 using jQueryApi;
-
 namespace OurSonic
 {
     public partial class SonicManager
     {
+        public static SonicManager Instance;
+        private static string[] base64chars =
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".Split("");
+        private static JsDictionary<string, int> base64Inv;
         private readonly CanvasInformation mainCanvas;
         private readonly SonicEngine myEngine;
         private readonly ObjectManager objectManager;
         public int DrawTickCount;
         private int imageLength;
+        private string myStatus;
         private object sonicSprites;
         private int tickCount;
         private bool waitingForDrawContinue;
         private bool waitingForTickContinue;
+        [IntrinsicProperty]
+        public GameState CurrentGameState { get; set; }
+        [IntrinsicProperty]
+        public IntersectingRectangle BigWindowLocation { get; set; }
+        [IntrinsicProperty]
+        public UIManager UIManager { get; set; }
+        [IntrinsicProperty]
+        public Sonic SonicToon { get; set; }
+        [IntrinsicProperty]
+        public Point Scale { get; set; }
+        [IntrinsicProperty]
+        public IntersectingRectangle WindowLocation { get; set; }
+        [IntrinsicProperty]
+        public Point RealScale { get; set; }
+        [IntrinsicProperty]
+        public bool InHaltMode { get; set; }
+        [IntrinsicProperty]
+        public int IndexedPalette { get; set; }
+        [IntrinsicProperty]
+        public List<Animation> Animations { get; set; }
+        [IntrinsicProperty]
+        public List<AnimationInstance> AnimationInstances { get; set; }
+        [IntrinsicProperty]
+        public Ring GoodRing { get; set; }
+        [IntrinsicProperty]
+        public bool ShowHeightMap { get; set; }
+        [IntrinsicProperty]
+        public Point ScreenOffset { get; set; }
+        [IntrinsicProperty]
+        public List<Ring> ActiveRings { get; set; }
+        [IntrinsicProperty]
+        public Action ForceResize { get; set; }
+        [IntrinsicProperty]
+        public SonicBackground Background { get; set; }
+        [IntrinsicProperty]
+        public ClickState ClickState { get; set; }
+        [IntrinsicProperty]
+        public SonicLevel SonicLevel { get; set; }
+        [IntrinsicProperty]
+        protected List<SonicObject> InFocusObjects { get; set; }
+        [IntrinsicProperty]
+        protected bool Loading { get; set; }
+        [IntrinsicProperty]
+        protected SpriteCache SpriteCache { get; set; }
+        [IntrinsicProperty]
+        protected SpriteLoader SpriteLoader { get; set; }
+        protected string Status
+        {
+            get { return myStatus; }
+            set
+            {
+                UIManager.UpdateTitle(value);
+                myStatus = value;
+            }
+        }
+
+        static SonicManager()
+        {
+            base64Inv = new JsDictionary<string, int>();
+            for (var i = 0; i < base64chars.Length; i++) {
+                base64Inv[base64chars[i]] = i;
+            }
+        }
 
         public SonicManager(SonicEngine engine, CanvasInformation gameCanvas, Action resize)
         {
             Instance = this;
-
             myEngine = engine;
             myEngine.canvasWidth = jQuery.Window.GetWidth();
             myEngine.canvasHeight = jQuery.Window.GetHeight();
+
+            gameCanvas.DomCanvas[0].SetAttribute("width", myEngine.canvasWidth);
+            gameCanvas.DomCanvas[0].SetAttribute("height", myEngine.canvasHeight);
 
             jQuery.GetJson("Content/sprites/sonic.js", data => { sonicSprites = data; });
 
@@ -39,10 +107,10 @@ namespace OurSonic
             RealScale = new Point(1, 1);
             mainCanvas = gameCanvas;
 
-            WindowLocation = Constants.DefaultWindowLocation(1, mainCanvas, Scale);
-            BigWindowLocation = Constants.DefaultWindowLocation(1, mainCanvas, Scale);
-            BigWindowLocation.Width = (int)(BigWindowLocation.Width * 1.8);
-            BigWindowLocation.Height = (int)(BigWindowLocation.Height * 1.8);
+            WindowLocation = Constants.DefaultWindowLocation(GameState.Editing, mainCanvas, Scale);
+            BigWindowLocation = Constants.DefaultWindowLocation(GameState.Editing, mainCanvas, Scale);
+            BigWindowLocation.Width = (int) ( BigWindowLocation.Width * 1.8 );
+            BigWindowLocation.Height = (int) ( BigWindowLocation.Height * 1.8 );
 
             Animations = new List<Animation>();
             AnimationInstances = new List<AnimationInstance>();
@@ -53,6 +121,8 @@ namespace OurSonic
             ActiveRings = new List<Ring>();
             ForceResize = resize;
             Background = null;
+            CurrentGameState = GameState.Editing;
+
             ScreenOffset = new Point(mainCanvas.DomCanvas.GetWidth() / 2 - WindowLocation.Width * Scale.X / 2,
                                      mainCanvas.DomCanvas.GetHeight() / 2 - WindowLocation.Height * Scale.Y / 2);
 
@@ -68,46 +138,15 @@ namespace OurSonic
             SonicLevel = new SonicLevel();
         }
 
-        public GameState CurrentGameState { get; set; }
-
-        public IntersectingRectangle BigWindowLocation { get; set; }
-        public UIManager UIManager { get; set; }
-        public Sonic SonicToon { get; set; }
-        public Point Scale { get; set; }
-        public IntersectingRectangle WindowLocation { get; set; }
-        public Point RealScale { get; set; }
-        public bool InHaltMode { get; set; }
-        public int IndexedPalette { get; set; }
-        public List<Animation> Animations { get; set; }
-        public List<AnimationInstance> AnimationInstances { get; set; }
-        public Ring GoodRing { get; set; }
-        public bool ShowHeightMap { get; set; }
-        public Point ScreenOffset { get; set; }
-        public List<Ring> ActiveRings { get; set; }
-        public Action ForceResize { get; set; }
-        public SonicBackground Background { get; set; }
-        public ClickState ClickState { get; set; }
-        public SonicLevel SonicLevel { get; set; }
-        protected List<SonicObject> InFocusObjects { get; set; }
-        protected bool Loading { get; set; }
-        protected SpriteCache SpriteCache { get; set; }
-        protected SpriteLoader SpriteLoader { get; set; }
-
-        public static SonicManager Instance;
-        private string myStatus;
-
-
         public bool OnClick(jQueryEvent elementEvent)
         {
             var e = new Point(elementEvent.ClientX / Scale.X / RealScale.X / WindowLocation.X,
                               elementEvent.ClientY / Scale.Y / RealScale.Y + WindowLocation.Y);
 
-            if (elementEvent.Button == 0)
-            {
+            if (elementEvent.Button == 0) {
                 int ey;
                 int ex;
-                switch (ClickState)
-                {
+                switch (ClickState) {
                     case ClickState.Dragging:
                         return false;
                         break;
@@ -116,8 +155,7 @@ namespace OurSonic
                         ey = e.Y / 128;
                         TileChunk ch = SonicLevel.Chunks[SonicLevel.ChunkMap[ex][ey]];
                         TilePiece tp = ch.GetBlock(e.X - ex * 128, e.Y - ey * 128);
-                        if (tp != null)
-                        {
+                        if (tp != null) {
                             TilePiece tpc = ch.GetTilePiece(e.X - ex * 128, e.Y - ey * 128);
                             UIManager.Data.Indexes.TPIndex = SonicLevel.Blocks.IndexOf(tp);
                             UIManager.Data.ModifyTilePieceArea.TilePiece = tp;
@@ -160,17 +198,14 @@ namespace OurSonic
         private void tickObjects()
         {
             InFocusObjects = new List<SonicObject>();
-            foreach (SonicObject obj in SonicLevel.Objects)
-            {
-                if (BigWindowLocation.Intersects(new Point(obj.X, obj.Y)))
-                {
+            foreach (SonicObject obj in SonicLevel.Objects) {
+                if (BigWindowLocation.Intersects(new Point(obj.X, obj.Y))) {
                     InFocusObjects.Add(obj);
                     obj.Tick(obj, SonicLevel, SonicToon);
                 }
             }
             //sonicManager.uiManager.liveObjectsArea.populate(sonicManager.inFocusObjects);TODO:::
-            foreach (AnimationInstance animationInstance in AnimationInstances)
-            {
+            foreach (AnimationInstance animationInstance in AnimationInstances) {
                 animationInstance.Tick();
             }
         }
@@ -179,22 +214,18 @@ namespace OurSonic
         {
             if (Loading) return;
 
-
-            if (CurrentGameState == GameState.Playing)
-            {
-                if (InHaltMode)
+            if (CurrentGameState == GameState.Playing) {
+                if (InHaltMode) {
                     if (waitingForTickContinue)
                         return;
+                }
 
                 tickCount++;
                 tickObjects();
                 SonicToon.Ticking = true;
-                try
-                {
+                try {
                     SonicToon.Tick(SonicLevel, Scale);
-                }
-                catch (Exception exc)
-                {
+                } catch (Exception exc) {
                     string txt = "There was an error on this page.\n\n";
                     txt += "Error description: " + exc.Message + "\n\n";
                     txt += "Stack: " + exc.InnerException + "\n\n"; //todo::callstack
@@ -202,24 +233,17 @@ namespace OurSonic
 
                     Window.Alert(txt);
                     throw exc;
-                }
-                finally
-                {
+                } finally {
                     SonicToon.Ticking = false;
                 }
-                if (InHaltMode)
-                {
+                if (InHaltMode) {
                     if (waitingForTickContinue)
-                    {
                         return;
-                    }
                     waitingForTickContinue = true;
                     waitingForDrawContinue = false;
                 }
                 if (SonicToon.X > 128 * SonicLevel.LevelWidth)
-                {
                     SonicToon.X = 0;
-                }
             }
         }
 
@@ -230,32 +254,29 @@ namespace OurSonic
             var inj = 0;
             var spriteLocations = new List<string>();
 
-            for (int j = 0; j < 4; j++)
-            {
+            for (int j = 0; j < 4; j++) {
                 spriteLocations.Add(string.Format("assets/Sprites/ring{0}.png", j));
                 imageLength++;
             }
             int md = 0;
             var ind_ = SpriteCache.Indexes;
             SpriteLoader = new SpriteLoader(completed, update);
-            var spriteStep = SpriteLoader.AddStep("Sprites", (i, done) =>
-                                                                 {
-                                                                     var sp = i * 200;
-                                                                     ci[sp] = Help.LoadSprite(spriteLocations[i],
-                                                                                              jd =>
-                                                                                              {
-                                                                                                  ci[
+            var spriteStep = SpriteLoader.AddStep("Sprites", (i, done) => {
+                                                                 var sp = i * 200;
+                                                                 ci[sp] = Help.LoadSprite(spriteLocations[i],
+                                                                                          jd => {
+                                                                                              ci[
                                                                                                       jd.Me().Tag *
                                                                                                       200 +
                                                                                                       scale.X * 100 +
                                                                                                       scale.Y] =
                                                                                                       Help.
-                                                                                                          ScaleSprite
-                                                                                                          (jd, scale,
-                                                                                                           jc =>
-                                                                                                           done());
-                                                                                              });
-                                                                 });
+                                                                                                              ScaleSprite
+                                                                                                              (jd, scale,
+                                                                                                               jc =>
+                                                                                                               done());
+                                                                                          });
+                                                             });
             /*
 
 
@@ -658,45 +679,34 @@ namespace OurSonic
 
         public void Draw(CanvasContext2D canvas)
         {
-            if (InHaltMode)
-            {
+            if (InHaltMode) {
                 canvas.FillStyle = "white";
                 canvas.Font = "21pt arial bold";
                 canvas.FillText("HALT MODE\r\n Press: P to step\r\n        O to resume", 10, 120);
 
                 if (waitingForDrawContinue)
-                {
                     return;
-                }
                 else
-                {
                     waitingForDrawContinue = true;
-                }
             }
             canvas.Save();
             DrawTickCount++;
-            if (false && (SpriteLoader != null && !SpriteLoader.Tick() || Loading))
-            {
+            if (false && ( SpriteLoader != null && !SpriteLoader.Tick() || Loading )) {
                 canvas.FillStyle = "white";
                 canvas.FillText(
-                    "Loading...   " /*+ (this.inds.tc + this.inds.tp + this.inds.t) + " / " + (this.inds.total)*/, 95,
-                    95);
+                        "Loading...   " /*+ (this.inds.tc + this.inds.tp + this.inds.t) + " / " + (this.inds.total)*/, 95,
+                        95);
                 canvas.Restore();
                 return;
             }
             ScreenOffset = new Point(0, 0);
 
-            if (CurrentGameState == GameState.Playing)
-            {
+            if (CurrentGameState == GameState.Playing) {
                 canvas.Scale(RealScale.X, RealScale.Y);
-                if (SonicToon.Ticking)
-                {
-                    while (true)
-                    {
+                if (SonicToon.Ticking) {
+                    while (true) {
                         if (SonicToon.Ticking)
-                        {
                             break;
-                        }
                     }
                 }
                 canvas.Translate(ScreenOffset.X, ScreenOffset.Y);
@@ -708,11 +718,10 @@ namespace OurSonic
 
                 BigWindowLocation.X = SonicToon.X * BigWindowLocation.Width / 2;
                 BigWindowLocation.Y = SonicToon.Y * BigWindowLocation.Height / 2;
-                if (Background != null)
-                {
+                if (Background != null) {
                     int wOffset = WindowLocation.X;
                     int bw = Background.Width / Scale.X;
-                    int movex = (wOffset / bw) * bw;
+                    int movex = ( wOffset / bw ) * bw;
                     Background.Draw(canvas, new Point(-WindowLocation.X * Scale.X + movex, -WindowLocation.Y / 4 * Scale.Y),
                                     Scale, wOffset);
                     Background.Draw(canvas,
@@ -730,38 +739,29 @@ namespace OurSonic
                 for (int j = -1; j < h1; j++)
                     offs.Add(new Point(i, j));
 
-
             var bounds = new IntersectingRectangle(-32, -32, WindowLocation.Width * Scale.X + 32,
                                                    WindowLocation.Height * Scale.Y + 32, Constants.Intersects);
-            if (SonicLevel.Chunks != null && SonicLevel.Chunks.Count > 0)
-            {
-                if (SonicLevel.PaletteItems[0] != null)
-                {
-                    for (int k = 0; k < SonicLevel.PaletteItems[0].Count; k++)
-                    {
+            if (SonicLevel.Chunks != null && SonicLevel.Chunks.Count > 0) {
+                if (SonicLevel.PaletteItems[0] != null) {
+                    for (int k = 0; k < SonicLevel.PaletteItems[0].Count; k++) {
                         var pal = SonicLevel.PaletteItems[0][k];
-                        for (int j = 0; j < pal.TotalLength; j += pal.SkipIndex)
-                        {
-                            if (DrawTickCount % (pal.TotalLength + pal.SkipIndex) == j)
-                            {
+                        for (int j = 0; j < pal.TotalLength; j += pal.SkipIndex) {
+                            if (DrawTickCount % ( pal.TotalLength + pal.SkipIndex ) == j)
                                 SonicLevel.palAn[k] = j / pal.SkipIndex;
-                            }
                         }
 
-                        for (int m = 0; m < pal.Pieces.Count; m++)
-                        {
+                        for (int m = 0; m < pal.Pieces.Count; m++) {
                             var mj = pal.Pieces[m];
                             SonicLevel.Palette[mj.PaletteIndex][mj.PaletteOffset / 2] =
-                                pal.Palette[SonicLevel.palAn[k] * (pal.Pieces.Count * 2) + 0 + (mj.PaletteMultiply)];
+                                    pal.Palette[SonicLevel.palAn[k] * ( pal.Pieces.Count * 2 ) + 0 + ( mj.PaletteMultiply )];
                             SonicLevel.Palette[mj.PaletteIndex][mj.PaletteOffset / 2 + 1] =
-                                pal.Palette[SonicLevel.palAn[k] * (pal.Pieces.Count * 2) + 1 + (mj.PaletteMultiply)];
+                                    pal.Palette[SonicLevel.palAn[k] * ( pal.Pieces.Count * 2 ) + 1 + ( mj.PaletteMultiply )];
                         }
                     }
                 }
-                int fxP = (WindowLocation.X + 128) / 128;
-                int fyP = (WindowLocation.Y + 128) / 128;
-                foreach (Point off in offs)
-                {
+                int fxP = ( WindowLocation.X + 128 ) / 128;
+                int fyP = ( WindowLocation.Y + 128 ) / 128;
+                foreach (Point off in offs) {
                     int _xP = fxP + off.X;
                     int _yP = fyP + off.Y;
                     int _yPreal = fyP + off.Y;
@@ -780,15 +780,13 @@ namespace OurSonic
                     var posj = new Point(pos.X - WindowLocation.X * Scale.X, pos.Y - WindowLocation.Y * Scale.Y);
                     if (!chunk.IsEmpty())
                         chunk.Draw(canvas, posj, Scale, 0, bounds);
-                    if (false && CurrentGameState == GameState.Editing)
-                    {
+                    if (false && CurrentGameState == GameState.Editing) {
                         canvas.StrokeStyle = "#DD0033";
                         canvas.LineWidth = 3;
                         canvas.StrokeRect(posj.X, posj.Y, 128 * Scale.X, 128 * Scale.Y);
                     }
                 }
-                foreach (var r in SonicLevel.Rings)
-                {
+                foreach (var r in SonicLevel.Rings) {
                     /*
                      for (var ring in this.SonicLevel.Rings) {
                             var r = this.SonicLevel.Rings[ring];
@@ -803,29 +801,22 @@ namespace OurSonic
                         }
                      */
                 }
-                foreach (SonicObject o in SonicLevel.Objects)
-                {
-                    if (o.Dead || BigWindowLocation.Intersects(new Point(o.X, o.Y)))
-                    {
-                        o.Draw(canvas, (o.X - WindowLocation.X) * Scale.X, (o.Y - WindowLocation.Y) * Scale.Y, Scale,
+                foreach (SonicObject o in SonicLevel.Objects) {
+                    if (o.Dead || BigWindowLocation.Intersects(new Point(o.X, o.Y))) {
+                        o.Draw(canvas, ( o.X - WindowLocation.X ) * Scale.X, ( o.Y - WindowLocation.Y ) * Scale.Y, Scale,
                                ShowHeightMap);
                     }
                 }
-                foreach (AnimationInstance ano in AnimationInstances)
-                {
+                foreach (AnimationInstance ano in AnimationInstances) {
                     ano.Draw(canvas, -WindowLocation.X, -WindowLocation.Y, Scale);
                 }
-                for (int i = ActiveRings.Count - 1; i >= 0; i--)
-                {
+                for (int i = ActiveRings.Count - 1; i >= 0; i--) {
                     Ring ac = ActiveRings[i];
                     ac.Draw(canvas, new Point(ac.X - WindowLocation.X, ac.Y - WindowLocation.Y), Scale);
                     if (ac.TickCount > 256)
-                    {
                         ActiveRings.Remove(ac);
-                    }
                 }
-                if (CurrentGameState == GameState.Playing)
-                {
+                if (CurrentGameState == GameState.Playing) {
                     SonicToon.Draw(canvas, Scale);
                     if (WindowLocation.X < 0) WindowLocation.X = 0;
                     if (WindowLocation.Y < 0) WindowLocation.Y = 0;
@@ -835,8 +826,7 @@ namespace OurSonic
                     //    WindowLocation.Y = 128 * SonicLevel.LevelHeight - WindowLocation.Height;
                 }
 
-                foreach (Point off in offs)
-                {
+                foreach (Point off in offs) {
                     int _xP = fxP + off.X;
                     int _yP = fyP + off.Y;
                     int _yPreal = fyP + off.Y;
@@ -848,18 +838,14 @@ namespace OurSonic
                     var pos = new Point(_xP * 128 * Scale.X, _yPreal * 128 * Scale.Y);
                     var posj = new Point(pos.X - WindowLocation.X * Scale.X, pos.Y - WindowLocation.Y * Scale.Y);
                     if (!chunk.IsEmpty() && !chunk.OnlyBackground())
-                    {
                         chunk.Draw(canvas, posj, Scale, 1, bounds);
-                    }
-                    if (false && CurrentGameState == GameState.Editing)
-                    {
+                    if (false && CurrentGameState == GameState.Editing) {
                         canvas.StrokeStyle = "#DD0033";
                         canvas.LineWidth = 3;
                         canvas.StrokeRect(posj.X, posj.Y, 128 * Scale.X, 128 * Scale.Y);
                     }
 
-                    if (ShowHeightMap)
-                    {
+                    if (ShowHeightMap) {
                         /*
                             var fd = sonicManager.SpriteCache.heightMapChunks[(this.SonicLevel.curHeightMap ? 1 : 2) + " " + chunk.index + " " + scale.y + " " + scale.x];
                                 if (!fd) {
@@ -910,8 +896,7 @@ namespace OurSonic
                                 }
                                 canvas.drawImage(fd, posj.x, posj.y);*/
                     }
-                    if (CurrentGameState == GameState.Editing)
-                    {
+                    if (CurrentGameState == GameState.Editing) {
                         canvas.StrokeStyle = "#DD0033";
                         canvas.LineWidth = 3;
                         canvas.StrokeRect(posj.X, posj.Y, 128 * Scale.X, 128 * Scale.Y);
@@ -921,61 +906,29 @@ namespace OurSonic
 
             canvas.Restore();
             if (CurrentGameState == GameState.Playing)
-            {
                 SonicToon.DrawUI(canvas, new Point(ScreenOffset.X, ScreenOffset.Y), Scale);
-            }
         }
-
 
         private Animation containsAnimatedTile(int tile)
         {
             return null;
         }
 
-        private static string[] base64chars =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".Split("");
-
-        private static JsDictionary<string, int> base64Inv;
-
-        static SonicManager()
-        {
-            base64Inv = new JsDictionary<string, int>();
-            for (var i = 0; i < base64chars.Length; i++)
-            {
-                base64Inv[base64chars[i]] = i;
-            }
-        }
-
-
         private int[] decodeNumeric(string s)
         {
             s = s.Replace(new Regex("[^" + base64chars.Join("") + "=]", "g"), "");
-            var p = s.CharAt(s.Length - 1) == "=" ? (s.CharAt(s.Length - 2) == "=" ? "AA" : "A") : "";
+            var p = s.CharAt(s.Length - 1) == "=" ? ( s.CharAt(s.Length - 2) == "=" ? "AA" : "A" ) : "";
             var r = new List<int>();
             s = s.Substr(0, s.Length - p.Length) + p;
-            for (int c = 0; c < s.Length; c += 4)
-            {
-                var n = (base64Inv[s.CharAt(c)] << 18) + (base64Inv[s.CharAt(c + 1)] << 12) +
-                        (base64Inv[s.CharAt(c + 2)] << 6) + base64Inv[s.CharAt(c + 3)];
+            for (int c = 0; c < s.Length; c += 4) {
+                var n = ( base64Inv[s.CharAt(c)] << 18 ) + ( base64Inv[s.CharAt(c + 1)] << 12 ) +
+                        ( base64Inv[s.CharAt(c + 2)] << 6 ) + base64Inv[s.CharAt(c + 3)];
 
-                r.Add((n >> 16) & 255);
-                r.Add((n >> 8) & 255);
+                r.Add(( n >> 16 ) & 255);
+                r.Add(( n >> 8 ) & 255);
                 r.Add(n & 255);
             }
-            return (int[])r.Slice(0, r.Count - 1);
-
+            return (int[]) r.Slice(0, r.Count - 1);
         }
-
-        protected string Status
-        {
-            get { return myStatus; }
-            set
-            {
-                UIManager.UpdateTitle(value);
-                myStatus = value;
-            }
-        }
-
-
     }
 }

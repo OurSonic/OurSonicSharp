@@ -104,7 +104,6 @@
     var btou = function (bin) {
         return bin.replace(re_bytes_nonascii, sub_bytes_nonascii);
     };
-console.log('aaa');
     global.Base64 = {
         fromBase64: fromBase64,
         toBase64: toBase64,
@@ -124,10 +123,10 @@ console.log('aaa');
             })));
         }
     };
-    console.log(global.Base64.utob);
+    
 
 
-})(global || window);
+})(this);
    
 
 
@@ -143,7 +142,7 @@ console.log('aaa');
 *   http://www.onicos.com/staff/iz/amuse/javascript/expert/deflate.txt
 */
 
-(function () {
+(function (global) {
 
     /* Copyright (C) 1999 Masanao Izumo <iz@onicos.co.jp>
     * Version: 1.0.1
@@ -1797,11 +1796,10 @@ console.log('aaa');
         zip_deflate_data = null; // G.C.
         return aout.join("");
     }
-
-    if (!(global || window).RawDeflate) global.RawDeflate = {};
+ global.RawDeflate = {};
     global.RawDeflate.deflate = zip_deflate;
 
-})();
+})(this);
 
 
 /*
@@ -1811,7 +1809,7 @@ console.log('aaa');
 * http://www.onicos.com/staff/iz/amuse/javascript/expert/inflate.txt
 */
 
-(function () {
+(function (global) {
 
     /* Copyright (C) 1999 Masanao Izumo <iz@onicos.co.jp>
     * Version: 1.0.0.1
@@ -2551,13 +2549,11 @@ console.log('aaa');
         zip_inflate_data = null; // G.C.
         return aout.join("");
     }
+ 
+  global.RawInflate= {};
+    global.RawInflate.inflate = zip_inflate;
 
-    if (!(global || window).RawDeflate) global.RawDeflate = {};
-    global.RawDeflate.inflate = zip_inflate;
-
-})();
-
-
+})(this);
 
 
 
@@ -2575,27 +2571,19 @@ console.log('aaa');
 
 
 
+
+var $_top=this;
 
 function Compressor() {
     var CompressText = function (str) {
-console.log('Jj3j');
-
-    console.log(global.Base64.utob);
-        return global.Base64.toBase64(global.RawDeflate.deflate(global.Base64.utob(str)));
-console.log('Jjj2');
+        return $_top.Base64.toBase64($_top.RawDeflate.deflate($_top.Base64.utob(str)));
     };
     var DecompressText = function (str) {
-console.log('Jjcsj');
-        return global.Base64.btou(global.RawDeflate.inflate(global.Base64.fromBase64(str)));
-console.log('Jjjc');
+        return $_top.Base64.btou($_top.RawInflate.inflate($_top.Base64.fromBase64(str)));
     };
-
-console.log('Jjj');
-
-
     this.CompressText = CompressText;
     this.DecompressText = DecompressText;
     return this;
 }
 
-(global || window).Compressor = Compressor; 
+$_top.Compressor = Compressor; 
