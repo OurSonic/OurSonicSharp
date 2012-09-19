@@ -23,9 +23,7 @@ namespace OurSonic.Drawing
         [IntrinsicProperty]
         public bool YFlip { get; set; }
         [IntrinsicProperty]
-        protected List<int> AnimatedFrames { get; set; }
-        [IntrinsicProperty]
-        protected int AnimationFrame { get; set; }
+        public List<int> AnimatedFrames { get; set; } 
         [IntrinsicProperty]
         public int Index { get; set; }
 
@@ -96,11 +94,11 @@ namespace OurSonic.Drawing
                          bool xFlip,
                          bool yFlip,
                          int animatedIndex)
-        {
+        { 
             var drawOrderIndex = 0;
 
             drawOrderIndex = xFlip ? ( yFlip ? 0 : 1 ) : ( yFlip ? 2 : 3 );
-            var fd = GetCache(layer, scale, drawOrderIndex, AnimationFrame, SonicManager.Instance.SonicLevel.palAn);
+            var fd = GetCache(layer, scale, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.palAn);
             if (fd == null) {
                 var ac = Help.DefaultCanvas(cx, cy);
                 var sX = 8 * scale.X;
@@ -117,13 +115,13 @@ namespace OurSonic.Drawing
                             var df = drawInfo[drawOrder[drawOrderIndex][i]];
                             localPoint.X = df[0] * sX;
                             localPoint.Y = df[1] * sY;
-                            tiles[mj._Tile].Draw(ac.Context, localPoint, scale, _xf, _yf, mj.Palette, layer, AnimationFrame);
+                            tiles[mj._Tile].Draw(ac.Context, localPoint, scale, _xf, _yf, mj.Palette, layer, animatedIndex);
                         }
                     }
                     i++;
                 }
                 fd = (CanvasElement) ac.DomCanvas[0];
-                SetCache(layer, scale, drawOrderIndex, AnimationFrame, SonicManager.Instance.SonicLevel.palAn, fd);
+                SetCache(layer, scale, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.palAn, fd);
             }
             DrawIt(canvas, fd, position);
             return true;
@@ -136,13 +134,13 @@ namespace OurSonic.Drawing
                               List<int> palAn,
                               CanvasElement image)
         {
-            dynamic val = ( ( drawOrder + 1 ) + ( scale.X * 10 ) + ( animationFrame * 1000 ) + ( ( layer + 1 ) * 10000 ) );
-            if ((dynamic) AnimatedFrames) {
+            var val = ((drawOrder + 1) + (scale.X * 10) + (animationFrame * 1000) + ((layer + 1) * 10000)).ToString();
+            if (AnimatedFrames!=null) {
                 foreach (var animatedFrame in AnimatedFrames) {
                     val += palAn[animatedFrame] + " ";
                 }
             }
-            ( (dynamic) Image )[val] = image;
+            Image[val] = image;
         }
 
         private void DrawIt(CanvasContext2D canvas, CanvasElement fd, Point position)
@@ -152,15 +150,15 @@ namespace OurSonic.Drawing
 
         private CanvasElement GetCache(int layer, Point scale, int drawOrder, int animationFrame, List<int> palAn)
         {
-            dynamic val = ( ( drawOrder + 1 ) + ( scale.X * 10 ) + ( animationFrame * 1000 ) + ( ( layer + 1 ) * 10000 ) );
-            if ((dynamic) AnimatedFrames) {
+            var val = ( ( drawOrder + 1 ) + ( scale.X * 10 ) + ( animationFrame * 1000 ) + ( ( layer + 1 ) * 10000 ) ).ToString();
+            if (AnimatedFrames!=null) {
                 foreach (var animatedFrame in AnimatedFrames) {
                     val += palAn[animatedFrame] + " ";
                 }
             }
 
-            if (!( (dynamic) Image )[val]) return null;
-            return Extensions.Me<CanvasElement>(( ( (dynamic) Image )[val] ));
+            if (Image[val]==null) return null;
+            return Image[val];
         }
     }
     public enum RotationMode

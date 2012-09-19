@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Html;
 using System.Html.Media.Graphics;
+using System.Runtime.CompilerServices;
 using CommonWebLibraries;
 using jQueryApi;
 namespace OurSonic
@@ -138,6 +139,12 @@ namespace OurSonic
         public static string DecodeString(string lvl)
         {
             return new Compressor().DecompressText(lvl);
+        }
+
+
+        [InlineCode("debugger")]
+        public static void Debugger()
+        {
         }
     }
 }

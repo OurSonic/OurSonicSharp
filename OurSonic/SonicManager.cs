@@ -782,7 +782,7 @@ namespace OurSonic
                     int ind = SonicLevel.ChunkMap[_xP][_yP];
                     TileChunk chunk = SonicLevel.Chunks[ind];
                     TileChunk anni = SonicLevel.Chunks[ind];
-                    if (false && anni != null)
+                    if  (anni != null)
                         anni.AnimatedTick();
                     if (chunk == null)
                         continue;
@@ -927,30 +927,18 @@ namespace OurSonic
                 SonicToon.DrawUI(canvas, new Point(ScreenOffset.X, ScreenOffset.Y), Scale);
         }
 
-        private Animation containsAnimatedTile(int tile, SLData sonLevel)
+        private Animation containsAnimatedTile(int tile, SonicLevel sonLevel)
         {
-            for (int index = 0; index < sonLevel.Animations.Count; index++) {
-                var an = sonLevel.Animations[index];
+            for (int i = 0; i < sonLevel.Animations.Count; i++) {
+                var an = sonLevel.Animations[i];
                 var anin = an.AnimationTileIndex;
                 var num = an.NumberOfTiles;
-                if (index >= anin && index < anin + num)
-                    return new Animation() {AnimationFile = an.AnimationFile, AutomatedTiming = an.AutomatedTiming};
+                if (tile >= anin && tile < anin + num)
+                    return an;
             }
             return null;
 
-            /*
-             
-        for (var i = 0; i < sonicManager.SonicLevel.Animations.length; i++) {
-            var an = sonicManager.SonicLevel.Animations[i];
-            var anin = an.AnimationTileIndex;
-            var num = an.NumberOfTiles;
-            if (index >= anin && index < anin + num) {
-                return an;
-            }
-        }
-        return undefined;
-             */
-            return null;
+  
         }
 
         private int[] decodeNumeric(string s)

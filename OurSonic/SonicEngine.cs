@@ -22,12 +22,12 @@ namespace OurSonic
             var gameCanvasItem = jQuery.Select(string.Format("#{0}", gameCanvasName));
             gameCanvas =
                     new CanvasInformation(
-                            (CanvasContext2D) gameCanvasItem[0].As<CanvasElement>().GetContext(Rendering.Render2D),
+                            (CanvasContext2D)gameCanvasItem[0].As<CanvasElement>().GetContext(Rendering.Render2D),
                             gameCanvasItem);
             var uiCanvasItem = jQuery.Select(string.Format("#{0}", uiCanvasName));
             uiCanvas =
                     new CanvasInformation(
-                            (CanvasContext2D) uiCanvasItem[0].As<CanvasElement>().GetContext(Rendering.Render2D), uiCanvasItem);
+                            (CanvasContext2D)uiCanvasItem[0].As<CanvasElement>().GetContext(Rendering.Render2D), uiCanvasItem);
 
             canvasWidth = 0;
             canvasHeight = 0;
@@ -44,25 +44,58 @@ namespace OurSonic
             uiCanvas.DomCanvas.Bind("mousewheel", handleScroll);
             uiCanvas.DomCanvas.Bind("contextmenu", (e) => e.PreventDefault());
 
-            jQuery.Document.Keydown(e => {
-                                        if (sonicManager.SonicToon == null)
-                                            sonicManager.UIManager.OnKeyDown(e);
-                                    });
+            jQuery.Document.Keydown(e =>
+            {
+                if (sonicManager.SonicToon == null)
+                    sonicManager.UIManager.OnKeyDown(e);
+            });
 
             jQuery.Document.Keydown(a => {
-                                        if (a.Me().keyCode == 37) {
-                                            sonicManager.WindowLocation.X -= 128;
-                                            sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.Y;
-                                        }
-                                        if (a.Me().keyCode == 38) {
-                                            sonicManager.WindowLocation.Y -= 128;
+
+                                        int keycode = a.Me().keyCode;
+
+                                        if (keycode == 49) {
+                                            sonicManager.Load(Window.Instance.Me().levelData[0], null);
+                                            sonicManager.WindowLocation.X = 0;
+                                            sonicManager.WindowLocation.Y = 0;
+                                            sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
                                             sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
                                         }
-                                        if (a.Me().keyCode == 39) {
-                                            sonicManager.WindowLocation.X += 128;
-                                            sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.Y;
+                                        else if (keycode == 50)
+                                        {
+                                            sonicManager.Load(Window.Instance.Me().levelData[1], null);
+                                            sonicManager.WindowLocation.X = 0;
+                                            sonicManager.WindowLocation.Y = 0;
+                                            sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
+                                            sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
                                         }
-                                        if (a.Me().keyCode == 40) {
+                                        else if (keycode == 51)
+                                        {
+                                            sonicManager.Load(Window.Instance.Me().levelData[2], null);
+                                            sonicManager.WindowLocation.X = 0;
+                                            sonicManager.WindowLocation.Y = 0;
+                                            sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
+                                            sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
+                                        }
+                                        else if (keycode == 52)
+                                        {
+                                            sonicManager.Load(Window.Instance.Me().levelData[3], null);
+                                            sonicManager.WindowLocation.X = 0;
+                                            sonicManager.WindowLocation.Y = 0;
+                                            sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
+                                            sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
+                                        }
+                                        else if (keycode == 52)
+                                        {
+                                            sonicManager.WindowLocation.X -= 128;
+                                            sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
+                                        } else if (keycode == 38) {
+                                            sonicManager.WindowLocation.Y -= 128;
+                                            sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
+                                        } else if (keycode == 39) {
+                                            sonicManager.WindowLocation.X += 128;
+                                            sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
+                                        } else if (keycode == 40) {
                                             sonicManager.WindowLocation.Y += 128;
                                             sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
                                         }
@@ -233,17 +266,17 @@ namespace OurSonic
                                              : new Point(canvasWidth / 320 / sonicManager.Scale.X,
                                                          canvasHeight / 224 / sonicManager.Scale.Y);
 
-            gameCanvas.DomCanvas.Attribute("width", ( sonicManager.WindowLocation.Width *
-                                                      ( sonicManager.SonicToon != null
+            gameCanvas.DomCanvas.Attribute("width", (sonicManager.WindowLocation.Width *
+                                                      (sonicManager.SonicToon != null
                                                                 ? sonicManager.Scale.X * sonicManager.RealScale.X
-                                                                : 1 ) ).ToString());
-            gameCanvas.DomCanvas.Attribute("height", ( sonicManager.WindowLocation.Height *
-                                                       ( sonicManager.SonicToon != null
+                                                                : 1)).ToString());
+            gameCanvas.DomCanvas.Attribute("height", (sonicManager.WindowLocation.Height *
+                                                       (sonicManager.SonicToon != null
                                                                  ? sonicManager.Scale.Y * sonicManager.RealScale.Y
-                                                                 : 1 ) ).ToString());
+                                                                 : 1)).ToString());
 
-//TODO::            that.uiCanvas.goodWidth = that.canvasWidth;
-//            that.gameCanvas.goodWidth = (window.sonicManager.windowLocation.width * (window.sonicManager.sonicToon ? window.sonicManager.scale.x * window.sonicManager.realScale.x : 1));
+            //TODO::            that.uiCanvas.goodWidth = that.canvasWidth;
+            //            that.gameCanvas.goodWidth = (window.sonicManager.windowLocation.width * (window.sonicManager.sonicToon ? window.sonicManager.scale.x * window.sonicManager.realScale.x : 1));
 
             var screenOffset = sonicManager.SonicToon != null
                                        ? new Point(canvasWidth / 2 -
@@ -259,7 +292,7 @@ namespace OurSonic
 
         public void Clear(CanvasInformation canv)
         {
-            canv.DomCanvas[0].Me().width = ( gameCanvas.DomCanvas.GetWidth() );
+            canv.DomCanvas[0].Me().width = (gameCanvas.DomCanvas.GetWidth());
         }
 
         public void GameDraw()

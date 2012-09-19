@@ -8,7 +8,7 @@ namespace OurSonic
         [PreserveCase]
         public List<Animation> Animations { get; set; }
         [IntrinsicProperty]
-        public int[][][] AnimatedFiles { get; set; }
+        public Tile[][] AnimatedFiles { get; set; }
         [IntrinsicProperty]
         public int[][] ChunkMap { get; set; }
         [IntrinsicProperty]

@@ -39,17 +39,6 @@
     <Compile Include="Server.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib">
-      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.1.2.5.7\tools\Assemblies\mscorlib.dll</HintPath>
-    </Reference>
-    <Reference Include="Script.Linq, Version=1.2.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Saltarelle.Linq.1.2.5.1\lib\Script.Linq.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\NodeLibraries\Fibers\Fibers.csproj">
       <Project>{48C25DF7-AFC5-4AC0-B11A-535DEF87076D}</Project>
       <Name>Fibers</Name>
@@ -75,8 +64,19 @@
       <Name>OurSonic</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.2.5.15\tools\Saltarelle.Compiler.targets')" />
-  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.1.2.5.15\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.2.5.15\tools\Saltarelle.Compiler.targets')" />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib">
+      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.1.3.0.1\tools\Assemblies\mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="Script.Linq, Version=1.3.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Saltarelle.Linq.1.3.0\lib\Script.Linq.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.3.0.3\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.1.3.0.3\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.3.0.3\tools\Saltarelle.Compiler.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

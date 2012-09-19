@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 namespace OurSonic.Drawing
@@ -16,7 +17,7 @@ namespace OurSonic.Drawing
         [IntrinsicProperty]
         public TilePiece[][] TilePieces { get; set; }
         [IntrinsicProperty]
-        public List<Animation> Animated { get; set; }
+        public JsDictionary<int, Animation> Animated { get; set; }
         [IntrinsicProperty]
         public int Index { get; set; }
 
@@ -39,18 +40,22 @@ namespace OurSonic.Drawing
 
         public bool OnlyBackground()
         {
-            if (isOnlyBackground == null) {
+            if (isOnlyBackground == null)
+            {
                 var blocks = SonicManager.Instance.SonicLevel.Blocks;
 
                 var tpl = TilePieces.Length;
                 var tph = TilePieces[0].Length;
-                for (int i = 0; i < tpl; i++) {
-                    for (int j = 0; j < tph; j++) {
+                for (int i = 0; i < tpl; i++)
+                {
+                    for (int j = 0; j < tph; j++)
+                    {
                         var r = TilePieces[i][j];
                         var pm = blocks[r.Block];
-                        if (pm != null) {
+                        if (pm != null)
+                        {
                             if (!pm.OnlyBackground())
-                                return ( isOnlyBackground = false ).Value;
+                                return (isOnlyBackground = false).Value;
                         }
                     }
                 }
@@ -61,14 +66,17 @@ namespace OurSonic.Drawing
 
         public bool IsEmpty()
         {
-            if (empty == null) {
+            if (empty == null)
+            {
                 var tpl = TilePieces.Length;
                 var tph = TilePieces[0].Length;
-                for (int i = 0; i < tpl; i++) {
-                    for (int j = 0; j < tph; j++) {
+                for (int i = 0; i < tpl; i++)
+                {
+                    for (int j = 0; j < tph; j++)
+                    {
                         var r = TilePieces[i][j];
                         if (r.Block != 0)
-                            return ( empty = false ).Value;
+                            return (empty = false).Value;
                     }
                 }
                 empty = true;
@@ -89,6 +97,7 @@ namespace OurSonic.Drawing
 
             var check = false;
 
+
             /*var RectB = new Rectangle(position.X, position.Y, len1 * lX, len2 * lY);
             var RectA = bounds;
             if (RectA.X < RectB.X+RectB.Width && RectA.X+RectA.Width > RectB.X+RectB.Width &&
@@ -97,35 +106,39 @@ namespace OurSonic.Drawing
             }*/
             /*
 
-        localPoint.X = position.X;
-            localPoint.Y = position.Y;
-            if (bounds.Intersects(localPoint)) {
-                localPoint.X = position.X+len1*lX;
-                localPoint.Y = position.Y;
-                if (bounds.Intersects(localPoint))
-                {
-                    localPoint.X = position.X;
-                    localPoint.Y = position.Y + len2 * lY;
-                    if (bounds.Intersects(localPoint))
-                    {
-                        localPoint.X = position.X + len1 * lX;
-                        localPoint.Y = position.Y + len2 * lY;
-                        if (bounds.Intersects(localPoint)) {
-                            check = false;
-                        }
-                    }
-                }   
-            } 
+       localPoint.X = position.X;
+           localPoint.Y = position.Y;
+           if (bounds.Intersects(localPoint)) {
+               localPoint.X = position.X+len1*lX;
+               localPoint.Y = position.Y;
+               if (bounds.Intersects(localPoint))
+               {
+                   localPoint.X = position.X;
+                   localPoint.Y = position.Y + len2 * lY;
+                   if (bounds.Intersects(localPoint))
+                   {
+                       localPoint.X = position.X + len1 * lX;
+                       localPoint.Y = position.Y + len2 * lY;
+                       if (bounds.Intersects(localPoint)) {
+                           check = false;
+                       }
+                   }
+               }   
+           } 
 */
 
+
             var blocks = SonicManager.Instance.SonicLevel.Blocks;
-            for (int i = 0; i < len1; i++) {
-                for (int j = 0; j < len2; j++) {
+            for (int i = 0; i < len1; i++)
+            {
+                for (int j = 0; j < len2; j++)
+                {
                     var r = TilePieces[i][j];
                     var pm = blocks[r.Block];
-                    if ((dynamic) pm) {
+                    if (pm != null)
+                    {
                         int animatedIndex = 0;
-                        if ((dynamic) Animated && (dynamic) ( Animated[j * len1 + i] ))
+                        if (Animated != null && (Animated[j * len1 + i] != null))
                             animatedIndex = Animated[j * len1 + i].LastAnimatedIndex;
 
                         localPoint.X = position.X + i * lX;
@@ -144,17 +157,23 @@ namespace OurSonic.Drawing
 
         public void AnimatedTick()
         {
-            foreach (var anni in Animated) {
-                if (anni.LastAnimatedFrame == null) {
+
+            foreach (var an in Animated)
+            {
+                var anni = an.Value;
+                if (anni.LastAnimatedFrame == null)
+                {
                     anni.LastAnimatedFrame = 0;
                     anni.LastAnimatedIndex = 0;
-                    if (anni.Frames[anni.LastAnimatedIndex].Ticks == 0 ||
-                        ( SonicManager.Instance.DrawTickCount - anni.LastAnimatedFrame ) >=
-                        ( ( anni.AutomatedTiming > 0 ) ? anni.AutomatedTiming : anni.Frames[anni.LastAnimatedIndex].Ticks )) {
-                        anni.LastAnimatedFrame = SonicManager.Instance.DrawTickCount;
-                        anni.LastAnimatedIndex = ( anni.LastAnimatedIndex + 1 ) % anni.Frames.Length;
-                    }
                 }
+                if (anni.Frames[anni.LastAnimatedIndex].Ticks == 0 ||
+                        (SonicManager.Instance.DrawTickCount - anni.LastAnimatedFrame) >=
+                        ((anni.AutomatedTiming > 0) ? anni.AutomatedTiming : anni.Frames[anni.LastAnimatedIndex].Ticks))
+                {
+                    anni.LastAnimatedFrame = SonicManager.Instance.DrawTickCount;
+                    anni.LastAnimatedIndex = (anni.LastAnimatedIndex + 1) % anni.Frames.Length;
+                }
+
             }
         }
     }
