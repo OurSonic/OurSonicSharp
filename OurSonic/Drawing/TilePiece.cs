@@ -2,6 +2,7 @@
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonicModels;
 namespace OurSonic.Drawing
 {
     public class TilePiece
@@ -11,7 +12,7 @@ namespace OurSonic.Drawing
         private int[][] drawInfo = new[] {new[] {0, 0}, new[] {1, 0}, new[] {0, 1}, new[] {1, 1}};
         private int[][] drawOrder = new[] {new[] {3, 2, 1, 0}, new[] {1, 0, 3, 2}, new[] {2, 3, 0, 1}, new[] {0, 1, 2, 3}};
         [IntrinsicProperty]
-        protected JsDictionary<string, CanvasElement> Image { get; set; }
+        public JsDictionary<string, CanvasElement> Image { get; set; }
         [IntrinsicProperty]
         protected object HeightMask { get; set; }
         [IntrinsicProperty]
@@ -26,6 +27,8 @@ namespace OurSonic.Drawing
         public List<int> AnimatedFrames { get; set; } 
         [IntrinsicProperty]
         public int Index { get; set; }
+        public Solidity Solid1 { get; set; }
+        public Solidity Solid2 { get; set; }
 
         public TilePiece()
         {
@@ -120,7 +123,7 @@ namespace OurSonic.Drawing
                     }
                     i++;
                 }
-                fd = (CanvasElement) ac.DomCanvas[0];
+                fd = ac.Canvas;
                 SetCache(layer, scale, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.palAn, fd);
             }
             DrawIt(canvas, fd, position);

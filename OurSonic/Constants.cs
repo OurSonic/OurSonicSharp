@@ -23,12 +23,8 @@ namespace OurSonic
         }
     }
     [Serializable]
-    public class IntersectingRectangle
+    public class IntersectingRectangle:Rectangle
     {
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
 
         public IntersectingRectangle(int x, int y, int width, int height)
         {
@@ -44,18 +40,17 @@ namespace OurSonic
         }
     }
     [Serializable]
-    public class Rectangle
+    public class Rectangle:Point
     {
         public int Width { get; set; }
-        public int Height { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
+        public int Height { get; set; } 
 
-        [ObjectLiteral]
-        public Rectangle(int x, int y, int width, int height)
+        public Rectangle() : base(0,0)
         {
-            X = x;
-            Y = y;
+            
+        }
+        public Rectangle(int x, int y, int width, int height) : base(x,y)
+        {
             Width = width;
             Height = height;
         }
@@ -65,12 +60,25 @@ namespace OurSonic
     {
         public int X { get; set; }
         public int Y { get; set; }
-
-        [ObjectLiteral]
         public Point(int x, int y)
         {
             X = x;
             Y = y;
         }
+        public Point(Point pos)
+        {
+            X = pos.X;
+            Y = pos.Y;
+
+        } 
+        public Point Offset(Point windowLocation)
+        {
+            return new Point(X + windowLocation.X, Y + windowLocation.Y);
+        }
+        public Point Negate(Point windowLocation)
+        {
+            return new Point(X - windowLocation.X, Y - windowLocation.Y);
+        }
+
     }
 }

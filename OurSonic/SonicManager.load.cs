@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Html;
 using System.Linq;
+using NodeJSLibrary;
 using OurSonic.Drawing;
 using OurSonicModels;
 using jQueryApi;
@@ -9,7 +10,7 @@ namespace OurSonic
 {
     public partial class SonicManager
     {
-        public void Load(string lvl, CanvasElement mainCanvas)
+        public void Load(string lvl)
         {
             Loading = true;
             Status = "Decoding";
@@ -23,7 +24,17 @@ namespace OurSonic
             if (SonicLevel.Tiles == null)
                 SonicLevel.Tiles = new List<Tile>();
             if (SonicLevel.Rings == null)
-                SonicLevel.Rings = new JsDictionary<string, Ring>();
+                SonicLevel.Rings = new List<Ring>();
+
+
+            for (var n = 0; n < sonicLevel.Rings.Length; n++)
+            {
+                SonicLevel.Rings[n] = new Ring(true);
+
+                SonicLevel.Rings[n].X = sonicLevel.Rings[n].X;
+                SonicLevel.Rings[n].Y = sonicLevel.Rings[n].Y;
+            }
+
 
             SonicLevel.LevelWidth = sonicLevel.ForegroundWidth;
             SonicLevel.LevelHeight = sonicLevel.ForegroundHeight;
@@ -38,6 +49,7 @@ namespace OurSonic
                 };
             })(l));
         }*/
+             
             SonicLevel.Objects = new List<SonicObject>();
 
             for (int l = 0; l < sonicLevel.Objects.Length; l++) {
@@ -228,6 +240,8 @@ namespace OurSonic
                     mj.TilePieces[p % 8][p / 8] = new TilePiece() {
                                                                           Index = p,
                                                                           Block = fc[p].Block,
+                                                                          Solid1 = fc[p].Solid1,
+                                                                          Solid2 =  fc[p].Solid2,
                                                                           XFlip = fc[p].XFlip,
                                                                           YFlip = fc[p].YFlip
                                                                   };
@@ -236,9 +250,9 @@ namespace OurSonic
                 SonicLevel.Chunks[j] = mj;
                 mj.Animated = new JsDictionary<int, Animation>();
                 //Help.Debugger();
-                for (int ic = 0; ic < mj.TilePieces.Length; ic++) {
-                    for (int jc = 0; jc < mj.TilePieces[ic].Length; jc++) {
-                        var r = mj.TilePieces[ic][jc];
+                for (int tpX = 0; tpX < mj.TilePieces.Length; tpX++) {
+                    for (int tpY = 0; tpY < mj.TilePieces[tpX].Length; tpY++) {
+                        var r = mj.TilePieces[tpX][tpY];
                         var pm = SonicLevel.Blocks[r.Block];
                         if (pm != null) {
                             for (int ci = 0; ci < pm.Tiles.Count; ci++) {
@@ -246,38 +260,14 @@ namespace OurSonic
                                 if (SonicLevel.Tiles[mjc._Tile] != null) {
                                     var fa = containsAnimatedTile(mjc._Tile, SonicLevel);
                                     if (fa != null) {
-                                        mj.Animated[jc * 8 + ic] = fa;
+                                        mj.Animated[tpY * 8 + tpX] = fa;
                                         acs[j] = mj;
                                     }
                                 }
                             }
                         }
                     }
-                }
-
-                /*for (je = 0; je < fc.angleMap1.length; je++) {
-                for (jc = 0; jc < fc.angleMap1[je].length; jc++) {
-                fc.angleMap1[je][jc] = parseInt(fc.angleMap1[je][jc], 16);
-                }
-                }
-                for (je = 0; je < fc.angleMap2.length; je++) {
-                for (jc = 0; jc < fc.angleMap2[je].length; jc++) {
-                fc.angleMap2[je][jc] = parseInt(fc.angleMap2[je][jc], 16);
-                }
-                }
-
-
-                for (je = 0; je < fc.heightMap1.length; je++) {
-                for (jc = 0; jc < fc.heightMap1[je].length; jc++) {
-                fc.heightMap1[je][jc] = sonicManager.SonicLevel.HeightMaps[fc.heightMap1[je][jc]];
-                }
-                }
-
-                for (je = 0; je < fc.heightMap2.length; je++) {
-                for (jc = 0; jc < fc.heightMap2[je].length; jc++) {
-                fc.heightMap2[je][jc] = sonicManager.SonicLevel.HeightMaps[fc.heightMap2[je][jc]];
-                }
-                }*/
+                } 
             }
             SonicLevel.Palette = sonicLevel.Palette;
 
@@ -329,10 +319,19 @@ namespace OurSonic
                         }
                     }
                 }
-            } 
+            }
 
-            //  SonicLevel = sonicLevel.Translate();
+            var finished = new Action(() => {
+                                     Loading = false;
+                                 });
+            PreloadSprites(Scale,()=> {
+                                     finished();
+                                     ForceResize();
 
+                                 },(s)=> {
+                                       Global.Console.Log("ff "+ s);
+  
+                                   });
             /* 
 
                

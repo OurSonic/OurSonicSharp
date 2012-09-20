@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{3222B6FB-15F6-4217-8ECD-193BCFCE7D60}</ProjectGuid>
+    <ProjectGuid>{B422D05D-269F-4B44-968B-2293A1CC3445}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OurSonic</RootNamespace>
-    <AssemblyName>OurSonic</AssemblyName>
+    <RootNamespace>WebLibraries</RootNamespace>
+    <AssemblyName>WebLibraries</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NoStdLib>True</NoStdLib>
@@ -32,51 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Animation.cs" />
-    <Compile Include="AnimationInstance.cs" />
-    <Compile Include="CanvasInformation.cs" />
-    <Compile Include="ClickState.cs" />
-    <Compile Include="Color.cs" />
-    <Compile Include="CommonWebLibraries.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="Drawing\Tile.cs" />
-    <Compile Include="Drawing\TileChunk.cs" />
-    <Compile Include="Drawing\TileItem.cs" />
-    <Compile Include="Drawing\TilePiece.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="GameState.cs" />
-    <Compile Include="HeightMask.cs" />
-    <Compile Include="Help.cs" />
-    <Compile Include="ObjectManager.cs" />
-    <Compile Include="Page.cs" />
-    <Compile Include="Ring.cs" />
-    <Compile Include="Sonic.cs" />
-    <Compile Include="SonicBackground.cs" />
-    <Compile Include="SonicEngine.cs" />
-    <Compile Include="SonicLevel.cs" />
-    <Compile Include="SonicManager.cs" />
-    <Compile Include="SonicManager.load.cs" />
-    <Compile Include="SonicObject.cs" />
-    <Compile Include="SpriteCache.cs" />
-    <Compile Include="SpriteLoader.cs" />
-    <Compile Include="UiManager.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\NodeLibraries\NodeJS\NodeJS.csproj">
-      <Project>{79800429-B885-4F5E-9A3B-48E50390214A}</Project>
-      <Name>NodeJS</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OurSonicModels\OurSonicModels.csproj">
-      <Project>{D16CB407-F890-4670-8DB6-37DF76880297}</Project>
-      <Name>OurSonicModels</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WebLibraries\WebLibraries.csproj">
-      <Project>{B422D05D-269F-4B44-968B-2293A1CC3445}</Project>
-      <Name>WebLibraries</Name>
-    </ProjectReference>
+    <Compile Include="KeyboardJS.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -85,16 +42,16 @@
     <Reference Include="mscorlib">
       <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.1.3.0.1\tools\Assemblies\mscorlib.dll</HintPath>
     </Reference>
-    <Reference Include="Script.jQuery, Version=1.3.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
+    <Reference Include="Script.jQuery">
       <HintPath>..\packages\Saltarelle.jQuery.1.3.0\lib\Script.jQuery.dll</HintPath>
     </Reference>
-    <Reference Include="Script.jQuery.UI, Version=1.3.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
+    <Reference Include="Script.jQuery.UI">
       <HintPath>..\packages\Saltarelle.jQuery.UI.1.3.0\lib\Script.jQuery.UI.dll</HintPath>
     </Reference>
-    <Reference Include="Script.Linq, Version=1.3.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
+    <Reference Include="Script.Linq">
       <HintPath>..\packages\Saltarelle.Linq.1.3.0\lib\Script.Linq.dll</HintPath>
     </Reference>
-    <Reference Include="Script.Web, Version=1.3.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
+    <Reference Include="Script.Web">
       <HintPath>..\packages\Saltarelle.Web.1.3.0\lib\Script.Web.dll</HintPath>
     </Reference>
   </ItemGroup>

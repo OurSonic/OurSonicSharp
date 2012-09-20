@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketIO", "NodeLibraries\S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeJS", "NodeLibraries\NodeJS\NodeJS.csproj", "{79800429-B885-4F5E-9A3B-48E50390214A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebLibraries", "WebLibraries\WebLibraries.csproj", "{B422D05D-269F-4B44-968B-2293A1CC3445}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,6 +81,10 @@ Global
 		{79800429-B885-4F5E-9A3B-48E50390214A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79800429-B885-4F5E-9A3B-48E50390214A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79800429-B885-4F5E-9A3B-48E50390214A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B422D05D-269F-4B44-968B-2293A1CC3445}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B422D05D-269F-4B44-968B-2293A1CC3445}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B422D05D-269F-4B44-968B-2293A1CC3445}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B422D05D-269F-4B44-968B-2293A1CC3445}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

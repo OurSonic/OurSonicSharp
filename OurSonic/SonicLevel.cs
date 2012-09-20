@@ -12,7 +12,9 @@ namespace OurSonic
         [IntrinsicProperty]
         public int[][] ChunkMap { get; set; }
         [IntrinsicProperty]
-        public JsDictionary<string, Ring> Rings { get; set; }
+        public JsDictionary<string, Ring> ActiveRings { get; set; }
+        [IntrinsicProperty]
+        public List<Ring> Rings { get; set; }
         [IntrinsicProperty]
         public bool CurHeightMap { get; set; }
         [IntrinsicProperty]
@@ -56,7 +58,7 @@ namespace OurSonic
             Blocks = new List<TilePiece>();
             Chunks = new List<TileChunk>();
             ChunkMap = new int[0][];
-            Rings = new JsDictionary<string, Ring>();
+            Rings = new List<Ring>();
             CurHeightMap = true;
             LevelWidth = 0;
             LevelHeight = 0;

@@ -1,5 +1,9 @@
-﻿using System.Html;
+﻿using System;
+using System.Collections.Generic;
+using System.Html;
 using System.Html.Media.Graphics;
+using System.Runtime.CompilerServices;
+using WebLibraries;
 using jQueryApi;
 namespace OurSonic
 {
@@ -54,159 +58,92 @@ namespace OurSonic
 
                                         int keycode = a.Me().keyCode;
 
-                                        if (keycode == 49) {
-                                            sonicManager.Load(Window.Instance.Me().levelData[0], null);
-                                            sonicManager.WindowLocation.X = 0;
-                                            sonicManager.WindowLocation.Y = 0;
-                                            sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
-                                            sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
+                                        for (int i = 49; i < 49+10; i++) {
+
+                                            if (keycode == i) {
+                                                sonicManager.Load(Window.Instance.Me().levelData[ i-49]);
+                                                sonicManager.WindowLocation.X = 0;
+                                                sonicManager.WindowLocation.Y = 0;
+                                                sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
+                                                sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
+                                                return;
+                                            }
                                         }
-                                        else if (keycode == 50)
+
+                                        var sca = 2;
+                                          if (keycode == 37)
                                         {
-                                            sonicManager.Load(Window.Instance.Me().levelData[1], null);
-                                            sonicManager.WindowLocation.X = 0;
-                                            sonicManager.WindowLocation.Y = 0;
-                                            sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
-                                            sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
-                                        }
-                                        else if (keycode == 51)
-                                        {
-                                            sonicManager.Load(Window.Instance.Me().levelData[2], null);
-                                            sonicManager.WindowLocation.X = 0;
-                                            sonicManager.WindowLocation.Y = 0;
-                                            sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
-                                            sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
-                                        }
-                                        else if (keycode == 52)
-                                        {
-                                            sonicManager.Load(Window.Instance.Me().levelData[3], null);
-                                            sonicManager.WindowLocation.X = 0;
-                                            sonicManager.WindowLocation.Y = 0;
-                                            sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
-                                            sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
-                                        }
-                                        else if (keycode == 52)
-                                        {
-                                            sonicManager.WindowLocation.X -= 128;
+                                            sonicManager.WindowLocation.X -= 128/sca;
                                             sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
                                         } else if (keycode == 38) {
-                                            sonicManager.WindowLocation.Y -= 128;
+                                            sonicManager.WindowLocation.Y -= 128 / sca;
                                             sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
                                         } else if (keycode == 39) {
-                                            sonicManager.WindowLocation.X += 128;
+                                            sonicManager.WindowLocation.X += 128 / sca;
                                             sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
+
                                         } else if (keycode == 40) {
-                                            sonicManager.WindowLocation.Y += 128;
+                                            sonicManager.WindowLocation.Y += 128 / sca;
                                             sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
                                         }
                                     });
 
-            /*
-    KeyboardJS.bind.key("o", function () {
-                     
 
-        if (sonicManager.sonicToon)
-            sonicManager.inHaltMode = !sonicManager.inHaltMode;
-    }, function () { });
-
-    KeyboardJS.bind.key("2", function () {
-        sonicManager.indexedPalette++;
-        for (var block in sonicManager.SonicLevel.Blocks) {
-            sonicManager.SonicLevel.Blocks[block].image = [];
-        }
-
-    }, function () { });
+            KeyboardJS.Instance().Bind.Key("f", () =>
+            {
+                sonicManager.ShowHeightMap = !sonicManager.ShowHeightMap;
+            }, () => { });
 
 
-    KeyboardJS.bind.key("p", function () {
-        if (sonicManager.sonicToon)
-            if (sonicManager.inHaltMode) {
-                sonicManager.waitingForTickContinue = false;
-            }
-    }, function () { });
+            KeyboardJS.Instance().Bind.Key("o", () =>
+            {
+                if (sonicManager.CurrentGameState == GameState.Playing)
+                {
 
+                    sonicManager.InHaltMode = !sonicManager.InHaltMode;
+                }
+            }, () =>{});
+            KeyboardJS.Instance().Bind.Key("2", () =>
+            {
+                sonicManager.IndexedPalette++;
+                foreach (var tilePiece in sonicManager.SonicLevel.Blocks)
+                {
 
-    KeyboardJS.bind.key("h", function () {
-        if (sonicManager.sonicToon)
-            sonicManager.sonicToon.hit(sonicManager.sonicToon.x, sonicManager.sonicToon.y);
-    }, function () { });
-
-
- 
-    KeyboardJS.bind.key("c", function () {
-        if (sonicManager.sonicToon)
-            sonicManager.sonicToon.debug();
-    }, function () { });
-
-    KeyboardJS.bind.key("e", function () {
-        sonicManager.SonicLevel.curHeightMap = !sonicManager.SonicLevel.curHeightMap;
-    }, function () { });
-
-    KeyboardJS.bind.key("f", function () {
-        sonicManager.showHeightMap = !sonicManager.showHeightMap;
-    }, function () { });
-
-    KeyboardJS.bind.key("up", function () {
-        if (sonicManager.sonicToon)
-            sonicManager.sonicToon.pressUp();
-        else {
-            sonicManager.windowLocation.y -= 128;
-            sonicManager.bigWindowLocation.y = sonicManager.windowLocation.y;
-
-        }
-
-    }, function () {
-        if (sonicManager.sonicToon)
-            sonicManager.sonicToon.releaseUp();
-    });
-
-    KeyboardJS.bind.key("down", function () {
-        if (sonicManager.sonicToon)
-            sonicManager.sonicToon.pressCrouch();
-        else {
-            sonicManager.windowLocation.y += 128;
-            sonicManager.bigWindowLocation.y = sonicManager.windowLocation.y;
-
-        }
-    }, function () {
-        if (sonicManager.sonicToon)
-            sonicManager.sonicToon.releaseCrouch();
-    });
-
-    KeyboardJS.bind.key("left", function () {
-        if (sonicManager.sonicToon) {
-            sonicManager.sonicToon.pressLeft();
-        } else {
-            sonicManager.windowLocation.x -= 128; 
-            sonicManager.bigWindowLocation.x = sonicManager.windowLocation.x;
+                    tilePiece.Image = new JsDictionary<string, CanvasElement>();
+                }
+            }, () =>{});
+            KeyboardJS.Instance().Bind.Key("p", () =>
+            {
+                if (sonicManager.CurrentGameState == GameState.Playing) {
+                    if (sonicManager.InHaltMode) {
+                        sonicManager.waitingForTickContinue = false;
+                    }
+                }
             
-        }
-    }, function () {
-        if (sonicManager.sonicToon)
-            sonicManager.sonicToon.releaseLeft();
-    });
+            }, () =>{});
 
-    KeyboardJS.bind.key("right", function () {
+            KeyboardJS.Instance().Bind.Key("h", () =>
+            {
+                if (sonicManager.CurrentGameState == GameState.Playing)
+                {
+                    sonicManager.SonicToon.Hit(sonicManager.SonicToon.X, sonicManager.SonicToon.Y);
+                }
 
-        if (sonicManager.sonicToon) {
-            sonicManager.sonicToon.pressRight();
-        } else {
-            sonicManager.windowLocation.x += 128;
-            sonicManager.bigWindowLocation.x = sonicManager.windowLocation.x;
+            }, () => { });
 
-        }
-    }, function () {
-        if (sonicManager.sonicToon)
-            sonicManager.sonicToon.releaseRight();
-    });
+            KeyboardJS.Instance().Bind.Key("c", () =>
+            {
+                if (sonicManager.CurrentGameState == GameState.Playing)
+                {
+                    sonicManager.SonicToon.Debug();
+                }
 
-    KeyboardJS.bind.key("space", function () {
-        if (sonicManager.sonicToon)
-            sonicManager.sonicToon.pressJump();
-    }, function () {
-        if (sonicManager.sonicToon)
-            sonicManager.sonicToon.releaseJump();
-    });*/
+            }, () => { });
+
+            KeyboardJS.Instance().Bind.Key("e", () =>
+            {
+                sonicManager.SonicLevel.CurHeightMap = !sonicManager.SonicLevel.CurHeightMap;
+            }, () => { }); 
 
             fullscreenMode = true;
 
@@ -219,6 +156,7 @@ namespace OurSonic
             Window.SetInterval(UIDraw, 1000 / 20);
             resizeCanvas();
         }
+
 
         private void handleScroll(jQueryEvent jQueryEvent)
         {
@@ -309,4 +247,6 @@ namespace OurSonic
             sonicManager.UIManager.Draw(uiCanvas.Context);
         }
     }
+
+
 }

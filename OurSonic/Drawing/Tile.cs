@@ -83,8 +83,7 @@ namespace OurSonic.Drawing
                     j.Context.FillRect(oPos.X + (i * scale.X), oPos.Y + jf * scale.Y, scale.X, scale.Y);
                 }
             }
-            var fd = j.DomCanvas;
-            canvas.DrawImage((CanvasElement)fd[0], pos.X, pos.Y);
+            canvas.DrawImage(j.Canvas, pos.X, pos.Y);
 
             if (ShowOutline)
             {

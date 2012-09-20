@@ -14,16 +14,60 @@ namespace OurSonic
             return number + "px";
         }
 
+        public static double Sin(int f)
+        {
+            return cos_table[(f + 0x40) & 0xFF];
+        }
+        public static double Cos(int f)
+        {
+            return cos_table[(f) & 0xFF];
+        }
+
+        public static double[] cos_table = new[] {
+                                                       1.00000, 0.99970, 0.99880, 0.99729, 0.99518, 0.99248, 0.98918, 0.98528,
+                                                       0.98079, 0.97570, 0.97003, 0.96378, 0.95694, 0.94953, 0.94154, 0.93299,
+                                                       0.92388, 0.91421, 0.90399, 0.89322, 0.88192, 0.87009, 0.85773, 0.84485,
+                                                       0.83147, 0.81758, 0.80321, 0.78835, 0.77301, 0.75721, 0.74095, 0.72425,
+                                                       0.70711, 0.68954, 0.67156, 0.65317, 0.63439, 0.61523, 0.59570, 0.57581,
+                                                       0.55557, 0.53500, 0.51410, 0.49290, 0.47140, 0.44961, 0.42755, 0.40524,
+                                                       0.38268, 0.35990, 0.33689, 0.31368, 0.29028, 0.26671, 0.24298, 0.21910,
+                                                       0.19509, 0.17096, 0.14673, 0.12241, 0.09802, 0.07356, 0.04907, 0.02454,
+                                                       0.00000, -0.02454, -0.04907, -0.07356, -0.09802, -0.12241, -0.14673, -0.17096,
+                                                       -0.19509, -0.21910, -0.24298, -0.26671, -0.29028, -0.31368, -0.33689, -0.35990,
+                                                       -0.38268, -0.40524, -0.42755, -0.44961, -0.47140, -0.49290, -0.51410, -0.53500,
+                                                       -0.55557, -0.57581, -0.59570, -0.61523, -0.63439, -0.65317, -0.67156, -0.68954,
+                                                       -0.70711, -0.72425, -0.74095, -0.75721, -0.77301, -0.78835, -0.80321, -0.81758,
+                                                       -0.83147, -0.84485, -0.85773, -0.87009, -0.88192, -0.89322, -0.90399, -0.91421,
+                                                       -0.92388, -0.93299, -0.94154, -0.94953, -0.95694, -0.96378, -0.97003, -0.97570,
+                                                       -0.98079, -0.98528, -0.98918, -0.99248, -0.99518, -0.99729, -0.99880, -0.99970,
+                                                       -1.00000, -0.99970, -0.99880, -0.99729, -0.99518, -0.99248, -0.98918, -0.98528,
+                                                       -0.98079, -0.97570, -0.97003, -0.96378, -0.95694, -0.94953, -0.94154, -0.93299,
+                                                       -0.92388, -0.91421, -0.90399, -0.89322, -0.88192, -0.87009, -0.85773, -0.84485,
+                                                       -0.83147, -0.81758, -0.80321, -0.78835, -0.77301, -0.75721, -0.74095, -0.72425,
+                                                       -0.70711, -0.68954, -0.67156, -0.65317, -0.63439, -0.61523, -0.59570, -0.57581,
+                                                       -0.55557, -0.53500, -0.51410, -0.49290, -0.47140, -0.44961, -0.42756, -0.40524,
+                                                       -0.38268, -0.35990, -0.33689, -0.31368, -0.29028, -0.26671, -0.24298, -0.21910,
+                                                       -0.19509, -0.17096, -0.14673, -0.12241, -0.09802, -0.07356, -0.04907, -0.02454,
+                                                       -0.00000, 0.02454, 0.04907, 0.07356, 0.09802, 0.12241, 0.14673, 0.17096,
+                                                       0.19509, 0.21910, 0.24298, 0.26671, 0.29028, 0.31368, 0.33689, 0.35990,
+                                                       0.38268, 0.40524, 0.42756, 0.44961, 0.47140, 0.49290, 0.51410, 0.53500,
+                                                       0.55557, 0.57581, 0.59570, 0.61523, 0.63439, 0.65317, 0.67156, 0.68954,
+                                                       0.70711, 0.72425, 0.74095, 0.75721, 0.77301, 0.78835, 0.80321, 0.81758,
+                                                       0.83147, 0.84485, 0.85773, 0.87009, 0.88192, 0.89322, 0.90399, 0.91421,
+                                                       0.92388, 0.93299, 0.94154, 0.94953, 0.95694, 0.96378, 0.97003, 0.97570,
+                                                       0.98079, 0.98528, 0.98918, 0.99248, 0.99518, 0.99729, 0.99880, 0.99970
+                                               };
         public static int Mod(int j, int n)
         {
-            return ( ( j % n ) + n ) % n;
+            return ((j % n) + n) % n;
         }
 
         public static ImageElement ScaleSprite(ImageElement image, Point scale, Action<ImageElement> complete)
         {
             var data = GetImageData(image);
             var colors = new List<Color>();
-            for (int f = 0; f < data.Length; f++) {
+            for (int f = 0; f < data.Length; f += 4)
+            {
                 colors.Add(ColorObjectFromData(data, f));
             }
             var d = DefaultCanvas(0, 0).Context.CreateImageData(image.Width * scale.X, image.Height * scale.Y);
@@ -33,22 +77,27 @@ namespace OurSonic
 
         private static void SetDataFromColors(PixelArray data, List<Color> colors, Point scale, int width, Color transparent)
         {
-            for (int i = 0; i < colors.Count; i++) {
+            for (int i = 0; i < colors.Count; i++)
+            {
                 var curX = i % width;
                 var curY = i / width;
                 var g = colors[i];
                 var isTrans = false;
-                if (transparent != null) {
+                if (transparent != null)
+                {
                     if (g.R == transparent.R && g.G == transparent.G && g.B == transparent.B)
                         isTrans = true;
                 }
 
-                for (int j = 0; j < scale.X; j++) {
-                    for (int k = 0; k < scale.Y; k++) {
-                        var x = ( curX * scale.X + j );
-                        var y = ( curY * scale.Y + k );
-                        var c = ( x + y * ( scale.X * width ) ) * 4;
-                        if (isTrans) {
+                for (int j = 0; j < scale.X; j++)
+                {
+                    for (int k = 0; k < scale.Y; k++)
+                    {
+                        var x = (curX * scale.X + j);
+                        var y = (curY * scale.Y + k);
+                        var c = (x + y * (scale.X * width)) * 4;
+                        if (isTrans)
+                        {
                             data[c + 0] = 0;
                             data[c + 1] = 0;
                             data[c + 2] = 0;
@@ -68,12 +117,12 @@ namespace OurSonic
         private static string GetBase64Image(ImageData data)
         {
             // Create an empty canvas element
-            var canvas = (CanvasElement) Document.CreateElement("canvas");
+            var canvas = (CanvasElement)Document.CreateElement("canvas");
             canvas.Width = data.Width;
             canvas.Height = data.Height;
 
             // Copy the image contents to the canvas
-            var ctx = (CanvasContext2D) canvas.GetContext("2d");
+            var ctx = (CanvasContext2D)canvas.GetContext("2d");
             ctx.PutImageData(data, 0, 0);
             var dataURL = canvas.Me().toDataURL("image/png");
             return dataURL;
@@ -81,19 +130,19 @@ namespace OurSonic
 
         private static Color ColorObjectFromData(PixelArray data, int c)
         {
-            var r = (int) data[c];
-            var g = (int) data[c + 1];
-            var b = (int) data[c + 2];
+            var r = (int)data[c];
+            var g = (int)data[c + 1];
+            var b = (int)data[c + 2];
 
             return new Color(r, g, b);
         }
 
         public static PixelArray GetImageData(ImageElement image)
         {
-            var canvas = (CanvasElement) Document.CreateElement("canvas");
+            var canvas = (CanvasElement)Document.CreateElement("canvas");
             canvas.Width = image.Width;
             canvas.Height = image.Height;
-            CanvasContext2D ctx = (CanvasContext2D) canvas.GetContext("2d");
+            CanvasContext2D ctx = (CanvasContext2D)canvas.GetContext("2d");
             ctx.DrawImage(image, 0, 0);
             var data = ctx.GetImageData(0, 0, image.Width, image.Height);
             return data.Data;
@@ -113,26 +162,36 @@ namespace OurSonic
                     return _H.loadSprite(_H.getBase64Image(d), complete);*/
             return null;
         }
+        public static bool Loaded(this ImageElement element)
+        {
+            return element.GetAttribute("loaded") == "true";
+        }
+
+        public static void Loaded(this ImageElement element, bool set)
+        {
+            element.SetAttribute("loaded", set ? "true" : "false");
+        }
 
         public static ImageElement LoadSprite(string src, Action<ImageElement> complete)
         {
             var sprite1 = new ImageElement();
-            sprite1.AddEventListener("onload", e => {
-                                                   sprite1.Me().loaded = true;
-                                                   if (complete != null) complete(sprite1);
-                                               }, false);
+            sprite1.AddEventListener("load", e =>
+            {
+                sprite1.Loaded(true);
+                if (complete != null) complete(sprite1);
+            }, false);
             sprite1.Src = src;
             return sprite1;
         }
 
         public static CanvasInformation DefaultCanvas(int w, int h)
         {
-            var canvas = (CanvasElement) Document.CreateElement("canvas");
+            var canvas = (CanvasElement)Document.CreateElement("canvas");
 
             canvas.Width = w;
             canvas.Height = h;
 
-            var ctx = (CanvasContext2D) canvas.GetContext("2d");
+            var ctx = (CanvasContext2D)canvas.GetContext("2d");
             return new CanvasInformation(ctx, jQuery.FromElement(canvas));
         }
 

@@ -1,64 +1,81 @@
 using System;
+using System.Collections.Generic;
 namespace OurSonic
 {
     public class SpriteLoader
     {
-        public SpriteLoader(Action completed, Action<string> update)
-        {
-            /*
-   var that = this;
-    this.stepIndex = 0;
-    this.steps = [];
-    this.done = false;
-    this.tickIndex = 0;
-    this.tick = function () {
-        //this.stepIndex = this.steps.length;
-
-        if (this.stepIndex == this.steps.length) {
-            if (!this.done) {
-                this.done = true;
-                completed();
-            }
-            return true;
-        }
-        var stp = this.steps[this.stepIndex];
-        if (!stp) return true;
-
-        if (that.tickIndex % _H.floor(stp.iterations.length / 12) == 0)
-            update("Caching: " + stp.title + " " + Math.floor(((that.tickIndex / stp.iterations.length) * 100)) + "%");
-
-        if (stp.iterations.length > this.tickIndex) {
-            stp.method(stp.iterations[this.tickIndex++], function () {
-                if (stp.finish()) {
-                    that.stepIndex++;
-                    that.tickIndex = 0;
-                }
-            });
-        }
-        return false;
-    };
-    this.addStep = function (title, method, onFinish, disable) {
-        if (disable)
-            return -1;
-        this.steps.push({ title: title, method: method, finish: onFinish, iterations: [] });
-        return this.steps.length - 1;
-    };
-    this.addIterationToStep = function (stepIndex, index) {
-        if (stepIndex == -1) return;
-        this.steps[stepIndex].iterations.push(index);
-    };
- */
-        }
+        private readonly Action myCompleted;
+        private readonly Action<string> myUpdate;
+        private int stepIndex = 0;
+        private List<SpriteLoaderStep> steps = new List<SpriteLoaderStep>();
+        private bool done = false;
+        private int tickIndex = 0;
 
         public bool Tick()
         {
+            if (stepIndex == steps.Count) {
+                if(!done) {
+                    done = true;
+                    myCompleted();
+                }
+                return true;
+
+            }
+            var stp = steps[stepIndex];
+            if (stp == null) {
+                return true;
+            }
+            if (tickIndex % stp.Iterations.Count / 12 == 0) {
+                myUpdate("Caching: " + stp.Title + " " + ((tickIndex / stp.Iterations.Count) * 100) + "%");
+            }
+            if (stp.Iterations.Count > tickIndex) {
+                stp.Method(stp.Iterations[tickIndex++], () => {
+                                                            if (stp.OnFinish()) {
+                                                                stepIndex++;
+                                                                tickIndex = 0;
+                                                            }
+                                                        });
+            }
+
             return false;
         }
 
-        public SpriteLoaderStep AddStep(string sprites, Action<int, Action> action)
+        public SpriteLoader(Action completed, Action<string> update)
         {
-            return null;
+            myCompleted = completed;
+            myUpdate = update;
+
+         }
+
+        public int AddStep(string title, Action<int, Action> method, Func<bool> onFinish, bool disable)
+        {
+            if (disable) {
+                return -1;
+            }
+            steps.Add(new SpriteLoaderStep(title,method,onFinish));
+            return steps.Count-1;
+        }
+
+        public void AddIterationToStep(int spriteStep, int i)
+        {
+            if (spriteStep == -1) {
+                return;
+            }
+            steps[stepIndex].Iterations.Add(i);
         }
     }
-    public class SpriteLoaderStep {}
+    public class SpriteLoaderStep {
+        public string Title { get; set; }
+        public Action<int, Action> Method { get; set; }
+        public Func<bool> OnFinish { get; set; }
+        public List<int> Iterations { get; set; }
+
+        public SpriteLoaderStep(string title, Action<int, Action> method, Func<bool> onFinish)
+        {
+            Title = title;
+            Method = method;
+            OnFinish = onFinish;
+            Iterations=new List<int>();
+        }
+    }
 }
