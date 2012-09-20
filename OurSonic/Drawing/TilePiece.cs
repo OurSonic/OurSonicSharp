@@ -6,13 +6,11 @@ using OurSonicModels;
 namespace OurSonic.Drawing
 {
     public class TilePiece
-    {
-        private int cx;
-        private int cy;
+    { 
         private int[][] drawInfo = new[] {new[] {0, 0}, new[] {1, 0}, new[] {0, 1}, new[] {1, 1}};
         private int[][] drawOrder = new[] {new[] {3, 2, 1, 0}, new[] {1, 0, 3, 2}, new[] {2, 3, 0, 1}, new[] {0, 1, 2, 3}};
         [IntrinsicProperty]
-        public JsDictionary<string, CanvasElement> Image { get; set; }
+        private JsDictionary<string, CanvasElement> Image { get; set; }
         [IntrinsicProperty]
         protected object HeightMask { get; set; }
         [IntrinsicProperty]
@@ -24,16 +22,19 @@ namespace OurSonic.Drawing
         [IntrinsicProperty]
         public bool YFlip { get; set; }
         [IntrinsicProperty]
-        public List<int> AnimatedFrames { get; set; }
+        public int[] AnimatedFrames { get; set; }
         [IntrinsicProperty]
         public int Index { get; set; }
         public Solidity Solid1 { get; set; }
         public Solidity Solid2 { get; set; }
+        public void ClearCache()
+        {
+            Image = new JsDictionary<string, CanvasElement>();
+
+        }
 
         public TilePiece()
-        {
-            cx = 8 * SonicManager.Instance.Scale.X * 2;
-            cy = 8 * SonicManager.Instance.Scale.Y * 2;
+        { 
             Image = new JsDictionary<string, CanvasElement>();
         }
 
@@ -41,7 +42,7 @@ namespace OurSonic.Drawing
         {
             var tiles = SonicManager.Instance.SonicLevel.Tiles;
             foreach (var mj in Tiles) {
-                if (tiles[mj._Tile] != null) {
+                if (tiles[mj._Tile] .Truthy()) {
                     if (mj.Priority)
                         return false;
                 }
@@ -102,8 +103,8 @@ namespace OurSonic.Drawing
 
             drawOrderIndex = xFlip ? ( yFlip ? 0 : 1 ) : ( yFlip ? 2 : 3 );
             var fd = GetCache(layer, scale, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.palAn);
-            if (fd == null) {
-                var ac = Help.DefaultCanvas(cx, cy);
+            if (fd .Falsey()) {
+                var ac = Help.DefaultCanvas(8 * SonicManager.Instance.Scale.X * 2, 8 * SonicManager.Instance.Scale.Y * 2);
                 var sX = 8 * scale.X;
                 var sY = 8 * scale.Y;
                 var i = 0;
@@ -111,7 +112,7 @@ namespace OurSonic.Drawing
                 var localPoint = new Point(0, 0);
                 var tiles = SonicManager.Instance.SonicLevel.Tiles;
                 foreach (var mj in Tiles) {
-                    if (tiles[mj._Tile] != null) {
+                    if (tiles[mj._Tile] .Truthy()) {
                         if (mj.Priority == ( layer == 1 )) {
                             var _xf = xFlip ^ mj.XFlip;
                             var _yf = yFlip ^ mj.YFlip;
@@ -138,8 +139,9 @@ namespace OurSonic.Drawing
                               CanvasElement image)
         {
             var val = ( ( drawOrder + 1 ) + ( scale.X * 10 ) + ( animationFrame * 1000 ) + ( ( layer + 1 ) * 10000 ) ).ToString();
-            if (AnimatedFrames != null) {
-                foreach (var animatedFrame in AnimatedFrames) {
+            if ((dynamic) AnimatedFrames) {
+                for (int index = 0; index < AnimatedFrames.Length; index++) {
+                    var animatedFrame = AnimatedFrames[index];
                     val += palAn[animatedFrame] + " ";
                 }
             }
@@ -154,13 +156,13 @@ namespace OurSonic.Drawing
         private CanvasElement GetCache(int layer, Point scale, int drawOrder, int animationFrame, List<int> palAn)
         {
             var val = ( ( drawOrder + 1 ) + ( scale.X * 10 ) + ( animationFrame * 1000 ) + ( ( layer + 1 ) * 10000 ) ).ToString();
-            if (AnimatedFrames != null) {
+            if (AnimatedFrames .Truthy()) {
                 foreach (var animatedFrame in AnimatedFrames) {
                     val += palAn[animatedFrame] + " ";
                 }
             }
 
-            if (Image[val] == null) return null;
+            if (Image[val] .Falsey()) return null;
             return Image[val];
         }
     }

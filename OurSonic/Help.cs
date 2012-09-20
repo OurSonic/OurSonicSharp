@@ -83,7 +83,7 @@ namespace OurSonic
                 var curY = i / width;
                 var g = colors[i];
                 var isTrans = false;
-                if (transparent != null) {
+                if (transparent.Truthy()) {
                     if (g.R == transparent.R && g.G == transparent.G && g.B == transparent.B)
                         isTrans = true;
                 }
@@ -174,7 +174,7 @@ namespace OurSonic
             var sprite1 = new ImageElement();
             sprite1.AddEventListener("load", e => {
                                                  sprite1.Loaded(true);
-                                                 if (complete != null) complete(sprite1);
+                                                 if (complete.Truthy()) complete(sprite1);
                                              }, false);
             sprite1.Src = src;
             return sprite1;
@@ -198,5 +198,17 @@ namespace OurSonic
 
         [InlineCode("debugger")]
         public static void Debugger() {}
+
+        [InlineCode("{o}")]
+        public static bool Truthy(this object o)
+        {
+            return o != null;
+        }
+
+        [InlineCode("!{o}")]
+        public static bool Falsey(this object o)
+        {
+            return o == null;
+        }
     }
 }

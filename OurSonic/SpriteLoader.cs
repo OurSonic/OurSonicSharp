@@ -27,7 +27,7 @@ namespace OurSonic
                 return true;
             }
             var stp = steps[stepIndex];
-            if (stp == null) return true;
+            if (stp.Falsey()) return true;
             if (tickIndex % stp.Iterations.Count / 12 == 0)
                 myUpdate("Caching: " + stp.Title + " " + ( ( tickIndex / stp.Iterations.Count ) * 100 ) + "%");
             if (stp.Iterations.Count > tickIndex) {

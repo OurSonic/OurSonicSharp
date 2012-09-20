@@ -20,7 +20,7 @@ namespace OurSonic
         }
         public bool IsDragging(jQueryEvent e)
         {
-            return lastPos != null;
+            return lastPos .Truthy();
         }
         public void MouseUp(jQueryEvent e)
         {
@@ -28,7 +28,7 @@ namespace OurSonic
         }
         public void MouseMove(jQueryEvent e)
         {
-            if (this.lastPos == null)
+            if (this.lastPos .Falsey())
             {
                 return;
             }

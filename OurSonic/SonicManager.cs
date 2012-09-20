@@ -157,7 +157,7 @@ namespace OurSonic
                         ey = e.Y / 128;
                         TileChunk ch = SonicLevel.Chunks[SonicLevel.ChunkMap[ex][ey]];
                         TilePiece tp = ch.GetBlock(e.X - ex * 128, e.Y - ey * 128);
-                        if (tp != null) {
+                        if (tp .Truthy()) {
                             TilePiece tpc = ch.GetTilePiece(e.X - ex * 128, e.Y - ey * 128);
                             UIManager.Data.Indexes.TPIndex = SonicLevel.Blocks.IndexOf(tp);
                             UIManager.Data.ModifyTilePieceArea.TilePiece = tp;
@@ -524,7 +524,7 @@ namespace OurSonic
             var localPoint = new Point(0, 0);
 
             DrawTickCount++;
-            if (SpriteLoader != null && !SpriteLoader.Tick() || Loading) {
+            if (SpriteLoader .Truthy() && !SpriteLoader.Tick() || Loading) {
                 canvas.FillStyle = "white";
                 canvas.FillText("Loading...   " /*+ (this.inds.tc + this.inds.tp + this.inds.t) + " / " + (this.inds.total)*/, 95, 95);
                 canvas.Restore();
@@ -550,7 +550,7 @@ namespace OurSonic
 
                 BigWindowLocation.X = SonicToon.X * BigWindowLocation.Width / 2;
                 BigWindowLocation.Y = SonicToon.Y * BigWindowLocation.Height / 2;
-                if (Background != null) {
+                if (Background .Truthy()) {
                     int wOffset = WindowLocation.X;
                     int bw = Background.Width / Scale.X;
                     int movex = ( wOffset / bw ) * bw;
@@ -576,8 +576,8 @@ namespace OurSonic
                     offs.Add(new Point(i, j));
 
             var bounds = new IntersectingRectangle(-32, -32, WindowLocation.Width * Scale.X + 32, WindowLocation.Height * Scale.Y + 32);
-            if (SonicLevel.Chunks != null && SonicLevel.Chunks.Count > 0) {
-                if (SonicLevel.PaletteItems[0] != null) {
+            if (SonicLevel.Chunks .Truthy() && SonicLevel.Chunks.Count > 0) {
+                if (SonicLevel.PaletteItems[0] .Truthy()) {
                     for (int k = 0; k < SonicLevel.PaletteItems[0].Count; k++) {
                         var pal = SonicLevel.PaletteItems[0][k];
                         for (int j = 0; j <= pal.TotalLength; j += pal.SkipIndex) {
@@ -607,9 +607,9 @@ namespace OurSonic
                     int ind = SonicLevel.ChunkMap[_xP][_yP];
                     TileChunk chunk = SonicLevel.Chunks[ind];
                     TileChunk anni = SonicLevel.Chunks[ind];
-                    if (anni != null)
+                    if (anni .Truthy())
                         anni.AnimatedTick();
-                    if (chunk == null)
+                    if (chunk .Falsey())
                         continue;
                     localPoint.X = ( _xP * 128 * Scale.X ) - WindowLocation.X * Scale.X;
                     localPoint.Y = ( _yPreal * 128 * Scale.Y ) - WindowLocation.Y * Scale.Y;
@@ -659,7 +659,7 @@ namespace OurSonic
                     if (_xP < 0 || _xP >= SonicLevel.LevelWidth) continue;
                     _yP = Help.Mod(_yP, SonicLevel.LevelHeight);
                     TileChunk chunk = SonicLevel.Chunks[SonicLevel.ChunkMap[_xP][_yP]];
-                    if (chunk == null)
+                    if (chunk .Falsey())
                         continue;
                     localPoint.X = ( _xP * 128 * Scale.X ) - WindowLocation.X * Scale.X;
                     localPoint.Y = ( _yPreal * 128 * Scale.Y ) - WindowLocation.Y * Scale.Y;
@@ -675,7 +675,7 @@ namespace OurSonic
                     if (ShowHeightMap) {
                         var fd = SpriteCache.HeightMapChunks[( SonicLevel.CurHeightMap ? 1 : 2 ) + " " + chunk.Index + " " + Scale.Y + " " + Scale.X];
 
-                        if (fd == null) {
+                        if (fd .Falsey()) {
                             var md = chunk;
                             var posj1 = new Point(0, 0);
                             var canv = Help.DefaultCanvas(128 * Scale.X, 128 * Scale.Y);
@@ -696,7 +696,7 @@ namespace OurSonic
                                     var vangle = 0;
                                     var posm = new Point(posj1.X + ( __x * 16 ) * Scale.X, posj1.Y + ( __y * 16 ) * Scale.Y);
 
-                                    if (hd == null) continue;
+                                    if (hd .Falsey()) continue;
                                     if (hd == 0) {} else if (hd == 1) {
                                         if (solid > 0) {
                                             ctx.FillStyle = HeightMask.colors[solid];

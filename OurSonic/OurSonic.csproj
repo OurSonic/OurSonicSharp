@@ -39,6 +39,7 @@
     <Compile Include="Color.cs" />
     <Compile Include="CommonWebLibraries.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Dragger.cs" />
     <Compile Include="Drawing\Tile.cs" />
     <Compile Include="Drawing\TileChunk.cs" />
     <Compile Include="Drawing\TileItem.cs" />

@@ -47,7 +47,7 @@ namespace OurSonic
             uiCanvas.DomCanvas.Bind("contextmenu", (e) => e.PreventDefault());
 
             jQuery.Document.Keydown(e => {
-                                        if (sonicManager.SonicToon == null)
+                                        if (sonicManager.CurrentGameState==GameState.Editing)
                                             sonicManager.UIManager.OnKeyDown(e);
                                     });
 
@@ -92,8 +92,10 @@ namespace OurSonic
                                                 }, () => { });
             KeyboardJS.Instance().Bind.Key("2", () => {
                                                     sonicManager.IndexedPalette++;
+                                                    foreach (var tile in sonicManager.SonicLevel.Tiles)
+                                                        tile.ClearCache();
                                                     foreach (var tilePiece in sonicManager.SonicLevel.Blocks) {
-                                                        tilePiece.Image = new JsDictionary<string, CanvasElement>();
+                                                        tilePiece.ClearCache();
                                                     }
                                                 }, () => { });
             KeyboardJS.Instance().Bind.Key("p",
@@ -130,6 +132,19 @@ namespace OurSonic
         {
             jQueryEvent.PreventDefault();
 
+            int j=jQueryEvent.Me().detail ? jQueryEvent.Me().detail * ( -120 ) : jQueryEvent.Me().wheelDelta;
+
+
+            var rate = j < 0 ? -1 : 1;
+            sonicManager.Scale.X += rate;
+            sonicManager.Scale.Y += rate;
+            foreach (var tile in sonicManager.SonicLevel.Tiles) {
+                tile.ClearCache();
+            }
+            foreach (var block in sonicManager.SonicLevel.Blocks) {
+                block.ClearCache();
+            }
+            sonicManager.PreloadSprites(sonicManager.Scale, () => { }, (a) => { });
             sonicManager.UIManager.OnMouseScroll(jQueryEvent);
         }
 
@@ -172,18 +187,18 @@ namespace OurSonic
                                                          canvasHeight / 224 / sonicManager.Scale.Y);
 
             gameCanvas.DomCanvas.Attribute("width", ( sonicManager.WindowLocation.Width *
-                                                      ( sonicManager.SonicToon != null
+                                                      ( sonicManager.CurrentGameState==GameState.Playing
                                                                 ? sonicManager.Scale.X * sonicManager.RealScale.X
                                                                 : 1 ) ).ToString());
             gameCanvas.DomCanvas.Attribute("height", ( sonicManager.WindowLocation.Height *
-                                                       ( sonicManager.SonicToon != null
+                                                       (sonicManager.CurrentGameState == GameState.Playing
                                                                  ? sonicManager.Scale.Y * sonicManager.RealScale.Y
                                                                  : 1 ) ).ToString());
 
             //TODO::            that.uiCanvas.goodWidth = that.canvasWidth;
             //            that.gameCanvas.goodWidth = (window.sonicManager.windowLocation.width * (window.sonicManager.sonicToon ? window.sonicManager.scale.x * window.sonicManager.realScale.x : 1));
 
-            var screenOffset = sonicManager.SonicToon != null
+            var screenOffset = sonicManager.CurrentGameState == GameState.Playing
                                        ? new Point(canvasWidth / 2 -
                                                    sonicManager.WindowLocation.Width * sonicManager.Scale.X *
                                                    sonicManager.RealScale.X / 2,

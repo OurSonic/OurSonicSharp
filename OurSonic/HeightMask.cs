@@ -80,7 +80,7 @@ namespace OurSonic
                 canvas.Scale(1, -1);
             }
             var fd = SonicManager.Instance.SpriteCache.HeightMaps[Index];
-            if (fd != null) {
+            if (fd .Truthy()) {
                 if (fd.Loaded())
                     canvas.DrawImage(fd, pos.X, pos.Y);
             } else {

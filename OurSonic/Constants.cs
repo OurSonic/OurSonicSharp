@@ -11,8 +11,9 @@ namespace OurSonic
                 case GameState.Editing:
                     var x = 0;
                     var y = 0;
-                    if (SonicManager.Instance.SonicLevel != null && SonicManager.Instance.SonicLevel.StartPositions != null &&
-                        SonicManager.Instance.SonicLevel.StartPositions[0] != null) {
+                    if (SonicManager.Instance.SonicLevel.Truthy() && SonicManager.Instance.SonicLevel.StartPositions.Truthy() &&
+                        SonicManager.Instance.SonicLevel.StartPositions[0].Truthy())
+                    {
                         x = SonicManager.Instance.SonicLevel.StartPositions[0].X - 128 * 2;
                         y = SonicManager.Instance.SonicLevel.StartPositions[0].Y - 128 * 2;
                     }
