@@ -1,24 +1,10 @@
 using System.Collections.Generic;
 using System.Html;
-using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 namespace OurSonic
 {
     public class SpriteCache
     {
-        public SpriteCache()
-        {
-            Rings = new List<ImageElement>();
-            TileChunks = new List<ImageElement>();
-            Tilepieces = new JsDictionary<string, CanvasInformation>();
-            Tiles = new List<ImageElement>();
-            SonicSprites = new List<ImageElement>();
-            HeightMaps = new List<ImageElement>();
-            HeightMapChunks = new JsDictionary<string, CanvasInformation>();
-            Indexes = new SpriteCacheIndexes();
-
-        }
-
         [IntrinsicProperty]
         public List<ImageElement> Rings { get; set; }
         [IntrinsicProperty]
@@ -30,11 +16,23 @@ namespace OurSonic
         [IntrinsicProperty]
         public List<ImageElement> Tiles { get; set; }
         [IntrinsicProperty]
-        public List<ImageElement> SonicSprites { get; set; } 
+        public List<ImageElement> SonicSprites { get; set; }
         [IntrinsicProperty]
         public JsDictionary<string, CanvasInformation> HeightMapChunks { get; set; }
         [IntrinsicProperty]
         public SpriteCacheIndexes Indexes { get; set; }
+
+        public SpriteCache()
+        {
+            Rings = new List<ImageElement>();
+            TileChunks = new List<ImageElement>();
+            Tilepieces = new JsDictionary<string, CanvasInformation>();
+            Tiles = new List<ImageElement>();
+            SonicSprites = new List<ImageElement>();
+            HeightMaps = new List<ImageElement>();
+            HeightMapChunks = new JsDictionary<string, CanvasInformation>();
+            Indexes = new SpriteCacheIndexes();
+        }
     }
     public class SpriteCacheIndexes
     {

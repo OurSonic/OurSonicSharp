@@ -24,7 +24,7 @@ namespace OurSonic.Drawing
         [IntrinsicProperty]
         public bool YFlip { get; set; }
         [IntrinsicProperty]
-        public List<int> AnimatedFrames { get; set; } 
+        public List<int> AnimatedFrames { get; set; }
         [IntrinsicProperty]
         public int Index { get; set; }
         public Solidity Solid1 { get; set; }
@@ -97,7 +97,7 @@ namespace OurSonic.Drawing
                          bool xFlip,
                          bool yFlip,
                          int animatedIndex)
-        { 
+        {
             var drawOrderIndex = 0;
 
             drawOrderIndex = xFlip ? ( yFlip ? 0 : 1 ) : ( yFlip ? 2 : 3 );
@@ -137,8 +137,8 @@ namespace OurSonic.Drawing
                               List<int> palAn,
                               CanvasElement image)
         {
-            var val = ((drawOrder + 1) + (scale.X * 10) + (animationFrame * 1000) + ((layer + 1) * 10000)).ToString();
-            if (AnimatedFrames!=null) {
+            var val = ( ( drawOrder + 1 ) + ( scale.X * 10 ) + ( animationFrame * 1000 ) + ( ( layer + 1 ) * 10000 ) ).ToString();
+            if (AnimatedFrames != null) {
                 foreach (var animatedFrame in AnimatedFrames) {
                     val += palAn[animatedFrame] + " ";
                 }
@@ -154,13 +154,13 @@ namespace OurSonic.Drawing
         private CanvasElement GetCache(int layer, Point scale, int drawOrder, int animationFrame, List<int> palAn)
         {
             var val = ( ( drawOrder + 1 ) + ( scale.X * 10 ) + ( animationFrame * 1000 ) + ( ( layer + 1 ) * 10000 ) ).ToString();
-            if (AnimatedFrames!=null) {
+            if (AnimatedFrames != null) {
                 foreach (var animatedFrame in AnimatedFrames) {
                     val += palAn[animatedFrame] + " ";
                 }
             }
 
-            if (Image[val]==null) return null;
+            if (Image[val] == null) return null;
             return Image[val];
         }
     }

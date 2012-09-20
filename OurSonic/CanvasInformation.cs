@@ -12,7 +12,6 @@ namespace OurSonic
         public jQueryObject DomCanvas { get; set; }
         [IntrinsicProperty]
         public CanvasElement Canvas { get; set; }
-        
 
         public CanvasInformation(CanvasContext2D context, jQueryObject domCanvas)
         {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Html;
 using System.Linq;
 using NodeJSLibrary;
 using OurSonic.Drawing;
@@ -26,15 +25,12 @@ namespace OurSonic
             if (SonicLevel.Rings == null)
                 SonicLevel.Rings = new List<Ring>();
 
-
-            for (var n = 0; n < sonicLevel.Rings.Length; n++)
-            {
+            for (var n = 0; n < sonicLevel.Rings.Length; n++) {
                 SonicLevel.Rings[n] = new Ring(true);
 
                 SonicLevel.Rings[n].X = sonicLevel.Rings[n].X;
                 SonicLevel.Rings[n].Y = sonicLevel.Rings[n].Y;
             }
-
 
             SonicLevel.LevelWidth = sonicLevel.ForegroundWidth;
             SonicLevel.LevelHeight = sonicLevel.ForegroundHeight;
@@ -49,7 +45,7 @@ namespace OurSonic
                 };
             })(l));
         }*/
-             
+
             SonicLevel.Objects = new List<SonicObject>();
 
             for (int l = 0; l < sonicLevel.Objects.Length; l++) {
@@ -106,7 +102,7 @@ namespace OurSonic
 
         });
 
-*/ 
+*/
             SonicLevel.CurPaletteIndex = 0;
             SonicLevel.palAn = new List<int>();
             SonicLevel.CurHeightMap = true;
@@ -137,13 +133,11 @@ namespace OurSonic
 
             if (sonicLevel.AnimatedFiles != null) {
                 SonicLevel.AnimatedFiles = new Tile[sonicLevel.AnimatedFiles.Length][];
-                for (var jc = 0; jc < sonicLevel.AnimatedFiles.Length; jc++)
-                {
+                for (var jc = 0; jc < sonicLevel.AnimatedFiles.Length; jc++) {
                     var fcc = sonicLevel.AnimatedFiles[jc];
                     SonicLevel.AnimatedFiles[jc] = new Tile[fcc.Length];
 
                     for (int j = 0; j < fcc.Length; j++) {
-                    
                         var c = fcc[j];
                         var tiles = c;
                         List<int> mjc = new List<int>();
@@ -160,7 +154,7 @@ namespace OurSonic
                         for (int n = 0; n < mjc.Count; n++) {
                             mfc[n % 8][n / 8] = mjc[n];
                         }
-                        Tile tile= new Tile(mfc);
+                        Tile tile = new Tile(mfc);
                         tile.Index = "A" + j + "_" + jc;
                         SonicLevel.AnimatedFiles[jc][j] = tile;
                     }
@@ -241,7 +235,7 @@ namespace OurSonic
                                                                           Index = p,
                                                                           Block = fc[p].Block,
                                                                           Solid1 = fc[p].Solid1,
-                                                                          Solid2 =  fc[p].Solid2,
+                                                                          Solid2 = fc[p].Solid2,
                                                                           XFlip = fc[p].XFlip,
                                                                           YFlip = fc[p].YFlip
                                                                   };
@@ -267,7 +261,7 @@ namespace OurSonic
                             }
                         }
                     }
-                } 
+                }
             }
             SonicLevel.Palette = sonicLevel.Palette;
 
@@ -296,22 +290,21 @@ namespace OurSonic
                                                                       };
                 }
             }
-             
+
             for (int kd = 0; kd < SonicLevel.Blocks.Count; kd++) {
                 var dj = SonicLevel.Blocks[kd];
                 dj.AnimatedFrames = new List<int>();
                 for (int index = 0; index < dj.Tiles.Count; index++) {
                     var mj = dj.Tiles[index];
                     if (SonicLevel.Tiles[mj._Tile] != null) {
-                        var pl=SonicLevel.Tiles[mj._Tile].GetAllPaletteIndexes();
+                        var pl = SonicLevel.Tiles[mj._Tile].GetAllPaletteIndexes();
                         if (SonicLevel.PaletteItems[0] != null) {
                             for (int k = 0; k < SonicLevel.PaletteItems[0].Count; k++) {
                                 var pal = SonicLevel.PaletteItems[0][k];
                                 foreach (var mjce in pal.Pieces) {
                                     PaletteItemPieces mje1 = mjce;
-                                    if (mj.Palette == mje1.PaletteIndex)
-                                    {
-                                        if (pl.Any(j => j == mje1.PaletteOffset / 2 || j == mje1.PaletteOffset / 2 + 1)) 
+                                    if (mj.Palette == mje1.PaletteIndex) {
+                                        if (pl.Any(j => j == mje1.PaletteOffset / 2 || j == mje1.PaletteOffset / 2 + 1))
                                             dj.AnimatedFrames.Add(k);
                                     }
                                 }
@@ -321,17 +314,11 @@ namespace OurSonic
                 }
             }
 
-            var finished = new Action(() => {
-                                     Loading = false;
-                                 });
-            PreloadSprites(Scale,()=> {
-                                     finished();
-                                     ForceResize();
-
-                                 },(s)=> {
-                                       Global.Console.Log("ff "+ s);
-  
-                                   });
+            var finished = new Action(() => { Loading = false; });
+            PreloadSprites(Scale, () => {
+                                      finished();
+                                      ForceResize();
+                                  }, (s) => { Global.Console.Log("ff " + s); });
             /* 
 
                

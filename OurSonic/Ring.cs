@@ -6,17 +6,16 @@ using System.Runtime.CompilerServices;
 namespace OurSonic
 {
     [Serializable]
-    public class Ring:Point
+    public class Ring : Point
     {
         [IntrinsicProperty]
         public bool Active { get; set; }
-[IntrinsicProperty]
-        protected int AnimationIndex { get; set; }
-
         [IntrinsicProperty]
-        public int TickCount { get; set; } 
+        protected int AnimationIndex { get; set; }
+        [IntrinsicProperty]
+        public int TickCount { get; set; }
+        public Ring(bool active) : base(0, 0) {}
 
-        public Ring(bool active) : base(0,0) {}
         public void Draw(CanvasContext2D canvas, Point pos, Point scale)
         {
             if (Active) {
@@ -51,28 +50,16 @@ namespace OurSonic
                  */
             }
 
-
             if (true || SonicManager.Instance.CurrentGameState == GameState.Playing)
-            {
-                this.AnimationIndex = (SonicManager.Instance.DrawTickCount % ((Active ? 4 : 8) * 4)) / (Active ? 4 : 8);
-            }
-            else this.AnimationIndex = 0;
+                AnimationIndex = ( SonicManager.Instance.DrawTickCount % ( ( Active ? 4 : 8 ) * 4 ) ) / ( Active ? 4 : 8 );
+            else AnimationIndex = 0;
             List<ImageElement> sprites = null;
             if (SonicManager.Instance.SpriteCache.Rings != null)
-            {
                 sprites = SonicManager.Instance.SpriteCache.Rings;
-            }
-            else {
-                throw new Exception("bad ring animation");
-            }
-            var sps = sprites[this.AnimationIndex * 200 + scale.Y * 100 + scale.X];
-            if (sps == null) {
-                throw new Exception("bad ring animation");
-            }
-            if (sps.Loaded() ) {
-                canvas.DrawImage(sps, ( pos.X - 8 ) * scale.X, ( pos.Y - 8 ) * scale.Y);
-            }
-         }
-
+            else throw new Exception("bad ring animation");
+            var sps = sprites[AnimationIndex * 200 + scale.Y * 100 + scale.X];
+            if (sps == null) throw new Exception("bad ring animation");
+            if (sps.Loaded()) canvas.DrawImage(sps, ( pos.X - 8 ) * scale.X, ( pos.Y - 8 ) * scale.Y);
+        }
     }
 }

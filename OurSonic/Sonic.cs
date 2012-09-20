@@ -13,13 +13,7 @@ namespace OurSonic
         public void Tick(SonicLevel sonicLevel, Point scale) {}
         public void Draw(CanvasContext2D canvas, Point scale) {}
         public void DrawUI(CanvasContext2D canvas, Point point, Point scale) {}
-
-        public void Hit(int x, int y)
-        {
-        }
-
-        public void Debug()
-        {
-        }
+        public void Hit(int x, int y) {}
+        public void Debug() {}
     }
 }

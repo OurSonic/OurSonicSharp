@@ -5,7 +5,13 @@ namespace OurSonic
 {
     public class HeightMask
     {
-        public static string[] colors = new[] { "", "rgba(255,98,235,0.6)", "rgba(24,218,235,0.6)", "rgba(24,98,235,0.6)" };
+        public static string[] colors = new[] {"", "rgba(255,98,235,0.6)", "rgba(24,218,235,0.6)", "rgba(24,98,235,0.6)"};
+        protected int Width { get; set; }
+        protected int Height { get; set; }
+        protected int[] Items { get; set; }
+        protected int Integer { get; set; }
+        protected int Index { get; set; }
+
         public HeightMask(int[] heightMap)
         {
             Items = heightMap;
@@ -14,27 +20,19 @@ namespace OurSonic
             Integer = -1000;
         }
 
-        protected int Width { get; set; }
-        protected int Height { get; set; }
-        protected int[] Items { get; set; }
-
         public static implicit operator HeightMask(int d)
         {
             var m = d == 0 ? 0 : 16;
-            return new HeightMask(new[] { m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m }); //16 m's
+            return new HeightMask(new[] {m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m}); //16 m's
         }
 
         public static implicit operator int(HeightMask d)
         {
-            if (d.Integer != -1000) {
-                return d.Integer;
-            }
+            if (d.Integer != -1000) return d.Integer;
 
             var good = d.Items[0];
-            for (int i = 0; i < d.Items.Length; i++)
-            {
-                if (d.Items[i] != good)
-                {
+            for (int i = 0; i < d.Items.Length; i++) {
+                if (d.Items[i] != good) {
                     good = -999;
                     break;
                 }
@@ -43,14 +41,11 @@ namespace OurSonic
             return good;
         }
 
-        protected int Integer { get; set; }
-
         public void SetItem(int x, int y, RotationMode rotationMode)
         {
             var jx = 0;
             var jy = 0;
-            switch (rotationMode)
-            {
+            switch (rotationMode) {
                 case RotationMode.Floor:
                     jx = x;
                     jy = y;
@@ -71,43 +66,30 @@ namespace OurSonic
             Items[jx] = 16 - jy;
         }
 
-
         public void Draw(CanvasContext2D canvas, Point pos, Point scale, int state, bool xflip, bool yflip, int solid, int angle)
         {
             canvas.Save();
 
             var oPos = new Point(pos);
-            if (xflip)
-            {
+            if (xflip) {
                 pos.X = -pos.X - 16 * scale.X;
                 canvas.Scale(-1, 1);
             }
-            if (yflip)
-            {
+            if (yflip) {
                 pos.Y = -pos.Y - 16 * scale.Y;
                 canvas.Scale(1, -1);
             }
-            var fd = SonicManager.Instance.SpriteCache.HeightMaps[this.Index];
-            if (fd != null)
-            {
+            var fd = SonicManager.Instance.SpriteCache.HeightMaps[Index];
+            if (fd != null) {
                 if (fd.Loaded())
-                {
                     canvas.DrawImage(fd, pos.X, pos.Y);
-                }
-            }
-            else
-            {
-                if (solid > 0)
-                {
-                    for (int x = 0; x < 16; x++)
-                    {
-                        for (int y = 0; y < 16; y++)
-                        {
+            } else {
+                if (solid > 0) {
+                    for (int x = 0; x < 16; x++) {
+                        for (int y = 0; y < 16; y++) {
                             var jx = 0;
                             var jy = 0;
-                            if (itemsGood(x, y))
-                            {
-
+                            if (itemsGood(x, y)) {
                                 jx = x;
                                 jy = y;
                                 var _x = pos.X + jx * scale.X;
@@ -134,9 +116,7 @@ namespace OurSonic
                                 canvas.StrokeStyle = "#000000";
                                 canvas.StrokeRect(pos.X, pos.Y, scale.X * 16, scale.Y * 16);
 */
-
                             }
-
                         }
                     }
                 }
@@ -149,13 +129,10 @@ namespace OurSonic
         private bool itemsGood(int x, int y)
         {
             if (Items[x] < 0)
-            {
                 return Math.Abs(Items[x]) >= y;
-            }
             return Items[x] >= 16 - y;
         }
 
-        protected int Index { get; set; }
         /*          
             this.drawUI = function (canvas, pos, scale, state, xflip, yflip, solid, angle) {
 

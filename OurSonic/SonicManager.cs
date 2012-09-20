@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using OurSonic.Drawing;
-using OurSonicModels;
 using jQueryApi;
 namespace OurSonic
 {
@@ -84,8 +82,7 @@ namespace OurSonic
         static SonicManager()
         {
             base64Inv = new JsDictionary<string, int>();
-            for (var i = 0; i < base64chars.Length; i++)
-            {
+            for (var i = 0; i < base64chars.Length; i++) {
                 base64Inv[base64chars[i]] = i;
             }
         }
@@ -111,8 +108,8 @@ namespace OurSonic
 
             WindowLocation = Constants.DefaultWindowLocation(GameState.Editing, mainCanvas, Scale);
             BigWindowLocation = Constants.DefaultWindowLocation(GameState.Editing, mainCanvas, Scale);
-            BigWindowLocation.Width = (int)(BigWindowLocation.Width * 1.8);
-            BigWindowLocation.Height = (int)(BigWindowLocation.Height * 1.8);
+            BigWindowLocation.Width = (int) ( BigWindowLocation.Width * 1.8 );
+            BigWindowLocation.Height = (int) ( BigWindowLocation.Height * 1.8 );
 
             Animations = new List<Animation>();
             AnimationInstances = new List<AnimationInstance>();
@@ -145,12 +142,10 @@ namespace OurSonic
             var e = new Point(elementEvent.ClientX / Scale.X / RealScale.X / WindowLocation.X,
                               elementEvent.ClientY / Scale.Y / RealScale.Y + WindowLocation.Y);
 
-            if (elementEvent.Button == 0)
-            {
+            if (elementEvent.Button == 0) {
                 int ey;
                 int ex;
-                switch (ClickState)
-                {
+                switch (ClickState) {
                     case ClickState.Dragging:
                         return false;
                         break;
@@ -159,8 +154,7 @@ namespace OurSonic
                         ey = e.Y / 128;
                         TileChunk ch = SonicLevel.Chunks[SonicLevel.ChunkMap[ex][ey]];
                         TilePiece tp = ch.GetBlock(e.X - ex * 128, e.Y - ey * 128);
-                        if (tp != null)
-                        {
+                        if (tp != null) {
                             TilePiece tpc = ch.GetTilePiece(e.X - ex * 128, e.Y - ey * 128);
                             UIManager.Data.Indexes.TPIndex = SonicLevel.Blocks.IndexOf(tp);
                             UIManager.Data.ModifyTilePieceArea.TilePiece = tp;
@@ -204,19 +198,16 @@ namespace OurSonic
         {
             var localPoint = new Point(0, 0);
             InFocusObjects = new List<SonicObject>();
-            foreach (SonicObject obj in SonicLevel.Objects)
-            {
+            foreach (SonicObject obj in SonicLevel.Objects) {
                 localPoint.X = obj.X;
                 localPoint.Y = obj.Y;
-                if (BigWindowLocation.Intersects(localPoint))
-                {
+                if (BigWindowLocation.Intersects(localPoint)) {
                     InFocusObjects.Add(obj);
                     obj.Tick(obj, SonicLevel, SonicToon);
                 }
             }
             //sonicManager.uiManager.liveObjectsArea.populate(sonicManager.inFocusObjects);TODO:::
-            foreach (AnimationInstance animationInstance in AnimationInstances)
-            {
+            foreach (AnimationInstance animationInstance in AnimationInstances) {
                 animationInstance.Tick();
             }
         }
@@ -225,10 +216,8 @@ namespace OurSonic
         {
             if (Loading) return;
 
-            if (CurrentGameState == GameState.Playing)
-            {
-                if (InHaltMode)
-                {
+            if (CurrentGameState == GameState.Playing) {
+                if (InHaltMode) {
                     if (waitingForTickContinue)
                         return;
                 }
@@ -236,12 +225,9 @@ namespace OurSonic
                 tickCount++;
                 tickObjects();
                 SonicToon.Ticking = true;
-                try
-                {
+                try {
                     SonicToon.Tick(SonicLevel, Scale);
-                }
-                catch (Exception exc)
-                {
+                } catch (Exception exc) {
                     string txt = "There was an error on this page.\n\n";
                     txt += "Error description: " + exc.Message + "\n\n";
                     txt += "Stack: " + exc.InnerException + "\n\n"; //todo::callstack
@@ -249,13 +235,10 @@ namespace OurSonic
 
                     Window.Alert(txt);
                     throw exc;
-                }
-                finally
-                {
+                } finally {
                     SonicToon.Ticking = false;
                 }
-                if (InHaltMode)
-                {
+                if (InHaltMode) {
                     if (waitingForTickContinue)
                         return;
                     waitingForTickContinue = true;
@@ -273,38 +256,31 @@ namespace OurSonic
             var inj = 0;
             var spriteLocations = new List<string>();
 
-            for (int j = 0; j < 4; j++)
-            {
+            for (int j = 0; j < 4; j++) {
                 spriteLocations.Add(string.Format("assets/Sprites/ring{0}.png", j));
                 imageLength++;
             }
             int md = 0;
             var ind_ = SpriteCache.Indexes;
-         var sl=   SpriteLoader = new SpriteLoader(completed, update);
-            var spriteStep = SpriteLoader.AddStep("Sprites", (i, done) =>
-            {
-                var sp = i * 200;
-                ci[sp] = Help.LoadSprite(spriteLocations[i],
-                                         jd =>
-                                         {
-                                             ci[jd.Me().Tag * 200 + scale.X * 100 + scale.Y] =
-                                                     Help.ScaleSprite(jd, scale, jc => done());
-                                         });
-                ci[sp].Me().Tag = i;
-            }, () =>
-            {
-                ind_.Sprites++;
-                if (ind_.Sprites == 4)
-                {
-                    return true;
-                }
-                return false;
-            }, false);
-            for (var i = 0; i < spriteLocations.Count; i++)
-            {
+            var sl = SpriteLoader = new SpriteLoader(completed, update);
+            var spriteStep = SpriteLoader.AddStep("Sprites", (i, done) => {
+                                                                 var sp = i * 200;
+                                                                 ci[sp] = Help.LoadSprite(spriteLocations[i],
+                                                                                          jd => {
+                                                                                              ci[jd.Me().Tag * 200 + scale.X * 100 + scale.Y] =
+                                                                                                      Help.ScaleSprite(jd, scale, jc => done());
+                                                                                          });
+                                                                 ci[sp].Me().Tag = i;
+                                                             }, () => {
+                                                                    ind_.Sprites++;
+                                                                    if (ind_.Sprites == 4)
+                                                                        return true;
+                                                                    return false;
+                                                                }, false);
+            for (var i = 0; i < spriteLocations.Count; i++) {
                 SpriteLoader.AddIterationToStep(spriteStep, i);
             }
-            var numOfAnimations = 0; 
+            var numOfAnimations = 0;
 
             /* 
                  
@@ -531,8 +507,7 @@ namespace OurSonic
 
         public void Draw(CanvasContext2D canvas)
         {
-            if (InHaltMode)
-            {
+            if (InHaltMode) {
                 canvas.FillStyle = "white";
                 canvas.Font = "21pt arial bold";
                 canvas.FillText("HALT MODE\r\n Press: P to step\r\n        O to resume", 10, 120);
@@ -546,8 +521,7 @@ namespace OurSonic
             var localPoint = new Point(0, 0);
 
             DrawTickCount++;
-            if (SpriteLoader != null && !SpriteLoader.Tick() || Loading)
-            {
+            if (SpriteLoader != null && !SpriteLoader.Tick() || Loading) {
                 canvas.FillStyle = "white";
                 canvas.FillText("Loading...   " /*+ (this.inds.tc + this.inds.tp + this.inds.t) + " / " + (this.inds.total)*/, 95, 95);
                 canvas.Restore();
@@ -556,13 +530,10 @@ namespace OurSonic
             ScreenOffset.X = 0;
             ScreenOffset.Y = 0;
 
-            if (CurrentGameState == GameState.Playing)
-            {
+            if (CurrentGameState == GameState.Playing) {
                 canvas.Scale(RealScale.X, RealScale.Y);
-                if (SonicToon.Ticking)
-                {
-                    while (true)
-                    {
+                if (SonicToon.Ticking) {
+                    while (true) {
                         if (SonicToon.Ticking)
                             break;
                     }
@@ -576,11 +547,10 @@ namespace OurSonic
 
                 BigWindowLocation.X = SonicToon.X * BigWindowLocation.Width / 2;
                 BigWindowLocation.Y = SonicToon.Y * BigWindowLocation.Height / 2;
-                if (Background != null)
-                {
+                if (Background != null) {
                     int wOffset = WindowLocation.X;
                     int bw = Background.Width / Scale.X;
-                    int movex = (wOffset / bw) * bw;
+                    int movex = ( wOffset / bw ) * bw;
                     localPoint.X = -WindowLocation.X * Scale.X + movex;
                     localPoint.Y = -WindowLocation.Y / 4 * Scale.Y;
 
@@ -603,33 +573,27 @@ namespace OurSonic
                     offs.Add(new Point(i, j));
 
             var bounds = new IntersectingRectangle(-32, -32, WindowLocation.Width * Scale.X + 32, WindowLocation.Height * Scale.Y + 32);
-            if (SonicLevel.Chunks != null && SonicLevel.Chunks.Count > 0)
-            {
-                if (SonicLevel.PaletteItems[0] != null)
-                {
-                    for (int k = 0; k < SonicLevel.PaletteItems[0].Count; k++)
-                    {
+            if (SonicLevel.Chunks != null && SonicLevel.Chunks.Count > 0) {
+                if (SonicLevel.PaletteItems[0] != null) {
+                    for (int k = 0; k < SonicLevel.PaletteItems[0].Count; k++) {
                         var pal = SonicLevel.PaletteItems[0][k];
-                        for (int j = 0; j <= pal.TotalLength; j += pal.SkipIndex)
-                        {
-                            if (DrawTickCount % (pal.TotalLength + pal.SkipIndex) == j)
+                        for (int j = 0; j <= pal.TotalLength; j += pal.SkipIndex) {
+                            if (DrawTickCount % ( pal.TotalLength + pal.SkipIndex ) == j)
                                 SonicLevel.palAn[k] = j / pal.SkipIndex;
                         }
 
-                        for (int m = 0; m < pal.Pieces.Count; m++)
-                        {
+                        for (int m = 0; m < pal.Pieces.Count; m++) {
                             var mj = pal.Pieces[m];
                             SonicLevel.Palette[mj.PaletteIndex][mj.PaletteOffset / 2] =
-                                    pal.Palette[SonicLevel.palAn[k] * (pal.Pieces.Count * 2) + 0 + (mj.PaletteMultiply)];
+                                    pal.Palette[SonicLevel.palAn[k] * ( pal.Pieces.Count * 2 ) + 0 + ( mj.PaletteMultiply )];
                             SonicLevel.Palette[mj.PaletteIndex][mj.PaletteOffset / 2 + 1] =
-                                    pal.Palette[SonicLevel.palAn[k] * (pal.Pieces.Count * 2) + 1 + (mj.PaletteMultiply)];
+                                    pal.Palette[SonicLevel.palAn[k] * ( pal.Pieces.Count * 2 ) + 1 + ( mj.PaletteMultiply )];
                         }
                     }
                 }
-                int fxP = (WindowLocation.X + 128) / 128;
-                int fyP = (WindowLocation.Y + 128) / 128;
-                foreach (Point off in offs)
-                {
+                int fxP = ( WindowLocation.X + 128 ) / 128;
+                int fyP = ( WindowLocation.Y + 128 ) / 128;
+                foreach (Point off in offs) {
                     int _xP = fxP + off.X;
                     int _yP = fyP + off.Y;
                     int _yPreal = fyP + off.Y;
@@ -644,35 +608,30 @@ namespace OurSonic
                         anni.AnimatedTick();
                     if (chunk == null)
                         continue;
-                    localPoint.X = (_xP * 128 * Scale.X) - WindowLocation.X * Scale.X;
-                    localPoint.Y = (_yPreal * 128 * Scale.Y) - WindowLocation.Y * Scale.Y;
+                    localPoint.X = ( _xP * 128 * Scale.X ) - WindowLocation.X * Scale.X;
+                    localPoint.Y = ( _yPreal * 128 * Scale.Y ) - WindowLocation.Y * Scale.Y;
 
                     if (!chunk.IsEmpty())
                         chunk.Draw(canvas, localPoint, Scale, 0, bounds);
-                    if (false && CurrentGameState == GameState.Editing)
-                    {
+                    if (false && CurrentGameState == GameState.Editing) {
                         canvas.StrokeStyle = "#DD0033";
                         canvas.LineWidth = 3;
                         canvas.StrokeRect(localPoint.X, localPoint.Y, 128 * Scale.X, 128 * Scale.Y);
                     }
                 }
 
-                foreach (SonicObject o in SonicLevel.Objects)
-                {
+                foreach (SonicObject o in SonicLevel.Objects) {
                     localPoint.X = o.X;
                     localPoint.Y = o.Y;
-                    if (o.Dead || BigWindowLocation.Intersects(localPoint))
-                    {
-                        o.Draw(canvas, (o.X - WindowLocation.X) * Scale.X, (o.Y - WindowLocation.Y) * Scale.Y, Scale,
+                    if (o.Dead || BigWindowLocation.Intersects(localPoint)) {
+                        o.Draw(canvas, ( o.X - WindowLocation.X ) * Scale.X, ( o.Y - WindowLocation.Y ) * Scale.Y, Scale,
                                ShowHeightMap);
                     }
                 }
-                foreach (AnimationInstance ano in AnimationInstances)
-                {
+                foreach (AnimationInstance ano in AnimationInstances) {
                     ano.Draw(canvas, -WindowLocation.X, -WindowLocation.Y, Scale);
                 }
-                for (int i = ActiveRings.Count - 1; i >= 0; i--)
-                {
+                for (int i = ActiveRings.Count - 1; i >= 0; i--) {
                     Ring ac = ActiveRings[i];
                     localPoint.X = ac.X - WindowLocation.X;
                     localPoint.Y = ac.Y - WindowLocation.Y;
@@ -680,8 +639,7 @@ namespace OurSonic
                     if (ac.TickCount > 256)
                         ActiveRings.Remove(ac);
                 }
-                if (CurrentGameState == GameState.Playing)
-                {
+                if (CurrentGameState == GameState.Playing) {
                     SonicToon.Draw(canvas, Scale);
                     if (WindowLocation.X < 0) WindowLocation.X = 0;
                     if (WindowLocation.Y < 0) WindowLocation.Y = 0;
@@ -691,8 +649,7 @@ namespace OurSonic
                     //    WindowLocation.Y = 128 * SonicLevel.LevelHeight - WindowLocation.Height;
                 }
 
-                foreach (Point off in offs)
-                {
+                foreach (Point off in offs) {
                     int _xP = fxP + off.X;
                     int _yP = fyP + off.Y;
                     int _yPreal = fyP + off.Y;
@@ -701,59 +658,54 @@ namespace OurSonic
                     TileChunk chunk = SonicLevel.Chunks[SonicLevel.ChunkMap[_xP][_yP]];
                     if (chunk == null)
                         continue;
-                    localPoint.X = (_xP * 128 * Scale.X) - WindowLocation.X * Scale.X;
-                    localPoint.Y = (_yPreal * 128 * Scale.Y) - WindowLocation.Y * Scale.Y;
+                    localPoint.X = ( _xP * 128 * Scale.X ) - WindowLocation.X * Scale.X;
+                    localPoint.Y = ( _yPreal * 128 * Scale.Y ) - WindowLocation.Y * Scale.Y;
 
                     if (!chunk.IsEmpty() && !chunk.OnlyBackground())
                         chunk.Draw(canvas, localPoint, Scale, 1, bounds);
-                    if (false && CurrentGameState == GameState.Editing)
-                    {
+                    if (false && CurrentGameState == GameState.Editing) {
                         canvas.StrokeStyle = "#DD0033";
                         canvas.LineWidth = 3;
                         canvas.StrokeRect(localPoint.X, localPoint.Y, 128 * Scale.X, 128 * Scale.Y);
                     }
 
-                    if (ShowHeightMap)
-                    {
+                    if (ShowHeightMap) {
+                        var fd = SpriteCache.HeightMapChunks[( SonicLevel.CurHeightMap ? 1 : 2 ) + " " + chunk.Index + " " + Scale.Y + " " + Scale.X];
 
-                        var fd = SpriteCache.HeightMapChunks[(this.SonicLevel.CurHeightMap ? 1 : 2) + " " + chunk.Index + " " + Scale.Y + " " + Scale.X];
-
-                        if (fd == null)
-                        {
+                        if (fd == null) {
                             var md = chunk;
                             var posj1 = new Point(0, 0);
                             var canv = Help.DefaultCanvas(128 * Scale.X, 128 * Scale.Y);
                             var ctx = canv.Context;
                             myEngine.Clear(canv);
-                            for (var _y = 0; _y < 8; _y++)
-                            {
-                                for (var _x = 0; _x < 8; _x++)
-                                {
+                            for (var _y = 0; _y < 8; _y++) {
+                                for (var _x = 0; _x < 8; _x++) {
                                     var tp = md.TilePieces[_x][_y];
-                                    var solid = (int) ( this.SonicLevel.CurHeightMap ? tp.Solid1 : tp.Solid2 );
-                                    var hd = SonicLevel.HeightMaps[(this.SonicLevel.CurHeightMap ? SonicLevel.CollisionIndexes1[tp.Block] : SonicLevel.CollisionIndexes2[tp.Block])];
+                                    var solid = (int) ( SonicLevel.CurHeightMap ? tp.Solid1 : tp.Solid2 );
+                                    var hd =
+                                            SonicLevel.HeightMaps[
+                                                    ( SonicLevel.CurHeightMap
+                                                              ? SonicLevel.CollisionIndexes1[tp.Block]
+                                                              : SonicLevel.CollisionIndexes2[tp.Block] )];
 
                                     var __x = _x;
                                     var __y = _y;
                                     var vangle = 0;
-                                    var posm = new Point(posj1.X + (__x * 16) * Scale.X, posj1.Y + (__y * 16) * Scale.Y);
+                                    var posm = new Point(posj1.X + ( __x * 16 ) * Scale.X, posj1.Y + ( __y * 16 ) * Scale.Y);
 
                                     if (hd == null) continue;
-                                    if (hd == 0)
-                                    {
-
-                                    }
-                                    else if (hd == 1)
-                                    {
-                                        if (solid > 0)
-                                        {
+                                    if (hd == 0) {} else if (hd == 1) {
+                                        if (solid > 0) {
                                             ctx.FillStyle = HeightMask.colors[solid];
-                                            ctx.FillRect(posj1.X + (__x * 16) * Scale.X, posj1.Y + (__y * 16) * Scale.Y, Scale.X * 16, Scale.Y * 16);
+                                            ctx.FillRect(posj1.X + ( __x * 16 ) * Scale.X, posj1.Y + ( __y * 16 ) * Scale.Y, Scale.X * 16,
+                                                         Scale.Y * 16);
                                         }
-                                    }
-                                    else
-                                    {
-                                        vangle = SonicLevel.Angles[(this.SonicLevel.CurHeightMap ? SonicLevel.CollisionIndexes1[tp.Block] : SonicLevel.CollisionIndexes2[tp.Block])];
+                                    } else {
+                                        vangle =
+                                                SonicLevel.Angles[
+                                                        ( SonicLevel.CurHeightMap
+                                                                  ? SonicLevel.CollisionIndexes1[tp.Block]
+                                                                  : SonicLevel.CollisionIndexes2[tp.Block] )];
 
                                         hd.Draw(ctx, posm, Scale, -1, tp.XFlip, tp.YFlip, solid, vangle);
                                         /*   posm.x += 16 * scale.x / 2;
@@ -766,33 +718,28 @@ namespace OurSonic
                                         ctx.strokeText(vangle.toString(16), posm.x - 12, posm.y + 7);*/
                                     }
                                 }
-                            } 
-                            fd = SpriteCache.HeightMapChunks[(this.SonicLevel.CurHeightMap ? 1 : 2) + " " + md.Index + " " + Scale.Y + " " + Scale.X] = canv;
+                            }
+                            fd =
+                                    SpriteCache.HeightMapChunks[( SonicLevel.CurHeightMap ? 1 : 2 ) + " " + md.Index + " " + Scale.Y + " " + Scale.X]
+                                    = canv;
                         }
                         canvas.DrawImage(fd.Canvas, localPoint.X, localPoint.Y);
-
                     }
-                    if (CurrentGameState == GameState.Editing)
-                    {
+                    if (CurrentGameState == GameState.Editing) {
                         canvas.StrokeStyle = "#DD0033";
                         canvas.LineWidth = 3;
                         canvas.StrokeRect(localPoint.X, localPoint.Y, 128 * Scale.X, 128 * Scale.Y);
                     }
                 }
             }
-            foreach (var r in SonicLevel.Rings)
-            {
-                switch (CurrentGameState)
-                {
+            foreach (var r in SonicLevel.Rings) {
+                switch (CurrentGameState) {
                     case GameState.Playing:
 
                         break;
                     case GameState.Editing:
-                        if (this.BigWindowLocation.Intersects(r))
-                        {
-                            this.GoodRing.Draw(canvas, r.Negate(WindowLocation), Scale);
-
-                        }
+                        if (BigWindowLocation.Intersects(r))
+                            GoodRing.Draw(canvas, r.Negate(WindowLocation), Scale);
                         break;
                 }
 
@@ -811,7 +758,6 @@ namespace OurSonic
                  */
             }
 
-
             canvas.Restore();
 
             if (CurrentGameState == GameState.Playing)
@@ -820,8 +766,7 @@ namespace OurSonic
 
         private Animation containsAnimatedTile(int tile, SonicLevel sonLevel)
         {
-            for (int i = 0; i < sonLevel.Animations.Count; i++)
-            {
+            for (int i = 0; i < sonLevel.Animations.Count; i++) {
                 var an = sonLevel.Animations[i];
                 var anin = an.AnimationTileIndex;
                 var num = an.NumberOfTiles;
@@ -829,9 +774,6 @@ namespace OurSonic
                     return an;
             }
             return null;
-
-
         }
-
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Html;
 using System.Html.Media.Graphics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -55,38 +54,33 @@ namespace OurSonic.Drawing
             if (pos.X < 0 || pos.Y < 0)
                 return;
             var oPos = new Point(0, 0);
-            if (xflip)
-            {
+            if (xflip) {
                 oPos.X = -Colors.Length * scale.X;
                 j.Context.Scale(-1, 1);
             }
-            if (yflip)
-            {
+            if (yflip) {
                 oPos.Y = -Colors.Length * scale.Y;
                 j.Context.Scale(1, -1);
             }
             var palette_ = SonicManager.Instance.SonicLevel.Palette;
             int indexed = SonicManager.Instance.IndexedPalette;
 
-            for (int i = 0; i < Colors.Length; i++)
-            {
-                for (int jf = 0; jf < Colors[i].Length; jf++)
-                {
+            for (int i = 0; i < Colors.Length; i++) {
+                for (int jf = 0; jf < Colors[i].Length; jf++) {
                     var gj = Colors[i][jf];
                     var m =
                             palette_[
-                                    (palette + indexed) %
+                                    ( palette + indexed ) %
                                     palette_.Length][gj];
                     if (j.Context.FillStyle != "#" + m)
                         j.Context.FillStyle = "#" + m;
 
-                    j.Context.FillRect(oPos.X + (i * scale.X), oPos.Y + jf * scale.Y, scale.X, scale.Y);
+                    j.Context.FillRect(oPos.X + ( i * scale.X ), oPos.Y + jf * scale.Y, scale.X, scale.Y);
                 }
             }
             canvas.DrawImage(j.Canvas, pos.X, pos.Y);
 
-            if (ShowOutline)
-            {
+            if (ShowOutline) {
                 canvas.StrokeStyle = "#DD0033";
                 canvas.LineWidth = 3;
                 canvas.StrokeRect(pos.X, pos.Y, 8 * scale.X, 8 * scale.Y);
@@ -102,21 +96,18 @@ namespace OurSonic.Drawing
                                int layer,
                                int animationFrame)
         {
-            if (Index != null && Index.CharAt(0) != "A")
-            {
+            if (Index != null && Index.CharAt(0) != "A") {
                 if (!canAnimate) return false;
                 var an = willAnimate;
-                if (willAnimate != null)
-                {
+                if (willAnimate != null) {
                     var anin = an.AnimationTileIndex;
                     var ind = animationFrame;
                     var frame = an.Frames[ind];
                     if (frame == null)
                         frame = an.Frames[0];
                     var file = SonicManager.Instance.SonicLevel.AnimatedFiles[an.AnimationFile];
-                    var va = file[frame.StartingTileIndex + (int.Parse(Index) - anin)];
-                    if (va != null)
-                    {
+                    var va = file[frame.StartingTileIndex + ( int.Parse(Index) - anin )];
+                    if (va != null) {
                         if (canvas.FillStyle != "rbga(255,255,255,255)")
                             canvas.FillStyle = "rbga(255,255,255,255)";
                         va.Draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
@@ -124,22 +115,19 @@ namespace OurSonic.Drawing
                     }
                     return false;
                 }
-                for (int i = 0; i < SonicManager.Instance.SonicLevel.Animations.Count; i++)
-                {
+                for (int i = 0; i < SonicManager.Instance.SonicLevel.Animations.Count; i++) {
                     var acn = SonicManager.Instance.SonicLevel.Animations[i];
                     var anin = acn.AnimationTileIndex;
                     var num = acn.NumberOfTiles;
-                    if (int.Parse(Index) >= anin && int.Parse(Index) < anin + num)
-                    {
+                    if (int.Parse(Index) >= anin && int.Parse(Index) < anin + num) {
                         willAnimate = acn;
                         var ind = animationFrame;
                         var frame = acn.Frames[ind];
                         if (frame == null)
                             frame = acn.Frames[0];
                         var file = SonicManager.Instance.SonicLevel.AnimatedFiles[acn.AnimationFile];
-                        var va = file[frame.StartingTileIndex + (int.Parse(Index) - anin)];
-                        if (va != null)
-                        {
+                        var va = file[frame.StartingTileIndex + ( int.Parse(Index) - anin )];
+                        if (va != null) {
                             if (canvas.FillStyle != "rbga(255,255,255,255)")
                                 canvas.FillStyle = "rbga(255,255,255,255)";
                             va.Draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
@@ -176,26 +164,20 @@ namespace OurSonic.Drawing
             Sprites = new List<int>();
         }
 
-
         public int[] GetAllPaletteIndexes()
         {
-            if (CurPaletteIndexes == null)
-            {
+            if (CurPaletteIndexes == null) {
                 var d = new List<int>();
-                for (int i = 0; i < Colors.Length; i++)
-                {
+                for (int i = 0; i < Colors.Length; i++) {
                     var color = Colors[i];
-                    for (int jf = 0; jf < color.Length; jf++)
-                    {
+                    for (int jf = 0; jf < color.Length; jf++) {
                         var gj = color[jf];
                         if (gj == 0) continue;
                         if (!d.Any(D => D == gj))
-                        {
                             d.Add(gj);
-                        }
                     }
                 }
-                CurPaletteIndexes = (int[])d.Slice(0);
+                CurPaletteIndexes = (int[]) d.Slice(0);
             }
             return CurPaletteIndexes;
         }
@@ -204,7 +186,6 @@ namespace OurSonic.Drawing
         {
             CurPaletteIndexes = null;
         }
-
 
         /*   
          
@@ -251,6 +232,5 @@ namespace OurSonic.Drawing
             };
      
             };*/
-
     }
 }

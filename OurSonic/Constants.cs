@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 namespace OurSonic
 {
     public class Constants
@@ -23,9 +22,8 @@ namespace OurSonic
         }
     }
     [Serializable]
-    public class IntersectingRectangle:Rectangle
+    public class IntersectingRectangle : Rectangle
     {
-
         public IntersectingRectangle(int x, int y, int width, int height)
         {
             X = x;
@@ -40,16 +38,13 @@ namespace OurSonic
         }
     }
     [Serializable]
-    public class Rectangle:Point
+    public class Rectangle : Point
     {
         public int Width { get; set; }
-        public int Height { get; set; } 
+        public int Height { get; set; }
+        public Rectangle() : base(0, 0) {}
 
-        public Rectangle() : base(0,0)
-        {
-            
-        }
-        public Rectangle(int x, int y, int width, int height) : base(x,y)
+        public Rectangle(int x, int y, int width, int height) : base(x, y)
         {
             Width = width;
             Height = height;
@@ -60,25 +55,27 @@ namespace OurSonic
     {
         public int X { get; set; }
         public int Y { get; set; }
+
         public Point(int x, int y)
         {
             X = x;
             Y = y;
         }
+
         public Point(Point pos)
         {
             X = pos.X;
             Y = pos.Y;
+        }
 
-        } 
         public Point Offset(Point windowLocation)
         {
             return new Point(X + windowLocation.X, Y + windowLocation.Y);
         }
+
         public Point Negate(Point windowLocation)
         {
             return new Point(X - windowLocation.X, Y - windowLocation.Y);
         }
-
     }
 }
