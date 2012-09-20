@@ -85,11 +85,14 @@ namespace OurSonic
             for (var i = 0; i < base64chars.Length; i++) {
                 base64Inv[base64chars[i]] = i;
             }
+
         }
 
         public SonicManager(SonicEngine engine, CanvasInformation gameCanvas, Action resize)
         {
             Instance = this;
+//            SonicToon = new Sonic();
+
             myEngine = engine;
             myEngine.canvasWidth = jQuery.Window.GetWidth();
             myEngine.canvasHeight = jQuery.Window.GetHeight();
@@ -777,3 +780,5 @@ namespace OurSonic
         }
     }
 }
+
+//http://www.youtube.com/watch?v=_VTJtFERW54

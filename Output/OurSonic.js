@@ -94,6 +94,58 @@ OurSonic.Constants.defaultWindowLocation = function(state, canvas, scale) {
 	}
 	return null;
 };
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.Dragger
+OurSonic.Dragger = function(onFling) {
+	this.$myOnFling = null;
+	this.$lastPos = null;
+	this.$xsp = 0;
+	this.$ysp = 0;
+	this.$lag = 0.925000011920929;
+	this.$myOnFling = onFling;
+};
+OurSonic.Dragger.prototype = {
+	click: function(e) {
+		this.$lastPos = OurSonic.Point.$ctor1(e.clientX, e.clientY);
+	},
+	isDragging: function(e) {
+		return ss.isValue(this.$lastPos);
+	},
+	mouseUp: function(e) {
+		this.$lastPos = null;
+	},
+	mouseMove: function(e) {
+		if (ss.isNullOrUndefined(this.$lastPos)) {
+			return;
+		}
+		this.$xsp += (this.$lastPos.x - e.clientX) * 2.70000004768372;
+		this.$ysp += (this.$lastPos.y - e.clientY) * 2.70000004768372;
+		this.$xsp = ((this.$xsp > 0) ? 1 : -1) * Math.min(Math.abs(this.$xsp), 60);
+		this.$ysp = ((this.$ysp > 0) ? 1 : -1) * Math.min(Math.abs(this.$ysp), 60);
+		this.$lastPos = OurSonic.Point.$ctor1(e.clientX, e.clientY);
+	},
+	tick: function() {
+		this.$myOnFling(this.$xsp, this.$ysp);
+		if (this.$xsp > 0) {
+			this.$xsp *= this.$lag;
+		}
+		else {
+			this.$xsp *= this.$lag;
+		}
+		if (this.$ysp > 0) {
+			this.$ysp *= this.$lag;
+		}
+		else {
+			this.$ysp *= this.$lag;
+		}
+		if (Math.abs(this.$xsp) <= 2) {
+			this.$xsp = 0;
+		}
+		if (Math.abs(this.$ysp) <= 2) {
+			this.$ysp = 0;
+		}
+	}
+};
 Type.registerNamespace('OurSonic.Drawing');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Drawing.RotationMode
@@ -665,6 +717,12 @@ OurSonic.HeightMask.prototype = {
 	set_integer: function(value) {
 		this.$1$IntegerField = value;
 	},
+	get_index: function() {
+		return this.$1$IndexField;
+	},
+	set_index: function(value) {
+		this.$1$IndexField = value;
+	},
 	setItem: function(x, y, rotationMode) {
 		var jx = 0;
 		var jy = 0;
@@ -753,12 +811,6 @@ OurSonic.HeightMask.prototype = {
 			return Math.abs(this.get_items()[x]) >= y;
 		}
 		return this.get_items()[x] >= 16 - y;
-	},
-	get_index: function() {
-		return this.$1$IndexField;
-	},
-	set_index: function(value) {
-		this.$1$IndexField = value;
 	}
 };
 OurSonic.HeightMask.op_Implicit$1 = function(d) {
@@ -1172,16 +1224,26 @@ OurSonic.SonicEngine = function() {
 	}));
 	$(document).keydown(Function.mkdel(this, function(a) {
 		var keycode = ss.Nullable.unbox(Type.cast(a.keyCode, ss.Int32));
-		for (var i = 49; i < 59; i++) {
-			if (keycode === i) {
-				this.$sonicManager.load(Type.cast(window.levelData[i - 49], String));
-				this.$sonicManager.windowLocation.x = 0;
-				this.$sonicManager.windowLocation.y = 0;
-				this.$sonicManager.bigWindowLocation.x = this.$sonicManager.windowLocation.x;
-				this.$sonicManager.bigWindowLocation.y = this.$sonicManager.windowLocation.y;
-				return;
-			}
-		}
+		//
+		//                                        for (int i = 49; i < 49 + 10; i++) {
+		//
+		//                                        if (keycode == i) {
+		//
+		//                                        sonicManager.Load(Window.Instance.Me().levelData[i - 49]);
+		//
+		//                                        sonicManager.WindowLocation.X = 0;
+		//
+		//                                        sonicManager.WindowLocation.Y = 0;
+		//
+		//                                        sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
+		//
+		//                                        sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
+		//
+		//                                        return;
+		//
+		//                                        }
+		//
+		//                                        }
 		var sca = 2;
 		if (keycode === 37) {
 			this.$sonicManager.windowLocation.x -= ss.Int32.div(128, sca);
@@ -1202,6 +1264,10 @@ OurSonic.SonicEngine = function() {
 	}));
 	KeyboardJS.bind.key('f', Function.mkdel(this, function() {
 		this.$sonicManager.showHeightMap = !this.$sonicManager.showHeightMap;
+	}), function() {
+	});
+	KeyboardJS.bind.key('q', Function.mkdel(this, function() {
+		this.$sonicManager.currentGameState = ((this.$sonicManager.currentGameState === 0) ? 1 : 0);
 	}), function() {
 	});
 	KeyboardJS.bind.key('o', Function.mkdel(this, function() {
@@ -1283,7 +1349,6 @@ OurSonic.SonicEngine.prototype = {
 		if (this.$sonicManager.onClick(queryEvent)) {
 			return;
 		}
-		this.$sonicManager.uiManager.dragger.click();
 	},
 	$canvasMouseUp: function(queryEvent) {
 		queryEvent.preventDefault();
@@ -1400,6 +1465,7 @@ OurSonic.SonicManager = function(engine, gameCanvas, resize) {
 	this.spriteCache = null;
 	this.spriteLoader = null;
 	OurSonic.SonicManager.instance = this;
+	//            SonicToon = new Sonic();
 	this.$myEngine = engine;
 	this.$myEngine.canvasWidth = $(window).width();
 	this.$myEngine.canvasHeight = $(window).height();
@@ -3328,9 +3394,9 @@ OurSonic.SpriteCacheIndexes = function() {
 OurSonic.SpriteLoader = function(completed, update) {
 	this.$myCompleted = null;
 	this.$myUpdate = null;
+	this.$done = false;
 	this.$stepIndex = 0;
 	this.$steps = [];
-	this.$done = false;
 	this.$tickIndex = 0;
 	this.$myCompleted = completed;
 	this.$myUpdate = update;
@@ -3416,24 +3482,44 @@ OurSonic.SpriteLoaderStep.prototype = {
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager
 OurSonic.UIManager = function(sonicManager, mainCanvas, scale) {
+	this.$sonicManager = null;
+	this.$mainCanvas = null;
+	this.$scale = null;
 	this.dragger = null;
 	this.data = null;
+	this.$sonicManager = sonicManager;
+	this.$mainCanvas = mainCanvas;
+	this.$scale = scale;
+	this.dragger = new OurSonic.Dragger(function(xsp, ysp) {
+		sonicManager.windowLocation.x += ss.Int32.trunc(xsp);
+		sonicManager.windowLocation.y += ss.Int32.trunc(ysp);
+		sonicManager.bigWindowLocation.x = sonicManager.windowLocation.x;
+		sonicManager.bigWindowLocation.y = sonicManager.windowLocation.y;
+	});
 };
 OurSonic.UIManager.prototype = {
-	onClick: function(elementEvent) {
+	onClick: function(e) {
+		this.$sonicManager.uiManager.dragger.click(e);
 		return false;
 	},
-	onMouseMove: function(elementEvent) {
+	onMouseMove: function(e) {
+		if (this.dragger.isDragging(e)) {
+			this.dragger.mouseMove(e);
+			return false;
+		}
+		this.dragger.mouseMove(e);
 		return false;
 	},
-	onMouseUp: function(lastMouseMove) {
+	onMouseUp: function(e) {
+		this.dragger.mouseUp(e);
 	},
-	onMouseScroll: function(elementEvent) {
+	onMouseScroll: function(e) {
 		return false;
 	},
 	onKeyDown: function(jQueryEvent) {
 	},
 	draw: function(gameCanvas) {
+		this.dragger.tick();
 	},
 	updateTitle: function(decoding) {
 	}
@@ -3456,6 +3542,7 @@ OurSonic.AnimationInstance.registerClass('OurSonic.AnimationInstance', Object);
 OurSonic.CanvasInformation.registerClass('OurSonic.CanvasInformation', Object);
 OurSonic.Color.registerClass('OurSonic.Color', Object);
 OurSonic.Constants.registerClass('OurSonic.Constants', Object);
+OurSonic.Dragger.registerClass('OurSonic.Dragger', Object);
 OurSonic.Drawing.Tile.registerClass('OurSonic.Drawing.Tile', Object);
 OurSonic.Drawing.TileChunk.registerClass('OurSonic.Drawing.TileChunk', Object);
 OurSonic.Drawing.TileItem.registerClass('OurSonic.Drawing.TileItem', Object);

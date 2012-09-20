@@ -54,6 +54,7 @@ namespace OurSonic
             jQuery.Document.Keydown(a => {
                                         int keycode = a.Me().keyCode;
 
+/*
                                         for (int i = 49; i < 49 + 10; i++) {
                                             if (keycode == i) {
                                                 sonicManager.Load(Window.Instance.Me().levelData[i - 49]);
@@ -64,6 +65,7 @@ namespace OurSonic
                                                 return;
                                             }
                                         }
+*/
 
                                         var sca = 2;
                                         if (keycode == 37) {
@@ -82,6 +84,7 @@ namespace OurSonic
                                     });
 
             KeyboardJS.Instance().Bind.Key("f", () => { sonicManager.ShowHeightMap = !sonicManager.ShowHeightMap; }, () => { });
+            KeyboardJS.Instance().Bind.Key("q", () => { sonicManager.CurrentGameState = (sonicManager.CurrentGameState == GameState.Playing ? GameState.Editing : GameState.Playing); }, () => { });
 
             KeyboardJS.Instance().Bind.Key("o", () => {
                                                     if (sonicManager.CurrentGameState == GameState.Playing)
@@ -145,7 +148,6 @@ namespace OurSonic
             queryEvent.PreventDefault();
             if (sonicManager.UIManager.OnClick(queryEvent)) return;
             if (sonicManager.OnClick(queryEvent)) return;
-            sonicManager.UIManager.dragger.Click( /*elementEvent*/);
         }
 
         private void canvasMouseUp(jQueryEvent queryEvent)
