@@ -3,7 +3,7 @@ namespace SocketIONodeLibrary
 {
     [IgnoreNamespace]
     [Imported(IsRealType = true)]
-    public class SocketIoClient
+    public class SocketIOClient
     {
         [ScriptName("sockets")] public SocketNamespace Sockets;
         private SocketNamespace sockets;

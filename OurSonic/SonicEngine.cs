@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Html;
+﻿using System.Html;
 using System.Html.Media.Graphics;
+using SocketIOWebLibrary;
 using WebLibraries;
 using jQueryApi;
 namespace OurSonic
@@ -47,25 +47,12 @@ namespace OurSonic
             uiCanvas.DomCanvas.Bind("contextmenu", (e) => e.PreventDefault());
 
             jQuery.Document.Keydown(e => {
-                                        if (sonicManager.CurrentGameState==GameState.Editing)
+                                        if (sonicManager.CurrentGameState == GameState.Editing)
                                             sonicManager.UIManager.OnKeyDown(e);
                                     });
 
             jQuery.Document.Keydown(a => {
                                         int keycode = a.Me().keyCode;
-
-/*
-                                        for (int i = 49; i < 49 + 10; i++) {
-                                            if (keycode == i) {
-                                                sonicManager.Load(Window.Instance.Me().levelData[i - 49]);
-                                                sonicManager.WindowLocation.X = 0;
-                                                sonicManager.WindowLocation.Y = 0;
-                                                sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
-                                                sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
-                                                return;
-                                            }
-                                        }
-*/
 
                                         var sca = 2;
                                         if (keycode == 37) {
@@ -84,13 +71,33 @@ namespace OurSonic
                                     });
 
             KeyboardJS.Instance().Bind.Key("f", () => { sonicManager.ShowHeightMap = !sonicManager.ShowHeightMap; }, () => { });
-            KeyboardJS.Instance().Bind.Key("q", () => { sonicManager.CurrentGameState = (sonicManager.CurrentGameState == GameState.Playing ? GameState.Editing : GameState.Playing); }, () => { });
+            KeyboardJS.Instance().Bind.Key("q",
+                                           () => {
+                                               sonicManager.CurrentGameState = ( sonicManager.CurrentGameState == GameState.Playing
+                                                                                         ? GameState.Editing
+                                                                                         : GameState.Playing );
+                                           }, () => { });
 
             KeyboardJS.Instance().Bind.Key("o", () => {
                                                     if (sonicManager.CurrentGameState == GameState.Playing)
                                                         sonicManager.InHaltMode = !sonicManager.InHaltMode;
                                                 }, () => { });
-            KeyboardJS.Instance().Bind.Key("2", () => {
+            int levelIndex = 0;
+            SocketIOClient client = SocketIOClient.Connect("50.116.22.241:8998");
+
+            client.On<dynamic>("SonicLevel", data => {
+                                                 sonicManager.Load(data.Data);
+
+                                                 sonicManager.WindowLocation.X = 0;
+                                                 sonicManager.WindowLocation.Y = 0;
+                                                 sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
+                                                 sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
+                                             });
+
+            KeyboardJS.Instance().Bind.Key("2", () => { client.Emit("GetSonicLevel", "0"); }, () => { });
+            client.Emit("GetSonicLevel", "0");
+
+            KeyboardJS.Instance().Bind.Key("1", () => {
                                                     sonicManager.IndexedPalette++;
                                                     foreach (var tile in sonicManager.SonicLevel.Tiles)
                                                         tile.ClearCache();
@@ -118,7 +125,7 @@ namespace OurSonic
 
             fullscreenMode = true;
 
-            Window.AddEventListener("onresize", e => resizeCanvas());
+            Window.AddEventListener("resize", e => resizeCanvas());
             jQuery.Document.Resize(e => resizeCanvas());
 
             sonicManager = new SonicManager(this, gameCanvas, resizeCanvas);
@@ -132,8 +139,7 @@ namespace OurSonic
         {
             jQueryEvent.PreventDefault();
 
-            int j=jQueryEvent.Me().detail ? jQueryEvent.Me().detail * ( -120 ) : jQueryEvent.Me().wheelDelta;
-
+            int j = jQueryEvent.Me().detail ? jQueryEvent.Me().detail * ( -120 ) : jQueryEvent.Me().wheelDelta;
 
             var rate = j < 0 ? -1 : 1;
             sonicManager.Scale.X += rate;
@@ -187,11 +193,11 @@ namespace OurSonic
                                                          canvasHeight / 224 / sonicManager.Scale.Y);
 
             gameCanvas.DomCanvas.Attribute("width", ( sonicManager.WindowLocation.Width *
-                                                      ( sonicManager.CurrentGameState==GameState.Playing
+                                                      ( sonicManager.CurrentGameState == GameState.Playing
                                                                 ? sonicManager.Scale.X * sonicManager.RealScale.X
                                                                 : 1 ) ).ToString());
             gameCanvas.DomCanvas.Attribute("height", ( sonicManager.WindowLocation.Height *
-                                                       (sonicManager.CurrentGameState == GameState.Playing
+                                                       ( sonicManager.CurrentGameState == GameState.Playing
                                                                  ? sonicManager.Scale.Y * sonicManager.RealScale.Y
                                                                  : 1 ) ).ToString());
 

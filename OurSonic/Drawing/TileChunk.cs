@@ -39,22 +39,18 @@ namespace OurSonic.Drawing
 
         public bool OnlyBackground()
         {
-            if (isOnlyBackground == null)
-            {
+            if (isOnlyBackground == null) {
                 var blocks = SonicManager.Instance.SonicLevel.Blocks;
 
                 var tpl = TilePieces.Length;
                 var tph = TilePieces[0].Length;
-                for (int i = 0; i < tpl; i++)
-                {
-                    for (int j = 0; j < tph; j++)
-                    {
+                for (int i = 0; i < tpl; i++) {
+                    for (int j = 0; j < tph; j++) {
                         var r = TilePieces[i][j];
                         var pm = blocks[r.Block];
-                        if (pm.Truthy())
-                        {
+                        if (pm.Truthy()) {
                             if (!pm.OnlyBackground())
-                                return (isOnlyBackground = false).Value;
+                                return ( isOnlyBackground = false ).Value;
                         }
                     }
                 }
@@ -65,17 +61,14 @@ namespace OurSonic.Drawing
 
         public bool IsEmpty()
         {
-            if (empty.Falsey())
-            {
+            if (empty.Falsey()) {
                 var tpl = TilePieces.Length;
                 var tph = TilePieces[0].Length;
-                for (int i = 0; i < tpl; i++)
-                {
-                    for (int j = 0; j < tph; j++)
-                    {
+                for (int i = 0; i < tpl; i++) {
+                    for (int j = 0; j < tph; j++) {
                         var r = TilePieces[i][j];
                         if (r.Block != 0)
-                            return (empty = false).Value;
+                            return ( empty = false ).Value;
                     }
                 }
                 empty = true;
@@ -126,16 +119,13 @@ namespace OurSonic.Drawing
 */
 
             var blocks = SonicManager.Instance.SonicLevel.Blocks;
-            for (int i = 0; i < len1; i++)
-            {
-                for (int j = 0; j < len2; j++)
-                {
+            for (int i = 0; i < len1; i++) {
+                for (int j = 0; j < len2; j++) {
                     var r = TilePieces[i][j];
                     var pm = blocks[r.Block];
-                    if (pm.Truthy())
-                    {
+                    if (pm.Truthy()) {
                         int animatedIndex = 0;
-                        if (Animated.Truthy() && (Animated[j * len1 + i].Truthy()))
+                        if (Animated.Truthy() && ( Animated[j * len1 + i].Truthy() ))
                             animatedIndex = Animated[j * len1 + i].LastAnimatedIndex;
 
                         localPoint.X = position.X + i * lX;
@@ -154,20 +144,17 @@ namespace OurSonic.Drawing
 
         public void AnimatedTick()
         {
-            foreach (var an in Animated)
-            {
+            foreach (var an in Animated) {
                 var anni = an.Value;
-                if (anni.LastAnimatedFrame.Falsey())
-                {
+                if (anni.LastAnimatedFrame.Falsey()) {
                     anni.LastAnimatedFrame = 0;
                     anni.LastAnimatedIndex = 0;
                 }
                 if (anni.Frames[anni.LastAnimatedIndex].Ticks == 0 ||
-                    (SonicManager.Instance.DrawTickCount - anni.LastAnimatedFrame) >=
-                    ((anni.AutomatedTiming > 0) ? anni.AutomatedTiming : anni.Frames[anni.LastAnimatedIndex].Ticks))
-                {
+                    ( SonicManager.Instance.DrawTickCount - anni.LastAnimatedFrame ) >=
+                    ( ( anni.AutomatedTiming > 0 ) ? anni.AutomatedTiming : anni.Frames[anni.LastAnimatedIndex].Ticks )) {
                     anni.LastAnimatedFrame = SonicManager.Instance.DrawTickCount;
-                    anni.LastAnimatedIndex = (anni.LastAnimatedIndex + 1) % anni.Frames.Length;
+                    anni.LastAnimatedIndex = ( anni.LastAnimatedIndex + 1 ) % anni.Frames.Length;
                 }
             }
         }

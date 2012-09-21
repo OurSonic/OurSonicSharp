@@ -19,7 +19,6 @@ namespace NodeJSLibrary
         public void WriteFile(string filename, string data, Action<FileSystemError, string> done) {}
         public void AppendFile(string filename, string data, string encoding, Action<FileSystemError, string> done) {}
         public void Exists(string path, Action<FileSystemError, bool> done) {}
-
-        public void Unlink(string filename){}
+        public void Unlink(string filename) {}
     }
 }

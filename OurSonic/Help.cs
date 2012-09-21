@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
@@ -67,18 +66,18 @@ namespace OurSonic
         public static ImageElement ScaleSprite(ImageElement image, Point scale, Action<ImageElement> complete)
         {
             var data = GetImageData(image);
-            var colors = new List<Color>();
+            var colors = new Color[data.Length / 4];
             for (int f = 0; f < data.Length; f += 4) {
-                colors.Add(ColorObjectFromData(data, f));
+                colors[f / 4] = ( ColorObjectFromData(data, f) );
             }
             var d = DefaultCanvas(0, 0).Context.CreateImageData(image.Width * scale.X, image.Height * scale.Y);
             SetDataFromColors(d.Data, colors, scale, image.Width, new Color(0, 0, 0));
             return LoadSprite(GetBase64Image(d), complete);
         }
 
-        private static void SetDataFromColors(PixelArray data, List<Color> colors, Point scale, int width, Color transparent)
+        private static void SetDataFromColors(PixelArray data, Color[] colors, Point scale, int width, Color transparent)
         {
-            for (int i = 0; i < colors.Count; i++) {
+            for (int i = 0; i < colors.Length; i++) {
                 var curX = i % width;
                 var curY = i / width;
                 var g = colors[i];
@@ -144,19 +143,20 @@ namespace OurSonic
             return data.Data;
         }
 
-        public static string ScaleCsSImage(ImageElement image, Point scale, Action<object> complete)
+        public static ImageElement ScaleCsImage(SonicImage image, Point scale, Action<ImageElement> complete)
         {
-            /* var df = image.bytes;
-                    var colors = [];
-                    for (var f = 0; f < df.length; f += 1) {
-                        colors.push(image.palette[df[f]]);
-                    }
-                    var dc = this.defaultCanvas();
-                    var d = dc.context.createImageData(image.width * scale.x, image.height * scale.y);
-                    _H.setDataFromColorsNew(d.data, colors, scale, image.width, { r: 0, g: 0, b: 0 });
+            var df = image.Bytes;
+            var colors = new Color[df.Length];
 
-                    return _H.loadSprite(_H.getBase64Image(d), complete);*/
-            return null;
+            for (int f = 0; f < df.Length; f++) {
+                var c = image.Palette[df[f]];
+                colors[f] = new Color(c[0], c[1], c[2] /*, c[3]*/);
+            }
+
+            var dc = DefaultCanvas(0, 0);
+            var d = dc.Context.CreateImageData(image.Width * scale.X, image.Height * scale.Y);
+            SetDataFromColors(d.Data, colors, scale, image.Width, new Color(0, 0, 0));
+            return LoadSprite(GetBase64Image(d), complete);
         }
 
         public static bool Loaded(this ImageElement element)

@@ -54,6 +54,7 @@
     <Compile Include="Sonic.cs" />
     <Compile Include="SonicBackground.cs" />
     <Compile Include="SonicEngine.cs" />
+    <Compile Include="SonicImage.cs" />
     <Compile Include="SonicLevel.cs" />
     <Compile Include="SonicManager.cs" />
     <Compile Include="SonicManager.load.cs" />
@@ -74,9 +75,13 @@
       <Project>{D16CB407-F890-4670-8DB6-37DF76880297}</Project>
       <Name>OurSonicModels</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WebLibraries\WebLibraries.csproj">
-      <Project>{B422D05D-269F-4B44-968B-2293A1CC3445}</Project>
-      <Name>WebLibraries</Name>
+    <ProjectReference Include="..\WebLibraries\CommonWebLibraries\CommonWebLibraries.csproj">
+      <Project>{6DA30112-FDBD-4E48-9F52-7268FCE19D25}</Project>
+      <Name>CommonWebLibraries</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WebLibraries\SocketIOWebLibrary\SocketIOWebLibrary.csproj">
+      <Project>{108D8A37-0782-4FFA-9A53-934E07B9B28A}</Project>
+      <Name>SocketIOWebLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

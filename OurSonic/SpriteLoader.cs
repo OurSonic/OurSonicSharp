@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 namespace OurSonic
 {
     public class SpriteLoader
@@ -52,14 +53,18 @@ namespace OurSonic
         public void AddIterationToStep(int spriteStep, int i)
         {
             if (spriteStep == -1) return;
-            steps[stepIndex].Iterations.Add(i);
+            steps[spriteStep].Iterations.Add(i);
         }
     }
     public class SpriteLoaderStep
     {
+        [IntrinsicProperty]
         public string Title { get; set; }
+        [IntrinsicProperty]
         public Action<int, Action> Method { get; set; }
+        [IntrinsicProperty]
         public Func<bool> OnFinish { get; set; }
+        [IntrinsicProperty]
         public List<int> Iterations { get; set; }
 
         public SpriteLoaderStep(string title, Action<int, Action> method, Func<bool> onFinish)

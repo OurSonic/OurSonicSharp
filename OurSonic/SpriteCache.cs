@@ -21,6 +21,7 @@ namespace OurSonic
         public JsDictionary<string, CanvasInformation> HeightMapChunks { get; set; }
         [IntrinsicProperty]
         public SpriteCacheIndexes Indexes { get; set; }
+        public JsDictionary<string, CanvasInformation> AnimationSprites { get; set; }
 
         public SpriteCache()
         {

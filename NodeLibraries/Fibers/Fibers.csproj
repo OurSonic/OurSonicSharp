@@ -49,7 +49,7 @@
     </ProjectReference>
     <ProjectReference Include="..\NodeJS\NodeJS.csproj">
       <Project>{79800429-B885-4F5E-9A3B-48E50390214A}</Project>
-      <Name>NodeJS %28Nodejs\NodeJS%29</Name>
+      <Name>NodeJS</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

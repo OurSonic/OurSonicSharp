@@ -6,7 +6,7 @@ namespace SocketIONodeLibrary
     [Imported(IsRealType = true)]
     public class SocketIOModule : NodeModule
     {
-        public SocketIoClient Listen(HttpServer app)
+        public SocketIOClient Listen(HttpServer app)
         {
             return null;
         }

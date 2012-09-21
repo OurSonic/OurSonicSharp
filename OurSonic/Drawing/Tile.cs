@@ -28,7 +28,6 @@ namespace OurSonic.Drawing
         protected bool ShowOutline { get; set; }
         [IntrinsicProperty]
         public int Index { get; set; }
-
         [IntrinsicProperty]
         public bool IsAnimated { get; set; }
 
@@ -99,19 +98,18 @@ namespace OurSonic.Drawing
                                int layer,
                                int animationFrame)
         {
-            if (!IsAnimated)
-            {
+            if (!IsAnimated) {
                 if (!canAnimate) return false;
                 var an = willAnimate;
-                if (willAnimate .Truthy()) {
+                if (willAnimate.Truthy()) {
                     var anin = an.AnimationTileIndex;
                     var ind = animationFrame;
                     var frame = an.Frames[ind];
-                    if (frame .Falsey())
+                    if (frame.Falsey())
                         frame = an.Frames[0];
                     var file = SonicManager.Instance.SonicLevel.AnimatedFiles[an.AnimationFile];
-                    var va = file[frame.StartingTileIndex + (Index - anin)];
-                    if (va .Truthy()) {
+                    var va = file[frame.StartingTileIndex + ( Index - anin )];
+                    if (va.Truthy()) {
                         if (canvas.FillStyle != "rbga(255,255,255,255)")
                             canvas.FillStyle = "rbga(255,255,255,255)";
                         va.Draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
@@ -123,16 +121,15 @@ namespace OurSonic.Drawing
                     var acn = SonicManager.Instance.SonicLevel.Animations[i];
                     var anin = acn.AnimationTileIndex;
                     var num = acn.NumberOfTiles;
-                    if (Index >= anin && Index < anin + num)
-                    {
+                    if (Index >= anin && Index < anin + num) {
                         willAnimate = acn;
                         var ind = animationFrame;
                         var frame = acn.Frames[ind];
-                        if (frame .Falsey())
+                        if (frame.Falsey())
                             frame = acn.Frames[0];
                         var file = SonicManager.Instance.SonicLevel.AnimatedFiles[acn.AnimationFile];
-                        var va = file[frame.StartingTileIndex + (Index - anin)];
-                        if (va .Truthy()) {
+                        var va = file[frame.StartingTileIndex + ( Index - anin )];
+                        if (va.Truthy()) {
                             if (canvas.FillStyle != "rbga(255,255,255,255)")
                                 canvas.FillStyle = "rbga(255,255,255,255)";
                             va.Draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
@@ -171,7 +168,7 @@ namespace OurSonic.Drawing
 
         public int[] GetAllPaletteIndexes()
         {
-            if (CurPaletteIndexes .Falsey()) {
+            if (CurPaletteIndexes.Falsey()) {
                 var d = new List<int>();
                 for (int i = 0; i < Colors.Length; i++) {
                     var color = Colors[i];

@@ -54,11 +54,11 @@ namespace OurSonic
                 AnimationIndex = ( SonicManager.Instance.DrawTickCount % ( ( Active ? 4 : 8 ) * 4 ) ) / ( Active ? 4 : 8 );
             else AnimationIndex = 0;
             List<ImageElement> sprites = null;
-            if (SonicManager.Instance.SpriteCache.Rings .Truthy())
+            if (SonicManager.Instance.SpriteCache.Rings.Truthy())
                 sprites = SonicManager.Instance.SpriteCache.Rings;
             else throw new Exception("bad ring animation");
             var sps = sprites[AnimationIndex * 200 + scale.Y * 100 + scale.X];
-            if (sps .Falsey()) throw new Exception("bad ring animation");
+            if (sps.Falsey()) throw new Exception("bad ring animation");
             if (sps.Loaded()) canvas.DrawImage(sps, ( pos.X - 8 ) * scale.X, ( pos.Y - 8 ) * scale.Y);
         }
     }

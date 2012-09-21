@@ -110,7 +110,7 @@ namespace OurSonicModels
         [ObjectLiteral]
         public SLDataCNZBumperEntry() {}
     }
-    public enum Solidity:int
+    public enum Solidity : int
     {
         [PreserveCase] NotSolid = 0,
         [PreserveCase] TopSolid = 1,

@@ -5,40 +5,37 @@ namespace OurSonic
 {
     public class UIManager
     {
-        private readonly SonicManager sonicManager;
         private readonly CanvasInformation mainCanvas;
         private readonly Point scale;
+        private readonly SonicManager sonicManager;
         [IntrinsicProperty]
         public Dragger dragger { get; set; }
         [IntrinsicProperty]
         public UIManagerData Data { get; set; }
+
         public UIManager(SonicManager sonicManager, CanvasInformation mainCanvas, Point scale)
         {
             this.sonicManager = sonicManager;
             this.mainCanvas = mainCanvas;
             this.scale = scale;
-            dragger = new Dragger((xsp, ysp) =>
-            {
-                sonicManager.WindowLocation.X += (int)xsp;
-                sonicManager.WindowLocation.Y += (int)ysp;
+            dragger = new Dragger((xsp, ysp) => {
+                                      sonicManager.WindowLocation.X += (int) xsp;
+                                      sonicManager.WindowLocation.Y += (int) ysp;
 
-                sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
-                sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
-            });
-
+                                      sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
+                                      sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
+                                  });
         }
 
         public bool OnClick(jQueryEvent e)
         {
-
             sonicManager.UIManager.dragger.Click(e);
             return false;
         }
 
         public bool OnMouseMove(jQueryEvent e)
         {
-            if (dragger.IsDragging(e))
-            {
+            if (dragger.IsDragging(e)) {
                 dragger.MouseMove(e);
                 return false;
             }
@@ -49,9 +46,7 @@ namespace OurSonic
 
         public void OnMouseUp(jQueryEvent e)
         {
-
-
-            this.dragger.MouseUp(e);
+            dragger.MouseUp(e);
         }
 
         public bool OnMouseScroll(jQueryEvent e)
@@ -59,14 +54,14 @@ namespace OurSonic
             return false;
         }
 
-        public void OnKeyDown(jQueryEvent jQueryEvent) { }
+        public void OnKeyDown(jQueryEvent jQueryEvent) {}
+
         public void Draw(CanvasContext2D gameCanvas)
         {
-            this.dragger.Tick();
-
-            
+            dragger.Tick();
         }
-        public void UpdateTitle(string decoding) { }
+
+        public void UpdateTitle(string decoding) {}
     }
     public class UIManagerData
     {

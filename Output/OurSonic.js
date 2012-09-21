@@ -45,33 +45,7 @@ OurSonic.ClickState.prototype = { dragging: 0, placeChunk: 1, placeRing: 2, plac
 OurSonic.ClickState.registerEnum('OurSonic.ClickState', false);
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Color
-OurSonic.Color = function(r, g, b) {
-	this.$1$RField = 0;
-	this.$1$GField = 0;
-	this.$1$BField = 0;
-	this.set_r(r);
-	this.set_g(g);
-	this.set_b(b);
-};
-OurSonic.Color.prototype = {
-	get_r: function() {
-		return this.$1$RField;
-	},
-	set_r: function(value) {
-		this.$1$RField = value;
-	},
-	get_g: function() {
-		return this.$1$GField;
-	},
-	set_g: function(value) {
-		this.$1$GField = value;
-	},
-	get_b: function() {
-		return this.$1$BField;
-	},
-	set_b: function(value) {
-		this.$1$BField = value;
-	}
+OurSonic.Color = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Constants
@@ -86,8 +60,8 @@ OurSonic.Constants.defaultWindowLocation = function(state, canvas, scale) {
 			var x = 0;
 			var y = 0;
 			if (OurSonic.SonicManager.instance.sonicLevel && OurSonic.SonicManager.instance.sonicLevel.startPositions && OurSonic.SonicManager.instance.sonicLevel.startPositions[0]) {
-				x = OurSonic.SonicManager.instance.sonicLevel.startPositions[0].x - 256;
-				y = OurSonic.SonicManager.instance.sonicLevel.startPositions[0].y - 256;
+				x = OurSonic.SonicManager.instance.sonicLevel.startPositions[0].x - 128 * scale.x;
+				y = OurSonic.SonicManager.instance.sonicLevel.startPositions[0].y - 128 * scale.y;
 			}
 			return OurSonic.IntersectingRectangle.$ctor(x, y, canvas.domCanvas.width(), canvas.domCanvas.height());
 		}
@@ -98,10 +72,10 @@ OurSonic.Constants.defaultWindowLocation = function(state, canvas, scale) {
 // OurSonic.Dragger
 OurSonic.Dragger = function(onFling) {
 	this.$myOnFling = null;
+	this.$lag = 0.925000011920929;
 	this.$lastPos = null;
 	this.$xsp = 0;
 	this.$ysp = 0;
-	this.$lag = 0.925000011920929;
 	this.$myOnFling = onFling;
 };
 OurSonic.Dragger.prototype = {
@@ -838,12 +812,12 @@ OurSonic.Help.mod = function(j, n) {
 };
 OurSonic.Help.scaleSprite = function(image, scale, complete) {
 	var data = OurSonic.Help.getImageData(image);
-	var colors = [];
+	var colors = new Array(ss.Int32.div(data.length, 4));
 	for (var f = 0; f < data.length; f += 4) {
-		colors.add(OurSonic.Help.$colorObjectFromData(data, f));
+		colors[ss.Int32.div(f, 4)] = OurSonic.Help.$colorObjectFromData(data, f);
 	}
 	var d = OurSonic.Help.defaultCanvas(0, 0).context.createImageData(image.width * scale.x, image.height * scale.y);
-	OurSonic.Help.$setDataFromColors(d.data, colors, scale, image.width, new OurSonic.Color(0, 0, 0));
+	OurSonic.Help.$setDataFromColors(d.data, colors, scale, image.width, { r: 0, g: 0, b: 0 });
 	return OurSonic.Help.loadSprite(OurSonic.Help.$getBase64Image(d), complete);
 };
 OurSonic.Help.$setDataFromColors = function(data, colors, scale, width, transparent) {
@@ -853,7 +827,7 @@ OurSonic.Help.$setDataFromColors = function(data, colors, scale, width, transpar
 		var g = colors[i];
 		var isTrans = false;
 		if (transparent) {
-			if (g.get_r() === transparent.get_r() && g.get_g() === transparent.get_g() && g.get_b() === transparent.get_b()) {
+			if (g.r === transparent.r && g.g === transparent.g && g.b === transparent.b) {
 				isTrans = true;
 			}
 		}
@@ -869,9 +843,9 @@ OurSonic.Help.$setDataFromColors = function(data, colors, scale, width, transpar
 					data[c + 3] = 0;
 					continue;
 				}
-				data[c] = g.get_r();
-				data[c + 1] = g.get_g();
-				data[c + 2] = g.get_b();
+				data[c] = g.r;
+				data[c + 1] = g.g;
+				data[c + 2] = g.b;
 				data[c + 3] = 255;
 			}
 		}
@@ -892,7 +866,7 @@ OurSonic.Help.$colorObjectFromData = function(data, c) {
 	var r = ss.Nullable.unbox(Type.cast(data[c], ss.Int32));
 	var g = ss.Nullable.unbox(Type.cast(data[c + 1], ss.Int32));
 	var b = ss.Nullable.unbox(Type.cast(data[c + 2], ss.Int32));
-	return new OurSonic.Color(r, g, b);
+	return { r: r, g: g, b: b };
 };
 OurSonic.Help.getImageData = function(image) {
 	var canvas = document.createElement('canvas');
@@ -903,18 +877,17 @@ OurSonic.Help.getImageData = function(image) {
 	var data = ctx.getImageData(0, 0, image.width, image.height);
 	return data.data;
 };
-OurSonic.Help.scaleCsSImage = function(image, scale, complete) {
-	// var df = image.bytes;
-	// var colors = [];
-	// for (var f = 0; f < df.length; f += 1) {
-	// colors.push(image.palette[df[f]]);
-	// }
-	// var dc = this.defaultCanvas();
-	// var d = dc.context.createImageData(image.width * scale.x, image.height * scale.y);
-	// _H.setDataFromColorsNew(d.data, colors, scale, image.width, { r: 0, g: 0, b: 0 });
-	// 
-	// return _H.loadSprite(_H.getBase64Image(d), complete);
-	return null;
+OurSonic.Help.scaleCsImage = function(image, scale, complete) {
+	var df = image.bytes;
+	var colors = new Array(df.length);
+	for (var f = 0; f < df.length; f++) {
+		var c = image.palette[df[f]];
+		colors[f] = { r: c[0], g: c[1], b: c[2] };
+	}
+	var dc = OurSonic.Help.defaultCanvas(0, 0);
+	var d = dc.context.createImageData(image.width * scale.x, image.height * scale.y);
+	OurSonic.Help.$setDataFromColors(d.data, colors, scale, image.width, { r: 0, g: 0, b: 0 });
+	return OurSonic.Help.loadSprite(OurSonic.Help.$getBase64Image(d), complete);
 };
 OurSonic.Help.loaded = function(element) {
 	return element.getAttribute('loaded') === 'true';
@@ -1212,26 +1185,6 @@ OurSonic.SonicEngine = function() {
 	}));
 	$(document).keydown(Function.mkdel(this, function(a) {
 		var keycode = ss.Nullable.unbox(Type.cast(a.keyCode, ss.Int32));
-		//
-		//                                        for (int i = 49; i < 49 + 10; i++) {
-		//
-		//                                        if (keycode == i) {
-		//
-		//                                        sonicManager.Load(Window.Instance.Me().levelData[i - 49]);
-		//
-		//                                        sonicManager.WindowLocation.X = 0;
-		//
-		//                                        sonicManager.WindowLocation.Y = 0;
-		//
-		//                                        sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
-		//
-		//                                        sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
-		//
-		//                                        return;
-		//
-		//                                        }
-		//
-		//                                        }
 		var sca = 2;
 		if (keycode === 37) {
 			this.$sonicManager.windowLocation.x -= ss.Int32.div(128, sca);
@@ -1264,7 +1217,21 @@ OurSonic.SonicEngine = function() {
 		}
 	}), function() {
 	});
-	KeyboardJS.bind.key('2', Function.mkdel(this, function() {
+	var levelIndex = 0;
+	var client = io.connect('50.116.22.241:8998');
+	client.on('SonicLevel', Function.mkdel(this, function(data) {
+		this.$sonicManager.load(Type.cast(data.Data, String));
+		this.$sonicManager.windowLocation.x = 0;
+		this.$sonicManager.windowLocation.y = 0;
+		this.$sonicManager.bigWindowLocation.x = this.$sonicManager.windowLocation.x;
+		this.$sonicManager.bigWindowLocation.y = this.$sonicManager.windowLocation.y;
+	}));
+	KeyboardJS.bind.key('2', function() {
+		client.emit('GetSonicLevel', '0');
+	}, function() {
+	});
+	client.emit('GetSonicLevel', '0');
+	KeyboardJS.bind.key('1', Function.mkdel(this, function() {
 		this.$sonicManager.indexedPalette++;
 		var $t1 = this.$sonicManager.sonicLevel.tiles.getEnumerator();
 		try {
@@ -1313,7 +1280,7 @@ OurSonic.SonicEngine = function() {
 	}), function() {
 	});
 	this.$fullscreenMode = true;
-	window.addEventListener('onresize', Function.mkdel(this, function(e2) {
+	window.addEventListener('resize', Function.mkdel(this, function(e2) {
 		this.resizeCanvas();
 	}));
 	$(document).resize(Function.mkdel(this, function(e3) {
@@ -1409,6 +1376,10 @@ OurSonic.SonicEngine.prototype = {
 		}
 		this.$sonicManager.uiManager.draw(this.$uiCanvas.context);
 	}
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.SonicImage
+OurSonic.SonicImage = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.SonicLevel
@@ -1706,874 +1677,34 @@ OurSonic.SonicManager.prototype = {
 			this.spriteLoader.addIterationToStep(spriteStep, i1);
 		}
 		var numOfAnimations = 0;
-		// 
-		//                 
-		//
-		//                    var numOfAnimations = 0;
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    var chunkStep = sm.addStep("Chunk Maps", function (k, done) {
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    var canv = _H.defaultCanvas(128 * scale.x, 128 * scale.y);
-		// 
-		//                 
-		//
-		//                    var ctx = canv.context;
-		// 
-		//                 
-		//
-		//                    canv.width = canv.width;
-		// 
-		//                 
-		//
-		//                    md = that.SonicLevel.Chunks[k];
-		// 
-		//                 
-		//
-		//                    /*
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    md.draw(ctx, { x: 0, y: 0 }, scale, false);
-		// 
-		//                 
-		//
-		//                    //var fc = canv.canvas.toDataURL("image/png");
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    that.SpriteCache.tileChunks[false + " " + md.index + " " + scale.y + " " + scale.x + " -"] = canv.canvas;
-		// 
-		//                 
-		//
-		//                    ind_.tcs++;
-		// 
-		//                 
-		//
-		//                    done();
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    canv = _H.defaultCanvas(128 * scale.x, 128 * scale.y);
-		// 
-		//                 
-		//
-		//                    ctx = canv.context;
-		// 
-		//                 
-		//
-		//                    ctx.clearRect(0, 0, canv.width, canv.height);
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    if (!md.onlyBackground()) {
-		// 
-		//                 
-		//
-		//                    md.draw(ctx, { x: 0, y: 0 }, scale, true);
-		// 
-		//                 
-		//
-		//                    //  var fc = canv.canvas.toDataURL("image/png");
-		// 
-		//                 
-		//
-		//                    that.SpriteCache.tileChunks[true + " " + md.index + " " + scale.y + " " + scale.x + " -"] = canv.canvas;
-		// 
-		//                 
-		//
-		//                    ind_.tcs++;
-		// 
-		//                 
-		//
-		//                    done();
-		// 
-		//                 
-		//
-		//                    } else {
-		// 
-		//                 
-		//
-		//                    that.SpriteCache.tileChunks[true + " " + md.index + " " + scale.y + " " + scale.x + " -"] = 1;
-		// 
-		//                 
-		//
-		//                    ind_.tcs++;
-		// 
-		//                 
-		//
-		//                    done();
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    if (md.animated) {
-		// 
-		//                 
-		//
-		//                    sonicManager.DrawTickCount = 0;
-		// 
-		//                 
-		//
-		//                    sonicManager.CACHING = false;
-		// 
-		//                 
-		//
-		//                    for (var c = 0; c < md.animated.Frames.length; c++) {
-		// 
-		//                 
-		//
-		//                    var frame = md.animated.Frames[c];
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    canv = _H.defaultCanvas(128 * scale.x, 128 * scale.y);
-		// 
-		//                 
-		//
-		//                    ctx = canv.context;
-		// 
-		//                 
-		//
-		//                    ctx.clearRect(0, 0, canv.width, canv.height);
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    md.draw(ctx, { x: 0, y: 0 }, scale, true, c);
-		// 
-		//                 
-		//
-		//                    //   var fc = canv.canvas.toDataURL("image/png");
-		// 
-		//                 
-		//
-		//                    that.SpriteCache.tileChunks[true + " " + md.index + " " + scale.y + " " + scale.x + " " + c] = canv.canvas;
-		// 
-		//                 
-		//
-		//                    canv = _H.defaultCanvas(128 * scale.x, 128 * scale.y);
-		// 
-		//                 
-		//
-		//                    ctx = canv.context;
-		// 
-		//                 
-		//
-		//                    ctx.clearRect(0, 0, canv.width, canv.height);
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    md.draw(ctx, { x: 0, y: 0 }, scale, false, c);
-		// 
-		//                 
-		//
-		//                    // var fc = canv.canvas.toDataURL("image/png");
-		// 
-		//                 
-		//
-		//                    that.SpriteCache.tileChunks[false + " " + md.index + " " + scale.y + " " + scale.x + " " + c] = canv.canvas;
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    sonicManager.CACHING = true;
-		// 
-		//                 
-		//
-		//                    }#1#
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    var posj = { x: 0, y: 0 };
-		// 
-		//                 
-		//
-		//                    canv = _H.defaultCanvas(128 * scale.x, 128 * scale.y);
-		// 
-		//                 
-		//
-		//                    ctx = canv.context;
-		// 
-		//                 
-		//
-		//                    ctx.clearRect(0, 0, canv.width, canv.height);
-		// 
-		//                 
-		//
-		//                    for (var _y = 0; _y < 8; _y++) {
-		// 
-		//                 
-		//
-		//                    for (var _x = 0; _x < 8; _x++) {
-		// 
-		//                 
-		//
-		//                    var tp = md.tilePieces[_x][_y];
-		// 
-		//                 
-		//
-		//                    var hd = sonicManager.SonicLevel.HeightMaps[sonicManager.SonicLevel.CollisionIndexes1[tp.Block]];
-		// 
-		//                 
-		//
-		//                    var __x = _x;
-		// 
-		//                 
-		//
-		//                    var __y = _y;
-		// 
-		//                 
-		//
-		//                    var vangle;
-		// 
-		//                 
-		//
-		//                    var posm = { x: posj.x + (__x * 16) * scale.x, y: posj.y + (__y * 16) * scale.y };
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    if (hd == undefined) continue;
-		// 
-		//                 
-		//
-		//                    if (hd == 0) {
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    } else if (hd == 1) {
-		// 
-		//                 
-		//
-		//                    if (tp.Solid1 > 0) {
-		// 
-		//                 
-		//
-		//                    ctx.fillStyle = HeightMask.colors[tp.Solid1];
-		// 
-		//                 
-		//
-		//                    ctx.fillRect(posj.x + (__x * 16) * scale.x, posj.y + (__y * 16) * scale.y, scale.x * 16, scale.y * 16);
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    else {
-		// 
-		//                 
-		//
-		//                    vangle = sonicManager.SonicLevel.Angles[sonicManager.SonicLevel.CollisionIndexes1[tp.Block]];
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    hd.draw(ctx, posm, scale, -1, tp.XFlip, tp.YFlip, tp.Solid1, vangle);
-		// 
-		//                 
-		//
-		//                    /*   posm.x += 16 * scale.x / 2;
-		// 
-		//                 
-		//
-		//                    posm.y += 16 * scale.y / 2;
-		// 
-		//                 
-		//
-		//                    ctx.strokeStyle = "#DDD";
-		// 
-		//                 
-		//
-		//                    ctx.font = "18pt courier ";
-		// 
-		//                 
-		//
-		//                    ctx.shadowColor = "";
-		// 
-		//                 
-		//
-		//                    ctx.shadowBlur = 0;
-		// 
-		//                 
-		//
-		//                    ctx.lineWidth = 1;
-		// 
-		//                 
-		//
-		//                    ctx.strokeText(vangle.toString(16), posm.x - 12, posm.y + 7);#1#
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    //  var fc = canv.canvas.toDataURL("image/png");
-		// 
-		//                 
-		//
-		//                    that.SpriteCache.heightMapChunks[1 + " " + md.index + " " + scale.y + " " + scale.x] = canv.canvas;
-		// 
-		//                 
-		//
-		//                    ind_.hmc++; done();
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    canv = _H.defaultCanvas(128 * scale.x, 128 * scale.y);
-		// 
-		//                 
-		//
-		//                    ctx = canv.context;
-		// 
-		//                 
-		//
-		//                    ctx.clearRect(0, 0, canv.width, canv.height);
-		// 
-		//                 
-		//
-		//                    for (var _y = 0; _y < 8; _y++) {
-		// 
-		//                 
-		//
-		//                    for (var _x = 0; _x < 8; _x++) {
-		// 
-		//                 
-		//
-		//                    var tp = md.tilePieces[_x][_y];
-		// 
-		//                 
-		//
-		//                    var hd = sonicManager.SonicLevel.HeightMaps[sonicManager.SonicLevel.CollisionIndexes2[tp.Block]];
-		// 
-		//                 
-		//
-		//                    var __x = _x;
-		// 
-		//                 
-		//
-		//                    var __y = _y;
-		// 
-		//                 
-		//
-		//                    var vangle;
-		// 
-		//                 
-		//
-		//                    var posm = { x: posj.x + (__x * 16) * scale.x, y: posj.y + (__y * 16) * scale.y };
-		// 
-		//                 
-		//
-		//                    if (hd == undefined) continue;
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    if (hd == 0) {
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    } else if (hd == 1) {
-		// 
-		//                 
-		//
-		//                    if (tp.Solid2 > 0) {
-		// 
-		//                 
-		//
-		//                    ctx.fillStyle = HeightMask.colors[tp.Solid2];
-		// 
-		//                 
-		//
-		//                    ctx.fillRect(posj.x + (__x * 16) * scale.x, posj.y + (__y * 16) * scale.y, scale.x * 16, scale.y * 16);
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    else {
-		// 
-		//                 
-		//
-		//                    vangle = sonicManager.SonicLevel.Angles[sonicManager.SonicLevel.CollisionIndexes2[tp.Block]];
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    hd.draw(ctx, posm, scale, -1, tp.XFlip, tp.YFlip, tp.Solid2, vangle);
-		// 
-		//                 
-		//
-		//                    /*   posm.x += 16 * scale.x / 2;
-		// 
-		//                 
-		//
-		//                    posm.y += 16 * scale.y / 2;
-		// 
-		//                 
-		//
-		//                    ctx.strokeStyle = "#DDD";
-		// 
-		//                 
-		//
-		//                    ctx.font = "18pt courier ";
-		// 
-		//                 
-		//
-		//                    ctx.shadowColor = "";
-		// 
-		//                 
-		//
-		//                    ctx.shadowBlur = 0;
-		// 
-		//                 
-		//
-		//                    ctx.lineWidth = 1;
-		// 
-		//                 
-		//
-		//                    ctx.strokeText(vangle.toString(16), posm.x - 12, posm.y + 7);#1#
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    //  var fc = canv.canvas.toDataURL("image/png");
-		// 
-		//                 
-		//
-		//                    that.SpriteCache.heightMapChunks[2 + " " + md.index + " " + scale.y + " " + scale.x] = canv.canvas;
-		// 
-		//                 
-		//
-		//                    ind_.hmc++; done();
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    }, function () {
-		// 
-		//                 
-		//
-		//                    if (/*ind_.tcs >= that.SonicLevel.Chunks.length * 2 / speed && #1#ind_.hmc >= that.SonicLevel.Chunks.length * 2 / speed) {
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    return true;
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    return false;
-		// 
-		//                 
-		//
-		//                    }, true);
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    for (var k = 0; k < this.SonicLevel.Chunks.length; k++) {
-		// 
-		//                 
-		//
-		//                    sm.addIterationToStep(chunkStep, k);
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    var sonicStep = sm.addStep("Sonic Sprites", function (sp, done) {
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    var cci = that.SpriteCache.sonicSprites;
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    for (var spritec in $sonicSprites) {
-		// 
-		//                 
-		//
-		//                    cci[spritec + scale.x + scale.y] = _H.scaleCSImage($sonicSprites[spritec], scale);
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    var cji = that.SpriteCache.animationSprites = [];
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    for (var anni in sonicManager.animations) {
-		// 
-		//                 
-		//
-		//                    var imd = 0;
-		// 
-		//                 
-		//
-		//                    for (var image in sonicManager.animations[anni].images) {
-		// 
-		//                 
-		//
-		//                    cji[(imd++) + " " + sonicManager.animations[anni].name + scale.x + scale.y] = _H.scaleCSImage(sonicManager.animations[anni].images[image], scale);
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    done();
-		// 
-		//                 
-		//
-		//                    }, function () {
-		// 
-		//                 
-		//
-		//                    return true;
-		// 
-		//                 
-		//
-		//                    }, false);
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    that.spriteLocations = [];
-		// 
-		//                 
-		//
-		//                    sm.addIterationToStep(sonicStep, true);
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    var bgStep = sm.addStep("Background data", function (sp, done) {
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    var canv = _H.defaultCanvas(that.SonicLevel.BackgroundWidth * 128 * scale.x, that.SonicLevel.BackgroundHeight * 128 * scale.y);
-		// 
-		//                 
-		//
-		//                    var ctx = canv.context;
-		// 
-		//                 
-		//
-		//                    ctx.clearRect(0, 0, canv.width, canv.height);
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    for (var x = 0; x < that.SonicLevel.BackgroundWidth; x++) {
-		// 
-		//                 
-		//
-		//                    for (var y = 0; y < that.SonicLevel.BackgroundHeight; y++) {
-		// 
-		//                 
-		//
-		//                    var ck = sonicManager.SonicLevel.Chunks[that.SonicLevel.BGChunkMap[x][y]];
-		// 
-		//                 
-		//
-		//                    if (ck) {
-		// 
-		//                 
-		//
-		//                    ck.draw(ctx, { x: x * 128 * scale.x, y: y * 128 * scale.y }, scale, 0);
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    }
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    that.SpriteCache.bgImage = _H.loadSprite(canv.canvas.toDataURL("image/png"), done);
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    }, function () {
-		// 
-		//                 
-		//
-		//                    that.background = new ParallaxBG(that.SpriteCache.bgImage, { x: 1, y: 1 });
-		// 
-		//                 
-		//
-		//                    return true;
-		// 
-		//                 
-		//
-		//                    
-		// 
-		//                 
-		//
-		//                    }, true);
-		// 
-		//                 
-		//
-		//                    sm.addIterationToStep(bgStep, 0);
+		var sonicStep = this.spriteLoader.addStep('Sonic Sprites', Function.mkdel(this, function(sp1, done1) {
+			var cci = this.spriteCache.sonicSprites;
+			var $t1 = Object.getObjectEnumerator(this.$sonicSprites);
+			try {
+				while ($t1.moveNext()) {
+					var sonicSprite = $t1.get_current();
+					cci[sonicSprite.key + scale.x + scale.y] = OurSonic.Help.scaleCsImage(sonicSprite.value, scale, function(ec) {
+					});
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+			//var cji = SpriteCache.AnimationSprites = new JsDictionary<string, CanvasInformation>();
+			//
+			//foreach (var anni in Animations)
+			//{
+			//var imd = 0;
+			//foreach (var image in anni.Images)
+			//{
+			//cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManager.animations[anni].images[image], scale);
+			//}
+			//}
+			done1();
+		}), function() {
+			return true;
+		}, false);
+		this.spriteLoader.addIterationToStep(sonicStep, 0);
 	},
 	draw: function(canvas) {
 		if (this.inHaltMode) {
@@ -2633,8 +1764,9 @@ OurSonic.SonicManager.prototype = {
 			this.windowLocation.x = 128 * this.sonicLevel.levelWidth - this.windowLocation.width;
 		}
 		var offs = [];
-		var w1 = ss.Int32.div(this.windowLocation.width, 128);
-		var h1 = ss.Int32.div(this.windowLocation.height, 128);
+		var w1 = ss.Int32.div(this.windowLocation.width, 128) + 2;
+		var h1 = ss.Int32.div(this.windowLocation.height, 128) + 2;
+		//cleaner with 2 padding on the widthheight
 		for (var i = -1; i < w1; i++) {
 			for (var j = -1; j < h1; j++) {
 				offs.add(OurSonic.Point.$ctor1(i, j));
@@ -2657,8 +1789,8 @@ OurSonic.SonicManager.prototype = {
 					}
 				}
 			}
-			var fxP = ss.Int32.div(this.windowLocation.x + 128, 128);
-			var fyP = ss.Int32.div(this.windowLocation.y + 128, 128);
+			var fxP = ss.Int32.trunc(this.windowLocation.x / 128);
+			var fyP = ss.Int32.trunc(this.windowLocation.y / 128);
 			var $t1 = offs.getEnumerator();
 			try {
 				while ($t1.moveNext()) {
@@ -3236,6 +2368,7 @@ OurSonic.SonicManager.prototype = {
 		}), function(s) {
 			console.log('ff ' + s);
 		});
+		this.forceResize();
 		// 
 		//
 		//               
@@ -3393,6 +2526,7 @@ OurSonic.SpriteCache = function() {
 	this.sonicSprites = null;
 	this.heightMapChunks = null;
 	this.indexes = null;
+	this.$1$AnimationSpritesField = null;
 	this.rings = [];
 	this.tileChunks = [];
 	this.tilepieces = {};
@@ -3401,6 +2535,14 @@ OurSonic.SpriteCache = function() {
 	this.heightMaps = [];
 	this.heightMapChunks = {};
 	this.indexes = new OurSonic.SpriteCacheIndexes();
+};
+OurSonic.SpriteCache.prototype = {
+	get_animationSprites: function() {
+		return this.$1$AnimationSpritesField;
+	},
+	set_animationSprites: function(value) {
+		this.$1$AnimationSpritesField = value;
+	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.SpriteCacheIndexes
@@ -3440,12 +2582,12 @@ OurSonic.SpriteLoader.prototype = {
 		if (!stp) {
 			return true;
 		}
-		if (ss.Int32.div(this.$tickIndex % stp.get_iterations().length, 12) === 0) {
-			this.$myUpdate('Caching: ' + stp.get_title() + ' ' + ss.Int32.div(this.$tickIndex, stp.get_iterations().length) * 100 + '%');
+		if (ss.Int32.div(this.$tickIndex % stp.iterations.length, 12) === 0) {
+			this.$myUpdate('Caching: ' + stp.title + ' ' + ss.Int32.div(this.$tickIndex, stp.iterations.length) * 100 + '%');
 		}
-		if (stp.get_iterations().length > this.$tickIndex) {
-			stp.get_method()(stp.get_iterations()[this.$tickIndex++], Function.mkdel(this, function() {
-				if (stp.get_onFinish()()) {
+		if (stp.iterations.length > this.$tickIndex) {
+			stp.method(stp.iterations[this.$tickIndex++], Function.mkdel(this, function() {
+				if (stp.onFinish()) {
 					this.$stepIndex++;
 					this.$tickIndex = 0;
 				}
@@ -3464,53 +2606,27 @@ OurSonic.SpriteLoader.prototype = {
 		if (spriteStep === -1) {
 			return;
 		}
-		this.$steps[this.$stepIndex].get_iterations().add(i);
+		this.$steps[spriteStep].iterations.add(i);
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.SpriteLoaderStep
 OurSonic.SpriteLoaderStep = function(title, method, onFinish) {
-	this.$1$TitleField = null;
-	this.$1$MethodField = null;
-	this.$1$OnFinishField = null;
-	this.$1$IterationsField = null;
-	this.set_title(title);
-	this.set_method(method);
-	this.set_onFinish(onFinish);
-	this.set_iterations([]);
-};
-OurSonic.SpriteLoaderStep.prototype = {
-	get_title: function() {
-		return this.$1$TitleField;
-	},
-	set_title: function(value) {
-		this.$1$TitleField = value;
-	},
-	get_method: function() {
-		return this.$1$MethodField;
-	},
-	set_method: function(value) {
-		this.$1$MethodField = value;
-	},
-	get_onFinish: function() {
-		return this.$1$OnFinishField;
-	},
-	set_onFinish: function(value) {
-		this.$1$OnFinishField = value;
-	},
-	get_iterations: function() {
-		return this.$1$IterationsField;
-	},
-	set_iterations: function(value) {
-		this.$1$IterationsField = value;
-	}
+	this.title = null;
+	this.method = null;
+	this.onFinish = null;
+	this.iterations = null;
+	this.title = title;
+	this.method = method;
+	this.onFinish = onFinish;
+	this.iterations = [];
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager
 OurSonic.UIManager = function(sonicManager, mainCanvas, scale) {
-	this.$sonicManager = null;
 	this.$mainCanvas = null;
 	this.$scale = null;
+	this.$sonicManager = null;
 	this.dragger = null;
 	this.data = null;
 	this.$sonicManager = sonicManager;
@@ -3586,6 +2702,7 @@ OurSonic.Ring.registerClass('OurSonic.Ring');
 OurSonic.Sonic.registerClass('OurSonic.Sonic', Object);
 OurSonic.SonicBackground.registerClass('OurSonic.SonicBackground', Object);
 OurSonic.SonicEngine.registerClass('OurSonic.SonicEngine', Object);
+OurSonic.SonicImage.registerClass('OurSonic.SonicImage', Object);
 OurSonic.SonicLevel.registerClass('OurSonic.SonicLevel', Object);
 OurSonic.SonicManager.registerClass('OurSonic.SonicManager', Object);
 OurSonic.SonicObject.registerClass('OurSonic.SonicObject', Object);
