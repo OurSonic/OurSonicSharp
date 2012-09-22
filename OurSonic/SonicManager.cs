@@ -19,7 +19,7 @@ namespace OurSonic
         public int DrawTickCount;
         private int imageLength;
         private string myStatus;
-        private JsDictionary<int, SonicImage> sonicSprites;
+        private JsDictionary<string, SonicImage> sonicSprites;
         private int tickCount;
         private bool waitingForDrawContinue;
         public bool waitingForTickContinue;
@@ -92,6 +92,8 @@ namespace OurSonic
             Instance = this;
             //            SonicToon = new Sonic();
 
+            ClickState = ClickState.PlaceRing;
+
             myEngine = engine;
             myEngine.canvasWidth = jQuery.Window.GetWidth();
             myEngine.canvasHeight = jQuery.Window.GetHeight();
@@ -99,7 +101,7 @@ namespace OurSonic
             gameCanvas.DomCanvas[0].SetAttribute("width", myEngine.canvasWidth);
             gameCanvas.DomCanvas[0].SetAttribute("height", myEngine.canvasHeight);
 
-            jQuery.GetJsonData<JsDictionary<int, SonicImage>>("Content/sprites/sonic.js", data => { sonicSprites = data; });
+            jQuery.GetJsonData<JsDictionary<string, SonicImage>>("Content/sprites/sonic.js", data => { sonicSprites = data; });
 
             objectManager = new ObjectManager(this);
             objectManager.Init();
@@ -168,7 +170,7 @@ namespace OurSonic
                     case ClickState.PlaceRing:
                         ex = e.X;
                         ey = e.Y;
-                        //this.SonicLevel.Rings.push({ X: ex, Y: ey });
+                        SonicLevel.Rings.Add(new Ring(true) {X = ex, Y = ey});
                         return true;
                     case ClickState.PlaceObject:
                         break;
@@ -345,11 +347,11 @@ namespace OurSonic
                 canvas.FillStyle = "#000000";
                 canvas.FillRect(0, 0, WindowLocation.Width * Scale.X, WindowLocation.Height * Scale.Y);
 
-                WindowLocation.X = SonicToon.X * WindowLocation.Width / 2;
-                WindowLocation.Y = SonicToon.Y * WindowLocation.Height / 2;
+                WindowLocation.X = SonicToon.X - WindowLocation.Width / 2;
+                WindowLocation.Y = SonicToon.Y - WindowLocation.Height / 2;
 
-                BigWindowLocation.X = SonicToon.X * BigWindowLocation.Width / 2;
-                BigWindowLocation.Y = SonicToon.Y * BigWindowLocation.Height / 2;
+                BigWindowLocation.X = SonicToon.X - BigWindowLocation.Width / 2;
+                BigWindowLocation.Y = SonicToon.Y - BigWindowLocation.Height / 2;
                 if (Background.Truthy()) {
                     int wOffset = WindowLocation.X;
                     int bw = Background.Width / Scale.X;

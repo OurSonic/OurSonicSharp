@@ -51,8 +51,10 @@
     <Compile Include="ObjectManager.cs" />
     <Compile Include="Page.cs" />
     <Compile Include="Ring.cs" />
+    <Compile Include="SensorManager.cs" />
     <Compile Include="Sonic.cs" />
     <Compile Include="SonicBackground.cs" />
+    <Compile Include="SonicConstants.cs" />
     <Compile Include="SonicEngine.cs" />
     <Compile Include="SonicImage.cs" />
     <Compile Include="SonicLevel.cs" />

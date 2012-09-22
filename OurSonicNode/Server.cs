@@ -35,7 +35,7 @@ namespace OurSonicNode
                                                                            socket.Emit("SonicLevel",
                                                                                        new {Data = fileData[curLevel++ % fileData.Length]});
                                                                        });
-                                            socket.On("disconnect", (string data) => { });
+                                            socket.On("disconnect", (string data) => { });          
                                         });
         }
     }

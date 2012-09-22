@@ -210,8 +210,8 @@ OurSonic.Drawing.Tile.prototype = {
 				}
 				return false;
 			}
-			for (var i = 0; i < OurSonic.SonicManager.instance.sonicLevel.get_Animations().length; i++) {
-				var acn = OurSonic.SonicManager.instance.sonicLevel.get_Animations()[i];
+			for (var i = 0; i < OurSonic.SonicManager.instance.sonicLevel.animations.length; i++) {
+				var acn = OurSonic.SonicManager.instance.sonicLevel.animations[i];
 				var anin1 = acn.animationTileIndex;
 				var num = acn.numberOfTiles;
 				if (this.index >= anin1 && this.index < anin1 + num) {
@@ -490,23 +490,11 @@ OurSonic.Drawing.TilePiece = function() {
 	this.yFlip = false;
 	this.animatedFrames = null;
 	this.index = 0;
-	this.$1$Solid1Field = 0;
-	this.$1$Solid2Field = 0;
+	this.solid1 = 0;
+	this.solid2 = 0;
 	this.image = {};
 };
 OurSonic.Drawing.TilePiece.prototype = {
-	get_solid1: function() {
-		return this.$1$Solid1Field;
-	},
-	set_solid1: function(value) {
-		this.$1$Solid1Field = value;
-	},
-	get_solid2: function() {
-		return this.$1$Solid2Field;
-	},
-	set_solid2: function(value) {
-		this.$1$Solid2Field = value;
-	},
 	clearCache: function() {
 		this.image = {};
 	},
@@ -644,47 +632,17 @@ OurSonic.GameState.registerEnum('OurSonic.GameState', false);
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.HeightMask
 OurSonic.HeightMask = function(heightMap) {
-	this.$1$WidthField = 0;
-	this.$1$HeightField = 0;
-	this.$1$ItemsField = null;
-	this.$1$IntegerField = 0;
-	this.$1$IndexField = 0;
-	this.set_items(heightMap);
-	this.set_width(16);
-	this.set_height(16);
-	this.set_integer(-1000);
+	this.width = 0;
+	this.height = 0;
+	this.items = null;
+	this.integer = 0;
+	this.index = 0;
+	this.items = heightMap;
+	this.width = 16;
+	this.height = 16;
+	this.integer = -1000;
 };
 OurSonic.HeightMask.prototype = {
-	get_width: function() {
-		return this.$1$WidthField;
-	},
-	set_width: function(value) {
-		this.$1$WidthField = value;
-	},
-	get_height: function() {
-		return this.$1$HeightField;
-	},
-	set_height: function(value) {
-		this.$1$HeightField = value;
-	},
-	get_items: function() {
-		return this.$1$ItemsField;
-	},
-	set_items: function(value) {
-		this.$1$ItemsField = value;
-	},
-	get_integer: function() {
-		return this.$1$IntegerField;
-	},
-	set_integer: function(value) {
-		this.$1$IntegerField = value;
-	},
-	get_index: function() {
-		return this.$1$IndexField;
-	},
-	set_index: function(value) {
-		this.$1$IndexField = value;
-	},
 	setItem: function(x, y, rotationMode) {
 		var jx = 0;
 		var jy = 0;
@@ -710,7 +668,7 @@ OurSonic.HeightMask.prototype = {
 				break;
 			}
 		}
-		this.get_items()[jx] = 16 - jy;
+		this.items[jx] = 16 - jy;
 	},
 	draw: function(canvas, pos, scale, state, xflip, yflip, solid, angle) {
 		canvas.save();
@@ -723,7 +681,7 @@ OurSonic.HeightMask.prototype = {
 			pos.y = -pos.y - 16 * scale.y;
 			canvas.scale(1, -1);
 		}
-		var fd = OurSonic.SonicManager.instance.spriteCache.heightMaps[this.get_index()];
+		var fd = OurSonic.SonicManager.instance.spriteCache.heightMaps[this.index];
 		if (fd) {
 			if (OurSonic.Help.loaded(fd)) {
 				canvas.drawImage(fd, pos.x, pos.y);
@@ -769,10 +727,10 @@ OurSonic.HeightMask.prototype = {
 		pos.y = oPos.y;
 	},
 	$itemsGood: function(x, y) {
-		if (this.get_items()[x] < 0) {
-			return Math.abs(this.get_items()[x]) >= y;
+		if (this.items[x] < 0) {
+			return Math.abs(this.items[x]) >= y;
 		}
-		return this.get_items()[x] >= 16 - y;
+		return this.items[x] >= 16 - y;
 	}
 };
 OurSonic.HeightMask.op_Implicit$1 = function(d) {
@@ -781,17 +739,17 @@ OurSonic.HeightMask.op_Implicit$1 = function(d) {
 	//16 m's
 };
 OurSonic.HeightMask.op_Implicit = function(d) {
-	if (d.get_integer() !== -1000) {
-		return d.get_integer();
+	if (d.integer !== -1000) {
+		return d.integer;
 	}
-	var good = d.get_items()[0];
-	for (var i = 0; i < d.get_items().length; i++) {
-		if (d.get_items()[i] !== good) {
+	var good = d.items[0];
+	for (var i = 0; i < d.items.length; i++) {
+		if (d.items[i] !== good) {
 			good = -999;
 			break;
 		}
 	}
-	d.set_integer(good);
+	d.integer = good;
 	return good;
 };
 ////////////////////////////////////////////////////////////////////////////////
@@ -915,6 +873,14 @@ OurSonic.Help.defaultCanvas = function(w, h) {
 };
 OurSonic.Help.decodeString = function(lvl) {
 	return (new Compressor()).DecompressText(lvl);
+};
+OurSonic.Help.fixAngle = function(angle) {
+	var fixedAng = ss.Int32.trunc(Math.floor((256 - angle) * 1.4062)) % 360;
+	var flop = 360 - fixedAng;
+	return OurSonic.Help.degToRad(flop);
+};
+OurSonic.Help.degToRad = function(angle) {
+	return angle * Math.PI / 180;
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.IntersectingRectangle
@@ -1119,22 +1085,744 @@ OurSonic.Ring.$ctor = function(active) {
 	return $this;
 };
 ////////////////////////////////////////////////////////////////////////////////
+// OurSonic.Sensor
+OurSonic.Sensor = function(x1, x2, y1, y2, manager, color, ignoreSolid, letter) {
+	this.value = 0;
+	this.angle = 0;
+	this.letter = null;
+	this.chosen = false;
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.SensorManager
+OurSonic.SensorManager = function(instance) {
+	this.sensors = null;
+	this.sensorResults = null;
+	this.sensors = {};
+	this.sensorResults = {};
+};
+OurSonic.SensorManager.prototype = {
+	addSensor: function(letter, sensor) {
+		this.sensors[letter] = sensor;
+		this.sensorResults[letter] = false;
+		return sensor;
+	},
+	createVerticalSensor: function(letter, x, y1, y2, color, ignoreSolid) {
+		return this.addSensor(letter, new OurSonic.Sensor(x, x, y1, y2, this, color, ignoreSolid, letter));
+	},
+	createHorizontalSensor: function(letter, x1, x2, y, color, ignoreSolid) {
+		return this.addSensor(letter, new OurSonic.Sensor(x1, x2, y, y, this, color, ignoreSolid, letter));
+	},
+	check: function(sonic) {
+	},
+	getResult: function(mn) {
+		return null;
+	},
+	draw: function(canvas, scale, sonic) {
+	}
+};
+////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Sonic
 OurSonic.Sonic = function() {
+	this.$myRec = null;
+	this.$runningTick = 0;
+	this.$sensorManager = null;
+	this.$sonicLastHitTick = 0;
+	this.$sonicLevel = null;
+	this.$ticking = 0;
 	this.ticking = false;
 	this.x = 0;
 	this.y = 0;
+	this.rings = 0;
+	this.debugging = false;
+	this.jumping = false;
+	this.crouching = false;
+	this.holdingLeft = false;
+	this.holdingRight = false;
+	this.holdingUp = false;
+	this.xsp = 0;
+	this.ysp = 0;
+	this.gsp = 0;
+	this.rolling = false;
+	this.inAir = false;
+	this.wasInAir = false;
+	this.holdingJump = false;
+	this.justHit = false;
+	this.hLock = 0;
+	this.mode = 0;
+	this.facing = false;
+	this.breaking = 0;
+	this.ducking = false;
+	this.spinDash = false;
+	this.spinDashSpeed = 0;
+	this.angle = 0;
+	this.currentlyBall = false;
+	this.spriteState = null;
+	this.haltSmoke = null;
+	var sonicManager = OurSonic.SonicManager.instance;
+	this.$sonicLevel = sonicManager.sonicLevel;
+	this.x = this.$sonicLevel.startPositions[0].x;
+	this.y = this.$sonicLevel.startPositions[0].y;
+	this.$sensorManager = new OurSonic.SensorManager(OurSonic.SonicManager.instance);
+	this.haltSmoke = [];
+	this.$sensorManager.createVerticalSensor('a', -9, 0, 36, '#F202F2', false);
+	this.$sensorManager.createVerticalSensor('b', 9, 0, 36, '#02C2F2', false);
+	this.$sensorManager.createVerticalSensor('c', -9, 0, -20, '#2D2C21', false);
+	this.$sensorManager.createVerticalSensor('d', 9, 0, -20, '#C24222', false);
+	this.$sensorManager.createHorizontalSensor('m1', 4, 0, -12, '#212C2E', false);
+	this.$sensorManager.createHorizontalSensor('m2', 4, 0, 12, '#22Ffc1', false);
+	this.spriteState = 'normal';
 };
 OurSonic.Sonic.prototype = {
+	updateMode: function() {
+		if (this.angle <= 34 || this.angle >= 222) {
+			this.mode = 134;
+		}
+		else if (this.angle > 34 && this.angle < 86) {
+			this.mode = 44;
+		}
+		else if (this.angle >= 86 && this.angle < 161) {
+			this.mode = 314;
+		}
+		else if (this.angle > 161 && this.angle < 222) {
+			this.mode = 224;
+		}
+		//        this.x = _H.floor(this.x);
+		//        this.y = _H.floor(this.y);
+		this.$myRec = OurSonic.Rectangle.$ctor1(this.x - 5, this.y - 20, 10, 40);
+		if (this.inAir) {
+			this.mode = 134;
+		}
+	},
 	tick: function(sonicLevel, scale) {
+		if (this.debugging) {
+			var debugSpeed = 15;
+			//this.watcher.multiply(15);
+			if (this.holdingRight) {
+				this.x += debugSpeed;
+			}
+			if (this.holdingLeft) {
+				this.x -= debugSpeed;
+			}
+			if (this.crouching) {
+				this.y += debugSpeed;
+			}
+			if (this.holdingUp) {
+				this.y -= debugSpeed;
+			}
+			var offset = OurSonic.Point.$ctor1(0, 0);
+			// this.getOffsetFromImage();
+			this.x = (sonicLevel.levelWidth * 128 + this.x) % (sonicLevel.levelWidth * 128) + offset.x;
+			this.y = (sonicLevel.levelHeight * 128 + this.y) % (sonicLevel.levelHeight * 128) + offset.y;
+			return;
+		}
+		this.updateMode();
+		if (this.hLock > 0) {
+			this.hLock--;
+			this.holdingRight = false;
+			this.holdingLeft = false;
+		}
+		if (this.inAir) {
+			if (this.angle !== 255) {
+				this.angle = (255 + (this.angle + ((this.angle > 127) ? 2 : -2))) % 255;
+				if (this.angle >= 253 || this.angle <= 1) {
+					this.angle = 255;
+				}
+			}
+		}
+		this.$effectPhysics();
+		this.$updateSprite();
+		this.$sensorManager.check(this);
+		var sensorM1 = this.$sensorManager.getResult('m1');
+		var sensorM2 = this.$sensorManager.getResult('m2');
+		var best = this.$getBestSensor(sensorM1, sensorM2, this.mode);
+		if (ss.isValue(best)) {
+			switch (this.mode) {
+				case 134: {
+					this.x = best.value + ((sensorM1.value === sensorM2.value) ? 12 : ((best.letter === 'm1') ? 12 : -12));
+					this.gsp = 0;
+					if (this.inAir) {
+						this.xsp = 0;
+					}
+					break;
+				}
+				case 44: {
+					this.y = best.value + ((sensorM1.value === sensorM2.value) ? 12 : ((best.letter === 'm1') ? 12 : -12));
+					if (this.inAir) {
+						this.xsp = 0;
+					}
+					break;
+				}
+				case 314: {
+					this.x = best.value + ((sensorM1.value === sensorM2.value) ? 12 : ((best.letter === 'm1') ? 12 : -12));
+					this.gsp = 0;
+					if (this.inAir) {
+						this.xsp = 0;
+					}
+					break;
+				}
+				case 224: {
+					this.y = best.value + ((sensorM1.value === sensorM2.value) ? 12 : ((best.letter === 'm1') ? 12 : -12));
+					this.gsp = 0;
+					if (this.inAir) {
+						this.xsp = 0;
+					}
+					break;
+				}
+			}
+		}
+		this.$sensorManager.check(this);
+		var sensorA = this.$sensorManager.getResult('a');
+		var sensorB = this.$sensorManager.getResult('b');
+		var fy;
+		var fx;
+		var hSize = this.$getHalfImageSize();
+		if (!this.inAir) {
+			best = this.$getBestSensor(sensorA, sensorB, this.mode);
+			if (ss.isNullOrUndefined(best)) {
+				this.inAir = true;
+			}
+			else {
+				this.justHit = false;
+				switch (this.mode) {
+					case 134: {
+						best.chosen = true;
+						this.angle = best.angle;
+						this.y = fy = best.value - hSize.y;
+						break;
+					}
+					case 44: {
+						best.chosen = true;
+						this.angle = best.angle;
+						this.x = fx = best.value + hSize.x;
+						break;
+					}
+					case 314: {
+						best.chosen = true;
+						this.angle = best.angle;
+						this.y = fy = best.value + hSize.y;
+						break;
+					}
+					case 224: {
+						best.chosen = true;
+						this.angle = best.angle;
+						this.x = fx = best.value - hSize.x;
+						break;
+					}
+				}
+			}
+			this.updateMode();
+		}
+		else {
+			if (ss.isNullOrUndefined(sensorA) && ss.isNullOrUndefined(sensorB)) {
+				this.inAir = true;
+			}
+			else if (sensorA.value >= 0 && sensorB.value >= 0) {
+				if (sensorA.value < sensorB.value) {
+					if (this.y + 20 >= sensorA.value) {
+						this.angle = sensorA.angle;
+						this.y = fy = sensorA.value - hSize.y;
+						this.rolling = this.currentlyBall = false;
+						this.inAir = false;
+					}
+				}
+				else if (sensorB.value > -1) {
+					if (this.y + 20 >= sensorB.value) {
+						this.angle = sensorB.angle;
+						this.y = fy = sensorB.value - hSize.y;
+						this.rolling = this.currentlyBall = false;
+						this.inAir = false;
+					}
+				}
+			}
+			else if (sensorA.value > -1) {
+				if (this.y + 20 >= sensorA.value) {
+					this.angle = sensorA.angle;
+					this.y = fy = sensorA.value - hSize.y;
+					this.rolling = this.currentlyBall = false;
+					this.inAir = false;
+				}
+			}
+			else if (sensorB.value > -1) {
+				if (this.y + 20 >= sensorB.value) {
+					this.angle = sensorB.angle;
+					this.y = fy = sensorB.value - hSize.y;
+					this.rolling = this.currentlyBall = false;
+					this.inAir = false;
+				}
+			}
+			this.updateMode();
+			var cur = OurSonic.SonicManager.instance.spriteCache.sonicSprites[this.spriteState + scale.x + scale.y];
+			var __h = ss.Int32.div(ss.Int32.div(cur.height, scale.y), 2);
+			this.$sensorManager.check(this);
+			var sensorC = this.$sensorManager.getResult('c');
+			var sensorD = this.$sensorManager.getResult('d');
+			if (ss.isNullOrUndefined(sensorC) && ss.isNullOrUndefined(sensorD)) {
+			}
+			else {
+				if (sensorC.value >= 0 && sensorD.value >= 0) {
+					if (sensorC.value < sensorD.value) {
+						if (this.y + __h >= sensorC.value) {
+							if (this.ysp < 0) {
+								if (sensorC.angle > 72 && sensorC.angle < 88) {
+									this.angle = sensorC.angle;
+									this.gsp = -this.ysp;
+									this.inAir = false;
+									this.wasInAir = false;
+								}
+								else {
+									this.ysp = 0;
+								}
+								this.y = fy = sensorC.value + __h;
+							}
+						}
+					}
+					else if (this.y + __h >= sensorD.value) {
+						if (this.ysp < 0) {
+							if (sensorD.angle > 72 && sensorD.angle < 88) {
+								this.angle = sensorD.angle;
+								this.gsp = -this.ysp;
+								this.inAir = false;
+								this.wasInAir = false;
+							}
+							else {
+								this.ysp = 0;
+							}
+							this.y = fy = sensorD.value + __h;
+						}
+					}
+				}
+				else if (sensorC.value > -1) {
+					if (this.y + __h >= sensorC.value) {
+						if (this.ysp < 0) {
+							if (sensorC.angle > 72 && sensorC.angle < 88) {
+								this.angle = sensorC.angle;
+								this.gsp = -this.ysp;
+								this.inAir = false;
+								this.wasInAir = false;
+							}
+							else {
+								this.ysp = 0;
+							}
+							this.y = fy = sensorC.value + __h;
+						}
+					}
+				}
+				else if (sensorD.value > -1) {
+					if (this.y + __h >= sensorD.value) {
+						if (this.ysp < 0) {
+							if (sensorD.angle > 72 && sensorD.angle < 88) {
+								this.angle = sensorD.angle;
+								this.gsp = -this.ysp;
+								this.inAir = false;
+								this.wasInAir = false;
+							}
+							else {
+								this.ysp = 0;
+							}
+							this.y = fy = sensorD.value + __h;
+						}
+					}
+				}
+				this.updateMode();
+			}
+		}
+	},
+	$getBestSensor: function(sensorA, sensorB, mode) {
+		return null;
+	},
+	invulnerable: function() {
+		var mc = OurSonic.SonicManager.instance.drawTickCount - this.$sonicLastHitTick;
+		if (mc < 120) {
+			if (mc % 8 < 4) {
+				return true;
+			}
+		}
+		return false;
+	},
+	$getHalfImageSize: function() {
+		return OurSonic.Point.$ctor1(20, 20);
+		var scale = OurSonic.SonicManager.instance.scale;
+		var cur = OurSonic.SonicManager.instance.spriteCache.sonicSprites[this.spriteState + scale.x + scale.y];
+		var xSize = 0;
+		var ySize = 0;
+		switch (this.mode) {
+			case 134: {
+				ySize = ss.Int32.div(ss.Int32.div(cur.height, scale.y), 2);
+				break;
+			}
+			case 44: {
+				xSize = ss.Int32.div(ss.Int32.div(cur.width, scale.x), 2);
+				break;
+			}
+			case 314: {
+				ySize = ss.Int32.div(ss.Int32.div(cur.height, scale.y), 2);
+				break;
+			}
+			case 224: {
+				xSize = ss.Int32.div(ss.Int32.div(cur.width, scale.x), 2);
+				break;
+			}
+		}
+		return OurSonic.Point.$ctor1(xSize, ySize);
+	},
+	$getOffsetFromImage: function() {
+		var scale = OurSonic.SonicManager.instance.scale;
+		var cur = OurSonic.SonicManager.instance.spriteCache.sonicSprites[this.spriteState + scale.x + scale.y];
+		var xOffset = 0;
+		var yOffset = 0;
+		if (cur.height !== 40 * scale.x) {
+			var n;
+			switch (this.mode) {
+				case 134: {
+					n = 0;
+					yOffset = ss.Int32.div(40 - ss.Int32.div(cur.height + n, scale.y), 2);
+					break;
+				}
+				case 44: {
+					n = 15;
+					xOffset = ss.Int32.div(-(40 - ss.Int32.div(cur.height + n, scale.x)), 2);
+					break;
+				}
+				case 314: {
+					n = 8;
+					yOffset = ss.Int32.div(-(40 - ss.Int32.div(cur.height + n, scale.y)), 2);
+					break;
+				}
+				case 224: {
+					n = 9;
+					xOffset = ss.Int32.div(40 - ss.Int32.div(cur.height + n, scale.x), 2);
+					break;
+				}
+			}
+		}
+		return OurSonic.Point.$ctor1(xOffset, yOffset);
+	},
+	$updateSprite: function() {
+		var absgsp = Math.abs(this.gsp);
+		var word = this.spriteState.substring(0, this.spriteState.length - 1);
+		var j = parseInt(this.spriteState.substring(this.spriteState.length - 1, this.spriteState.length));
+		if (this.breaking > 0) {
+			if (this.gsp > 0 || this.gsp === 0 || this.spriteState === 'breaking3') {
+				this.facing = false;
+				this.breaking = 0;
+			}
+		}
+		else if (this.breaking < 0) {
+			if (this.gsp < 0 || this.gsp === 0 || this.spriteState === 'breaking3') {
+				this.breaking = 0;
+				this.facing = true;
+			}
+		}
+		var epsilon = 1E-05;
+		if (this.justHit) {
+			if (word !== 'hit') {
+				this.spriteState = 'hit0';
+				this.$runningTick = 1;
+			}
+			else if (this.$runningTick++ % ss.Int32.trunc(Math.floor(8 - absgsp)) === 0) {
+				this.spriteState = 'hit1';
+			}
+		}
+		else if (this.spinDash) {
+			if (word !== 'spindash') {
+				this.spriteState = 'spindash0';
+				this.$runningTick = 1;
+			}
+			else if (this.$runningTick++ % ss.Int32.trunc(Math.floor(2 - absgsp)) === 0) {
+				this.spriteState = 'spindash' + (j + 1) % 6;
+			}
+		}
+		else if (Math.abs(absgsp - 0) < epsilon && this.inAir === false) {
+			if (this.ducking) {
+				if (word !== 'duck') {
+					this.spriteState = 'duck0';
+					this.$runningTick = 1;
+				}
+				else if (this.$runningTick++ % ss.Int32.trunc(Math.floor(4 - absgsp)) === 0) {
+					this.spriteState = 'duck1';
+				}
+			}
+			else if (this.holdingUp) {
+				if (word !== 'lookingup') {
+					this.spriteState = 'lookingup0';
+					this.$runningTick = 1;
+				}
+				else if (this.$runningTick++ % ss.Int32.trunc(Math.floor(4 - absgsp)) === 0) {
+					this.spriteState = 'lookingup1';
+				}
+			}
+			else {
+				this.spriteState = 'normal';
+				this.currentlyBall = false;
+				this.rolling = false;
+				this.$runningTick = 0;
+			}
+		}
+		else if (this.breaking !== 0) {
+			if (word !== 'breaking') {
+				this.spriteState = 'breaking0';
+				this.$runningTick = 1;
+			}
+			else if (this.$runningTick++ % 7 === 0) {
+				this.spriteState = 'breaking' + (j + 1) % 4;
+				if (j === 0) {
+					this.haltSmoke.add(OurSonic.Point.$ctor1(this.x, this.y));
+				}
+			}
+		}
+		else if (this.currentlyBall) {
+			if (word !== 'balls') {
+				this.spriteState = 'balls0';
+				this.$runningTick = 1;
+			}
+			else if (this.$runningTick++ % ss.Int32.trunc(Math.floor(8 - absgsp)) === 0 || 8 - absgsp < 1) {
+				this.spriteState = 'balls' + (j + 1) % 5;
+			}
+		}
+		else if (absgsp < 6) {
+			if (word !== 'running') {
+				this.spriteState = 'running0';
+				this.$runningTick = 1;
+			}
+			else if (this.$runningTick++ % ss.Int32.trunc(Math.floor(8 - absgsp)) === 0 || 8 - absgsp < 1) {
+				this.spriteState = 'running' + (j + 1) % 8;
+			}
+		}
+		else if (absgsp >= 6) {
+			if (word !== 'fastrunning') {
+				this.spriteState = 'fastrunning0';
+				this.$runningTick = 1;
+			}
+			else if (this.$runningTick++ % ss.Int32.trunc(Math.floor(8 - absgsp)) === 0 || 8 - absgsp < 1) {
+				this.spriteState = 'fastrunning' + (j + 1) % 4;
+			}
+		}
+	},
+	$effectPhysics: function() {
 	},
 	draw: function(canvas, scale) {
+		var fx = this.x;
+		var fy = this.y;
+		if (this.invulnerable()) {
+			return;
+		}
+		var cur = OurSonic.SonicManager.instance.spriteCache.sonicSprites[this.spriteState + scale.x + scale.y];
+		if (ss.isNullOrUndefined(cur)) {
+		}
+		if (OurSonic.Help.loaded(cur)) {
+			canvas.save();
+			var offset = this.$getOffsetFromImage();
+			canvas.translate((fx - OurSonic.SonicManager.instance.windowLocation.x + offset.x) * scale.x, (fy - OurSonic.SonicManager.instance.windowLocation.y + offset.y) * scale.y);
+			if (true || OurSonic.SonicManager.instance.showHeightMap) {
+				canvas.save();
+				var mul = 6;
+				var xj = this.xsp * scale.x * mul;
+				var yj = this.ysp * scale.y * mul;
+				canvas.beginPath();
+				canvas.moveTo(0, 0);
+				canvas.lineTo(xj, yj);
+				canvas.fillStyle = 'rgba(163,241,255,0.8)';
+				canvas.arc(xj, yj, 5, 0, 2 * Math.PI, true);
+				canvas.closePath();
+				canvas.lineWidth = 6;
+				canvas.strokeStyle = 'white';
+				//6C6CFC
+				canvas.stroke();
+				canvas.lineWidth = 3;
+				canvas.strokeStyle = '#2448D8';
+				//6C6CFC
+				canvas.fill();
+				canvas.stroke();
+				canvas.restore();
+			}
+			if (!this.facing) {
+				//canvas.translate(cur.width, 0);
+				canvas.scale(-1, 1);
+				if (!this.currentlyBall && !this.spinDash) {
+					canvas.rotate(-OurSonic.Help.fixAngle(this.angle));
+				}
+				canvas.drawImage(cur, ss.Int32.div(-cur.width, 2), ss.Int32.div(-cur.height, 2));
+				if (this.spinDash) {
+					canvas.drawImage(OurSonic.SonicManager.instance.spriteCache.sonicSprites['spinsmoke' + ss.Int32.div(OurSonic.SonicManager.instance.drawTickCount % 14, 2) + scale.x + scale.y], ss.Int32.div(-cur.width, 2) - 25 * scale.x, ss.Int32.div(-cur.height, 2) + offset.y * scale.y - 14, cur.width, cur.height);
+				}
+			}
+			else {
+				if (!this.currentlyBall && !this.spinDash) {
+					canvas.rotate(OurSonic.Help.fixAngle(this.angle));
+				}
+				canvas.drawImage(cur, ss.Int32.div(-cur.width, 2), ss.Int32.div(-cur.height, 2));
+				if (this.spinDash) {
+					canvas.drawImage(OurSonic.SonicManager.instance.spriteCache.sonicSprites['spinsmoke' + ss.Int32.div(OurSonic.SonicManager.instance.drawTickCount % 14, 2) + scale.x + scale.y], ss.Int32.div(-cur.width, 2) - 25 * scale.x, ss.Int32.div(-cur.height, 2) + offset.y * scale.y - 14, cur.width, cur.height);
+				}
+			}
+			//
+			//               canvas.moveTo(-10 * scale.x, 4 * scale.y);
+			//
+			//               canvas.lineTo(10 * scale.x, 4 * scale.y);
+			//
+			//               canvas.lineWidth = 3;
+			//
+			//               canvas.strokeStyle = "#FFF";
+			//
+			//               canvas.stroke();
+			//
+			//               
+			//
+			//               canvas.moveTo(-9 * scale.x, 0 * scale.y);
+			//
+			//               canvas.lineTo(-9 * scale.x, 20 * scale.y);
+			//
+			//               canvas.lineWidth = 3;
+			//
+			//               canvas.strokeStyle = "#FFF";
+			//
+			//               canvas.stroke();
+			//
+			//               
+			//
+			//               canvas.moveTo(9 * scale.x, 0 * scale.y);
+			//
+			//               canvas.lineTo(9 * scale.x, 20 * scale.y);
+			//
+			//               canvas.lineWidth = 3;
+			//
+			//               canvas.strokeStyle = "#FFF";
+			//
+			//               canvas.stroke();
+			//
+			//                canvas.strokeStyle = "#FFF";
+			//
+			//                canvas.lineWidth = 4;
+			//
+			//                canvas.strokeRect(-cur.width / 2, -cur.height / 2, cur.width, cur.height);
+			canvas.restore();
+			if (OurSonic.SonicManager.instance.showHeightMap) {
+				this.$sensorManager.draw(canvas, scale, this);
+			}
+			for (var i = 0; i < this.haltSmoke.length; i++) {
+				var lo = this.haltSmoke[i];
+				canvas.drawImage(OurSonic.SonicManager.instance.spriteCache.sonicSprites['haltsmoke' + ss.Int32.div(OurSonic.SonicManager.instance.drawTickCount % 24, 6) + scale.x + scale.y], (lo.x - OurSonic.SonicManager.instance.windowLocation.x - 25) * scale.x, (lo.y + 12 - OurSonic.SonicManager.instance.windowLocation.y + offset.y) * scale.y);
+				if (ss.Int32.div((OurSonic.SonicManager.instance.drawTickCount + 6) % 24, 6) === 0) {
+					this.haltSmoke.extract(i, 1);
+				}
+			}
+		}
 	},
-	drawUI: function(canvas, point, scale) {
+	drawUI: function(canvas, pos, scale) {
+		if (canvas.font !== '13pt Arial bold') {
+			canvas.font = '13pt Arial bold';
+		}
+		canvas.fillStyle = 'White';
+		canvas.fillText('Rings: ' + this.rings, pos.x + 90, pos.y + 45);
+		canvas.fillText('Angle: ' + this.angle.toString(16), pos.x + 90, pos.y + 75);
+		canvas.fillText('Position: ' + this.x + ', ' + this.y, pos.x + 90, pos.y + 105);
+		canvas.fillText('Speed: g: ' + this.gsp.toFixed(3) + ' x:' + this.xsp.toFixed(3) + ' y:' + this.ysp.toFixed(3), pos.x + 90, pos.y + 135);
+		canvas.fillText('Mode: ' + this.mode.toString(), pos.x + 90, pos.y + 165);
+		if (this.inAir) {
+			canvas.fillText('Air ', pos.x + 220, pos.y + 45);
+		}
+		if (this.hLock > 0) {
+			canvas.fillText('HLock: ' + this.hLock, pos.x + 90, pos.y + 195);
+		}
 	},
 	hit: function(x, y) {
+		//
+		//        if (sonicManager.drawTickCount - this.sonicLastHitTick < 120)
+		//
+		//        return;
+		//
+		//        this.justHit = true;
+		//
+		//        this.ysp = -4;
+		//
+		//        this.xsp = 2 * ((this.x - _x) < 0 ? -1 : 1);
+		//
+		//        this.sonicLastHitTick = sonicManager.drawTickCount;
+		//
+		//        var t = 0;
+		//
+		//        var angle = 101.25;
+		//
+		//        var n = false;
+		//
+		//        var speed = 4;
+		//
+		//        while (t < this.rings) {
+		//
+		//        var ring = new Ring(true);
+		//
+		//        sonicManager.activeRings.push(ring);
+		//
+		//        ring.x = this.x;
+		//
+		//        ring.y = this.y - 10;
+		//
+		//        ring.ysp = -Math.sin(angle) * speed;
+		//
+		//        ring.xsp = Math.cos(angle) * speed;
+		//
+		//        
+		//
+		//        if (n) {
+		//
+		//        ring.ysp *= -1;
+		//
+		//        angle += 22.5;
+		//
+		//        }
+		//
+		//        n = !n;
+		//
+		//        t++;
+		//
+		//        if (t == 16) {
+		//
+		//        speed = 2;
+		//
+		//        angle = 101.25;
+		//
+		//        }
+		//
+		//        }
+		//
+		//        this.rings = 0;
 	},
 	debug: function() {
+		this.debugging = !this.debugging;
+		this.xsp = 0;
+		this.gsp = 0;
+		this.ysp = 0;
+		this.spriteState = 'normal';
+	},
+	pressUp: function() {
+		this.holdingUp = true;
+	},
+	releaseUp: function() {
+		this.holdingUp = false;
+	},
+	pressCrouch: function() {
+		this.crouching = true;
+	},
+	releaseCrouch: function() {
+		this.crouching = false;
+	},
+	pressLeft: function() {
+		this.holdingLeft = true;
+	},
+	releaseLeft: function() {
+		this.holdingLeft = false;
+	},
+	pressRight: function() {
+		this.holdingRight = true;
+	},
+	releaseRight: function() {
+		this.holdingRight = false;
+	},
+	pressJump: function() {
+		this.jumping = true;
+	},
+	releaseJump: function() {
+		this.jumping = false;
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
@@ -1146,6 +1834,37 @@ OurSonic.SonicBackground = function() {
 OurSonic.SonicBackground.prototype = {
 	draw: function(canvas, point, scale, wOffset) {
 	}
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.SonicConstants
+OurSonic.SonicConstants = function() {
+	this.acc = 0;
+	this.air = 0;
+	this.dec = 0;
+	this.frc = 0;
+	this.grv = 0;
+	this.jmp = 0;
+	this.rdec = 0;
+	this.rfrc = 0;
+	this.slpRollingDown = 0;
+	this.slpRollingUp = 0;
+	this.topSpeed = 0;
+};
+OurSonic.SonicConstants.sonic = function() {
+	var $t1 = new OurSonic.SonicConstants();
+	$t1.acc = 0.046875;
+	$t1.dec = 0.5;
+	$t1.frc = 0.46875;
+	$t1.rdec = 0.125;
+	$t1.rfrc = 0.0234375;
+	$t1.slpRollingUp = 0.078125;
+	$t1.slpRollingDown = 0.3125;
+	$t1.jmp = -6.5;
+	$t1.grv = 0.21875;
+	$t1.air = 0.09375;
+	$t1.topSpeed = 6;
+	var sc = $t1;
+	return sc;
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.SonicEngine
@@ -1183,32 +1902,8 @@ OurSonic.SonicEngine = function() {
 			this.$sonicManager.uiManager.onKeyDown(e1);
 		}
 	}));
-	$(document).keydown(Function.mkdel(this, function(a) {
-		var keycode = ss.Nullable.unbox(Type.cast(a.keyCode, ss.Int32));
-		var sca = 2;
-		if (keycode === 37) {
-			this.$sonicManager.windowLocation.x -= ss.Int32.div(128, sca);
-			this.$sonicManager.bigWindowLocation.x = this.$sonicManager.windowLocation.x;
-		}
-		else if (keycode === 38) {
-			this.$sonicManager.windowLocation.y -= ss.Int32.div(128, sca);
-			this.$sonicManager.bigWindowLocation.y = this.$sonicManager.windowLocation.y;
-		}
-		else if (keycode === 39) {
-			this.$sonicManager.windowLocation.x += ss.Int32.div(128, sca);
-			this.$sonicManager.bigWindowLocation.x = this.$sonicManager.windowLocation.x;
-		}
-		else if (keycode === 40) {
-			this.$sonicManager.windowLocation.y += ss.Int32.div(128, sca);
-			this.$sonicManager.bigWindowLocation.y = this.$sonicManager.windowLocation.y;
-		}
-	}));
 	KeyboardJS.bind.key('f', Function.mkdel(this, function() {
 		this.$sonicManager.showHeightMap = !this.$sonicManager.showHeightMap;
-	}), function() {
-	});
-	KeyboardJS.bind.key('q', Function.mkdel(this, function() {
-		this.$sonicManager.currentGameState = ((this.$sonicManager.currentGameState === 0) ? 1 : 0);
 	}), function() {
 	});
 	KeyboardJS.bind.key('o', Function.mkdel(this, function() {
@@ -1255,6 +1950,23 @@ OurSonic.SonicEngine = function() {
 		}
 	}), function() {
 	});
+	KeyboardJS.bind.key('q', Function.mkdel(this, function() {
+		switch (this.$sonicManager.currentGameState) {
+			case 0: {
+				this.$sonicManager.currentGameState = 1;
+				this.$sonicManager.windowLocation = OurSonic.Constants.defaultWindowLocation(this.$sonicManager.currentGameState, this.$gameCanvas, this.$sonicManager.scale);
+				this.$sonicManager.sonicToon = null;
+				break;
+			}
+			case 1: {
+				this.$sonicManager.currentGameState = 0;
+				this.$sonicManager.windowLocation = OurSonic.Constants.defaultWindowLocation(this.$sonicManager.currentGameState, this.$gameCanvas, this.$sonicManager.scale);
+				this.$sonicManager.sonicToon = new OurSonic.Sonic();
+				break;
+			}
+		}
+	}), function() {
+	});
 	KeyboardJS.bind.key('p', Function.mkdel(this, function() {
 		if (this.$sonicManager.currentGameState === 0) {
 			if (this.$sonicManager.inHaltMode) {
@@ -1275,6 +1987,119 @@ OurSonic.SonicEngine = function() {
 		}
 	}), function() {
 	});
+	KeyboardJS.bind.key('up', Function.mkdel(this, function() {
+		switch (this.$sonicManager.currentGameState) {
+			case 0: {
+				this.$sonicManager.sonicToon.pressUp();
+				break;
+			}
+			case 1: {
+				this.$sonicManager.windowLocation.y -= 128;
+				this.$sonicManager.bigWindowLocation.y = this.$sonicManager.windowLocation.y;
+				break;
+			}
+		}
+	}), Function.mkdel(this, function() {
+		switch (this.$sonicManager.currentGameState) {
+			case 0: {
+				this.$sonicManager.sonicToon.releaseUp();
+				break;
+			}
+			case 1: {
+				break;
+			}
+		}
+	}));
+	KeyboardJS.bind.key('down', Function.mkdel(this, function() {
+		switch (this.$sonicManager.currentGameState) {
+			case 0: {
+				this.$sonicManager.sonicToon.pressCrouch();
+				break;
+			}
+			case 1: {
+				this.$sonicManager.windowLocation.y += 128;
+				this.$sonicManager.bigWindowLocation.y = this.$sonicManager.windowLocation.y;
+				break;
+			}
+		}
+	}), Function.mkdel(this, function() {
+		switch (this.$sonicManager.currentGameState) {
+			case 0: {
+				this.$sonicManager.sonicToon.releaseCrouch();
+				break;
+			}
+			case 1: {
+				break;
+			}
+		}
+	}));
+	KeyboardJS.bind.key('left', Function.mkdel(this, function() {
+		switch (this.$sonicManager.currentGameState) {
+			case 0: {
+				this.$sonicManager.sonicToon.pressLeft();
+				break;
+			}
+			case 1: {
+				this.$sonicManager.windowLocation.x -= 128;
+				this.$sonicManager.bigWindowLocation.x = this.$sonicManager.windowLocation.x;
+				break;
+			}
+		}
+	}), Function.mkdel(this, function() {
+		switch (this.$sonicManager.currentGameState) {
+			case 0: {
+				this.$sonicManager.sonicToon.releaseLeft();
+				break;
+			}
+			case 1: {
+				break;
+			}
+		}
+	}));
+	KeyboardJS.bind.key('right', Function.mkdel(this, function() {
+		switch (this.$sonicManager.currentGameState) {
+			case 0: {
+				this.$sonicManager.sonicToon.pressRight();
+				break;
+			}
+			case 1: {
+				this.$sonicManager.windowLocation.x += 128;
+				this.$sonicManager.bigWindowLocation.x = this.$sonicManager.windowLocation.x;
+				break;
+			}
+		}
+	}), Function.mkdel(this, function() {
+		switch (this.$sonicManager.currentGameState) {
+			case 0: {
+				this.$sonicManager.sonicToon.releaseRight();
+				break;
+			}
+			case 1: {
+				break;
+			}
+		}
+	}));
+	KeyboardJS.bind.key('right', Function.mkdel(this, function() {
+		switch (this.$sonicManager.currentGameState) {
+			case 0: {
+				this.$sonicManager.sonicToon.pressJump();
+				break;
+			}
+			case 1: {
+				break;
+			}
+		}
+	}), Function.mkdel(this, function() {
+		switch (this.$sonicManager.currentGameState) {
+			case 0: {
+				this.$sonicManager.sonicToon.releaseJump();
+				break;
+			}
+			case 1: {
+				break;
+			}
+		}
+	}));
 	KeyboardJS.bind.key('e', Function.mkdel(this, function() {
 		this.$sonicManager.sonicLevel.curHeightMap = !this.$sonicManager.sonicLevel.curHeightMap;
 	}), function() {
@@ -1288,6 +2113,7 @@ OurSonic.SonicEngine = function() {
 	}));
 	this.$sonicManager = new OurSonic.SonicManager(this, this.$gameCanvas, Function.mkdel(this, this.resizeCanvas));
 	this.$sonicManager.indexedPalette = 0;
+	window.setInterval(Function.mkdel(this.$sonicManager, this.$sonicManager.tick), 16);
 	window.setInterval(Function.mkdel(this, this.gameDraw), 16);
 	window.setInterval(Function.mkdel(this, this.uiDraw), 50);
 	this.resizeCanvas();
@@ -1384,7 +2210,7 @@ OurSonic.SonicImage = function() {
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.SonicLevel
 OurSonic.SonicLevel = function() {
-	this.$1$AnimationsField = null;
+	this.animations = null;
 	this.animatedFiles = null;
 	this.chunkMap = null;
 	this.activeRings = null;
@@ -1415,14 +2241,6 @@ OurSonic.SonicLevel = function() {
 	this.curHeightMap = true;
 	this.levelWidth = 0;
 	this.levelHeight = 0;
-};
-OurSonic.SonicLevel.prototype = {
-	get_Animations: function() {
-		return this.$1$AnimationsField;
-	},
-	set_Animations: function(value) {
-		this.$1$AnimationsField = value;
-	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.SonicManager
@@ -1462,6 +2280,7 @@ OurSonic.SonicManager = function(engine, gameCanvas, resize) {
 	this.spriteLoader = null;
 	OurSonic.SonicManager.instance = this;
 	//            SonicToon = new Sonic();
+	this.clickState = 2;
 	this.$myEngine = engine;
 	this.$myEngine.canvasWidth = $(window).width();
 	this.$myEngine.canvasHeight = $(window).height();
@@ -1535,6 +2354,11 @@ OurSonic.SonicManager.prototype = {
 				case 2: {
 					ex = e.x;
 					ey = e.y;
+					var $t2 = this.sonicLevel.rings;
+					var $t1 = OurSonic.Ring.$ctor(true);
+					$t1.x = ex;
+					$t1.y = ey;
+					$t2.add($t1);
 					return true;
 				}
 				case 3: {
@@ -1741,10 +2565,10 @@ OurSonic.SonicManager.prototype = {
 			canvas.translate(this.screenOffset.x, this.screenOffset.y);
 			canvas.fillStyle = '#000000';
 			canvas.fillRect(0, 0, this.windowLocation.width * this.scale.x, this.windowLocation.height * this.scale.y);
-			this.windowLocation.x = ss.Int32.div(this.sonicToon.x * this.windowLocation.width, 2);
-			this.windowLocation.y = ss.Int32.div(this.sonicToon.y * this.windowLocation.height, 2);
-			this.bigWindowLocation.x = ss.Int32.div(this.sonicToon.x * this.bigWindowLocation.width, 2);
-			this.bigWindowLocation.y = ss.Int32.div(this.sonicToon.y * this.bigWindowLocation.height, 2);
+			this.windowLocation.x = this.sonicToon.x - ss.Int32.div(this.windowLocation.width, 2);
+			this.windowLocation.y = this.sonicToon.y - ss.Int32.div(this.windowLocation.height, 2);
+			this.bigWindowLocation.x = this.sonicToon.x - ss.Int32.div(this.bigWindowLocation.width, 2);
+			this.bigWindowLocation.y = this.sonicToon.y - ss.Int32.div(this.bigWindowLocation.height, 2);
 			if (this.background) {
 				var wOffset = this.windowLocation.x;
 				var bw = ss.Int32.div(this.background.width, this.scale.x);
@@ -1909,7 +2733,7 @@ OurSonic.SonicManager.prototype = {
 							for (var _y = 0; _y < 8; _y++) {
 								for (var _x = 0; _x < 8; _x++) {
 									var tp = md.tilePieces[_x][_y];
-									var solid = (this.sonicLevel.curHeightMap ? tp.get_solid1() : tp.get_solid2());
+									var solid = (this.sonicLevel.curHeightMap ? tp.solid1 : tp.solid2);
 									var hd = this.sonicLevel.heightMaps[(this.sonicLevel.curHeightMap ? this.sonicLevel.collisionIndexes1[tp.block] : this.sonicLevel.collisionIndexes2[tp.block])];
 									var __x = _x;
 									var __y = _y;
@@ -2003,8 +2827,8 @@ OurSonic.SonicManager.prototype = {
 		}
 	},
 	$containsAnimatedTile: function(tile, sonLevel) {
-		for (var i = 0; i < sonLevel.get_Animations().length; i++) {
-			var an = sonLevel.get_Animations()[i];
+		for (var i = 0; i < sonLevel.animations.length; i++) {
+			var an = sonLevel.animations[i];
 			var anin = an.animationTileIndex;
 			var num = an.numberOfTiles;
 			if (tile >= anin && tile < anin + num) {
@@ -2225,7 +3049,7 @@ OurSonic.SonicManager.prototype = {
 			this.sonicLevel.blocks[j2] = mj1;
 		}
 		this.sonicLevel.angles = sonicLevel.Angles;
-		this.sonicLevel.set_Animations(sonicLevel.Animations.map(function(a) {
+		this.sonicLevel.animations = sonicLevel.Animations.map(function(a) {
 			var $t3 = new OurSonic.Animation();
 			$t3.animationFile = a.AnimationFile;
 			$t3.animationTileIndex = a.AnimationTileIndex;
@@ -2238,7 +3062,7 @@ OurSonic.SonicManager.prototype = {
 				return $t4;
 			}).slice(0), Array);
 			return $t3;
-		}).clone());
+		}).clone();
 		this.sonicLevel.collisionIndexes1 = sonicLevel.CollisionIndexes1;
 		this.sonicLevel.collisionIndexes2 = sonicLevel.CollisionIndexes2;
 		this.sonicLevel.heightMaps = [];
@@ -2278,8 +3102,8 @@ OurSonic.SonicManager.prototype = {
 				var $t5 = new OurSonic.Drawing.TilePiece();
 				$t5.index = p1;
 				$t5.block = fc2[p1].Block;
-				$t5.set_solid1(fc2[p1].Solid1);
-				$t5.set_solid2(fc2[p1].Solid2);
+				$t5.solid1 = fc2[p1].Solid1;
+				$t5.solid2 = fc2[p1].Solid2;
 				$t5.xFlip = fc2[p1].XFlip;
 				$t5.yFlip = fc2[p1].YFlip;
 				$t6[$t7] = $t5;
@@ -2307,6 +3131,9 @@ OurSonic.SonicManager.prototype = {
 			}
 		}
 		this.sonicLevel.palette = sonicLevel.Palette;
+		this.sonicLevel.startPositions = sonicLevel.StartPositions.map(function(a1) {
+			return OurSonic.Point.$ctor1(a1.X, a1.Y);
+		});
 		this.sonicLevel.paletteItems = [];
 		if (sonicLevel.PaletteItems[0]) {
 			this.sonicLevel.paletteItems[0] = [];
@@ -2317,11 +3144,11 @@ OurSonic.SonicManager.prototype = {
 				$t8.palette = Type.cast(eval(pal.Palette), Array);
 				$t8.skipIndex = pal.SkipIndex;
 				$t8.totalLength = pal.TotalLength;
-				$t8.pieces = pal.Pieces.map(function(a1) {
+				$t8.pieces = pal.Pieces.map(function(a2) {
 					var $t9 = new OurSonic.PaletteItemPieces();
-					$t9.paletteIndex = a1.PaletteIndex;
-					$t9.paletteMultiply = a1.PaletteMultiply;
-					$t9.paletteOffset = a1.PaletteOffset;
+					$t9.paletteIndex = a2.PaletteIndex;
+					$t9.paletteMultiply = a2.PaletteMultiply;
+					$t9.paletteOffset = a2.PaletteOffset;
 					return $t9;
 				});
 				$t10[k] = $t8;
@@ -2531,7 +3358,7 @@ OurSonic.SpriteCache = function() {
 	this.tileChunks = [];
 	this.tilepieces = {};
 	this.tiles = [];
-	this.sonicSprites = [];
+	this.sonicSprites = {};
 	this.heightMaps = [];
 	this.heightMapChunks = {};
 	this.indexes = new OurSonic.SpriteCacheIndexes();
@@ -2699,8 +3526,11 @@ OurSonic.PaletteItemPieces.registerClass('OurSonic.PaletteItemPieces', Object);
 OurSonic.Point.registerClass('OurSonic.Point', Object);
 OurSonic.Rectangle.registerClass('OurSonic.Rectangle');
 OurSonic.Ring.registerClass('OurSonic.Ring');
+OurSonic.Sensor.registerClass('OurSonic.Sensor', Object);
+OurSonic.SensorManager.registerClass('OurSonic.SensorManager', Object);
 OurSonic.Sonic.registerClass('OurSonic.Sonic', Object);
 OurSonic.SonicBackground.registerClass('OurSonic.SonicBackground', Object);
+OurSonic.SonicConstants.registerClass('OurSonic.SonicConstants', Object);
 OurSonic.SonicEngine.registerClass('OurSonic.SonicEngine', Object);
 OurSonic.SonicImage.registerClass('OurSonic.SonicImage', Object);
 OurSonic.SonicLevel.registerClass('OurSonic.SonicLevel', Object);

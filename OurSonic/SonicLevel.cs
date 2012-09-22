@@ -5,7 +5,7 @@ namespace OurSonic
 {
     public class SonicLevel
     {
-        [PreserveCase]
+        [IntrinsicProperty]
         public List<Animation> Animations { get; set; }
         [IntrinsicProperty]
         public Tile[][] AnimatedFiles { get; set; }

@@ -266,6 +266,7 @@ namespace OurSonic
                 }
             }
             SonicLevel.Palette = sonicLevel.Palette;
+            SonicLevel.StartPositions = Script.Reinterpret<Point[]>(sonicLevel.StartPositions.Map(a => new Point(a.X, a.Y)));
 
             SonicLevel.PaletteItems = new List<List<PaletteItem>>();
             if (sonicLevel.PaletteItems[0].Truthy()) {

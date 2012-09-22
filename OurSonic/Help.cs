@@ -210,5 +210,17 @@ namespace OurSonic
         {
             return o == null;
         }
+
+        public static double FixAngle(int angle)
+        {
+            var fixedAng = (int) Math.Floor(( 256 - angle ) * 1.4062) % 360;
+            var flop = 360 - fixedAng;
+            return DegToRad(flop);
+        }
+
+        public static double DegToRad(int angle)
+        {
+            return angle * Math.PI / 180;
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace OurSonic
         [IntrinsicProperty]
         public List<ImageElement> Tiles { get; set; }
         [IntrinsicProperty]
-        public List<ImageElement> SonicSprites { get; set; }
+        public JsDictionary<string, ImageElement> SonicSprites { get; set; }
         [IntrinsicProperty]
         public JsDictionary<string, CanvasInformation> HeightMapChunks { get; set; }
         [IntrinsicProperty]
@@ -29,7 +29,7 @@ namespace OurSonic
             TileChunks = new List<ImageElement>();
             Tilepieces = new JsDictionary<string, CanvasInformation>();
             Tiles = new List<ImageElement>();
-            SonicSprites = new List<ImageElement>();
+            SonicSprites = new JsDictionary<string, ImageElement>();
             HeightMaps = new List<ImageElement>();
             HeightMapChunks = new JsDictionary<string, CanvasInformation>();
             Indexes = new SpriteCacheIndexes();

@@ -25,7 +25,9 @@ namespace OurSonic.Drawing
         public int[] AnimatedFrames { get; set; }
         [IntrinsicProperty]
         public int Index { get; set; }
+        [IntrinsicProperty]
         public Solidity Solid1 { get; set; }
+        [IntrinsicProperty]
         public Solidity Solid2 { get; set; }
 
         public TilePiece()

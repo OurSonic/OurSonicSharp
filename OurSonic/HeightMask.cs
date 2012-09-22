@@ -1,15 +1,21 @@
 using System;
 using System.Html.Media.Graphics;
+using System.Runtime.CompilerServices;
 using OurSonic.Drawing;
 namespace OurSonic
 {
     public class HeightMask
     {
         public static string[] colors = new[] {"", "rgba(255,98,235,0.6)", "rgba(24,218,235,0.6)", "rgba(24,98,235,0.6)"};
+        [IntrinsicProperty]
         protected int Width { get; set; }
+        [IntrinsicProperty]
         protected int Height { get; set; }
+        [IntrinsicProperty]
         protected int[] Items { get; set; }
+        [IntrinsicProperty]
         protected int Integer { get; set; }
+        [IntrinsicProperty]
         protected int Index { get; set; }
 
         public HeightMask(int[] heightMap)
