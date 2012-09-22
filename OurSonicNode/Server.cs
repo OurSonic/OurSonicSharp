@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NodeJSLibrary;
 using SocketIONodeLibrary;
 namespace OurSonicNode
@@ -9,6 +10,11 @@ namespace OurSonicNode
 
         public Server()
         {
+
+            Global.SetInterval(() => { Global.Console.Log("keep alive " + new DateTime().ToString().Substring(17, 24)); }, 10 * 1000);
+
+
+             
             levelData = new JsDictionary<int, string>();
             //load();
             var http = Global.Require<Http>("http");

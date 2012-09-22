@@ -36,6 +36,9 @@ OurSonicNode.Compress = function() {
 // OurSonicNode.Server
 OurSonicNode.Server = function() {
 	this.$levelData = null;
+	setInterval(function() {
+		console.log('keep alive ' + (new Date()).toString().substring(17, 24));
+	}, 10000);
 	this.$levelData = {};
 	//load();
 	var http = require('http');

@@ -172,6 +172,9 @@ OurSonic.Drawing.Tile.prototype = {
 		for (var i = 0; i < this.colors.length; i++) {
 			for (var jf = 0; jf < this.colors[i].length; jf++) {
 				var gj = this.colors[i][jf];
+				if (gj === 0) {
+					continue;
+				}
 				var m = palette_[(palette + indexed) % palette_.length][gj];
 				if (!ss.referenceEquals(j.context.fillStyle, '#' + m)) {
 					j.context.fillStyle = '#' + m;
@@ -305,11 +308,39 @@ OurSonic.Drawing.TileChunk = function() {
 	this.tilePieces = null;
 	this.animated = null;
 	this.index = 0;
+	this.$1$HeightBlocks1Field = null;
+	this.$1$HeightBlocks2Field = null;
+	this.$1$AngleMap1Field = null;
+	this.$1$AngleMap2Field = null;
 	this.hLayers = [];
 	this.sprites = [];
 	this.isOnlyBackground = null;
 };
 OurSonic.Drawing.TileChunk.prototype = {
+	get_heightBlocks1: function() {
+		return this.$1$HeightBlocks1Field;
+	},
+	set_heightBlocks1: function(value) {
+		this.$1$HeightBlocks1Field = value;
+	},
+	get_heightBlocks2: function() {
+		return this.$1$HeightBlocks2Field;
+	},
+	set_heightBlocks2: function(value) {
+		this.$1$HeightBlocks2Field = value;
+	},
+	get_angleMap1: function() {
+		return this.$1$AngleMap1Field;
+	},
+	set_angleMap1: function(value) {
+		this.$1$AngleMap1Field = value;
+	},
+	get_angleMap2: function() {
+		return this.$1$AngleMap2Field;
+	},
+	set_angleMap2: function(value) {
+		this.$1$AngleMap2Field = value;
+	},
 	getBlock: function(x, y) {
 		return OurSonic.SonicManager.instance.sonicLevel.blocks[this.tilePieces[ss.Int32.div(x, 16)][ss.Int32.div(y, 16)].block];
 	},
@@ -592,7 +623,7 @@ OurSonic.Drawing.TilePiece.prototype = {
 		return true;
 	},
 	$setCache: function(layer, scale, drawOrder, animationFrame, palAn, image) {
-		var val = (drawOrder + 1 + scale.x * 10 + animationFrame * 1000 + (layer + 1) * 10000).toString();
+		var val = drawOrder + 1 + scale.x * 10 + animationFrame * 1000 + (layer + 1) * 10000;
 		if (!!this.animatedFrames) {
 			for (var index = 0; index < this.animatedFrames.length; index++) {
 				var animatedFrame = this.animatedFrames[index];
@@ -605,17 +636,17 @@ OurSonic.Drawing.TilePiece.prototype = {
 		canvas.drawImage(fd, position.x, position.y);
 	},
 	$getCache: function(layer, scale, drawOrder, animationFrame, palAn) {
-		var val = (drawOrder + 1 + scale.x * 10 + animationFrame * 1000 + (layer + 1) * 10000).toString();
+		var val = drawOrder + 1 + scale.x * 10 + animationFrame * 1000 + (layer + 1) * 10000;
 		if (this.animatedFrames) {
 			for (var $t1 = 0; $t1 < this.animatedFrames.length; $t1++) {
 				var animatedFrame = this.animatedFrames[$t1];
 				val += palAn[animatedFrame] + ' ';
 			}
 		}
-		if (!this.image[val]) {
+		if (!!this.image[val].Falsey()) {
 			return null;
 		}
-		return this.image[val];
+		return Type.cast(this.image[val], Element);
 	}
 };
 Type.registerNamespace('OurSonic');
@@ -692,7 +723,7 @@ OurSonic.HeightMask.prototype = {
 				for (var y = 0; y < 16; y++) {
 					var jx = 0;
 					var jy = 0;
-					if (this.$itemsGood(x, y)) {
+					if (OurSonic.HeightMask.itemsGood(this.items, x, y)) {
 						jx = x;
 						jy = y;
 						var _x = pos.x + jx * scale.x;
@@ -725,12 +756,6 @@ OurSonic.HeightMask.prototype = {
 		canvas.restore();
 		pos.x = oPos.x;
 		pos.y = oPos.y;
-	},
-	$itemsGood: function(x, y) {
-		if (this.items[x] < 0) {
-			return Math.abs(this.items[x]) >= y;
-		}
-		return this.items[x] >= 16 - y;
 	}
 };
 OurSonic.HeightMask.op_Implicit$1 = function(d) {
@@ -751,6 +776,12 @@ OurSonic.HeightMask.op_Implicit = function(d) {
 	}
 	d.integer = good;
 	return good;
+};
+OurSonic.HeightMask.itemsGood = function(items, x, y) {
+	if (items[x] < 0) {
+		return Math.abs(items[x]) >= y;
+	}
+	return items[x] >= 16 - y;
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Help
@@ -775,7 +806,7 @@ OurSonic.Help.scaleSprite = function(image, scale, complete) {
 		colors[ss.Int32.div(f, 4)] = OurSonic.Help.$colorObjectFromData(data, f);
 	}
 	var d = OurSonic.Help.defaultCanvas(0, 0).context.createImageData(image.width * scale.x, image.height * scale.y);
-	OurSonic.Help.$setDataFromColors(d.data, colors, scale, image.width, { r: 0, g: 0, b: 0 });
+	OurSonic.Help.$setDataFromColors(d.data, colors, scale, image.width, colors[0]);
 	return OurSonic.Help.loadSprite(OurSonic.Help.$getBase64Image(d), complete);
 };
 OurSonic.Help.$setDataFromColors = function(data, colors, scale, width, transparent) {
@@ -824,7 +855,8 @@ OurSonic.Help.$colorObjectFromData = function(data, c) {
 	var r = ss.Nullable.unbox(Type.cast(data[c], ss.Int32));
 	var g = ss.Nullable.unbox(Type.cast(data[c + 1], ss.Int32));
 	var b = ss.Nullable.unbox(Type.cast(data[c + 2], ss.Int32));
-	return { r: r, g: g, b: b };
+	var a = ss.Nullable.unbox(Type.cast(data[c + 3], ss.Int32));
+	return { r: r, g: g, b: b, a: a };
 };
 OurSonic.Help.getImageData = function(image) {
 	var canvas = document.createElement('canvas');
@@ -840,11 +872,11 @@ OurSonic.Help.scaleCsImage = function(image, scale, complete) {
 	var colors = new Array(df.length);
 	for (var f = 0; f < df.length; f++) {
 		var c = image.palette[df[f]];
-		colors[f] = { r: c[0], g: c[1], b: c[2] };
+		colors[f] = { r: c[0], g: c[1], b: c[2], a: c[3] };
 	}
 	var dc = OurSonic.Help.defaultCanvas(0, 0);
 	var d = dc.context.createImageData(image.width * scale.x, image.height * scale.y);
-	OurSonic.Help.$setDataFromColors(d.data, colors, scale, image.width, { r: 0, g: 0, b: 0 });
+	OurSonic.Help.$setDataFromColors(d.data, colors, scale, image.width, colors[0]);
 	return OurSonic.Help.loadSprite(OurSonic.Help.$getBase64Image(d), complete);
 };
 OurSonic.Help.loaded = function(element) {
@@ -881,6 +913,21 @@ OurSonic.Help.fixAngle = function(angle) {
 };
 OurSonic.Help.degToRad = function(angle) {
 	return angle * Math.PI / 180;
+};
+OurSonic.Help.sign = function(m) {
+	return ((m === 0) ? 0 : ((m < 0) ? -1 : 1));
+};
+OurSonic.Help.floor = function(spinDashSpeed) {
+	if (spinDashSpeed > 0) {
+		return ss.Nullable.unbox(Type.cast(~~spinDashSpeed, ss.Int32));
+	}
+	return ss.Int32.trunc(Math.floor(spinDashSpeed));
+};
+OurSonic.Help.max = function(f1, f2) {
+	return ((f1 < f2) ? f2 : f1);
+};
+OurSonic.Help.min = function(f1, f2) {
+	return ((f1 > f2) ? f2 : f1);
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.IntersectingRectangle
@@ -1082,19 +1129,575 @@ OurSonic.Ring.$ctor = function(active) {
 	$this.active = false;
 	$this.animationIndex = 0;
 	$this.tickCount = 0;
+	$this.ysp = 0;
+	$this.xsp = 0;
 	return $this;
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Sensor
 OurSonic.Sensor = function(x1, x2, y1, y2, manager, color, ignoreSolid, letter) {
+	this.$__currentM = { value: 0, angle: 0 };
 	this.value = 0;
 	this.angle = 0;
 	this.letter = null;
 	this.chosen = false;
+	this.ignoreSolid = false;
+	this.color = null;
+	this.manager = null;
+	this.x1 = 0;
+	this.x2 = 0;
+	this.y1 = 0;
+	this.y2 = 0;
+	this.x1 = x1;
+	this.x2 = x2;
+	this.y1 = y1;
+	this.y2 = y2;
+	this.manager = manager;
+	this.color = color;
+	this.ignoreSolid = ignoreSolid;
+	this.letter = letter;
+};
+OurSonic.Sensor.prototype = {
+	$checkCollisionLineWrap: function(x1, x2, y1, y2, ignoreSolid) {
+		var _x = ss.Int32.div(x1, 128);
+		var _y = OurSonic.Help.mod(ss.Int32.div(y1, 128), OurSonic.SonicManager.instance.sonicLevel.levelHeight);
+		var tc = OurSonic.SonicManager.instance.sonicLevel.chunks[OurSonic.SonicManager.instance.sonicLevel.chunkMap[_x][_y]];
+		this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
+		var curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_heightBlocks1() : tc.get_heightBlocks2());
+		var cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_angleMap1() : tc.get_angleMap2());
+		var __x = x1 - _x * 128;
+		var __y = y1 - _y * 128;
+		var i = 0;
+		var length = 0;
+		if (y1 === y2) {
+			if (Math.max(x1, x2) > OurSonic.SonicManager.instance.sonicLevel.levelWidth * 128) {
+				this.$__currentM.value = OurSonic.SonicManager.instance.sonicLevel.levelWidth * 128 - 20;
+				this.$__currentM.angle = 255;
+				return this.$__currentM;
+			}
+			if (x1 < x2) {
+				length = x2 - x1;
+				if (curh[__x][__y] >= 2) {
+					for (i = 0; i < 256; i++) {
+						while (true) {
+							if (__x - i < 0) {
+								if (_x - 1 < 0) {
+									this.$__currentM.value = 0;
+									this.$__currentM.angle = 255;
+									return this.$__currentM;
+								}
+								tc = OurSonic.SonicManager.instance.sonicLevel.chunks[OurSonic.SonicManager.instance.sonicLevel.chunkMap[_x - 1][_y]];
+								this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
+								curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_heightBlocks1() : tc.get_heightBlocks2());
+								cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_angleMap1() : tc.get_angleMap2());
+								__x += 128;
+							}
+							else {
+								break;
+							}
+						}
+						if (curh[__x - i][__y] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1 - i, y1, this.letter)) {
+							if (!(curh[__x - i][__y] < 3 || (this.letter === 'a' || this.letter === 'b'))) {
+								continue;
+							}
+							this.$__currentM.value = x1 - i;
+							this.$__currentM.angle = cura[ss.Int32.div(__x - i, 16)][ss.Int32.div(__y, 16)];
+							return this.$__currentM;
+						}
+					}
+				}
+				for (i = 0; i < length; i++) {
+					while (true) {
+						if (__x + i >= 128) {
+							//
+							//                                if (_x + 1 >= SonicManager.Instance.SonicLevel.LevelWidth)
+							//
+							//                                {
+							//
+							//                                this.__currentM.Value = SonicManager.Instance.SonicLevel.LevelWidth * 128;
+							//
+							//                                this.__currentM.Angle = 0xFF;
+							//
+							//                                return this.__currentM;
+							//
+							//                                }
+							tc = OurSonic.SonicManager.instance.sonicLevel.chunks[OurSonic.SonicManager.instance.sonicLevel.chunkMap[_x + 1][_y]];
+							this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
+							curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_heightBlocks1() : tc.get_heightBlocks2());
+							cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_angleMap1() : tc.get_angleMap2());
+							__x -= 128;
+						}
+						else {
+							break;
+						}
+					}
+					if (curh[__x + i][__y] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1 + i, y1, this.letter)) {
+						if (!(curh[__x + i][__y] < 3 || (this.letter === 'a' || this.letter === 'b'))) {
+							continue;
+						}
+						this.$__currentM.value = x1 + i;
+						this.$__currentM.angle = cura[ss.Int32.div(__x + i, 16)][ss.Int32.div(__y, 16)];
+						return this.$__currentM;
+					}
+				}
+			}
+			else {
+				length = x1 - x2;
+				if (curh[__x][__y] >= 2) {
+					for (i = 0; i < 256; i++) {
+						while (true) {
+							if (__x + i >= 128) {
+								//
+								//                                    if (_x + 1 >= SonicManager.Instance.SonicLevel.LevelWidth)
+								//
+								//                                    {
+								//
+								//                                    this.__currentM.Value = SonicManager.Instance.SonicLevel.LevelWidth * 128;
+								//
+								//                                    this.__currentM.Angle = 0xFF;
+								//
+								//                                    return this.__currentM;
+								//
+								//                                    }
+								tc = OurSonic.SonicManager.instance.sonicLevel.chunks[OurSonic.SonicManager.instance.sonicLevel.chunkMap[_x + 1][_y]];
+								this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
+								curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_heightBlocks1() : tc.get_heightBlocks2());
+								cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_angleMap1() : tc.get_angleMap2());
+								__x -= 128;
+							}
+							else {
+								break;
+							}
+						}
+						if (curh[__x + i][__y] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1 + i, y1, this.letter)) {
+							if (!(curh[__x + i][__y] < 3 || (this.letter === 'a' || this.letter === 'b'))) {
+								continue;
+							}
+							this.$__currentM.value = x1 + i;
+							this.$__currentM.angle = cura[ss.Int32.div(__x + i, 16)][ss.Int32.div(__y, 16)];
+							return this.$__currentM;
+						}
+					}
+				}
+				for (i = 0; i < length; i++) {
+					while (true) {
+						if (__x - i < 0) {
+							if (_x - 1 < 0) {
+								this.$__currentM.value = 0;
+								this.$__currentM.angle = 255;
+								return this.$__currentM;
+							}
+							tc = OurSonic.SonicManager.instance.sonicLevel.chunks[OurSonic.SonicManager.instance.sonicLevel.chunkMap[_x - 1][_y]];
+							this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
+							curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_heightBlocks1() : tc.get_heightBlocks2());
+							cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_angleMap1() : tc.get_angleMap2());
+							__x += 128;
+						}
+						else {
+							break;
+						}
+					}
+					if (curh[__x - i][__y] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1 - i, y1, this.letter)) {
+						if (!(curh[__x - i][__y] < 3 || (this.letter === 'a' || this.letter === 'b'))) {
+							continue;
+						}
+						this.$__currentM.value = x1 - i;
+						this.$__currentM.angle = cura[ss.Int32.div(__x - i, 16)][ss.Int32.div(__y, 16)];
+						return this.$__currentM;
+					}
+				}
+			}
+		}
+		else {
+			//top to bottom 
+			if (y1 < y2) {
+				length = y2 - y1;
+				if (curh[__x][__y] >= 2) {
+					for (i = 0; i < 256; i++) {
+						while (true) {
+							if (__y - i < 0) {
+								tc = OurSonic.SonicManager.instance.sonicLevel.chunks[OurSonic.SonicManager.instance.sonicLevel.chunkMap[_x][OurSonic.Help.mod(_y - 1, OurSonic.SonicManager.instance.sonicLevel.levelHeight)]];
+								this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
+								curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_heightBlocks1() : tc.get_heightBlocks2());
+								cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_angleMap1() : tc.get_angleMap2());
+								__y += 128;
+							}
+							else {
+								break;
+							}
+						}
+						if (curh[__x][__y - i] > 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1, y1 - i, this.letter)) {
+							if (!(curh[__x][__y - i] < 3 || (this.letter === 'a' || this.letter === 'b'))) {
+								continue;
+							}
+							this.$__currentM.value = y1 - i;
+							this.$__currentM.angle = cura[ss.Int32.div(__x, 16)][ss.Int32.div(__y - i, 16)];
+							return this.$__currentM;
+						}
+					}
+				}
+				for (i = 0; i < length; i++) {
+					while (true) {
+						if (__y + i >= 128) {
+							tc = OurSonic.SonicManager.instance.sonicLevel.chunks[OurSonic.SonicManager.instance.sonicLevel.chunkMap[_x][(_y + 1) % OurSonic.SonicManager.instance.sonicLevel.levelHeight]];
+							this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
+							curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_heightBlocks1() : tc.get_heightBlocks2());
+							cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_angleMap1() : tc.get_angleMap2());
+							__y -= 128;
+						}
+						else {
+							break;
+						}
+					}
+					if (curh[__x][__y + i] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1, y1 + i, this.letter)) {
+						if (curh[__x][__y + i] === 1 && OurSonic.SonicManager.instance.sonicToon.inAir && OurSonic.SonicManager.instance.sonicToon.ysp < 0) {
+							continue;
+						}
+						if (!(curh[__x][__y + i] < 3 || (this.letter === 'a' || this.letter === 'b'))) {
+							continue;
+						}
+						this.$__currentM.value = y1 + i;
+						this.$__currentM.angle = cura[ss.Int32.div(__x, 16)][ss.Int32.div(__y + i, 16)];
+						return this.$__currentM;
+					}
+				}
+			}
+			else {
+				length = y1 - y2;
+				if (curh[__x][__y] >= 2) {
+					for (i = 0; i < 256; i++) {
+						while (true) {
+							if (__y + i >= 128) {
+								tc = OurSonic.SonicManager.instance.sonicLevel.chunks[OurSonic.SonicManager.instance.sonicLevel.chunkMap[_x][(_y + 1) % OurSonic.SonicManager.instance.sonicLevel.levelHeight]];
+								this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
+								curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_heightBlocks1() : tc.get_heightBlocks2());
+								cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_angleMap1() : tc.get_angleMap2());
+								__y -= 128;
+							}
+							else {
+								break;
+							}
+						}
+						if (curh[__x][__y + i] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1, y1 + i, this.letter)) {
+							if (!(curh[__x][__y + i] < 3 || (this.letter === 'a' || this.letter === 'b'))) {
+								continue;
+							}
+							this.$__currentM.value = y1 + i;
+							this.$__currentM.angle = cura[ss.Int32.div(__x, 16)][ss.Int32.div(__y + i, 16)];
+							return this.$__currentM;
+						}
+					}
+				}
+				for (i = 0; i < length; i++) {
+					while (true) {
+						if (__y - i < 0) {
+							tc = OurSonic.SonicManager.instance.sonicLevel.chunks[OurSonic.SonicManager.instance.sonicLevel.chunkMap[_x][OurSonic.Help.mod(_y - 1, OurSonic.SonicManager.instance.sonicLevel.levelHeight)]];
+							this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
+							curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_heightBlocks1() : tc.get_heightBlocks2());
+							cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.get_angleMap1() : tc.get_angleMap2());
+							__y += 128;
+						}
+						else {
+							break;
+						}
+					}
+					if (curh[__x][__y - i] > 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1, y1 + i, this.letter)) {
+						if (!(curh[__x][__y - i] < 3 || (this.letter === 'a' || this.letter === 'b'))) {
+							continue;
+						}
+						this.$__currentM.value = y1 - i;
+						this.$__currentM.angle = cura[ss.Int32.div(__x, 16)][ss.Int32.div(__y - i, 16)];
+						return this.$__currentM;
+					}
+				}
+			}
+		}
+		return null;
+	},
+	$buildChunk: function(chunk, isLayerOne) {
+		if (isLayerOne) {
+			if (chunk.get_heightBlocks1()) {
+				return;
+			}
+			var $t1 = new Array(128);
+			chunk.set_heightBlocks1($t1);
+			var hb1 = $t1;
+			var $t2 = new Array(8);
+			chunk.set_angleMap1($t2);
+			var ab1 = $t2;
+			for (var _1 = 0; _1 < 128; _1++) {
+				hb1[_1] = new Array(128);
+			}
+			for (var _11 = 0; _11 < 8; _11++) {
+				ab1[_11] = new Array(8);
+			}
+			for (var _y = 0; _y < 8; _y++) {
+				for (var _x = 0; _x < 8; _x++) {
+					var tp = chunk.tilePieces[_x][_y];
+					ab1[_x][_y] = OurSonic.SonicManager.instance.sonicLevel.angles[OurSonic.SonicManager.instance.sonicLevel.collisionIndexes1[tp.block]];
+					if (!(ab1[_x][_y] === 0 || ab1[_x][_y] === 255 || ab1[_x][_y] === 1)) {
+						if (tp.xFlip) {
+							if (tp.yFlip) {
+								ab1[_x][_y] = 192 - ab1[_x][_y] + 192;
+								ab1[_x][_y] = 128 - ab1[_x][_y] + 128;
+							}
+							else {
+								ab1[_x][_y] = 128 - ab1[_x][_y] + 128;
+							}
+						}
+						else if (tp.yFlip) {
+							ab1[_x][_y] = 192 - ab1[_x][_y] + 192;
+						}
+						else {
+							ab1[_x][_y] = ab1[_x][_y];
+						}
+					}
+					var __x = 0;
+					var __y = 0;
+					var heightMask = OurSonic.SonicManager.instance.sonicLevel.heightMaps[OurSonic.SonicManager.instance.sonicLevel.collisionIndexes1[tp.block]];
+					var heightMaskItems = null;
+					if (ss.isNullOrUndefined(heightMask)) {
+						continue;
+					}
+					var mj;
+					if (OurSonic.HeightMask.op_Implicit(heightMask) === 0 || OurSonic.HeightMask.op_Implicit(heightMask) === 1) {
+						mj = ((OurSonic.HeightMask.op_Implicit(heightMask) === 0) ? 0 : tp.solid1);
+						for (__y = 0; __y < 16; __y++) {
+							for (__x = 0; __x < 16; __x++) {
+								hb1[_x * 16 + __x][_y * 16 + __y] = mj;
+							}
+						}
+					}
+					else {
+						heightMaskItems = heightMask.items;
+					}
+					for (__y = 0; __y < 16; __y++) {
+						for (__x = 0; __x < 16; __x++) {
+							var jx = 0;
+							var jy = 0;
+							if (tp.xFlip) {
+								if (tp.yFlip) {
+									jx = 15 - __x;
+									jy = 15 - __y;
+								}
+								else {
+									jx = 15 - __x;
+									jy = __y;
+								}
+							}
+							else if (tp.yFlip) {
+								jx = __x;
+								jy = 15 - __y;
+							}
+							else {
+								jx = __x;
+								jy = __y;
+							}
+							if (!(OurSonic.HeightMask.op_Implicit(heightMask) === 0 || OurSonic.HeightMask.op_Implicit(heightMask) === 1)) {
+								switch (tp.solid1) {
+									case 0: {
+										hb1[_x * 16 + jx][_y * 16 + jy] = 0;
+										break;
+									}
+									case 1:
+									case 2:
+									case 3: {
+										hb1[_x * 16 + jx][_y * 16 + jy] = (OurSonic.HeightMask.itemsGood(heightMaskItems, __x, __y) ? tp.solid1 : 0);
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		else {
+			if (chunk.get_heightBlocks2()) {
+				return;
+			}
+			var $t3 = new Array(128);
+			chunk.set_heightBlocks2($t3);
+			var hb2 = $t3;
+			var $t4 = new Array(8);
+			chunk.set_angleMap2($t4);
+			var ab2 = $t4;
+			for (var _12 = 0; _12 < 128; _12++) {
+				hb2[_12] = new Array(128);
+			}
+			for (var _13 = 0; _13 < 8; _13++) {
+				ab2[_13] = new Array(8);
+			}
+			for (var _y1 = 0; _y1 < 8; _y1++) {
+				for (var _x1 = 0; _x1 < 8; _x1++) {
+					var tp1 = chunk.tilePieces[_x1][_y1];
+					ab2[_x1][_y1] = OurSonic.SonicManager.instance.sonicLevel.angles[OurSonic.SonicManager.instance.sonicLevel.collisionIndexes2[tp1.block]];
+					if (!(ab2[_x1][_y1] === 0 || ab2[_x1][_y1] === 255 || ab2[_x1][_y1] === 1)) {
+						if (tp1.xFlip) {
+							if (tp1.yFlip) {
+								ab2[_x1][_y1] = 192 - ab2[_x1][_y1] + 192;
+								ab2[_x1][_y1] = 128 - ab2[_x1][_y1] + 128;
+							}
+							else {
+								ab2[_x1][_y1] = 128 - ab2[_x1][_y1] + 128;
+							}
+						}
+						else if (tp1.yFlip) {
+							ab2[_x1][_y1] = 192 - ab2[_x1][_y1] + 192;
+						}
+						else {
+							ab2[_x1][_y1] = ab2[_x1][_y1];
+						}
+					}
+					var __x1;
+					var __y1;
+					var hd2 = OurSonic.SonicManager.instance.sonicLevel.heightMaps[OurSonic.SonicManager.instance.sonicLevel.collisionIndexes2[tp1.block]];
+					if (ss.isNullOrUndefined(hd2)) {
+						continue;
+					}
+					var mj1;
+					var hd2Items = null;
+					if (OurSonic.HeightMask.op_Implicit(hd2) === 0 || OurSonic.HeightMask.op_Implicit(hd2) === 1) {
+						mj1 = ((OurSonic.HeightMask.op_Implicit(hd2) === 0) ? 0 : tp1.solid2);
+						for (__y1 = 0; __y1 < 16; __y1++) {
+							for (__x1 = 0; __x1 < 16; __x1++) {
+								hb2[_x1 * 16 + __x1][_y1 * 16 + __y1] = mj1;
+							}
+						}
+					}
+					else {
+						hd2Items = hd2.items;
+					}
+					for (__y1 = 0; __y1 < 16; __y1++) {
+						for (__x1 = 0; __x1 < 16; __x1++) {
+							var jx1 = 0;
+							var jy1 = 0;
+							if (tp1.xFlip) {
+								if (tp1.yFlip) {
+									jx1 = 15 - __x1;
+									jy1 = 15 - __y1;
+								}
+								else {
+									jx1 = 15 - __x1;
+									jy1 = __y1;
+								}
+							}
+							else if (tp1.yFlip) {
+								jx1 = __x1;
+								jy1 = 15 - __y1;
+							}
+							else {
+								jx1 = __x1;
+								jy1 = __y1;
+							}
+							if (!(OurSonic.HeightMask.op_Implicit(hd2) === 0 || OurSonic.HeightMask.op_Implicit(hd2) === 1)) {
+								switch (tp1.solid2) {
+									case 0: {
+										hb2[_x1 * 16 + jx1][_y1 * 16 + jy1] = 0;
+										break;
+									}
+									case 1:
+									case 2:
+									case 3: {
+										hb2[_x1 * 16 + jx1][_y1 * 16 + jy1] = (OurSonic.HeightMask.itemsGood(hd2Items, __x1, __y1) ? tp1.solid2 : 0);
+										break;
+									}
+								}
+							}
+							//imap[(x * 128 + _x * 16 + __x) + (y * 128 + _y * 16 + __y) * (SonicManager.Instance.SonicLevel.LevelWidth)] = tp.heightMask.angle;
+						}
+					}
+				}
+			}
+		}
+	},
+	draw: function(canvas, scale, character, sensorResult) {
+		var x = OurSonic.Help.floor(character.x) - OurSonic.SonicManager.instance.windowLocation.x;
+		var y = OurSonic.Help.floor(character.y) - OurSonic.SonicManager.instance.windowLocation.y;
+		canvas.beginPath();
+		if (sensorResult && sensorResult.chosen) {
+			canvas.strokeStyle = '#FFF76D';
+			canvas.lineWidth = 4;
+		}
+		else {
+			canvas.strokeStyle = this.color;
+			canvas.lineWidth = 2;
+		}
+		switch (character.mode) {
+			case 134: {
+				canvas.moveTo((x + this.x1) * scale.x, (y + this.y1) * scale.y);
+				canvas.lineTo((x + this.x2) * scale.x, (y + this.y2) * scale.y);
+				break;
+			}
+			case 44: {
+				canvas.moveTo((x - this.y1) * scale.x, (y + this.x1) * scale.y);
+				canvas.lineTo((x - this.y2) * scale.x, (y + this.x2) * scale.y);
+				break;
+			}
+			case 314: {
+				canvas.moveTo((x - this.x1) * scale.x, (y - this.y1) * scale.y);
+				canvas.lineTo((x - this.x2) * scale.x, (y - this.y2) * scale.y);
+				break;
+			}
+			case 224: {
+				canvas.moveTo((x + this.y1) * scale.x, (y - this.x1) * scale.y);
+				canvas.lineTo((x + this.y2) * scale.x, (y - this.x2) * scale.y);
+				break;
+			}
+		}
+		canvas.closePath();
+		canvas.stroke();
+	},
+	check: function(character) {
+		var _y2 = (character.inAir ? this.y2 : this.y2);
+		var m = null;
+		var x = OurSonic.Help.floor(character.x);
+		var y = OurSonic.Help.floor(character.y);
+		switch (character.mode) {
+			case 134: {
+				m = this.$checkCollisionLineWrap(x + this.x1, x + this.x2, y + this.y1, y + _y2, this.ignoreSolid);
+				break;
+			}
+			case 44: {
+				m = this.$checkCollisionLineWrap(x - this.y1, x - _y2, y + this.x1, y + this.x2, this.ignoreSolid);
+				break;
+			}
+			case 314: {
+				m = this.$checkCollisionLineWrap(x - this.x1, x - this.x2, y - this.y1, y - _y2, this.ignoreSolid);
+				break;
+			}
+			case 224: {
+				m = this.$checkCollisionLineWrap(x + this.y1, x + _y2, y - this.x1, y - this.x2, this.ignoreSolid);
+				break;
+			}
+		}
+		if (ss.isValue(m)) {
+			m.letter = this.letter;
+			if (m.angle === 255 || m.angle === 0 || m.angle === 1) {
+				if (character.mode === 134) {
+					m.angle = 255;
+				}
+				if (character.mode === 44) {
+					m.angle = 64;
+				}
+				if (character.mode === 314) {
+					m.angle = 128;
+				}
+				if (character.mode === 224) {
+					m.angle = 192;
+				}
+			}
+		}
+		return m;
+	}
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.SensorM
+OurSonic.SensorM = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.SensorManager
-OurSonic.SensorManager = function(instance) {
+OurSonic.SensorManager = function() {
 	this.sensors = null;
 	this.sensorResults = null;
 	this.sensors = {};
@@ -1103,32 +1706,58 @@ OurSonic.SensorManager = function(instance) {
 OurSonic.SensorManager.prototype = {
 	addSensor: function(letter, sensor) {
 		this.sensors[letter] = sensor;
-		this.sensorResults[letter] = false;
+		this.sensorResults[letter] = null;
 		return sensor;
 	},
 	createVerticalSensor: function(letter, x, y1, y2, color, ignoreSolid) {
 		return this.addSensor(letter, new OurSonic.Sensor(x, x, y1, y2, this, color, ignoreSolid, letter));
 	},
-	createHorizontalSensor: function(letter, x1, x2, y, color, ignoreSolid) {
+	createHorizontalSensor: function(letter, y, x1, x2, color, ignoreSolid) {
 		return this.addSensor(letter, new OurSonic.Sensor(x1, x2, y, y, this, color, ignoreSolid, letter));
 	},
-	check: function(sonic) {
+	check: function(character) {
+		var none = false;
+		var $t1 = Object.getObjectEnumerator(this.sensors);
+		try {
+			while ($t1.moveNext()) {
+				var i = $t1.get_current();
+				this.sensorResults[i.key] = i.value.check(character);
+				none = none || ss.isValue(this.sensorResults[i.key]);
+			}
+		}
+		finally {
+			$t1.dispose();
+		}
+		return none;
 	},
 	getResult: function(mn) {
-		return null;
+		return this.sensorResults[mn];
 	},
 	draw: function(canvas, scale, sonic) {
+		var $t1 = Object.getObjectEnumerator(this.sensors);
+		try {
+			while ($t1.moveNext()) {
+				var sensor = $t1.get_current();
+				sensor.value.draw(canvas, scale, sonic, this.sensorResults[sensor.key]);
+			}
+		}
+		finally {
+			$t1.dispose();
+		}
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Sonic
 OurSonic.Sonic = function() {
 	this.$myRec = null;
+	this.$oldSign = 0;
+	this.$physicsVariables = null;
 	this.$runningTick = 0;
 	this.$sensorManager = null;
 	this.$sonicLastHitTick = 0;
 	this.$sonicLevel = null;
 	this.$ticking = 0;
+	this.watcher = null;
 	this.ticking = false;
 	this.x = 0;
 	this.y = 0;
@@ -1158,12 +1787,16 @@ OurSonic.Sonic = function() {
 	this.currentlyBall = false;
 	this.spriteState = null;
 	this.haltSmoke = null;
+	this.wasJumping = false;
+	this.watcher = new OurSonic.Watcher();
+	this.$physicsVariables = OurSonic.SonicConstants.sonic();
 	var sonicManager = OurSonic.SonicManager.instance;
 	this.$sonicLevel = sonicManager.sonicLevel;
 	this.x = this.$sonicLevel.startPositions[0].x;
 	this.y = this.$sonicLevel.startPositions[0].y;
-	this.$sensorManager = new OurSonic.SensorManager(OurSonic.SonicManager.instance);
+	this.$sensorManager = new OurSonic.SensorManager();
 	this.haltSmoke = [];
+	this.rings = 100;
 	this.$sensorManager.createVerticalSensor('a', -9, 0, 36, '#F202F2', false);
 	this.$sensorManager.createVerticalSensor('b', 9, 0, 36, '#02C2F2', false);
 	this.$sensorManager.createVerticalSensor('c', -9, 0, -20, '#2D2C21', false);
@@ -1186,17 +1819,16 @@ OurSonic.Sonic.prototype = {
 		else if (this.angle > 161 && this.angle < 222) {
 			this.mode = 224;
 		}
-		//        this.x = _H.floor(this.x);
-		//        this.y = _H.floor(this.y);
-		this.$myRec = OurSonic.Rectangle.$ctor1(this.x - 5, this.y - 20, 10, 40);
+		//        x = _H.floor(x);
+		//        y = _H.floor(y);
+		this.$myRec = OurSonic.Rectangle.$ctor1(ss.Int32.trunc(this.x - 5), ss.Int32.trunc(this.y - 20), 10, 40);
 		if (this.inAir) {
 			this.mode = 134;
 		}
 	},
 	tick: function(sonicLevel, scale) {
 		if (this.debugging) {
-			var debugSpeed = 15;
-			//this.watcher.multiply(15);
+			var debugSpeed = this.watcher.multiply(15);
 			if (this.holdingRight) {
 				this.x += debugSpeed;
 			}
@@ -1210,7 +1842,7 @@ OurSonic.Sonic.prototype = {
 				this.y -= debugSpeed;
 			}
 			var offset = OurSonic.Point.$ctor1(0, 0);
-			// this.getOffsetFromImage();
+			// getOffsetFromImage();
 			this.x = (sonicLevel.levelWidth * 128 + this.x) % (sonicLevel.levelWidth * 128) + offset.x;
 			this.y = (sonicLevel.levelHeight * 128 + this.y) % (sonicLevel.levelHeight * 128) + offset.y;
 			return;
@@ -1238,7 +1870,7 @@ OurSonic.Sonic.prototype = {
 		if (ss.isValue(best)) {
 			switch (this.mode) {
 				case 134: {
-					this.x = best.value + ((sensorM1.value === sensorM2.value) ? 12 : ((best.letter === 'm1') ? 12 : -12));
+					this.x = best.value + ((ss.isValue(sensorM2) && ss.isValue(sensorM1) && sensorM1.value === sensorM2.value) ? 12 : ((best.letter === 'm1') ? 12 : -12));
 					this.gsp = 0;
 					if (this.inAir) {
 						this.xsp = 0;
@@ -1246,14 +1878,14 @@ OurSonic.Sonic.prototype = {
 					break;
 				}
 				case 44: {
-					this.y = best.value + ((sensorM1.value === sensorM2.value) ? 12 : ((best.letter === 'm1') ? 12 : -12));
+					this.y = best.value + ((ss.isValue(sensorM2) && ss.isValue(sensorM1) && sensorM1.value === sensorM2.value) ? 12 : ((best.letter === 'm1') ? 12 : -12));
 					if (this.inAir) {
 						this.xsp = 0;
 					}
 					break;
 				}
 				case 314: {
-					this.x = best.value + ((sensorM1.value === sensorM2.value) ? 12 : ((best.letter === 'm1') ? 12 : -12));
+					this.x = best.value + ((ss.isValue(sensorM2) && ss.isValue(sensorM1) && sensorM1.value === sensorM2.value) ? 12 : ((best.letter === 'm1') ? 12 : -12));
 					this.gsp = 0;
 					if (this.inAir) {
 						this.xsp = 0;
@@ -1261,7 +1893,7 @@ OurSonic.Sonic.prototype = {
 					break;
 				}
 				case 224: {
-					this.y = best.value + ((sensorM1.value === sensorM2.value) ? 12 : ((best.letter === 'm1') ? 12 : -12));
+					this.y = best.value + ((ss.isValue(sensorM2) && ss.isValue(sensorM1) && sensorM1.value === sensorM2.value) ? 12 : ((best.letter === 'm1') ? 12 : -12));
 					this.gsp = 0;
 					if (this.inAir) {
 						this.xsp = 0;
@@ -1316,7 +1948,7 @@ OurSonic.Sonic.prototype = {
 			if (ss.isNullOrUndefined(sensorA) && ss.isNullOrUndefined(sensorB)) {
 				this.inAir = true;
 			}
-			else if (sensorA.value >= 0 && sensorB.value >= 0) {
+			else if (ss.isValue(sensorA) && sensorA.value >= 0 && (ss.isValue(sensorB) && sensorB.value >= 0)) {
 				if (sensorA.value < sensorB.value) {
 					if (this.y + 20 >= sensorA.value) {
 						this.angle = sensorA.angle;
@@ -1334,7 +1966,7 @@ OurSonic.Sonic.prototype = {
 					}
 				}
 			}
-			else if (sensorA.value > -1) {
+			else if (ss.isValue(sensorA) && sensorA.value > -1) {
 				if (this.y + 20 >= sensorA.value) {
 					this.angle = sensorA.angle;
 					this.y = fy = sensorA.value - hSize.y;
@@ -1342,7 +1974,7 @@ OurSonic.Sonic.prototype = {
 					this.inAir = false;
 				}
 			}
-			else if (sensorB.value > -1) {
+			else if (ss.isValue(sensorB) && sensorB.value > -1) {
 				if (this.y + 20 >= sensorB.value) {
 					this.angle = sensorB.angle;
 					this.y = fy = sensorB.value - hSize.y;
@@ -1359,7 +1991,7 @@ OurSonic.Sonic.prototype = {
 			if (ss.isNullOrUndefined(sensorC) && ss.isNullOrUndefined(sensorD)) {
 			}
 			else {
-				if (sensorC.value >= 0 && sensorD.value >= 0) {
+				if (ss.isValue(sensorD) && ss.isValue(sensorC) && (sensorC.value >= 0 && sensorD.value >= 0)) {
 					if (sensorC.value < sensorD.value) {
 						if (this.y + __h >= sensorC.value) {
 							if (this.ysp < 0) {
@@ -1391,7 +2023,7 @@ OurSonic.Sonic.prototype = {
 						}
 					}
 				}
-				else if (sensorC.value > -1) {
+				else if (ss.isValue(sensorC) && sensorC.value > -1) {
 					if (this.y + __h >= sensorC.value) {
 						if (this.ysp < 0) {
 							if (sensorC.angle > 72 && sensorC.angle < 88) {
@@ -1407,7 +2039,7 @@ OurSonic.Sonic.prototype = {
 						}
 					}
 				}
-				else if (sensorD.value > -1) {
+				else if (ss.isValue(sensorD) && sensorD.value > -1) {
 					if (this.y + __h >= sensorD.value) {
 						if (this.ysp < 0) {
 							if (sensorD.angle > 72 && sensorD.angle < 88) {
@@ -1427,7 +2059,30 @@ OurSonic.Sonic.prototype = {
 			}
 		}
 	},
-	$getBestSensor: function(sensorA, sensorB, mode) {
+	$getBestSensor: function(sensor1, sensor2, mode) {
+		if (ss.isNullOrUndefined(sensor1) && ss.isNullOrUndefined(sensor2)) {
+			return null;
+		}
+		if (ss.isNullOrUndefined(sensor1)) {
+			return sensor2;
+		}
+		if (ss.isNullOrUndefined(sensor2)) {
+			return sensor1;
+		}
+		switch (mode) {
+			case 134: {
+				return ((sensor1.value < sensor2.value) ? sensor1 : sensor2);
+			}
+			case 44: {
+				return ((sensor1.value > sensor2.value) ? sensor1 : sensor2);
+			}
+			case 314: {
+				return ((sensor1.value > sensor2.value) ? sensor1 : sensor2);
+			}
+			case 224: {
+				return ((sensor1.value < sensor2.value) ? sensor1 : sensor2);
+			}
+		}
 		return null;
 	},
 	invulnerable: function() {
@@ -1566,7 +2221,7 @@ OurSonic.Sonic.prototype = {
 			else if (this.$runningTick++ % 7 === 0) {
 				this.spriteState = 'breaking' + (j + 1) % 4;
 				if (j === 0) {
-					this.haltSmoke.add(OurSonic.Point.$ctor1(this.x, this.y));
+					this.haltSmoke.add(OurSonic.Point.$ctor1(ss.Int32.trunc(this.x), ss.Int32.trunc(this.y)));
 				}
 			}
 		}
@@ -1599,6 +2254,253 @@ OurSonic.Sonic.prototype = {
 		}
 	},
 	$effectPhysics: function() {
+		//watcher.tick();
+		var physics = this.$physicsVariables;
+		var max = physics.topSpeed;
+		if (!this.jumping) {
+			if (!this.inAir && this.wasJumping) {
+				this.wasJumping = false;
+			}
+		}
+		if (this.inAir && !this.wasInAir) {
+			this.wasInAir = true;
+			var offset = this.$getOffsetFromImage();
+			this.x += offset.x;
+			this.y += offset.y;
+			//if ((angle >= 0x70 && angle <= 0x90)) {
+			//xsp = (gsp);
+			//}
+		}
+		if (!this.inAir && this.wasInAir) {
+			this.wasInAir = false;
+			if (this.angle >= 240 || this.angle <= 15) {
+				this.gsp = this.xsp;
+			}
+			else if (this.angle > 226 && this.angle <= 239 || this.angle >= 16 && this.angle <= 31) {
+				this.gsp = this.ysp;
+			}
+			else if (this.angle >= 192 && this.angle <= 226) {
+				this.gsp = -this.ysp;
+			}
+			else if (this.angle >= 32 && this.angle <= 63) {
+				this.gsp = this.ysp;
+			}
+			this.xsp = 0;
+			this.ysp = 0;
+		}
+		if (!this.inAir && !this.rolling) {
+			if (!this.holdingLeft && !this.holdingRight && !this.justHit) {
+				//friction
+				this.gsp -= Math.min(Math.abs(this.gsp), this.watcher.multiply(physics.frc)) * ((this.gsp > 0) ? 1 : -1);
+			}
+			this.$oldSign = OurSonic.Help.sign(this.gsp);
+			//slope
+			this.gsp += this.watcher.multiply(physics.slp) * -OurSonic.Help.sin(this.angle);
+			if (this.$oldSign !== OurSonic.Help.sign(this.gsp) && this.$oldSign !== 0) {
+				this.hLock = 30;
+			}
+			if (this.holdingRight && !this.holdingLeft && !this.justHit) {
+				this.facing = true;
+				if (this.gsp >= 0) {
+					//accelerate 
+					this.gsp += this.watcher.multiply(physics.acc);
+					if (this.gsp > max) {
+						this.gsp = max;
+					}
+				}
+				else {
+					//decelerate 
+					this.gsp += this.watcher.multiply(physics.dec);
+					if (Math.abs(this.gsp) > 4.5) {
+						this.facing = false;
+						this.breaking = 1;
+						this.$runningTick = 0;
+					}
+				}
+			}
+			if (this.holdingLeft && !this.holdingRight && !this.justHit) {
+				this.facing = false;
+				if (this.gsp <= 0) {
+					//accelerate 
+					this.gsp -= this.watcher.multiply(physics.acc);
+					if (this.gsp < -max) {
+						this.gsp = -max;
+					}
+				}
+				else {
+					//decelerate 
+					this.gsp -= this.watcher.multiply(physics.dec);
+					if (Math.abs(this.gsp) > 4.5) {
+						this.facing = true;
+						this.breaking = -1;
+						this.$runningTick = 0;
+					}
+				}
+			}
+		}
+		this.ducking = false;
+		if (this.crouching) {
+			if (Math.abs(this.gsp) > 1.03125) {
+				this.rolling = true;
+				this.currentlyBall = true;
+			}
+			else {
+				this.ducking = true;
+			}
+		}
+		else if (this.spinDash) {
+			this.gsp = (8 + ss.Int32.div(OurSonic.Help.floor(this.spinDashSpeed), 2)) * (this.facing ? 1 : -1);
+			this.spinDash = false;
+			this.rolling = true;
+			this.currentlyBall = true;
+		}
+		if (!this.inAir && this.rolling) {
+			//dec  
+			if (this.holdingLeft && !this.justHit) {
+				if (this.gsp > 0) {
+					if (this.rolling) {
+						this.gsp = OurSonic.Help.max(0, this.gsp - this.watcher.multiply(physics.rdec));
+					}
+				}
+			}
+			if (this.holdingRight && !this.justHit) {
+				if (this.gsp < 0) {
+					if (this.rolling) {
+						this.gsp = OurSonic.Help.min(0, this.gsp + this.watcher.multiply(physics.rdec));
+					}
+				}
+			}
+			//friction
+			this.gsp -= Math.min(Math.abs(this.gsp), this.watcher.multiply(physics.rfrc)) * ((this.gsp > 0) ? 1 : -1);
+			this.$oldSign = OurSonic.Help.sign(this.gsp);
+			//slope
+			var ang = OurSonic.Help.sin(this.angle);
+			if (ang > 0 === this.gsp > 0) {
+				this.gsp += this.watcher.multiply(-physics.slpRollingUp) * ang;
+			}
+			else {
+				this.gsp += this.watcher.multiply(-physics.slpRollingDown) * ang;
+			}
+			if (this.gsp > max * 2.5) {
+				this.gsp = max * 2.5;
+			}
+			if (this.gsp < -max * 2.5) {
+				this.gsp = -max * 2.5;
+			}
+			if (this.$oldSign !== OurSonic.Help.sign(this.gsp) && this.$oldSign !== 0) {
+				this.hLock = 30;
+			}
+			if (Math.abs(this.gsp) < 0.53125) {
+				this.rolling = false;
+				this.currentlyBall = false;
+			}
+		}
+		this.$checkCollisionWithRing();
+		if (this.inAir) {
+			if (this.holdingRight && !this.holdingLeft && !this.justHit) {
+				this.facing = true;
+				if (this.xsp >= 0) {
+					//accelerate 
+					this.xsp += this.watcher.multiply(physics.air);
+					if (this.xsp > max) {
+						this.xsp = max;
+					}
+				}
+				else {
+					//decelerate 
+					this.xsp += this.watcher.multiply(physics.air);
+				}
+			}
+			if (this.holdingLeft && !this.holdingRight && !this.justHit) {
+				this.facing = false;
+				if (this.xsp <= 0) {
+					//accelerate 
+					this.xsp -= this.watcher.multiply(physics.air);
+					if (this.xsp < -max) {
+						this.xsp = -max;
+					}
+				}
+				else {
+					//decelerate 
+					this.xsp -= this.watcher.multiply(physics.air);
+				}
+			}
+			if (this.wasInAir) {
+				if (this.jumping) {
+				}
+				else {
+				}
+			}
+			//gravity
+			this.ysp += (this.justHit ? 0.1875 : physics.grv);
+			//drag
+			if (this.ysp < 0 && this.ysp > -4) {
+				if (Math.abs(this.xsp) > 0.125) {
+					this.xsp *= 0.96875;
+				}
+			}
+			if (this.ysp > 16) {
+				this.ysp = 16;
+			}
+		}
+		if (this.wasInAir && this.jumping) {
+		}
+		else if (this.jumping && !this.wasJumping) {
+			this.wasJumping = true;
+			if (this.ducking) {
+				this.spinDash = true;
+				this.spinDashSpeed += 2;
+				if (this.spinDashSpeed > 8) {
+					this.spinDashSpeed = 8;
+				}
+				this.spriteState = 'spindash0';
+			}
+			else {
+				this.inAir = true;
+				this.currentlyBall = true;
+				this.xsp = physics.jmp * OurSonic.Help.sin(this.angle) + this.gsp * OurSonic.Help.cos(this.angle);
+				this.ysp = physics.jmp * OurSonic.Help.cos(this.angle);
+				if (Math.abs(this.xsp) < 0.17) {
+					this.xsp = 0;
+				}
+			}
+		}
+		if (!this.inAir) {
+			if (this.spinDash) {
+				this.gsp = 0;
+			}
+			this.xsp = this.gsp * OurSonic.Help.cos(this.angle);
+			this.ysp = this.gsp * -OurSonic.Help.sin(this.angle);
+			if (Math.abs(this.gsp) < 2.5 && this.mode !== 134) {
+				if (this.mode === 224) {
+					this.x += 0;
+				}
+				else if (this.mode === 44) {
+					this.x += 0;
+				}
+				else if (this.mode === 314) {
+					this.y += 0;
+				}
+				var oldMode = this.mode;
+				this.updateMode();
+				this.gsp = 0;
+				this.mode = 134;
+				this.hLock = 30;
+				this.inAir = true;
+			}
+		}
+		if (this.xsp > 0 && this.xsp < 0.008) {
+			this.gsp = 0;
+			this.xsp = 0;
+		}
+		if (this.xsp < 0 && this.xsp > -0.008) {
+			this.gsp = 0;
+			this.xsp = 0;
+		}
+		this.x = (this.$sonicLevel.levelWidth * 128 + (this.x + this.xsp)) % (this.$sonicLevel.levelWidth * 128);
+		this.y = (this.$sonicLevel.levelHeight * 128 + (this.y + this.ysp)) % (this.$sonicLevel.levelHeight * 128);
+	},
+	$checkCollisionWithRing: function() {
 	},
 	draw: function(canvas, scale) {
 		var fx = this.x;
@@ -1703,7 +2605,7 @@ OurSonic.Sonic.prototype = {
 				var lo = this.haltSmoke[i];
 				canvas.drawImage(OurSonic.SonicManager.instance.spriteCache.sonicSprites['haltsmoke' + ss.Int32.div(OurSonic.SonicManager.instance.drawTickCount % 24, 6) + scale.x + scale.y], (lo.x - OurSonic.SonicManager.instance.windowLocation.x - 25) * scale.x, (lo.y + 12 - OurSonic.SonicManager.instance.windowLocation.y + offset.y) * scale.y);
 				if (ss.Int32.div((OurSonic.SonicManager.instance.drawTickCount + 6) % 24, 6) === 0) {
-					this.haltSmoke.extract(i, 1);
+					this.haltSmoke = this.haltSmoke.extract(i, 1);
 				}
 			}
 		}
@@ -1726,66 +2628,36 @@ OurSonic.Sonic.prototype = {
 		}
 	},
 	hit: function(x, y) {
-		//
-		//        if (sonicManager.drawTickCount - this.sonicLastHitTick < 120)
-		//
-		//        return;
-		//
-		//        this.justHit = true;
-		//
-		//        this.ysp = -4;
-		//
-		//        this.xsp = 2 * ((this.x - _x) < 0 ? -1 : 1);
-		//
-		//        this.sonicLastHitTick = sonicManager.drawTickCount;
-		//
-		//        var t = 0;
-		//
-		//        var angle = 101.25;
-		//
-		//        var n = false;
-		//
-		//        var speed = 4;
-		//
-		//        while (t < this.rings) {
-		//
-		//        var ring = new Ring(true);
-		//
-		//        sonicManager.activeRings.push(ring);
-		//
-		//        ring.x = this.x;
-		//
-		//        ring.y = this.y - 10;
-		//
-		//        ring.ysp = -Math.sin(angle) * speed;
-		//
-		//        ring.xsp = Math.cos(angle) * speed;
-		//
-		//        
-		//
-		//        if (n) {
-		//
-		//        ring.ysp *= -1;
-		//
-		//        angle += 22.5;
-		//
-		//        }
-		//
-		//        n = !n;
-		//
-		//        t++;
-		//
-		//        if (t == 16) {
-		//
-		//        speed = 2;
-		//
-		//        angle = 101.25;
-		//
-		//        }
-		//
-		//        }
-		//
-		//        this.rings = 0;
+		if (OurSonic.SonicManager.instance.drawTickCount - this.$sonicLastHitTick < 120) {
+			return;
+		}
+		this.justHit = true;
+		this.ysp = -4;
+		this.xsp = 2 * ((this.x - x < 0) ? -1 : 1);
+		this.$sonicLastHitTick = OurSonic.SonicManager.instance.drawTickCount;
+		var t = 0;
+		var angle = 101.25;
+		var n = false;
+		var speed = 4;
+		while (t < this.rings) {
+			var ring = OurSonic.Ring.$ctor(true);
+			OurSonic.SonicManager.instance.activeRings.add(ring);
+			ring.x = ss.Int32.trunc(this.x);
+			ring.y = ss.Int32.trunc(this.y) - 10;
+			ring.ysp = -Math.sin(angle) * speed;
+			ring.xsp = Math.cos(angle) * speed;
+			if (n) {
+				ring.ysp *= -1;
+				angle += 22.5;
+			}
+			n = !n;
+			t++;
+			if (t === 16) {
+				speed = 2;
+				angle = 101.25;
+			}
+		}
+		this.rings = 0;
 	},
 	debug: function() {
 		this.debugging = !this.debugging;
@@ -1823,6 +2695,9 @@ OurSonic.Sonic.prototype = {
 	},
 	releaseJump: function() {
 		this.jumping = false;
+	},
+	checkCollisionWithObjects: function(x, y, letter) {
+		return false;
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
@@ -1846,6 +2721,7 @@ OurSonic.SonicConstants = function() {
 	this.jmp = 0;
 	this.rdec = 0;
 	this.rfrc = 0;
+	this.slp = 0;
 	this.slpRollingDown = 0;
 	this.slpRollingUp = 0;
 	this.topSpeed = 0;
@@ -1854,7 +2730,8 @@ OurSonic.SonicConstants.sonic = function() {
 	var $t1 = new OurSonic.SonicConstants();
 	$t1.acc = 0.046875;
 	$t1.dec = 0.5;
-	$t1.frc = 0.46875;
+	$t1.slp = 0.125;
+	$t1.frc = 0.046875;
 	$t1.rdec = 0.125;
 	$t1.rfrc = 0.0234375;
 	$t1.slpRollingUp = 0.078125;
@@ -2079,7 +2956,7 @@ OurSonic.SonicEngine = function() {
 			}
 		}
 	}));
-	KeyboardJS.bind.key('right', Function.mkdel(this, function() {
+	KeyboardJS.bind.key('space', Function.mkdel(this, function() {
 		switch (this.$sonicManager.currentGameState) {
 			case 0: {
 				this.$sonicManager.sonicToon.pressJump();
@@ -2445,16 +3322,6 @@ OurSonic.SonicManager.prototype = {
 			try {
 				this.sonicToon.tick(this.sonicLevel, this.scale);
 			}
-			catch ($t1) {
-				var exc = ss.Exception.wrap($t1);
-				var txt = 'There was an error on this page.\n\n';
-				txt += 'Error description: ' + exc.get_message() + '\n\n';
-				txt += 'Stack: ' + exc.get_innerException() + '\n\n';
-				//todo::callstack
-				txt += 'Click OK to continue.\n\n';
-				window.alert(txt);
-				throw exc;
-			}
 			finally {
 				this.sonicToon.ticking = false;
 			}
@@ -2565,10 +3432,10 @@ OurSonic.SonicManager.prototype = {
 			canvas.translate(this.screenOffset.x, this.screenOffset.y);
 			canvas.fillStyle = '#000000';
 			canvas.fillRect(0, 0, this.windowLocation.width * this.scale.x, this.windowLocation.height * this.scale.y);
-			this.windowLocation.x = this.sonicToon.x - ss.Int32.div(this.windowLocation.width, 2);
-			this.windowLocation.y = this.sonicToon.y - ss.Int32.div(this.windowLocation.height, 2);
-			this.bigWindowLocation.x = this.sonicToon.x - ss.Int32.div(this.bigWindowLocation.width, 2);
-			this.bigWindowLocation.y = this.sonicToon.y - ss.Int32.div(this.bigWindowLocation.height, 2);
+			this.windowLocation.x = ss.Int32.trunc(this.sonicToon.x) - ss.Int32.div(this.windowLocation.width, 2);
+			this.windowLocation.y = ss.Int32.trunc(this.sonicToon.y) - ss.Int32.div(this.windowLocation.height, 2);
+			this.bigWindowLocation.x = ss.Int32.trunc(this.sonicToon.x) - ss.Int32.div(this.bigWindowLocation.width, 2);
+			this.bigWindowLocation.y = ss.Int32.trunc(this.sonicToon.y) - ss.Int32.div(this.bigWindowLocation.height, 2);
 			if (this.background) {
 				var wOffset = this.windowLocation.x;
 				var bw = ss.Int32.div(this.background.width, this.scale.x);
@@ -3505,6 +4372,17 @@ OurSonic.UIManagerData = function() {
 OurSonic.UIManagerDataIndexes = function() {
 	this.tpIndex = 0;
 };
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.Watcher
+OurSonic.Watcher = function() {
+};
+OurSonic.Watcher.prototype = {
+	tick: function() {
+	},
+	multiply: function(v) {
+		return v;
+	}
+};
 OurSonic.Animation.registerClass('OurSonic.Animation', Object);
 OurSonic.AnimationFrame.registerClass('OurSonic.AnimationFrame', Object);
 OurSonic.AnimationInstance.registerClass('OurSonic.AnimationInstance', Object);
@@ -3527,6 +4405,7 @@ OurSonic.Point.registerClass('OurSonic.Point', Object);
 OurSonic.Rectangle.registerClass('OurSonic.Rectangle');
 OurSonic.Ring.registerClass('OurSonic.Ring');
 OurSonic.Sensor.registerClass('OurSonic.Sensor', Object);
+OurSonic.SensorM.registerClass('OurSonic.SensorM', Object);
 OurSonic.SensorManager.registerClass('OurSonic.SensorManager', Object);
 OurSonic.Sonic.registerClass('OurSonic.Sonic', Object);
 OurSonic.SonicBackground.registerClass('OurSonic.SonicBackground', Object);
@@ -3543,6 +4422,7 @@ OurSonic.SpriteLoaderStep.registerClass('OurSonic.SpriteLoaderStep', Object);
 OurSonic.UIManager.registerClass('OurSonic.UIManager', Object);
 OurSonic.UIManagerData.registerClass('OurSonic.UIManagerData', Object);
 OurSonic.UIManagerDataIndexes.registerClass('OurSonic.UIManagerDataIndexes', Object);
+OurSonic.Watcher.registerClass('OurSonic.Watcher', Object);
 OurSonic.IntersectingRectangle.registerClass('OurSonic.IntersectingRectangle');
 OurSonic.HeightMask.colors = ['', 'rgba(255,98,235,0.6)', 'rgba(24,218,235,0.6)', 'rgba(24,98,235,0.6)'];
 OurSonic.Help.cos_table = [1, 0.9997, 0.9988, 0.99729, 0.99518, 0.99248, 0.98918, 0.98528, 0.98079, 0.9757, 0.97003, 0.96378, 0.95694, 0.94953, 0.94154, 0.93299, 0.92388, 0.91421, 0.90399, 0.89322, 0.88192, 0.87009, 0.85773, 0.84485, 0.83147, 0.81758, 0.80321, 0.78835, 0.77301, 0.75721, 0.74095, 0.72425, 0.70711, 0.68954, 0.67156, 0.65317, 0.63439, 0.61523, 0.5957, 0.57581, 0.55557, 0.535, 0.5141, 0.4929, 0.4714, 0.44961, 0.42755, 0.40524, 0.38268, 0.3599, 0.33689, 0.31368, 0.29028, 0.26671, 0.24298, 0.2191, 0.19509, 0.17096, 0.14673, 0.12241, 0.09802, 0.07356, 0.04907, 0.02454, 0, -0.02454, -0.04907, -0.07356, -0.09802, -0.12241, -0.14673, -0.17096, -0.19509, -0.2191, -0.24298, -0.26671, -0.29028, -0.31368, -0.33689, -0.3599, -0.38268, -0.40524, -0.42755, -0.44961, -0.4714, -0.4929, -0.5141, -0.535, -0.55557, -0.57581, -0.5957, -0.61523, -0.63439, -0.65317, -0.67156, -0.68954, -0.70711, -0.72425, -0.74095, -0.75721, -0.77301, -0.78835, -0.80321, -0.81758, -0.83147, -0.84485, -0.85773, -0.87009, -0.88192, -0.89322, -0.90399, -0.91421, -0.92388, -0.93299, -0.94154, -0.94953, -0.95694, -0.96378, -0.97003, -0.9757, -0.98079, -0.98528, -0.98918, -0.99248, -0.99518, -0.99729, -0.9988, -0.9997, -1, -0.9997, -0.9988, -0.99729, -0.99518, -0.99248, -0.98918, -0.98528, -0.98079, -0.9757, -0.97003, -0.96378, -0.95694, -0.94953, -0.94154, -0.93299, -0.92388, -0.91421, -0.90399, -0.89322, -0.88192, -0.87009, -0.85773, -0.84485, -0.83147, -0.81758, -0.80321, -0.78835, -0.77301, -0.75721, -0.74095, -0.72425, -0.70711, -0.68954, -0.67156, -0.65317, -0.63439, -0.61523, -0.5957, -0.57581, -0.55557, -0.535, -0.5141, -0.4929, -0.4714, -0.44961, -0.42756, -0.40524, -0.38268, -0.3599, -0.33689, -0.31368, -0.29028, -0.26671, -0.24298, -0.2191, -0.19509, -0.17096, -0.14673, -0.12241, -0.09802, -0.07356, -0.04907, -0.02454, 0, 0.02454, 0.04907, 0.07356, 0.09802, 0.12241, 0.14673, 0.17096, 0.19509, 0.2191, 0.24298, 0.26671, 0.29028, 0.31368, 0.33689, 0.3599, 0.38268, 0.40524, 0.42756, 0.44961, 0.4714, 0.4929, 0.5141, 0.535, 0.55557, 0.57581, 0.5957, 0.61523, 0.63439, 0.65317, 0.67156, 0.68954, 0.70711, 0.72425, 0.74095, 0.75721, 0.77301, 0.78835, 0.80321, 0.81758, 0.83147, 0.84485, 0.85773, 0.87009, 0.88192, 0.89322, 0.90399, 0.91421, 0.92388, 0.93299, 0.94154, 0.94953, 0.95694, 0.96378, 0.97003, 0.9757, 0.98079, 0.98528, 0.98918, 0.99248, 0.99518, 0.99729, 0.9988, 0.9997];

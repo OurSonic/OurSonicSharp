@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonic.Drawing;
@@ -231,15 +230,22 @@ namespace OurSonic
                 SonicToon.Ticking = true;
                 try {
                     SonicToon.Tick(SonicLevel, Scale);
-                } catch (Exception exc) {
+                }
+/*
+                catch (Exception exc)
+                {
                     string txt = "There was an error on this page.\n\n";
                     txt += "Error description: " + exc.Message + "\n\n";
                     txt += "Stack: " + exc.InnerException + "\n\n"; //todo::callstack
                     txt += "Click OK to continue.\n\n";
 
+
+                    Global.Console.Log(exc.Me());
                     Window.Alert(txt);
                     throw exc;
-                } finally {
+                }
+*/
+                finally {
                     SonicToon.Ticking = false;
                 }
                 if (InHaltMode) {
@@ -296,14 +302,14 @@ namespace OurSonic
 
                                                                       /*var cji = SpriteCache.AnimationSprites = new JsDictionary<string, CanvasInformation>();
 
-                foreach (var anni in Animations)
-                {
-                    var imd = 0;
-                    foreach (var image in anni.Images)
-                    {
-                        cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManager.animations[anni].images[image], scale);
-                    }
-                }*/
+foreach (var anni in Animations)
+{
+var imd = 0;
+foreach (var image in anni.Images)
+{
+cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManager.animations[anni].images[image], scale);
+}
+}*/
                                                                       done();
                                                                   }, () => true, false);
 
@@ -347,11 +353,11 @@ namespace OurSonic
                 canvas.FillStyle = "#000000";
                 canvas.FillRect(0, 0, WindowLocation.Width * Scale.X, WindowLocation.Height * Scale.Y);
 
-                WindowLocation.X = SonicToon.X - WindowLocation.Width / 2;
-                WindowLocation.Y = SonicToon.Y - WindowLocation.Height / 2;
+                WindowLocation.X = (int) ( SonicToon.X ) - WindowLocation.Width / 2;
+                WindowLocation.Y = (int) ( SonicToon.Y ) - WindowLocation.Height / 2;
 
-                BigWindowLocation.X = SonicToon.X - BigWindowLocation.Width / 2;
-                BigWindowLocation.Y = SonicToon.Y - BigWindowLocation.Height / 2;
+                BigWindowLocation.X = (int) ( SonicToon.X ) - BigWindowLocation.Width / 2;
+                BigWindowLocation.Y = (int) ( SonicToon.Y ) - BigWindowLocation.Height / 2;
                 if (Background.Truthy()) {
                     int wOffset = WindowLocation.X;
                     int bw = Background.Width / Scale.X;

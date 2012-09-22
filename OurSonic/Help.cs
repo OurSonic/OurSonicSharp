@@ -71,7 +71,7 @@ namespace OurSonic
                 colors[f / 4] = ( ColorObjectFromData(data, f) );
             }
             var d = DefaultCanvas(0, 0).Context.CreateImageData(image.Width * scale.X, image.Height * scale.Y);
-            SetDataFromColors(d.Data, colors, scale, image.Width, new Color(0, 0, 0));
+            SetDataFromColors(d.Data, colors, scale, image.Width, colors[0]);
             return LoadSprite(GetBase64Image(d), complete);
         }
 
@@ -128,8 +128,9 @@ namespace OurSonic
             var r = (int) data[c];
             var g = (int) data[c + 1];
             var b = (int) data[c + 2];
+            var a = (int) data[c + 3];
 
-            return new Color(r, g, b);
+            return new Color(r, g, b, a);
         }
 
         public static PixelArray GetImageData(ImageElement image)
@@ -150,12 +151,12 @@ namespace OurSonic
 
             for (int f = 0; f < df.Length; f++) {
                 var c = image.Palette[df[f]];
-                colors[f] = new Color(c[0], c[1], c[2] /*, c[3]*/);
+                colors[f] = new Color(c[0], c[1], c[2], c[3]);
             }
 
             var dc = DefaultCanvas(0, 0);
             var d = dc.Context.CreateImageData(image.Width * scale.X, image.Height * scale.Y);
-            SetDataFromColors(d.Data, colors, scale, image.Width, new Color(0, 0, 0));
+            SetDataFromColors(d.Data, colors, scale, image.Width, colors[0]);
             return LoadSprite(GetBase64Image(d), complete);
         }
 
@@ -221,6 +222,28 @@ namespace OurSonic
         public static double DegToRad(int angle)
         {
             return angle * Math.PI / 180;
+        }
+
+        public static int Sign(double m)
+        {
+            return m == 0 ? 0 : ( m < 0 ? -1 : 1 );
+        }
+
+        public static int Floor(double spinDashSpeed)
+        {
+            if (spinDashSpeed > 0)
+                return ~~spinDashSpeed.Me();
+            return (int) Math.Floor(spinDashSpeed);
+        }
+
+        public static double Max(double f1, double f2)
+        {
+            return f1 < f2 ? f2 : f1;
+        }
+
+        public static double Min(double f1, double f2)
+        {
+            return f1 > f2 ? f2 : f1;
         }
     }
 }

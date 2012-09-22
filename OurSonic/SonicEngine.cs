@@ -199,7 +199,7 @@ namespace OurSonic
                                                            }
                                                        });
 
-            KeyboardJS.Instance().Bind.Key("right", () => {
+            KeyboardJS.Instance().Bind.Key("space", () => {
                                                         switch (sonicManager.CurrentGameState) {
                                                             case GameState.Playing:
                                                                 sonicManager.SonicToon.PressJump();

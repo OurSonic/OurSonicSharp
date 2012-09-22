@@ -35,6 +35,7 @@ namespace NodeJSLibrary
     [IgnoreGenericArguments]
     public class Console
     {
-        public void Log(string log) {}
+        public void Log(string log) { }
+        public void Log(Exception log) { }
     }
 }

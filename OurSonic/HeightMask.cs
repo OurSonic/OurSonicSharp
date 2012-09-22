@@ -12,7 +12,7 @@ namespace OurSonic
         [IntrinsicProperty]
         protected int Height { get; set; }
         [IntrinsicProperty]
-        protected int[] Items { get; set; }
+        public int[] Items { get; set; }
         [IntrinsicProperty]
         protected int Integer { get; set; }
         [IntrinsicProperty]
@@ -95,7 +95,7 @@ namespace OurSonic
                         for (int y = 0; y < 16; y++) {
                             var jx = 0;
                             var jy = 0;
-                            if (itemsGood(x, y)) {
+                            if (ItemsGood(Items, x, y)) {
                                 jx = x;
                                 jy = y;
                                 var _x = pos.X + jx * scale.X;
@@ -132,11 +132,11 @@ namespace OurSonic
             pos.Y = oPos.Y;
         }
 
-        private bool itemsGood(int x, int y)
+        public static bool ItemsGood(int[] items, int x, int y)
         {
-            if (Items[x] < 0)
-                return Math.Abs(Items[x]) >= y;
-            return Items[x] >= 16 - y;
+            if (items[x] < 0)
+                return Math.Abs(items[x]) >= y;
+            return items[x] >= 16 - y;
         }
 
         /*          
@@ -168,7 +168,7 @@ namespace OurSonic
                             var _y = _H.floor(pos.y + (jy * scale.y));
 
                             canvas.lineWidth = 1;
-                            if (state <= 0 && _H.itemsGood(this.items, x, y, jy) && solid > 0) {
+                            if (state <= 0 && _H.ItemsGood(this.items, x, y, jy) && solid > 0) {
                                 canvas.fillStyle = HeightMask.colors[solid];
                                 canvas.fillRect(_x, _y, scale.x, scale.y);
                             } else {

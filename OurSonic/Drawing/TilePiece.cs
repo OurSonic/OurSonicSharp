@@ -140,14 +140,14 @@ namespace OurSonic.Drawing
                               List<int> palAn,
                               CanvasElement image)
         {
-            var val = ( ( drawOrder + 1 ) + ( scale.X * 10 ) + ( animationFrame * 1000 ) + ( ( layer + 1 ) * 10000 ) ).ToString();
+            dynamic val = ((drawOrder + 1) + (scale.X * 10) + (animationFrame * 1000) + ((layer + 1) * 10000));
             if ((dynamic) AnimatedFrames) {
                 for (int index = 0; index < AnimatedFrames.Length; index++) {
                     var animatedFrame = AnimatedFrames[index];
                     val += palAn[animatedFrame] + " ";
                 }
             }
-            Image[val] = image;
+            Image.Me()[val] = image;
         }
 
         private void DrawIt(CanvasContext2D canvas, CanvasElement fd, Point position)
@@ -157,15 +157,15 @@ namespace OurSonic.Drawing
 
         private CanvasElement GetCache(int layer, Point scale, int drawOrder, int animationFrame, List<int> palAn)
         {
-            var val = ( ( drawOrder + 1 ) + ( scale.X * 10 ) + ( animationFrame * 1000 ) + ( ( layer + 1 ) * 10000 ) ).ToString();
+            dynamic val = ( ( drawOrder + 1 ) + ( scale.X * 10 ) + ( animationFrame * 1000 ) + ( ( layer + 1 ) * 10000 ) );
             if (AnimatedFrames.Truthy()) {
                 foreach (var animatedFrame in AnimatedFrames) {
                     val += palAn[animatedFrame] + " ";
                 }
             }
 
-            if (Image[val].Falsey()) return null;
-            return Image[val];
+            if (Image.Me()[val].Falsey()) return null;
+            return Image.Me()[val];
         }
     }
     public enum RotationMode

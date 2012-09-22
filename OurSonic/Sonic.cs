@@ -8,17 +8,21 @@ namespace OurSonic
     public class Sonic
     {
         private Rectangle myRec;
+        private int oldSign;
+        private SonicConstants physicsVariables;
         private int runningTick;
         private SensorManager sensorManager;
         private int sonicLastHitTick;
         private SonicLevel sonicLevel;
         private int ticking;
         [IntrinsicProperty]
+        public Watcher Watcher { get; set; }
+        [IntrinsicProperty]
         public bool Ticking { get; set; }
         [IntrinsicProperty]
-        public int X { get; set; }
+        public double X { get; set; }
         [IntrinsicProperty]
-        public int Y { get; set; }
+        public double Y { get; set; }
         [IntrinsicProperty]
         public int Rings { get; set; }
         [IntrinsicProperty]
@@ -34,11 +38,11 @@ namespace OurSonic
         [IntrinsicProperty]
         public bool HoldingUp { get; set; }
         [IntrinsicProperty]
-        public float Xsp { get; set; }
+        public double Xsp { get; set; }
         [IntrinsicProperty]
-        public float Ysp { get; set; }
+        public double Ysp { get; set; }
         [IntrinsicProperty]
-        public float Gsp { get; set; }
+        public double Gsp { get; set; }
         [IntrinsicProperty]
         public bool Rolling { get; set; }
         [IntrinsicProperty]
@@ -62,7 +66,7 @@ namespace OurSonic
         [IntrinsicProperty]
         public bool SpinDash { get; set; }
         [IntrinsicProperty]
-        public int SpinDashSpeed { get; set; }
+        public double SpinDashSpeed { get; set; }
         [IntrinsicProperty]
         public int Angle { get; set; }
         [IntrinsicProperty]
@@ -71,19 +75,25 @@ namespace OurSonic
         protected string SpriteState { get; set; }
         [IntrinsicProperty]
         protected List<Point> HaltSmoke { get; set; }
+        [IntrinsicProperty]
+        public bool WasJumping { get; set; }
         /*    
-    this.obtainedRing = [];   
+    obtainedRing = [];   
 */
 
         public Sonic()
         {
+            Watcher = new Watcher();
+
+            physicsVariables = SonicConstants.Sonic();
+
             var sonicManager = SonicManager.Instance;
             sonicLevel = sonicManager.SonicLevel;
             X = sonicLevel.StartPositions[0].X;
             Y = sonicLevel.StartPositions[0].Y;
-            sensorManager = new SensorManager(SonicManager.Instance);
+            sensorManager = new SensorManager();
             HaltSmoke = new List<Point>();
-
+            Rings = 100;
             sensorManager.CreateVerticalSensor("a", -9, 0, 36, "#F202F2");
             sensorManager.CreateVerticalSensor("b", 9, 0, 36, "#02C2F2");
             sensorManager.CreateVerticalSensor("c", -9, 0, -20, "#2D2C21");
@@ -104,9 +114,9 @@ namespace OurSonic
                 Mode = RotationMode.Ceiling;
             else if (Angle > 0xA1 && Angle < 0xDE)
                 Mode = RotationMode.RightWall;
-            //        this.x = _H.floor(this.x);
-            //        this.y = _H.floor(this.y);
-            myRec = new Rectangle(X - 5, Y - 20, 5 * 2, 20 * 2);
+            //        x = _H.floor(x);
+            //        y = _H.floor(y);
+            myRec = new Rectangle((int) ( X - 5 ), (int) ( Y - 20 ), 5 * 2, 20 * 2);
             if (InAir)
                 Mode = RotationMode.Floor;
         }
@@ -114,7 +124,7 @@ namespace OurSonic
         public void Tick(SonicLevel sonicLevel, Point scale)
         {
             if (Debugging) {
-                var debugSpeed = 15; //this.watcher.multiply(15);
+                var debugSpeed = Watcher.Multiply(15);
 
                 if (HoldingRight)
                     X += debugSpeed;
@@ -124,7 +134,7 @@ namespace OurSonic
                     Y += debugSpeed;
                 if (HoldingUp)
                     Y -= debugSpeed;
-                var offset = new Point(0, 0); // this.getOffsetFromImage();
+                var offset = new Point(0, 0); // getOffsetFromImage();
                 X = ( ( sonicLevel.LevelWidth * 128 ) + ( X ) ) % ( sonicLevel.LevelWidth * 128 ) + offset.X;
                 Y = ( ( sonicLevel.LevelHeight * 128 ) + ( Y ) ) % ( sonicLevel.LevelHeight * 128 ) + offset.Y;
                 return;
@@ -158,23 +168,27 @@ namespace OurSonic
             if (best != null) {
                 switch (Mode) {
                     case RotationMode.Floor:
-                        X = ( best.Value + ( sensorM1.Value == sensorM2.Value ? 12 : ( best.Letter == "m1" ? 12 : -12 ) ) );
+                        X = ( best.Value +
+                              ( sensorM2 != null && sensorM1 != null && ( sensorM1.Value == sensorM2.Value ) ? 12 : ( best.Letter == "m1" ? 12 : -12 ) ) );
                         Gsp = 0;
                         if (InAir) Xsp = 0;
                         break;
                     case RotationMode.LeftWall:
-                        Y = ( best.Value + ( sensorM1.Value == sensorM2.Value ? 12 : ( best.Letter == "m1" ? 12 : -12 ) ) );
+                        Y = ( best.Value +
+                              ( sensorM2 != null && sensorM1 != null && ( sensorM1.Value == sensorM2.Value ) ? 12 : ( best.Letter == "m1" ? 12 : -12 ) ) );
                         if (InAir) Xsp = 0;
 
                         break;
                     case RotationMode.Ceiling:
-                        X = ( best.Value + ( sensorM1.Value == sensorM2.Value ? 12 : ( best.Letter == "m1" ? 12 : -12 ) ) );
+                        X = ( best.Value +
+                              ( sensorM2 != null && sensorM1 != null && ( sensorM1.Value == sensorM2.Value ) ? 12 : ( best.Letter == "m1" ? 12 : -12 ) ) );
                         Gsp = 0;
                         if (InAir) Xsp = 0;
 
                         break;
                     case RotationMode.RightWall:
-                        Y = ( best.Value + ( sensorM1.Value == sensorM2.Value ? 12 : ( best.Letter == "m1" ? 12 : -12 ) ) );
+                        Y = ( best.Value +
+                              ( sensorM2 != null && sensorM1 != null && ( sensorM1.Value == sensorM2.Value ) ? 12 : ( best.Letter == "m1" ? 12 : -12 ) ) );
                         Gsp = 0;
                         if (InAir) Xsp = 0;
 
@@ -230,7 +244,7 @@ namespace OurSonic
                 if (sensorA == null && sensorB == null)
                     InAir = true;
                 else {
-                    if (sensorA.Value >= 0 && sensorB.Value >= 0) {
+                    if (( sensorA != null && sensorA.Value >= 0 ) && ( sensorB != null && sensorB.Value >= 0 )) {
                         if (sensorA.Value < sensorB.Value) {
                             if (Y + ( 20 ) >= sensorA.Value) {
                                 Angle = sensorA.Angle;
@@ -248,14 +262,14 @@ namespace OurSonic
                                 }
                             }
                         }
-                    } else if (sensorA.Value > -1) {
+                    } else if (( sensorA != null ) && sensorA.Value > -1) {
                         if (Y + ( 20 ) >= sensorA.Value) {
                             Angle = sensorA.Angle;
                             Y = fy = sensorA.Value - hSize.Y;
                             Rolling = CurrentlyBall = false;
                             InAir = false;
                         }
-                    } else if (sensorB.Value > -1) {
+                    } else if (sensorB != null && sensorB.Value > -1) {
                         if (Y + ( 20 ) >= sensorB.Value) {
                             Angle = sensorB.Angle;
                             Y = fy = sensorB.Value - hSize.Y;
@@ -274,7 +288,7 @@ namespace OurSonic
                 var sensorD = sensorManager.GetResult("d");
 
                 if (( sensorC == null && sensorD == null )) {} else {
-                    if (sensorC.Value >= 0 && sensorD.Value >= 0) {
+                    if (sensorD != null && ( sensorC != null ) && ( sensorC.Value >= 0 && sensorD.Value >= 0 )) {
                         if (sensorC.Value < sensorD.Value) {
                             if (Y + ( __h ) >= sensorC.Value) {
                                 if (Ysp < 0) {
@@ -303,7 +317,7 @@ namespace OurSonic
                                 }
                             }
                         }
-                    } else if (sensorC.Value > -1) {
+                    } else if (sensorC != null && sensorC.Value > -1) {
                         if (Y + ( __h ) >= sensorC.Value) {
                             if (Ysp < 0) {
                                 if (sensorC.Angle > 0x48 && sensorC.Angle < 0x58) {
@@ -316,7 +330,7 @@ namespace OurSonic
                                 Y = fy = sensorC.Value + __h;
                             }
                         }
-                    } else if (sensorD.Value > -1) {
+                    } else if (sensorD != null && sensorD.Value > -1) {
                         if (Y + ( __h ) >= sensorD.Value) {
                             if (Ysp < 0) {
                                 if (sensorD.Angle > 0x48 && sensorD.Angle < 0x58) {
@@ -334,8 +348,23 @@ namespace OurSonic
             }
         }
 
-        private Sensor GetBestSensor(Sensor sensorA, Sensor sensorB, RotationMode mode)
+        private SensorM GetBestSensor(SensorM sensor1, SensorM sensor2, RotationMode mode)
         {
+            if (sensor1 == null && sensor2 == null) return null;
+
+            if (sensor1 == null) return sensor2;
+            if (sensor2 == null) return sensor1;
+
+            switch (mode) {
+                case RotationMode.Floor:
+                    return sensor1.Value < sensor2.Value ? sensor1 : sensor2;
+                case RotationMode.LeftWall:
+                    return sensor1.Value > sensor2.Value ? sensor1 : sensor2;
+                case RotationMode.Ceiling:
+                    return sensor1.Value > sensor2.Value ? sensor1 : sensor2;
+                case RotationMode.RightWall:
+                    return sensor1.Value < sensor2.Value ? sensor1 : sensor2;
+            }
             return null;
         }
 
@@ -464,7 +493,7 @@ namespace OurSonic
                 } else if (( runningTick++ ) % ( 7 ) == 0) {
                     SpriteState = "breaking" + ( ( j + 1 ) % 4 );
                     if (j == 0)
-                        HaltSmoke.Add(new Point(X, Y));
+                        HaltSmoke.Add(new Point((int) X, (int) Y));
                 }
             } else if (CurrentlyBall) {
                 if (word != "balls") {
@@ -487,7 +516,229 @@ namespace OurSonic
             }
         }
 
-        private void EffectPhysics() {}
+        private void EffectPhysics()
+        {
+            //watcher.tick();
+
+            var physics = physicsVariables;
+
+            var max = physics.TopSpeed;
+            if (!Jumping) {
+                if (!InAir && WasJumping)
+                    WasJumping = false;
+            }
+            if (InAir && !WasInAir) {
+                WasInAir = true;
+
+                var offset = GetOffsetFromImage();
+                X += offset.X;
+                Y += offset.Y;
+
+                /*if ((angle >= 0x70 && angle <= 0x90)) {
+                xsp = (gsp);
+                }*/
+            }
+            if (!InAir && WasInAir) {
+                WasInAir = false;
+                if (( Angle >= 0xF0 || Angle <= 0x0F ))
+                    Gsp = ( Xsp );
+                else if (( Angle > 0xE2 && Angle <= 0xEF ) ||
+                         ( Angle >= 0x10 && Angle <= 0x1F ))
+                    Gsp = ( Ysp );
+                else if (( Angle >= 0xC0 && Angle <= 0xE2 ))
+                    Gsp = ( -Ysp );
+                else if (( Angle >= 0x20 && Angle <= 0x3F ))
+                    Gsp = ( Ysp );
+                Xsp = 0;
+                Ysp = 0;
+            }
+
+            if (!InAir && !Rolling) {
+                if (!HoldingLeft && !HoldingRight && !JustHit) {
+                    //friction
+                    Gsp -= ( Math.Min(Math.Abs(Gsp), Watcher.Multiply(physics.Frc)) * ( Gsp > 0 ? 1 : -1 ) );
+                }
+                oldSign = Help.Sign(Gsp);
+                //slope
+                Gsp += Watcher.Multiply(physics.Slp) * -Help.Sin(Angle);
+                if (oldSign != Help.Sign(Gsp) && oldSign != 0)
+                    HLock = 30;
+
+                if (HoldingRight && !HoldingLeft && !JustHit) {
+                    Facing = true;
+                    if (Gsp >= 0) {
+                        //accelerate 
+                        Gsp += Watcher.Multiply(physics.Acc);
+                        if (Gsp > max) Gsp = max;
+                    } else {
+                        //decelerate 
+                        Gsp += Watcher.Multiply(physics.Dec);
+                        if (Math.Abs(Gsp) > 4.5) {
+                            Facing = false;
+                            Breaking = 1;
+                            runningTick = 0;
+                        }
+                    }
+                }
+                if (HoldingLeft && !HoldingRight && !JustHit) {
+                    Facing = false;
+                    if (Gsp <= 0) {
+                        //accelerate 
+                        Gsp -= Watcher.Multiply(physics.Acc);
+                        if (Gsp < -max) Gsp = -max;
+                    } else {
+                        //decelerate 
+                        Gsp -= Watcher.Multiply(physics.Dec);
+                        if (Math.Abs(Gsp) > 4.5) {
+                            Facing = true;
+                            Breaking = -1;
+                            runningTick = 0;
+                        }
+                    }
+                }
+            }
+
+            Ducking = false;
+            if (Crouching) {
+                if (Math.Abs(Gsp) > 1.03125) {
+                    Rolling = true;
+                    CurrentlyBall = true;
+                } else
+                    Ducking = true;
+            } else {
+                if (SpinDash) {
+                    Gsp = ( 8 + Help.Floor(SpinDashSpeed) / 2 ) * ( Facing ? 1 : -1 );
+                    SpinDash = false;
+                    Rolling = true;
+                    CurrentlyBall = true;
+                }
+            }
+
+            if (!InAir && Rolling) {
+                //dec  
+                if (HoldingLeft && !JustHit) {
+                    if (Gsp > 0) {
+                        if (Rolling)
+                            Gsp = ( Help.Max(0, Gsp - Watcher.Multiply(physics.Rdec)) );
+                    }
+                }
+                if (HoldingRight && !JustHit) {
+                    if (Gsp < 0) {
+                        if (Rolling)
+                            Gsp = ( Help.Min(0, Gsp + Watcher.Multiply(physics.Rdec)) );
+                    }
+                }
+                //friction
+                Gsp -= ( Math.Min(Math.Abs(Gsp), Watcher.Multiply(physics.Rfrc)) * ( Gsp > 0 ? 1 : -1 ) );
+                oldSign = Help.Sign(Gsp);
+                //slope
+                var ang = Help.Sin(Angle);
+                if (( ang > 0 ) == ( Gsp > 0 ))
+                    Gsp += Watcher.Multiply(-physics.SlpRollingUp) * ang;
+                else
+                    Gsp += Watcher.Multiply(-physics.SlpRollingDown) * ang;
+
+                if (Gsp > max * 2.5) Gsp = max * 2.5f;
+                if (Gsp < -max * 2.5) Gsp = -max * 2.5f;
+
+                if (oldSign != Help.Sign(Gsp) && oldSign != 0)
+                    HLock = 30;
+                if (Math.Abs(Gsp) < 0.53125) {
+                    Rolling = false;
+                    CurrentlyBall = false;
+                }
+            }
+
+            CheckCollisionWithRing();
+
+            if (InAir) {
+                if (HoldingRight && !HoldingLeft && !JustHit) {
+                    Facing = true;
+
+                    if (Xsp >= 0) {
+                        //accelerate 
+                        Xsp += Watcher.Multiply(physics.Air);
+                        if (Xsp > max) Xsp = max;
+                    } else {
+                        //decelerate 
+                        Xsp += Watcher.Multiply(physics.Air);
+                    }
+                }
+                if (HoldingLeft && !HoldingRight && !JustHit) {
+                    Facing = false;
+                    if (Xsp <= 0) {
+                        //accelerate 
+                        Xsp -= Watcher.Multiply(physics.Air);
+                        if (Xsp < -max) Xsp = -max;
+                    } else {
+                        //decelerate 
+                        Xsp -= Watcher.Multiply(physics.Air);
+                    }
+                }
+                if (WasInAir)
+                    if (Jumping) {} else {}
+                //gravity
+                Ysp += JustHit ? 0.1875 : physics.Grv;
+                //drag
+                if (Ysp < 0 && Ysp > -4) {
+                    if (Math.Abs(Xsp) > 0.125)
+                        Xsp *= 0.96875f;
+                }
+                if (Ysp > 16) Ysp = 16;
+            }
+            if (WasInAir && Jumping) {} else if (Jumping && !WasJumping) {
+                WasJumping = true;
+                if (Ducking) {
+                    SpinDash = true;
+                    SpinDashSpeed += 2;
+                    if (SpinDashSpeed > 8)
+                        SpinDashSpeed = 8;
+
+                    SpriteState = "spindash0";
+                } else {
+                    InAir = true;
+                    CurrentlyBall = true;
+                    Xsp = physics.Jmp * Help.Sin(Angle) + Gsp * Help.Cos(Angle);
+                    Ysp = physics.Jmp * Help.Cos(Angle);
+
+                    if (Math.Abs(Xsp) < .17)
+                        Xsp = 0;
+                }
+            }
+
+            if (!InAir) {
+                if (SpinDash)
+                    Gsp = 0;
+                Xsp = Gsp * Help.Cos(Angle);
+                Ysp = Gsp * -Help.Sin(Angle);
+
+                if (Math.Abs(Gsp) < 2.5 && Mode != RotationMode.Floor) {
+                    if (Mode == RotationMode.RightWall) X += 0;
+                    else if (Mode == RotationMode.LeftWall) X += 0;
+                    else if (Mode == RotationMode.Ceiling) Y += 0;
+                    var oldMode = Mode;
+                    UpdateMode();
+                    Gsp = 0;
+                    Mode = RotationMode.Floor;
+                    HLock = 30;
+                    InAir = true;
+                }
+            }
+
+            if (Xsp > 0 && Xsp < 0.008) {
+                Gsp = 0;
+                Xsp = 0;
+            }
+            if (Xsp < 0 && Xsp > -0.008) {
+                Gsp = 0;
+                Xsp = 0;
+            }
+
+            X = ( ( sonicLevel.LevelWidth * 128 ) + ( X + Xsp ) ) % ( sonicLevel.LevelWidth * 128 );
+            Y = ( ( sonicLevel.LevelHeight * 128 ) + ( Y + Ysp ) ) % ( sonicLevel.LevelHeight * 128 );
+        }
+
+        private void CheckCollisionWithRing() {}
 
         public void Draw(CanvasContext2D canvas, Point scale)
         {
@@ -587,7 +838,7 @@ namespace OurSonic
                             ( ( lo.X - SonicManager.Instance.WindowLocation.X - 25 ) * scale.X ),
                             ( ( lo.Y + 12 - SonicManager.Instance.WindowLocation.Y + offset.Y ) * scale.Y ));
                     if (( ( SonicManager.Instance.DrawTickCount + 6 ) % ( 4 * 6 ) ) / 6 == 0)
-                        HaltSmoke.Extract(i, 1);
+                        HaltSmoke = HaltSmoke.Extract(i, 1);
                 }
             }
         }
@@ -608,39 +859,38 @@ namespace OurSonic
                 canvas.FillText("HLock: " + HLock, pos.X + 90, pos.Y + 195);
         }
 
-        public void Hit(int x, int y)
+        public void Hit(double x, double y)
         {
-            /*
-        if (sonicManager.drawTickCount - this.sonicLastHitTick < 120)
-            return;
-        this.justHit = true;
-        this.ysp = -4;
-        this.xsp = 2 * ((this.x - _x) < 0 ? -1 : 1);
-        this.sonicLastHitTick = sonicManager.drawTickCount;
-        var t = 0;
-        var angle = 101.25;
-        var n = false;
-        var speed = 4;
-        while (t < this.rings) {
-            var ring = new Ring(true);
-            sonicManager.activeRings.push(ring);
-            ring.x = this.x;
-            ring.y = this.y - 10;
-            ring.ysp = -Math.sin(angle) * speed;
-            ring.xsp = Math.cos(angle) * speed;
+            if (SonicManager.Instance.DrawTickCount - sonicLastHitTick < 120)
+                return;
+            JustHit = true;
+            Ysp = -4;
+            Xsp = 2 * ( ( X - x ) < 0 ? -1 : 1 );
+            sonicLastHitTick = SonicManager.Instance.DrawTickCount;
+            var t = 0;
+            var angle = 101.25;
+            var n = false;
+            var speed = 4;
+            while (t < Rings) {
+                var ring = new Ring(true);
+                SonicManager.Instance.ActiveRings.Add(ring);
+                ring.X = (int) X;
+                ring.Y = (int) Y - 10;
+                ring.Ysp = -Math.Sin(angle) * speed;
+                ring.Xsp = Math.Cos(angle) * speed;
 
-            if (n) {
-                ring.ysp *= -1;
-                angle += 22.5;
+                if (n) {
+                    ring.Ysp *= -1;
+                    angle += 22.5;
+                }
+                n = !n;
+                t++;
+                if (t == 16) {
+                    speed = 2;
+                    angle = 101.25;
+                }
             }
-            n = !n;
-            t++;
-            if (t == 16) {
-                speed = 2;
-                angle = 101.25;
-            }
-        }
-        this.rings = 0;*/
+            Rings = 0;
         }
 
         public void Debug()
@@ -700,6 +950,20 @@ namespace OurSonic
         public void ReleaseJump()
         {
             Jumping = false;
+        }
+
+        public bool CheckCollisionWithObjects(int x, int y, string letter)
+        {
+            return false;
+        }
+    }
+    public class Watcher
+    {
+        public void Tick() {}
+
+        public double Multiply(double v)
+        {
+            return v;
         }
     }
 }

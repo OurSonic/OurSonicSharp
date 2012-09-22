@@ -70,6 +70,7 @@ namespace OurSonic.Drawing
             for (int i = 0; i < Colors.Length; i++) {
                 for (int jf = 0; jf < Colors[i].Length; jf++) {
                     var gj = Colors[i][jf];
+                    if (gj == 0) continue;
                     var m =
                             palette_[
                                     ( palette + indexed ) %

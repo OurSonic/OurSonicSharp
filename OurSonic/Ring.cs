@@ -14,6 +14,10 @@ namespace OurSonic
         protected int AnimationIndex { get; set; }
         [IntrinsicProperty]
         public int TickCount { get; set; }
+        [IntrinsicProperty]
+        public double Ysp { get; set; }
+        [IntrinsicProperty]
+        public double Xsp { get; set; }
         public Ring(bool active) : base(0, 0) {}
 
         public void Draw(CanvasContext2D canvas, Point pos, Point scale)

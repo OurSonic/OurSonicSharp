@@ -4,13 +4,13 @@ namespace OurSonic
 {
     public class Dragger
     {
-        private readonly Action<float, float> myOnFling;
-        private float lag = 0.925f;
+        private readonly Action<double, double> myOnFling;
+        private double lag = 0.925f;
         private Point lastPos;
-        private float xsp;
-        private float ysp;
+        private double xsp;
+        private double ysp;
 
-        public Dragger(Action<float, float> onFling)
+        public Dragger(Action<double, double> onFling)
         {
             myOnFling = onFling;
         }
@@ -37,8 +37,8 @@ namespace OurSonic
 
             xsp += ( lastPos.X - e.ClientX ) * 2.7f;
             ysp += ( lastPos.Y - e.ClientY ) * 2.7f;
-            xsp = (float) ( ( xsp > 0 ? 1 : -1 ) * Math.Min(Math.Abs(xsp), 60) );
-            ysp = (float) ( ( ysp > 0 ? 1 : -1 ) * Math.Min(Math.Abs(ysp), 60) );
+            xsp = (double) ( ( xsp > 0 ? 1 : -1 ) * Math.Min(Math.Abs(xsp), 60) );
+            ysp = (double) ( ( ysp > 0 ? 1 : -1 ) * Math.Min(Math.Abs(ysp), 60) );
             lastPos = new Point(e.ClientX, e.ClientY);
         }
 

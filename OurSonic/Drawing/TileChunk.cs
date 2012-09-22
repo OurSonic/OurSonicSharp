@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonicModels;
 namespace OurSonic.Drawing
 {
     public class TileChunk
@@ -19,6 +20,10 @@ namespace OurSonic.Drawing
         public JsDictionary<int, Animation> Animated { get; set; }
         [IntrinsicProperty]
         public int Index { get; set; }
+        public Solidity[][] HeightBlocks1 { get; set; }
+        public Solidity[][] HeightBlocks2 { get; set; }
+        public int[][] AngleMap1 { get; set; }
+        public int[][] AngleMap2 { get; set; }
 
         public TileChunk( /*TilePiece[][] tilePieces*/)
         {
