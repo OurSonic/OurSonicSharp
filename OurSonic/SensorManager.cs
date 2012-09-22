@@ -138,8 +138,8 @@ namespace OurSonic
                             if ( /*x1 - i > SonicManager.Instance.SonicLevel.LevelWidth || */curh[( __x - i )][__y] >= (Solidity) 1 ||
                                                                                              SonicManager.Instance.SonicToon.CheckCollisionWithObjects
                                                                                                      (x1 - i, y1, Letter)) {
-                                if (!( ( curh[( __x - i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
-                                    continue;
+                    /*            if (!( ( curh[( __x - i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+                                    continue;*/
 
                                 __currentM.Value = x1 - i;
                                 __currentM.Angle = cura[( __x - i ) / 16][( __y ) / 16];
@@ -172,8 +172,8 @@ namespace OurSonic
                         if ( /*x1 + i > SonicManager.Instance.SonicLevel.LevelWidth || */ curh[( __x + i )][__y] >= (Solidity) 1 ||
                                                                                           SonicManager.Instance.SonicToon.CheckCollisionWithObjects(
                                                                                                   x1 + i, y1, Letter)) {
-                            if (!( ( curh[( __x + i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
-                                continue;
+                            /*if (!( ( curh[( __x + i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+                                continue;*/
 
                             __currentM.Value = x1 + i;
                             __currentM.Angle = cura[( __x + i ) / 16][( __y ) / 16];
@@ -205,8 +205,8 @@ namespace OurSonic
                             if ( /*x1 + i > SonicManager.Instance.SonicLevel.LevelWidth || */  curh[( __x + i )][__y] >= (Solidity) 1 ||
                                                                                                SonicManager.Instance.SonicToon.
                                                                                                        CheckCollisionWithObjects(x1 + i, y1, Letter)) {
-                                if (!( ( curh[( __x + i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
-                                    continue;
+                            /*    if (!( ( curh[( __x + i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+                                    continue;*/
 
                                 __currentM.Value = x1 + i;
                                 __currentM.Angle = cura[( __x + i ) / 16][( __y ) / 16];
@@ -235,8 +235,8 @@ namespace OurSonic
                         if ( /*x1 - i > SonicManager.Instance.SonicLevel.LevelWidth ||*/ curh[( __x - i )][__y] >= (Solidity) 1 ||
                                                                                          SonicManager.Instance.SonicToon.CheckCollisionWithObjects(
                                                                                                  x1 - i, y1, Letter)) {
-                            if (!( ( curh[( __x - i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
-                                continue;
+                  /*          if (!( ( curh[( __x - i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+                                continue;*/
 
                             __currentM.Value = x1 - i;
                             __currentM.Angle = cura[( __x - i ) / 16][( __y ) / 16];
@@ -263,8 +263,12 @@ namespace OurSonic
                                 } else break;
                             }
                             if (curh[__x][__y - i] > (Solidity) 1 || SonicManager.Instance.SonicToon.CheckCollisionWithObjects(x1, y1 - i, Letter)) {
-                                if (!( ( curh[__x][__y - i] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+/*
+                                if (!( ( curh[__x][__y - i] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) )) {
+                                    Help.Debugger();
                                     continue;
+                                }
+*/
 
                                 __currentM.Value = y1 - i;
                                 __currentM.Angle = cura[( __x ) / 16][( __y - i ) / 16];
@@ -289,9 +293,13 @@ namespace OurSonic
                             if (curh[__x][__y + i] == (Solidity) 1 && SonicManager.Instance.SonicToon.InAir && SonicManager.Instance.SonicToon.Ysp < 0)
                                 continue;
 
+/*
                             if (!( ( curh[__x][__y + i] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+                            {
+                                Help.Debugger();
                                 continue;
-
+                            }
+*/
                             __currentM.Value = y1 + i;
                             __currentM.Angle = cura[( __x ) / 16][( __y + i ) / 16];
                             return __currentM;
@@ -314,9 +322,13 @@ namespace OurSonic
                                 } else break;
                             }
                             if (curh[__x][__y + i] >= (Solidity) 1 || SonicManager.Instance.SonicToon.CheckCollisionWithObjects(x1, y1 + i, Letter)) {
+/*
                                 if (!( ( curh[__x][__y + i] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+                                {
+                                    Help.Debugger();
                                     continue;
-
+                                }
+*/
                                 __currentM.Value = y1 + i;
                                 __currentM.Angle = cura[( __x ) / 16][( __y + i ) / 16];
                                 return __currentM;
@@ -338,8 +350,11 @@ namespace OurSonic
                             } else break;
                         }
                         if (curh[__x][__y - i] > (Solidity) 1 || SonicManager.Instance.SonicToon.CheckCollisionWithObjects(x1, y1 + i, Letter)) {
-                            if (!( ( curh[__x][__y - i] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+/*                            if (!( ( curh[__x][__y - i] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+                            {
+                                Help.Debugger();
                                 continue;
+                            }*/
                             __currentM.Value = y1 - i;
                             __currentM.Angle = cura[( __x ) / 16][( __y - i ) / 16];
                             return __currentM;

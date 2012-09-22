@@ -164,7 +164,7 @@ namespace OurSonic.Drawing
                 }
             }
 
-            if (Image.Me()[val].Falsey()) return null;
+            if (!Image.Me()[val]) return null;
             return Image.Me()[val];
         }
     }

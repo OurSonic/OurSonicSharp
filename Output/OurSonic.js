@@ -643,7 +643,7 @@ OurSonic.Drawing.TilePiece.prototype = {
 				val += palAn[animatedFrame] + ' ';
 			}
 		}
-		if (!!this.image[val].Falsey()) {
+		if (!!!this.image[val]) {
 			return null;
 		}
 		return Type.cast(this.image[val], Element);
@@ -1197,9 +1197,8 @@ OurSonic.Sensor.prototype = {
 							}
 						}
 						if (curh[__x - i][__y] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1 - i, y1, this.letter)) {
-							if (!(curh[__x - i][__y] < 3 || (this.letter === 'a' || this.letter === 'b'))) {
-								continue;
-							}
+							//            if (!( ( curh[( __x - i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+							//            continue;
 							this.$__currentM.value = x1 - i;
 							this.$__currentM.angle = cura[ss.Int32.div(__x - i, 16)][ss.Int32.div(__y, 16)];
 							return this.$__currentM;
@@ -1232,9 +1231,8 @@ OurSonic.Sensor.prototype = {
 						}
 					}
 					if (curh[__x + i][__y] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1 + i, y1, this.letter)) {
-						if (!(curh[__x + i][__y] < 3 || (this.letter === 'a' || this.letter === 'b'))) {
-							continue;
-						}
+						//if (!( ( curh[( __x + i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+						//continue;
 						this.$__currentM.value = x1 + i;
 						this.$__currentM.angle = cura[ss.Int32.div(__x + i, 16)][ss.Int32.div(__y, 16)];
 						return this.$__currentM;
@@ -1270,9 +1268,8 @@ OurSonic.Sensor.prototype = {
 							}
 						}
 						if (curh[__x + i][__y] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1 + i, y1, this.letter)) {
-							if (!(curh[__x + i][__y] < 3 || (this.letter === 'a' || this.letter === 'b'))) {
-								continue;
-							}
+							//    if (!( ( curh[( __x + i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+							//    continue;
 							this.$__currentM.value = x1 + i;
 							this.$__currentM.angle = cura[ss.Int32.div(__x + i, 16)][ss.Int32.div(__y, 16)];
 							return this.$__currentM;
@@ -1298,9 +1295,8 @@ OurSonic.Sensor.prototype = {
 						}
 					}
 					if (curh[__x - i][__y] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1 - i, y1, this.letter)) {
-						if (!(curh[__x - i][__y] < 3 || (this.letter === 'a' || this.letter === 'b'))) {
-							continue;
-						}
+						//          if (!( ( curh[( __x - i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+						//          continue;
 						this.$__currentM.value = x1 - i;
 						this.$__currentM.angle = cura[ss.Int32.div(__x - i, 16)][ss.Int32.div(__y, 16)];
 						return this.$__currentM;
@@ -1327,9 +1323,14 @@ OurSonic.Sensor.prototype = {
 							}
 						}
 						if (curh[__x][__y - i] > 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1, y1 - i, this.letter)) {
-							if (!(curh[__x][__y - i] < 3 || (this.letter === 'a' || this.letter === 'b'))) {
-								continue;
-							}
+							//
+							//                                if (!( ( curh[__x][__y - i] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) )) {
+							//
+							//                                Help.Debugger();
+							//
+							//                                continue;
+							//
+							//                                }
 							this.$__currentM.value = y1 - i;
 							this.$__currentM.angle = cura[ss.Int32.div(__x, 16)][ss.Int32.div(__y - i, 16)];
 							return this.$__currentM;
@@ -1353,9 +1354,16 @@ OurSonic.Sensor.prototype = {
 						if (curh[__x][__y + i] === 1 && OurSonic.SonicManager.instance.sonicToon.inAir && OurSonic.SonicManager.instance.sonicToon.ysp < 0) {
 							continue;
 						}
-						if (!(curh[__x][__y + i] < 3 || (this.letter === 'a' || this.letter === 'b'))) {
-							continue;
-						}
+						//
+						//                            if (!( ( curh[__x][__y + i] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+						//
+						//                            {
+						//
+						//                            Help.Debugger();
+						//
+						//                            continue;
+						//
+						//                            }
 						this.$__currentM.value = y1 + i;
 						this.$__currentM.angle = cura[ss.Int32.div(__x, 16)][ss.Int32.div(__y + i, 16)];
 						return this.$__currentM;
@@ -1379,9 +1387,16 @@ OurSonic.Sensor.prototype = {
 							}
 						}
 						if (curh[__x][__y + i] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1, y1 + i, this.letter)) {
-							if (!(curh[__x][__y + i] < 3 || (this.letter === 'a' || this.letter === 'b'))) {
-								continue;
-							}
+							//
+							//                                if (!( ( curh[__x][__y + i] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+							//
+							//                                {
+							//
+							//                                Help.Debugger();
+							//
+							//                                continue;
+							//
+							//                                }
 							this.$__currentM.value = y1 + i;
 							this.$__currentM.angle = cura[ss.Int32.div(__x, 16)][ss.Int32.div(__y + i, 16)];
 							return this.$__currentM;
@@ -1402,9 +1417,11 @@ OurSonic.Sensor.prototype = {
 						}
 					}
 					if (curh[__x][__y - i] > 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1, y1 + i, this.letter)) {
-						if (!(curh[__x][__y - i] < 3 || (this.letter === 'a' || this.letter === 'b'))) {
-							continue;
-						}
+						//                            if (!( ( curh[__x][__y - i] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+						//                            {
+						//                            Help.Debugger();
+						//                            continue;
+						//                            }
 						this.$__currentM.value = y1 - i;
 						this.$__currentM.angle = cura[ss.Int32.div(__x, 16)][ss.Int32.div(__y - i, 16)];
 						return this.$__currentM;
