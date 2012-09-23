@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 namespace OurSonic.Level
@@ -35,23 +36,19 @@ namespace OurSonic.Level
 
         public void Init(LevelObjectInfo @object, SonicLevel level, Sonic sonic)
         {
-            /*
- 
-                    object.reset();
 
-                    this.evalMe("initScript").apply(object, [object, level, sonic]);*/
+            @object.Reset();
+            this.evalMe("initScript").Me().apply(@object, new object[] { @object, level, sonic });
         }
 
         public dynamic OnCollide(LevelObjectInfo @object, SonicLevel level, Sonic sonic, SensorM sensor, dynamic piece)
         {
-            //return this.evalMe("collideScript").apply(object, [object, level, sonic, sensor, piece]);
-            return null;
+            return this.evalMe("collideScript").Me().apply(@object, new object[] { @object, level, sonic, sensor, piece });
         }
 
         public dynamic OnHurtSonic(LevelObjectInfo @object, SonicLevel level, Sonic sonic, SensorM sensor, dynamic piece)
         {
-            //return this.evalMe("hurtScript").apply(object, [object, level, sonic, sensor, piece]);
-            return null;
+            return this.evalMe("hurtScript").Me().apply(@object, new object[] { @object, level, sonic, sensor, piece });
         }
 
         public bool Tick(LevelObjectInfo @object, SonicLevel level, Sonic sonic)
@@ -61,9 +58,10 @@ namespace OurSonic.Level
 
             @object.lastDrawTick = SonicManager.Instance.tickCount;
 
-            evalMe("tickScript").apply(@object, new dynamic[] {@object, level, sonic});
+            evalMe("tickScript").Me().apply(@object, new object[] { @object, level, sonic });
 
-            if (@object.State.Truthy()) {
+            if (@object.State.Truthy())
+            {
                 @object.Xsp = @object.State.Xsp;
                 @object.Ysp = @object.State.Ysp;
             }
@@ -77,26 +75,29 @@ namespace OurSonic.Level
             //alert('todo death');
         }
 
-        private dynamic evalMe(string js)
+        private JsDictionary<string, Func<LevelObjectInfo, SonicLevel, Sonic, SensorM, LevelObjectPiece, bool>> cache = new JsDictionary<string, Func<LevelObjectInfo, SonicLevel, Sonic, SensorM, LevelObjectPiece, bool>>();
+
+        private Func<LevelObjectInfo, SonicLevel, Sonic, SensorM, LevelObjectPiece, bool> evalMe(string js)
         {
-            /*
-        if (!this[js + "_last"]) {
-            this[js + "_last"] = "";
-        }
-        if (this[js + "_last"] != this[js]) {
-            this[js + "Compiled"] = undefined;
-        }
+            if (Help.Falsey(cache[js + "_last"]))
+            {
+                cache[js + "_last"] = null;
+            }
+            if (cache[js + "_last"] != cache[js])
+            {
+                cache[js + "Compiled"] = null;
+            }
 
-        this[js + "_last"] = this[js];
+            cache[js + "_last"] = cache[js];
 
 
-        if (!this[js + "Compiled"]) {
-            this[js + "Compiled"] = eval("(function(object,level,sonic,sensor,piece){" + this[js] + "});");
+            if (cache[js + "Compiled"].Falsey()) {
+                cache[js + "Compiled"] =
+                        Script.Reinterpret<Func<LevelObjectInfo, SonicLevel, Sonic, SensorM, LevelObjectPiece, bool>>(
+                                Script.Eval("(function(object,level,sonic,sensor,piece){" + cache[js] + "});"));
 
-        }
-        return this[js + "Compiled"];
-             */
-            return null;
+            }
+            return cache[js + "Compiled"];
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
@@ -30,7 +31,7 @@ namespace OurSonic.Level
             }
         }
 
-        public void DrawUI(CanvasInformation canvas,
+        public void DrawUI(CanvasContext2D canvas,
                            Point pos,
                            Point scale,
                            bool showOutline,
@@ -38,95 +39,114 @@ namespace OurSonic.Level
                            int selectedPieceIndex,
                            Point zeroPosition)
         {
-            /* canvas.save();
-        canvas.strokeStyle = "#000000";
-        canvas.lineWidth = 2;
+            canvas.Save();
+            canvas.StrokeStyle = "#000000";
+            canvas.LineWidth = 2;
 
-        canvas.fillStyle = "#FFFFFF";
-        canvas.fillRect(pos.x, pos.y, this.width, this.height);
+            canvas.FillStyle = "#FFFFFF";
+            canvas.FillRect(pos.X, pos.Y, this.Width, this.Height);
 
-        canvas.beginPath();
-        canvas.rect(pos.x, pos.y, this.width, this.height);
-        canvas.clip();
-        canvas.closePath();
+            canvas.BeginPath();
+            canvas.Rect(pos.X, pos.Y, this.Width, this.Height);
+            canvas.Clip();
+            canvas.ClosePath();
 
-        canvas.translate(zeroPosition.x, zeroPosition.y);
-        //        canvas.scale(3, 3);
+            canvas.Translate(zeroPosition.X, zeroPosition.Y);
+            //        canvas.scale(3, 3);
 
-        canvas.beginPath();
-        canvas.moveTo(pos.x + -250, pos.y + 0);
-        canvas.lineTo(pos.x + 250, pos.y + 0);
-        canvas.closePath();
-        canvas.stroke();
+            canvas.BeginPath();
+            canvas.MoveTo(pos.X + -250, pos.Y + 0);
+            canvas.LineTo(pos.X + 250, pos.Y + 0);
+            canvas.ClosePath();
+            canvas.Stroke();
 
-        canvas.beginPath();
-        canvas.moveTo(pos.x + 0, pos.y + -250);
-        canvas.lineTo(pos.x + 0, pos.y + 250);
-        canvas.closePath();
-        canvas.stroke();
-
-
-        for (var i = 1; i < this.pieces.length; i++) {
-            var j = this.pieces[i];
-
-            canvas.beginPath();
-            canvas.moveTo(pos.x + j.x, pos.y + j.y);
-            canvas.lineTo(pos.x + this.pieces[i - 1].x, pos.y + this.pieces[i - 1].y);
-            canvas.stroke();
-
-        }
+            canvas.BeginPath();
+            canvas.MoveTo(pos.X + 0, pos.Y + -250);
+            canvas.LineTo(pos.X + 0, pos.Y + 250);
+            canvas.ClosePath();
+            canvas.Stroke();
 
 
-        var drawRadial;
-        for (var i = 0; i < this.pieces.length; i++) {
-            var j = this.pieces[i];
-            if (showImages) {
-                var piece = sonicManager.uiManager.objectFrameworkArea.objectFramework.pieces[j.pieceIndex];
-                var asset = sonicManager.uiManager.objectFrameworkArea.objectFramework.assets[piece.assetIndex];
-                if (asset.frames.length > 0) {
-                    var frm = asset.frames[j.frameIndex];
-                    drawRadial = sonicManager.mainCanvas.createRadialGradient(0, 0, 0, 10, 10, 50);
-                    drawRadial.addColorStop(0, 'white');
-                    if (selectedPieceIndex == i) {
-                        drawRadial.addColorStop(1, 'yellow');
-                    } else {
-                        drawRadial.addColorStop(1, 'red');
-                    }
-                    var borderSize = 3;
-                    canvas.fillStyle = drawRadial;
-                    //   canvas.fillRect(pos.x + j.x - frm.offsetX - borderSize, pos.y + j.y - frm.offsetY - borderSize, frm.width + borderSize * 2, frm.height + borderSize*2);
-                    frm.drawUI(canvas, { x: pos.x + j.x - frm.offsetX, y: pos.y + j.y - frm.offsetY }, { width: frm.width, height: frm.height }, false, true, true, false, piece.xflip, piece.yflip);
-                }
-            } else {
-                drawRadial = sonicManager.mainCanvas.createRadialGradient(0, 0, 0, 10, 10, 50);
-                drawRadial.addColorStop(0, 'white');
-                if (selectedPieceIndex == i) {
-                    drawRadial.addColorStop(1, 'yellow');
-                } else {
-                    drawRadial.addColorStop(1, 'red');
-                }
+            for (var i = 1; i < this.Pieces.Count; i++)
+            {
+                var j = this.Pieces[i];
 
-                canvas.fillStyle = drawRadial;
-                canvas.beginPath();
-                canvas.arc(pos.x + j.x, pos.y + j.y, 10, 0, Math.PI * 2, true);
-                canvas.closePath();
-                canvas.fill();
+                canvas.BeginPath();
+                canvas.MoveTo(pos.X + j.X, pos.Y + j.Y);
+                canvas.LineTo(pos.X + this.Pieces[i - 1].X, pos.Y + this.Pieces[i - 1].Y);
+                canvas.Stroke();
 
             }
-        }
-        canvas.restore();*/
+
+
+            Gradient drawRadial;
+            for (var i = 0; i < this.Pieces.Count; i++)
+            {
+                var j = this.Pieces[i];
+                if (showImages)
+                {
+/*
+                    LevelObjectPiece piece = sonicManager.uiManager.objectFrameworkArea.objectFramework.pieces[j.PieceIndex];
+                    var asset = sonicManager.uiManager.objectFrameworkArea.objectFramework.assets[piece.AssetIndex];
+                    if (asset.Frames.length > 0)
+                    {
+                        LevelObjectAssetFrame frm = asset.Frames[j.FrameIndex];
+                        drawRadial = SonicManager.Instance.mainCanvas.Context.CreateRadialGradient(0, 0, 0, 10, 10, 50);
+                        drawRadial.AddColorStop(0, "white");
+                        if (selectedPieceIndex == i)
+                        {
+                            drawRadial.AddColorStop(1, "yellow");
+                        }
+                        else
+                        {
+                            drawRadial.AddColorStop(1, "red");
+                        }
+                        var borderSize = 3;
+                        canvas.FillStyle = drawRadial;
+                        //   canvas.fillRect(pos.x + j.x - frm.offsetX - borderSize, pos.y + j.y - frm.offsetY - borderSize, frm.width + borderSize * 2, frm.height + borderSize*2);
+                        frm.DrawUI(canvas, new Point(pos.X + j.X - frm.OffsetX, pos.Y + j.Y - frm.OffsetY), new Point(frm.Width, frm.Height),
+                            false, true, true, false, piece.Xflip, piece.Yflip);
+                    }
+*/
+                }
+                else
+                {
+                    drawRadial = SonicManager.Instance.mainCanvas.Context.CreateRadialGradient(0, 0, 0, 10, 10, 50);
+                    drawRadial.AddColorStop(0, "white");
+                    if (selectedPieceIndex == i)
+                    {
+                        drawRadial.AddColorStop(1, "yellow");
+                    }
+                    else
+                    {
+                        drawRadial.AddColorStop(1, "red");
+                    }
+
+                    canvas.FillStyle = drawRadial;
+                    canvas.BeginPath();
+                    canvas.Arc(pos.X + j.X, pos.Y + j.Y, 10, 0, Math.PI * 2, true);
+                    canvas.ClosePath();
+                    canvas.Fill();
+
+                }
+            }
+            canvas.Restore();
         }
 
         public void Draw(CanvasContext2D canvas, int x, int y, Point scale, LevelObject framework, LevelObjectInfo instance, bool showHeightMap)
         {
-            for (var i = 0; i < instance.Pieces.Count; i++) {
+            for (var i = 0; i < instance.Pieces.Count; i++)
+            {
                 var j = instance.Pieces[i];
                 if (!j.Visible) continue;
                 var piece = framework.Pieces[j.PieceIndex];
                 var asset = framework.Assets[piece.AssetIndex];
-                if (asset.Frames.Count > 0) {
+                if (asset.Frames.Count > 0)
+                {
                     var frm = asset.Frames[j.FrameIndex];
-//                  frm.DrawUI(canvas, new Point((x + j.X * scale.X) - (frm.OffsetX * scale.X), (y + j.Y * scale.Y) - (frm.OffsetY * scale.Y)), new Point(frm.Width * scale.X, frm.Height * scale.Y), false, showHeightMap, showHeightMap, false, piece.Xflip, piece.Yflip);
+                    frm.DrawUI(canvas, new Point(( x + j.X * scale.X ) - ( frm.OffsetX * scale.X ), ( y + j.Y * scale.Y ) - ( frm.OffsetY * scale.Y )),
+                               new Point(frm.Width * scale.X, frm.Height * scale.Y), false, showHeightMap, showHeightMap, false, piece.Xflip,
+                               piece.Yflip);
                 }
             }
         }

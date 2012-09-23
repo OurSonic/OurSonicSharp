@@ -13,7 +13,7 @@ namespace OurSonic
         private static string[] base64chars =
                 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".Split("");
         private static JsDictionary<string, int> base64Inv;
-        private readonly CanvasInformation mainCanvas;
+        public readonly CanvasInformation mainCanvas;
         private readonly SonicEngine myEngine;
         private readonly ObjectManager objectManager;
         public int DrawTickCount;

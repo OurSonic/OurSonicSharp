@@ -10,6 +10,52 @@ namespace OurSonic
 {
     public partial class SonicManager
     {
+        public void loadObjects(dynamic[] objects)
+        {
+            for (int l = 0; l < SonicLevel.Objects.Count; l++) {
+                var o = SonicLevel.Objects[l].Key;
+                if()
+            }
+
+            /* 
+        OurSonic.SonicLevels.getObjects(objectKeys, function (objects) {
+            window.CachedObjects = [];
+            for (l = 0; l < sonicManager.SonicLevel.Objects.length; l++) {
+                o = sonicManager.SonicLevel.Objects[l].key;
+                if (window.CachedObjects[o]) {
+                    sonicManager.SonicLevel.Objects[l].setObjectData(window.CachedObjects[o]);
+                    continue;
+                }
+                var d = JSLINQ(objects).First(function (p) { return p.key == o; });
+                if (!d) {
+                    sonicManager.SonicLevel.Objects[l].setObjectData(new LevelObject(o));
+                    continue;
+                }
+
+                var dr = _H.extend(new LevelObject(""), jQuery.parseJSON(d.value));
+                dr = sonicManager.objectManager.extendObject(dr);
+
+                for (var n = 0; n < dr.assets.length; n++) {
+                    for (var s = 0; s < dr.assets[n].frames.length; s++) {
+                        dr.assets[n].frames[s].hurtSonicMap.length = dr.assets[n].frames[s].width;
+                        dr.assets[n].frames[s].collisionMap.length = dr.assets[n].frames[s].width;
+                        for (var t = 0; t < dr.assets[n].frames[s].hurtSonicMap.length; t++) {
+                            dr.assets[n].frames[s].hurtSonicMap[t].length = dr.assets[n].frames[s].height;
+                            dr.assets[n].frames[s].collisionMap[t].length = dr.assets[n].frames[s].height;
+
+                        }
+                    }
+                }
+
+                window.CachedObjects[o] = dr;
+                sonicManager.SonicLevel.Objects[l].setObjectData(dr);
+
+            }
+
+        });
+
+*/
+        }
         public void Load(string lvl)
         {
             Loading = true;
@@ -55,56 +101,17 @@ namespace OurSonic
             }
 
 
-            var objectKeys = new JsDictionary<string, object>();
-            /*
-        var objectKeys = [];
-        for (l = 0; l < sonicManager.SonicLevel.Objects.length; l++) {
-            o = sonicManager.SonicLevel.Objects[l].key;
-
-            if (JSLINQ(objectKeys).Count(function (p) { return p == o; }) == 0) {
-                objectKeys.push(o);
-            }
-        }
-
-
-
-        OurSonic.SonicLevels.getObjects(objectKeys, function (objects) {
-            window.CachedObjects = [];
-            for (l = 0; l < sonicManager.SonicLevel.Objects.length; l++) {
-                o = sonicManager.SonicLevel.Objects[l].key;
-                if (window.CachedObjects[o]) {
-                    sonicManager.SonicLevel.Objects[l].setObjectData(window.CachedObjects[o]);
-                    continue;
-                }
-                var d = JSLINQ(objects).First(function (p) { return p.key == o; });
-                if (!d) {
-                    sonicManager.SonicLevel.Objects[l].setObjectData(new LevelObject(o));
-                    continue;
+            var objectKeys = new List<string>();
+            for (int l = 0; l < SonicLevel.Objects.Count; l++) {
+                var o = SonicLevel.Objects[l].Key;
+                if (objectKeys.Count(p => p == o) == 0) {
+                    objectKeys.Add(o);
                 }
 
-                var dr = _H.extend(new LevelObject(""), jQuery.parseJSON(d.value));
-                dr = sonicManager.objectManager.extendObject(dr);
+            }        
 
-                for (var n = 0; n < dr.assets.length; n++) {
-                    for (var s = 0; s < dr.assets[n].frames.length; s++) {
-                        dr.assets[n].frames[s].hurtSonicMap.length = dr.assets[n].frames[s].width;
-                        dr.assets[n].frames[s].collisionMap.length = dr.assets[n].frames[s].width;
-                        for (var t = 0; t < dr.assets[n].frames[s].hurtSonicMap.length; t++) {
-                            dr.assets[n].frames[s].hurtSonicMap[t].length = dr.assets[n].frames[s].height;
-                            dr.assets[n].frames[s].collisionMap[t].length = dr.assets[n].frames[s].height;
-
-                        }
-                    }
-                }
-
-                window.CachedObjects[o] = dr;
-                sonicManager.SonicLevel.Objects[l].setObjectData(dr);
-
-            }
-
-        });
-
-*/
+//TODO: LOAD OBJECTS
+            KLOADOBEJCTS
             SonicLevel.CurPaletteIndex = 0;
             SonicLevel.palAn = new List<int>();
             SonicLevel.CurHeightMap = true;
