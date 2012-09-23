@@ -1819,7 +1819,7 @@ OurSonic.Sonic = function() {
 	this.$sensorManager.createVerticalSensor('c', -9, 0, -20, '#2D2C21', false);
 	this.$sensorManager.createVerticalSensor('d', 9, 0, -20, '#C24222', false);
 	this.$sensorManager.createHorizontalSensor('m1', 4, 0, -12, '#212C2E', false);
-	this.$sensorManager.createHorizontalSensor('m2', 4, 0, 12, '#22Ffc1', false);
+	this.$sensorManager.createHorizontalSensor('m2', 4, 0, 13, '#22Ffc1', false);
 	this.spriteState = 'normal';
 };
 OurSonic.Sonic.prototype = {
@@ -1902,7 +1902,7 @@ OurSonic.Sonic.prototype = {
 					break;
 				}
 				case 314: {
-					this.x = best.value + ((ss.isValue(sensorM2) && ss.isValue(sensorM1) && sensorM1.value === sensorM2.value) ? 12 : ((best.letter === 'm1') ? 12 : -12));
+					this.x = best.value + ((ss.isValue(sensorM2) && ss.isValue(sensorM1) && sensorM1.value === sensorM2.value) ? 12 : ((best.letter === 'm1') ? -12 : 12));
 					this.gsp = 0;
 					if (this.inAir) {
 						this.xsp = 0;
@@ -1910,7 +1910,7 @@ OurSonic.Sonic.prototype = {
 					break;
 				}
 				case 224: {
-					this.y = best.value + ((ss.isValue(sensorM2) && ss.isValue(sensorM1) && sensorM1.value === sensorM2.value) ? 12 : ((best.letter === 'm1') ? 12 : -12));
+					this.y = best.value + ((ss.isValue(sensorM2) && ss.isValue(sensorM1) && sensorM1.value === sensorM2.value) ? 12 : ((best.letter === 'm1') ? -12 : 12));
 					this.gsp = 0;
 					if (this.inAir) {
 						this.xsp = 0;
@@ -2012,9 +2012,9 @@ OurSonic.Sonic.prototype = {
 					if (sensorC.value < sensorD.value) {
 						if (this.y + __h >= sensorC.value) {
 							if (this.ysp < 0) {
-								if (sensorC.angle > 72 && sensorC.angle < 88) {
+								if (sensorC.angle > 64 && sensorC.angle < 192) {
 									this.angle = sensorC.angle;
-									this.gsp = -this.ysp;
+									this.gsp = this.ysp;
 									this.inAir = false;
 									this.wasInAir = false;
 								}
@@ -2027,7 +2027,7 @@ OurSonic.Sonic.prototype = {
 					}
 					else if (this.y + __h >= sensorD.value) {
 						if (this.ysp < 0) {
-							if (sensorD.angle > 72 && sensorD.angle < 88) {
+							if (sensorD.angle > 64 && sensorD.angle < 192) {
 								this.angle = sensorD.angle;
 								this.gsp = -this.ysp;
 								this.inAir = false;
@@ -2043,9 +2043,9 @@ OurSonic.Sonic.prototype = {
 				else if (ss.isValue(sensorC) && sensorC.value > -1) {
 					if (this.y + __h >= sensorC.value) {
 						if (this.ysp < 0) {
-							if (sensorC.angle > 72 && sensorC.angle < 88) {
+							if (sensorC.angle > 64 && sensorC.angle < 192) {
 								this.angle = sensorC.angle;
-								this.gsp = -this.ysp;
+								this.gsp = this.ysp;
 								this.inAir = false;
 								this.wasInAir = false;
 							}
@@ -2059,7 +2059,7 @@ OurSonic.Sonic.prototype = {
 				else if (ss.isValue(sensorD) && sensorD.value > -1) {
 					if (this.y + __h >= sensorD.value) {
 						if (this.ysp < 0) {
-							if (sensorD.angle > 72 && sensorD.angle < 88) {
+							if (sensorD.angle > 64 && sensorD.angle < 192) {
 								this.angle = sensorD.angle;
 								this.gsp = -this.ysp;
 								this.inAir = false;

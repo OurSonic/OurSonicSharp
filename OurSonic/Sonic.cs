@@ -99,7 +99,7 @@ namespace OurSonic
             sensorManager.CreateVerticalSensor("c", -9, 0, -20, "#2D2C21");
             sensorManager.CreateVerticalSensor("d", 9, 0, -20, "#C24222");
             sensorManager.CreateHorizontalSensor("m1", 4, 0, -12, "#212C2E");
-            sensorManager.CreateHorizontalSensor("m2", 4, 0, 12, "#22Ffc1");
+            sensorManager.CreateHorizontalSensor("m2", 4, 0, 13, "#22Ffc1");
 
             SpriteState = "normal";
         }
@@ -181,14 +181,14 @@ namespace OurSonic
                         break;
                     case RotationMode.Ceiling:
                         X = ( best.Value +
-                              ( sensorM2 != null && sensorM1 != null && ( sensorM1.Value == sensorM2.Value ) ? 12 : ( best.Letter == "m1" ? 12 : -12 ) ) );
+                              ( sensorM2 != null && sensorM1 != null && ( sensorM1.Value == sensorM2.Value ) ? 12 : ( best.Letter == "m1" ? -12 : 12 ) ) );
                         Gsp = 0;
                         if (InAir) Xsp = 0;
 
                         break;
                     case RotationMode.RightWall:
                         Y = ( best.Value +
-                              ( sensorM2 != null && sensorM1 != null && ( sensorM1.Value == sensorM2.Value ) ? 12 : ( best.Letter == "m1" ? 12 : -12 ) ) );
+                              ( sensorM2 != null && sensorM1 != null && ( sensorM1.Value == sensorM2.Value ) ? 12 : ( best.Letter == "m1" ? -12 : 12 ) ) );
                         Gsp = 0;
                         if (InAir) Xsp = 0;
 
@@ -292,10 +292,10 @@ namespace OurSonic
                         if (sensorC.Value < sensorD.Value) {
                             if (Y + ( __h ) >= sensorC.Value) {
                                 if (Ysp < 0) {
-                                    if (sensorC.Angle > 0x48 && sensorC.Angle < 0x58) {
+                                    if (sensorC.Angle > 0x40 && sensorC.Angle < 0xC0) {
                                         Angle = sensorC.Angle;
 
-                                        Gsp = -Ysp;
+                                        Gsp = Ysp;
                                         InAir = false;
                                         WasInAir = false;
                                     } else Ysp = 0;
@@ -306,10 +306,11 @@ namespace OurSonic
                         } else {
                             if (Y + ( __h ) >= sensorD.Value) {
                                 if (Ysp < 0) {
-                                    if (sensorD.Angle > 0x48 && sensorD.Angle < 0x58) {
+                                    if (sensorD.Angle > 0x40 && sensorD.Angle < 0xC0)
+                                    {
                                         Angle = sensorD.Angle;
 
-                                        Gsp = -Ysp;
+                                        Gsp =-Ysp;
                                         InAir = false;
                                         WasInAir = false;
                                     } else Ysp = 0;
@@ -320,9 +321,10 @@ namespace OurSonic
                     } else if (sensorC != null && sensorC.Value > -1) {
                         if (Y + ( __h ) >= sensorC.Value) {
                             if (Ysp < 0) {
-                                if (sensorC.Angle > 0x48 && sensorC.Angle < 0x58) {
+                                if (sensorC.Angle > 0x40 && sensorC.Angle < 0xC0)
+                                {
                                     Angle = sensorC.Angle;
-                                    Gsp = -Ysp;
+                                    Gsp = Ysp;
 
                                     InAir = false;
                                     WasInAir = false;
@@ -333,7 +335,8 @@ namespace OurSonic
                     } else if (sensorD != null && sensorD.Value > -1) {
                         if (Y + ( __h ) >= sensorD.Value) {
                             if (Ysp < 0) {
-                                if (sensorD.Angle > 0x48 && sensorD.Angle < 0x58) {
+                                if (sensorD.Angle > 0x40 && sensorD.Angle < 0xC0)
+                                {
                                     Angle = sensorD.Angle;
                                     Gsp = -Ysp;
                                     InAir = false;
