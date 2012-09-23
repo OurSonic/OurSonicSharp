@@ -1,5 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
-namespace OurSonic.Drawing
+namespace OurSonic.Tiles
 {
     public class TileItem
     {

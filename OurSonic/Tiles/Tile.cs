@@ -2,7 +2,7 @@
 using System.Html.Media.Graphics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-namespace OurSonic.Drawing
+namespace OurSonic.Tiles
 {
     public class Tile
     {

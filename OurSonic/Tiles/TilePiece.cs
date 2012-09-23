@@ -3,7 +3,7 @@ using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonicModels;
-namespace OurSonic.Drawing
+namespace OurSonic.Tiles
 {
     public class TilePiece
     {
@@ -140,7 +140,7 @@ namespace OurSonic.Drawing
                               List<int> palAn,
                               CanvasElement image)
         {
-            dynamic val = ((drawOrder + 1) + (scale.X * 10) + (animationFrame * 1000) + ((layer + 1) * 10000));
+            dynamic val = ( ( drawOrder + 1 ) + ( scale.X * 10 ) + ( animationFrame * 1000 ) + ( ( layer + 1 ) * 10000 ) );
             if ((dynamic) AnimatedFrames) {
                 for (int index = 0; index < AnimatedFrames.Length; index++) {
                     var animatedFrame = AnimatedFrames[index];

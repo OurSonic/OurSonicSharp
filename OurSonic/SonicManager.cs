@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
-using OurSonic.Drawing;
+using OurSonic.Level;
+using OurSonic.Tiles;
 using jQueryApi;
 namespace OurSonic
 {

@@ -2,19 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
-using OurSonic.Drawing;
+using OurSonic.Tiles;
 using OurSonicModels;
 namespace OurSonic
 {
     public class SensorManager
-    { 
+    {
         [IntrinsicProperty]
         protected JsDictionary<string, Sensor> Sensors { get; set; }
         [IntrinsicProperty]
         protected JsDictionary<string, SensorM> SensorResults { get; set; }
 
-        public SensorManager( )
-        { 
+        public SensorManager()
+        {
             Sensors = new JsDictionary<string, Sensor>();
             SensorResults = new JsDictionary<string, SensorM>();
         }
@@ -138,7 +138,7 @@ namespace OurSonic
                             if ( /*x1 - i > SonicManager.Instance.SonicLevel.LevelWidth || */curh[( __x - i )][__y] >= (Solidity) 1 ||
                                                                                              SonicManager.Instance.SonicToon.CheckCollisionWithObjects
                                                                                                      (x1 - i, y1, Letter)) {
-                    /*            if (!( ( curh[( __x - i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+                                /*            if (!( ( curh[( __x - i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
                                     continue;*/
 
                                 __currentM.Value = x1 - i;
@@ -205,7 +205,7 @@ namespace OurSonic
                             if ( /*x1 + i > SonicManager.Instance.SonicLevel.LevelWidth || */  curh[( __x + i )][__y] >= (Solidity) 1 ||
                                                                                                SonicManager.Instance.SonicToon.
                                                                                                        CheckCollisionWithObjects(x1 + i, y1, Letter)) {
-                            /*    if (!( ( curh[( __x + i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+                                /*    if (!( ( curh[( __x + i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
                                     continue;*/
 
                                 __currentM.Value = x1 + i;
@@ -235,7 +235,7 @@ namespace OurSonic
                         if ( /*x1 - i > SonicManager.Instance.SonicLevel.LevelWidth ||*/ curh[( __x - i )][__y] >= (Solidity) 1 ||
                                                                                          SonicManager.Instance.SonicToon.CheckCollisionWithObjects(
                                                                                                  x1 - i, y1, Letter)) {
-                  /*          if (!( ( curh[( __x - i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
+                            /*          if (!( ( curh[( __x - i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
                                 continue;*/
 
                             __currentM.Value = x1 - i;

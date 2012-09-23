@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
-using OurSonic.Drawing;
+using OurSonic.Tiles;
 namespace OurSonic
 {
     public class Sonic
@@ -306,11 +306,10 @@ namespace OurSonic
                         } else {
                             if (Y + ( __h ) >= sensorD.Value) {
                                 if (Ysp < 0) {
-                                    if (sensorD.Angle > 0x40 && sensorD.Angle < 0xC0)
-                                    {
+                                    if (sensorD.Angle > 0x40 && sensorD.Angle < 0xC0) {
                                         Angle = sensorD.Angle;
 
-                                        Gsp =-Ysp;
+                                        Gsp = -Ysp;
                                         InAir = false;
                                         WasInAir = false;
                                     } else Ysp = 0;
@@ -321,8 +320,7 @@ namespace OurSonic
                     } else if (sensorC != null && sensorC.Value > -1) {
                         if (Y + ( __h ) >= sensorC.Value) {
                             if (Ysp < 0) {
-                                if (sensorC.Angle > 0x40 && sensorC.Angle < 0xC0)
-                                {
+                                if (sensorC.Angle > 0x40 && sensorC.Angle < 0xC0) {
                                     Angle = sensorC.Angle;
                                     Gsp = Ysp;
 
@@ -335,8 +333,7 @@ namespace OurSonic
                     } else if (sensorD != null && sensorD.Value > -1) {
                         if (Y + ( __h ) >= sensorD.Value) {
                             if (Ysp < 0) {
-                                if (sensorD.Angle > 0x40 && sensorD.Angle < 0xC0)
-                                {
+                                if (sensorD.Angle > 0x40 && sensorD.Angle < 0xC0) {
                                     Angle = sensorD.Angle;
                                     Gsp = -Ysp;
                                     InAir = false;

@@ -2,7 +2,7 @@
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonicModels;
-namespace OurSonic.Drawing
+namespace OurSonic.Tiles
 {
     public class TileChunk
     {

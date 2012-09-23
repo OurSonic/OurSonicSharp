@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using OurSonic.Drawing;
+using OurSonic.Tiles;
 namespace OurSonic
 {
     public class SonicLevel
