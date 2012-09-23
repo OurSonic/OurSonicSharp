@@ -1,4 +1,5 @@
-﻿using System.Html;
+﻿using System;
+using System.Html;
 using System.Html.Media.Graphics;
 using SocketIOWebLibrary;
 using WebLibraries;
@@ -239,9 +240,9 @@ namespace OurSonic
 
             int j = jQueryEvent.Me().detail ? jQueryEvent.Me().detail * ( -120 ) : jQueryEvent.Me().wheelDelta;
 
-            var rate = j < 0 ? -1 : 1;
-            sonicManager.Scale.X += rate;
-            sonicManager.Scale.Y += rate;
+            double rate = j < 0 ? -1 : 1;
+            sonicManager.Scale.X += Script.Reinterpret<int>(rate);
+            sonicManager.Scale.Y += Script.Reinterpret<int>(rate);
             foreach (var tile in sonicManager.SonicLevel.Tiles) {
                 tile.ClearCache();
             }

@@ -1,18 +1,24 @@
+using System;
 namespace OurSonic.Level
 {
+    [Serializable]
     public class LevelObjectProjectile
     {
-        /*
-            this.x = 0;
-            this.y = 0;
-            this.xsp = 0;
-            this.ysp = 0;
-            this.xflip = 0;
-            this.yflip = 0;
-            this.assetIndex = 0;
-            this.frameIndex = 0;
-            this.name = name ? name : "";*/
-        public LevelObjectProjectile(string name) {}
+        public int X { get; set; }
+        public int Y { get; set; }
+        public double Xsp { get; set; }
+        public double Ysp { get; set; }
+        public bool Xflip { get; set; }
+        public bool Yflip { get; set; }
+        public int AssetIndex { get; set; }
+        public int FrameIndex { get; set; }
+        public string Name { get; set; }
+
+        public LevelObjectProjectile(string name)
+        {
+            Name = name;
+        }
+
         /*
             this.init = function (level, sonic) {
             };

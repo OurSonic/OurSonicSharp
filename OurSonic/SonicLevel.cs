@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using OurSonic.Level;
 using OurSonic.Tiles;
 namespace OurSonic
 {
@@ -28,7 +29,7 @@ namespace OurSonic
         [IntrinsicProperty]
         public List<TilePiece> Blocks { get; set; }
         [IntrinsicProperty]
-        public List<SonicObject> Objects { get; set; }
+        public List<LevelObjectInfo> Objects { get; set; }
         [IntrinsicProperty]
         public List<List<PaletteItem>> PaletteItems { get; set; }
         [IntrinsicProperty]

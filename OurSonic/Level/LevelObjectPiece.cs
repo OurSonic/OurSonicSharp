@@ -1,15 +1,23 @@
+using System;
 namespace OurSonic.Level
 {
+    [Serializable]
     public class LevelObjectPiece
     {
-        /*this.assetIndex = 0;
-    this.frameIndex = 0;
-    this.collided = false;
-    this.xflip = false;
-    this.yflip = false;
-    this.visible = true;
-    this.name = name ? name : "";
-*/
-        public LevelObjectPiece(string name) {}
+        public int AssetIndex { get; set; }
+        public int FrameIndex { get; set; }
+        public int PieceIndex { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+        public bool Collided { get; set; }
+        public bool Xflip { get; set; }
+        public bool Yflip { get; set; }
+        public bool Visible { get; set; }
+        public string Name { get; set; }
+
+        public LevelObjectPiece(string name)
+        {
+            Name = name;
+        }
     }
 }

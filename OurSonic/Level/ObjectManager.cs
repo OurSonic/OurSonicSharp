@@ -1,43 +1,79 @@
+using System.Html;
 namespace OurSonic.Level
 {
     public class ObjectManager
     {
-//        STATIC var broken = _H.loadSprite("assets/Sprites/broken.png");
+        public static ImageElement broken = Help.LoadSprite("assets/Sprites/broken.png", (e) => { });
+        private SonicManager sonicManager;
+
         public ObjectManager(SonicManager sonicManager)
         {
-            /*
-
-    this.sonicManager = sonicManager;
-    window.objectManager = this;
-    this.metaObjectFrameworks = [];
-    this.objectFrameworks = [];
-*/
+            this.sonicManager = sonicManager;
+            Window.Instance.Me().objectManager = this;
         }
 
         public void Init() {}
 
-        public void ExtendObject(dynamic d)
+        public LevelObject ExtendObject(LevelObjectData d)
         {
-            /*d.oldKey = name;
-        for (var asset in d.assets) {
-            d.assets[asset] = _H.extend(new LevelObjectAsset(""), d.assets[asset]);
-            for (var frame in d.assets[asset].frames) {
-                d.assets[asset].frames[frame] = _H.extend(new LevelObjectAssetFrame(0), d.assets[asset].frames[frame]);
+            LevelObject obj = new LevelObject(d.Key) {
+                                                             CollideScript = d.CollideScript,
+                                                             HurtScript = d.HurtScript,
+                                                             InitScript = d.InitScript,
+                                                             TickScript = d.TickScript
+                                                     };
+            //d.oldKey = name;
+            for (int i = 0; i < d.Assets.Count; i++) {
+                var asset = d.Assets[i];
+                var levelObjectAsset = new LevelObjectAsset("") {
+                                                                        Name = asset.Name,
+                                                                };
+
+                for (int index = 0; index < asset.Frames.Count; index++) {
+                    var fr = asset.Frames[index];
+                    levelObjectAsset.Frames[index] = new LevelObjectAssetFrame("") {
+                                                                                           OffsetX = fr.OffsetX,
+                                                                                           Width = fr.Width,
+                                                                                           Height = fr.Height,
+                                                                                           OffsetY = fr.OffsetY,
+                                                                                           HurtSonicMap = fr.HurtSonicMap,
+                                                                                           CollisionMap = fr.CollisionMap,
+                                                                                           ColorMap = fr.ColorMap,
+                                                                                           Palette = fr.Palette,
+                                                                                   };
+                }
+                obj.Assets[i] = levelObjectAsset;
             }
-        }
-        for (var piece in d.pieces) {
-            d.pieces[piece] = _H.extend(new LevelObjectPiece(""), d.pieces[piece]);
-        }
-        for (var pieceLayout in d.pieceLayouts) {
-            d.pieceLayouts[pieceLayout] = _H.extend(new LevelObjectPieceLayout(""), d.pieceLayouts[pieceLayout]);
-            for (var piece in d.pieceLayouts[pieceLayout].pieces) {
-                d.pieceLayouts[pieceLayout].pieces[piece] = _H.extend(new LevelObjectPieceLayoutPiece(0), d.pieceLayouts[pieceLayout].pieces[piece]);
+            for (int index = 0; index < d.Pieces.Count; index++) {
+                var piece = d.Pieces[index];
+                obj.Pieces[index] = piece;
             }
-        }
-        for (var projectile in d.projectiles) {
-            d.projectiles[projectile] = _H.extend(new LevelObjectProjectile(""), d.projectiles[projectile]);
-        }
-        return d;*/
+            for (int index = 0; index < d.PieceLayouts.Count; index++) {
+                var pl = d.PieceLayouts[index];
+                obj.PieceLayouts[index] = new LevelObjectPieceLayout(pl.Name) {
+                                                                                      Height = pl.Height,
+                                                                                      Width = pl.Width
+                                                                              };
+
+                for (int i = 0; i < d.PieceLayouts[index].Pieces.Count; i++) {
+                    obj.PieceLayouts[index].Pieces[i] = d.PieceLayouts[index].Pieces[i];
+                }
+            }
+            for (int index = 0; index < d.Projectiles.Count; index++) {
+                var proj = d.Projectiles[index];
+                proj = new LevelObjectProjectile(proj.Name) {
+                                                                    X = proj.X,
+                                                                    Y = proj.Y,
+                                                                    Xsp = proj.Xsp,
+                                                                    Ysp = proj.Ysp,
+                                                                    Xflip = proj.Xflip,
+                                                                    Yflip = proj.Yflip,
+                                                                    AssetIndex = proj.AssetIndex,
+                                                                    FrameIndex = proj.FrameIndex,
+                                                            };
+                obj.Projectiles[index] = proj;
+            }
+            return obj;
         }
     }
 }

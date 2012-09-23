@@ -1,22 +1,39 @@
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 namespace OurSonic.Level
 {
     public class LevelObject
     {
+        [IntrinsicProperty]
+        public string Key { get; set; }
+        [IntrinsicProperty]
+        public List<LevelObjectAsset> Assets { get; set; }
+        [IntrinsicProperty]
+        public List<LevelObjectPiece> Pieces { get; set; }
+        [IntrinsicProperty]
+        public List<LevelObjectPieceLayout> PieceLayouts { get; set; }
+        [IntrinsicProperty]
+        public List<LevelObjectProjectile> Projectiles { get; set; }
+        [IntrinsicProperty]
+        public string InitScript { get; set; }
+        [IntrinsicProperty]
+        public string TickScript { get; set; }
+        [IntrinsicProperty]
+        public string CollideScript { get; set; }
+        [IntrinsicProperty]
+        public string HurtScript { get; set; }
+
         public LevelObject(string key)
         {
-            /*    this.assets = [];
-    this.key = key ? key : "";
-    this.pieces = [];
-    this.pieceLayouts = [];
-    this.projectiles = [];
-    this.initScript = "this.state = {\r\n\txsp: 0.0,\r\n\tysp: 0.0,\r\n\tfacing: false,\r\n};";
-    this.tickScript = "";
-    this.collideScript = "";
-    this.hurtScript = "";
-*/
+            Key = key;
+            InitScript = "this.state = {\r\n\txsp: 0.0,\r\n\tysp: 0.0,\r\n\tfacing: false,\r\n};";
+            Pieces = new List<LevelObjectPiece>();
+            PieceLayouts = new List<LevelObjectPieceLayout>();
+            Projectiles = new List<LevelObjectProjectile>();
+            Assets = new List<LevelObjectAsset>();
         }
 
-        public void Init(dynamic @object, dynamic level, Sonic sonic)
+        public void Init(LevelObjectInfo @object, SonicLevel level, Sonic sonic)
         {
             /*
  
@@ -25,34 +42,34 @@ namespace OurSonic.Level
                     this.evalMe("initScript").apply(object, [object, level, sonic]);*/
         }
 
-        public dynamic OnCollide(dynamic @object, dynamic level, Sonic sonic, SensorM sensor, dynamic piece)
+        public dynamic OnCollide(LevelObjectInfo @object, SonicLevel level, Sonic sonic, SensorM sensor, dynamic piece)
         {
             //return this.evalMe("collideScript").apply(object, [object, level, sonic, sensor, piece]);
             return null;
         }
 
-        public dynamic OnHurtSonic(dynamic @object, dynamic level, Sonic sonic, SensorM sensor, dynamic piece)
+        public dynamic OnHurtSonic(LevelObjectInfo @object, SonicLevel level, Sonic sonic, SensorM sensor, dynamic piece)
         {
             //return this.evalMe("hurtScript").apply(object, [object, level, sonic, sensor, piece]);
             return null;
         }
 
-        public void Tick(dynamic @object, dynamic level, Sonic sonic)
+        public bool Tick(LevelObjectInfo @object, SonicLevel level, Sonic sonic)
         {
-            /*
-   if (object.lastDrawTick != sonicManager.tickCount - 1)
-            this.init(object, level, sonic);
+            if (@object.lastDrawTick != SonicManager.Instance.tickCount - 1)
+                Init(@object, level, sonic);
 
-        object.lastDrawTick = sonicManager.tickCount;
+            @object.lastDrawTick = SonicManager.Instance.tickCount;
 
-        this.evalMe("tickScript").apply(object, [object, level, sonic]);
+            evalMe("tickScript").apply(@object, new dynamic[] {@object, level, sonic});
 
-        if (object.state) {
-            object.xsp = object.state.xsp;
-            object.ysp = object.state.ysp;
-        }
-        object.x += object.xsp;
-        object.y += object.ysp;*/
+            if (@object.State.Truthy()) {
+                @object.Xsp = @object.State.Xsp;
+                @object.Ysp = @object.State.Ysp;
+            }
+            @object.X += @object.Xsp;
+            @object.Y += @object.Ysp;
+            return true;
         }
 
         public void Die()

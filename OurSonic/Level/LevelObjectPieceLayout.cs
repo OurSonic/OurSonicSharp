@@ -1,20 +1,33 @@
+using System.Collections.Generic;
+using System.Html.Media.Graphics;
+using System.Runtime.CompilerServices;
 namespace OurSonic.Level
 {
     public class LevelObjectPieceLayout
     {
-        /* this.width = 350;
-    this.height = 280;
-    this.pieces = [];
+        [IntrinsicProperty]
+        public int Width { get; set; }
+        [IntrinsicProperty]
+        public int Height { get; set; }
+        [IntrinsicProperty]
+        public List<LevelObjectPieceLayoutPiece> Pieces { get; set; }
+        [IntrinsicProperty]
+        public string Name { get; set; }
 
-    this.name = name ? name : "";
-*/
-        public LevelObjectPieceLayout(string name) {}
+        public LevelObjectPieceLayout(string name)
+        {
+            Name = name;
+            Width = 350;
+            Height = 280;
+            Pieces = new List<LevelObjectPieceLayoutPiece>();
+        }
 
         public void Update()
         {
-            /*    for (l = 0; l < sonicManager.SonicLevel.Objects.length; l++) {
-            sonicManager.SonicLevel.Objects[l].reset();
-        }*/
+            foreach (LevelObjectInfo t in SonicManager.Instance.SonicLevel.Objects)
+            {
+                t.Reset();
+            }
         }
 
         public void DrawUI(CanvasInformation canvas,
@@ -104,19 +117,18 @@ namespace OurSonic.Level
         canvas.restore();*/
         }
 
-        public void Draw(CanvasInformation canvas, int x, int y, Point scale, dynamic framework, dynamic instance, bool showHeightMap)
+        public void Draw(CanvasContext2D canvas, int x, int y, Point scale, LevelObject framework, LevelObjectInfo instance, bool showHeightMap)
         {
-            /*   for (var i = 0; i < instance.pieces.length; i++) {
-            var j = instance.pieces[i];
-            if (!j.visible) continue;
-            var piece = framework.pieces[j.pieceIndex];
-            var asset = framework.assets[piece.assetIndex];
-            if (asset.frames.length > 0) {
-                var frm = asset.frames[j.frameIndex];
-                frm.drawUI(canvas, { x: (x + j.x * scale.x) - (frm.offsetX * scale.x), y: (y + j.y * scale.y) - (frm.offsetY * scale.y) }, { width: frm.width * scale.x, height: frm.height * scale.y }, false, showHeightMap, showHeightMap, false, piece.xflip, piece.yflip);
+            for (var i = 0; i < instance.Pieces.Count; i++) {
+                var j = instance.Pieces[i];
+                if (!j.Visible) continue;
+                var piece = framework.Pieces[j.PieceIndex];
+                var asset = framework.Assets[piece.AssetIndex];
+                if (asset.Frames.Count > 0) {
+                    var frm = asset.Frames[j.FrameIndex];
+//                  frm.DrawUI(canvas, new Point((x + j.X * scale.X) - (frm.OffsetX * scale.X), (y + j.Y * scale.Y) - (frm.OffsetY * scale.Y)), new Point(frm.Width * scale.X, frm.Height * scale.Y), false, showHeightMap, showHeightMap, false, piece.Xflip, piece.Yflip);
+                }
             }
-
-        }*/
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NodeJSLibrary;
+using OurSonic.Level;
 using OurSonic.Tiles;
 using OurSonicModels;
 using jQueryApi;
@@ -46,12 +47,13 @@ namespace OurSonic
             })(l));
         }*/
 
-            SonicLevel.Objects = new List<SonicObject>();
+            SonicLevel.Objects = new List<LevelObjectInfo>();
 
             for (int l = 0; l < sonicLevel.Objects.Length; l++) {
-                SonicLevel.Objects[l] = new SonicObject(sonicLevel.Objects[l]);
+                SonicLevel.Objects[l] = new LevelObjectInfo(sonicLevel.Objects[l]);
                 SonicLevel.Objects[l].Index = l;
             }
+
 
             var objectKeys = new JsDictionary<string, object>();
             /*

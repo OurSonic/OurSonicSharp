@@ -44,6 +44,7 @@
     <Compile Include="Level\LevelObject.cs" />
     <Compile Include="Level\LevelObjectAsset.cs" />
     <Compile Include="Level\LevelObjectAssetFrame.cs" />
+    <Compile Include="Level\LevelObjectData.cs" />
     <Compile Include="Level\LevelObjectInfo.cs" />
     <Compile Include="Level\LevelObjectPiece.cs" />
     <Compile Include="Level\LevelObjectPieceLayout.cs" />
@@ -69,7 +70,6 @@
     <Compile Include="SonicLevel.cs" />
     <Compile Include="SonicManager.cs" />
     <Compile Include="SonicManager.load.cs" />
-    <Compile Include="SonicObject.cs" />
     <Compile Include="SpriteCache.cs" />
     <Compile Include="SpriteLoader.cs" />
     <Compile Include="UiManager.cs" />

@@ -1,231 +1,233 @@
+using System;
+using System.Collections.Generic;
+using System.Html.Media.Graphics;
 namespace OurSonic.Level
 {
+    [Serializable]
     public class LevelObjectInfo
     {
-        /*  this.o = o;
-            this.x = o.X;
-            this.y = o.Y;
-            this.xsp = 0;
-            this.ysp = 0;
-            this.xflip = o.XFlip;
-            this.yflip = o.YFlip;
-            this.subdata = o.SubType;
-            this.key = o.ID;
-            this.ObjectData = null;
-            this.upperNibble = this.subdata >> 4;
-            this.lowerNibble = this.subdata & 0xf;
-            this.pieceIndex = 0;
-            this.pieces = [];
-            this.dead = false;
-            this.debug = { lines: [] };
-    this._rect = { x: 0, y: 0, width: 0, height: 0 };
-         */
-        public LevelObjectInfo(dynamic o) {}
-
-        public void Log(string txt, int level)
+        private Rectangle _rect = new Rectangle(0, 0, 0, 0);
+        public int lastDrawTick;
+        public object O { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Xsp { get; set; }
+        public double Ysp { get; set; }
+        public bool Xflip { get; set; }
+        public bool Yflip { get; set; }
+        public int Subdata { get; set; }
+        public int Key { get; set; }
+        public LevelObject ObjectData { get; set; }
+        public int UpperNibble { get; set; }
+        public int LowerNibble { get; set; }
+        public int PieceIndex { get; set; }
+        public List<LevelObjectPiece> Pieces { get; set; }
+        public bool Dead { get; set; }
+        public LevelObjectInfo State { get; set; }
+        public int Index { get; set; }
+        //public int Debug = { lines: [] };
+        public LevelObjectInfo(dynamic o)
         {
-            /*    if (level === undefined) level = 100;
-
-        if (level == 0) {
-            this.debug.lines.push(" -- " + txt + " -- ");
-        } else {
-            this.debug.lines.push(txt);
+            O = o;
+            X = o.X;
+            Y = o.Y;
+            Xflip = o.XFlip;
+            Yflip = o.YFlip;
+            Subdata = o.SubType;
+            Key = o.ID;
+            UpperNibble = Subdata >> 4;
+            LowerNibble = Subdata & 0xf;
         }
 
-        if (this.consoleLog) {
-            this.consoleLog(this.debug);
-        }*/
+        public void Log(string txt, int level = 100)
+        {
+            /*
+                        if (level == 0) {
+                            this.Debug.Lines.Add(" -- " + txt + " -- ");
+                        }else {
+                            this.Debug.Lines.Add(txt);
+                        }
+                        if (this.consoleLog) {
+                            this.consoleLog(this.Debug);
+                        }
+            */
         }
 
         public void SetPieceLayoutIndex(int ind)
         {
-            /* this.pieceIndex = ind;
-        var pcs = this.ObjectData.pieceLayouts[this.pieceIndex].pieces;
+            /*            PieceIndex = ind;
 
-        this.pieces = [];
-        for (var i = 0; i < pcs.length; i++) {
-            this.pieces.push(_H.clone(pcs[i]));
-        }
-*/
+                        var pcs = ObjectData.PieceLayouts[PieceIndex].Pieces;
+
+                        Pieces = new List<LevelObjectPieceLayoutPiece>();
+                        for (int i = 0; i < pcs.Count; i++) {
+                            Pieces.Add(pcs[i]);
+                        }*/
         }
 
-        public void SetObjectData(dynamic obj)
+        public void SetObjectData(LevelObject obj)
         {
-            /*      this.ObjectData = obj;
+            ObjectData = obj;
 
-        if (this.ObjectData.pieceLayouts.length > this.pieceIndex &&
-            this.ObjectData.pieceLayouts[this.pieceIndex].pieces.length > 0) {
-            this.setPieceLayoutIndex(this.pieceIndex);
-        }
-*/
+            if (ObjectData.PieceLayouts.Count > PieceIndex &&
+                ObjectData.PieceLayouts[PieceIndex].Pieces.Count > 0)
+                SetPieceLayoutIndex(PieceIndex);
         }
 
-        public void Tick(dynamic @object, dynamic level, Sonic sonic)
+        public bool Tick(LevelObjectInfo @object, SonicLevel level, Sonic sonic)
         {
-            /*
-        if (this.dead || !this.ObjectData) return false;
+            if (Dead || ObjectData.Falsey()) return false;
 
-        try {
-            return this.ObjectData.tick(object, level, sonic);
-        } catch (EJ) {
-            this.log(EJ.name + " " + EJ.message, 0);
+            try {
+                return ObjectData.Tick(@object, level, sonic);
+            } catch (Exception EJ) {
+                //this.Log(EJ.name + " " + EJ.message, 0);
 
-            return false;
-        }*/
+                return false;
+            }
         }
 
         public LevelObjectPieceLayout MainPieceLayout()
         {
-            //return this.ObjectData.pieceLayouts[this.pieceIndex];
-
-            return null;
+            return ObjectData.PieceLayouts[PieceIndex];
         }
 
         public Rectangle GetRect(Point scale)
         {
-            /*
-                    if (this.ObjectData.pieceLayouts.length == 0) {
-                        this._rect.x = this.x;
-                        this._rect.y = this.y;
-                        this._rect.width = broken.width;
-                        this._rect.height = broken.height;
-                        return this._rect;
-                    }
+            if (ObjectData.PieceLayouts.Count == 0) {
+                _rect.X = (int) X;
+                _rect.Y = (int) Y;
+                _rect.Width = ObjectManager.broken.Width;
+                _rect.Height = ObjectManager.broken.Height;
+                return _rect;
+            }
 
-                    var pcs = this.pieces;
+            var pcs = Pieces;
 
-                    this._rect.x = 0;
-                    this._rect.y = 0;
-                    this._rect.width = 0;
-                    this._rect.height = 0;
+            _rect.Y = 0;
+            _rect.Y = 0;
+            _rect.Width = 0;
+            _rect.Height = 0;
 
-                    for (var pieceIndex = 0; pieceIndex < pcs.length; pieceIndex++) {
-                        var j = pcs[pieceIndex];
-                        var piece = this.ObjectData.pieces[j.pieceIndex];
-                        var asset = this.ObjectData.assets[piece.assetIndex];
-                        if (asset.frames.length > 0) {
-                            var frm = asset.frames[j.frameIndex];
-                            _H.mergeRect(this._rect, { x: frm.offsetX + j.x, y: frm.offsetY + j.y, width: frm.width * scale.x, height: frm.height * scale.y });
-                        }
-                    }
-                    this._rect.x = this._rect.x * scale.x;
-                    this._rect.y = this._rect.y * scale.y;
-                    this._rect.width -= this._rect.x;
-                    this._rect.height -= this._rect.y;
+            for (var pieceIndex = 0; pieceIndex < pcs.Count; pieceIndex++) {
+                var j = pcs[pieceIndex];
+                var piece = ObjectData.Pieces[j.PieceIndex];
+                var asset = ObjectData.Assets[piece.AssetIndex];
+                if (asset.Frames.Count > 0) {
+                    var frm = asset.Frames[j.FrameIndex];
+                    Help.MergeRect(_rect, new Rectangle(frm.OffsetX + j.Y, frm.OffsetY + j.Y, frm.Width * scale.Y, frm.Height * scale.Y));
+                }
+            }
+            _rect.X = _rect.X * scale.X;
+            _rect.Y = _rect.Y * scale.Y;
+            _rect.Width -= _rect.X;
+            _rect.Height -= _rect.Y;
 
-                    this._rect.x += this.x;
-                    this._rect.y += this.y;
-                    return this._rect;*/
-            return null;
+            _rect.X += (int) X;
+            _rect.Y += (int) Y;
+            return _rect;
         }
 
-        public void Draw(CanvasInformation canvas, int x, int y, Point scale, bool showHeightMap)
+        public void Draw(CanvasContext2D canvas, int x, int y, Point scale, bool showHeightMap)
         {
-            /*        if (this.dead || !this.ObjectData) return;
+            if (Dead || ObjectData.Falsey()) return;
 
-        if (this.ObjectData.pieceLayouts.length == 0) {
-            canvas.drawImage(broken, _H.floor((x - broken.width / 2)), _H.floor((y - broken.height / 2)), broken.width * scale.x, broken.height * scale.y);
-            return;
-        }
+            if (ObjectData.PieceLayouts.Count == 0) {
+                canvas.DrawImage(ObjectManager.broken, ( x - ObjectManager.broken.Width / 2 ), ( y - ObjectManager.broken.Height / 2 ),
+                                 ObjectManager.broken.Width * scale.X, ObjectManager.broken.Height * scale.Y);
+                return;
+            }
 
-        this.mainPieceLayout().draw(canvas, x, y, scale, this.ObjectData, this, showHeightMap);
-        if (this.consoleLog) {
-
-            var gr = this.getRect(scale);
-            canvas.save();
-            canvas.fillStyle = "rgba(228,228,12,0.4)";
-            var wd = 1;
-            canvas.fillRect(gr.x - this.x + x - (gr.width / 2) - wd, gr.y - this.y + y - (gr.height / 2) - wd, gr.width - (gr.x - this.x) + wd * 2, gr.height - (gr.y - this.y) + wd * 2);
-            canvas.restore();
-
-        }*/
+            MainPieceLayout().Draw(canvas, x, y, scale, ObjectData, this, showHeightMap);
+            if (true /* || this.consoleLog*/) {
+                var gr = GetRect(scale);
+                canvas.Save();
+                canvas.FillStyle = "rgba(228,228,12,0.4)";
+                var wd = 1;
+                canvas.FillRect(gr.X - X + x - ( gr.Width / 2 ) - wd, gr.Y - Y + y - ( gr.Height / 2 ) - wd, gr.Width - ( gr.X - X ) + wd * 2,
+                                gr.Height - ( gr.Y - Y ) + wd * 2);
+                canvas.Restore();
+            }
         }
 
         public void Reset()
         {
-            /*
-        this.x = this.o.X;
-        this.y = this.o.Y;
-        this.xsp = 0;
-        this.ysp = 0;
-        this.state = undefined;
-        this.xflip = this.o.XFlip;
-        this.yflip = this.o.YFlip;
-        this.dead = false;
-        this.pieceIndex = 0; //maybe
-        this.subdata = this.o.SubType;
-        this.upperNibble = this.subdata >> 4;
-        this.lowerNibble = this.subdata & 0xf;
-        if (this.ObjectData.pieceLayouts.length > this.pieceIndex &&
-            this.ObjectData.pieceLayouts[this.pieceIndex].pieces.length > 0) {
-            this.setPieceLayoutIndex(this.pieceIndex);
-        }
-*/
+            /*        this.X = this.o.X;
+                    this.Y = this.o.Y;
+                    this.Xsp = 0;
+                    this.Ysp = 0;
+                    this.State = undefined;
+                    this.Xflip = this.o.XFlip;
+                    this.Yflip = this.o.YFlip;
+                    this.Dead = false;
+                    this.PieceIndex = 0; //maybe
+                    this.Subdata = this.o.SubType;
+                    this.UpperNibble = this.subdata >> 4;
+                    this.LowerNibble = this.subdata & 0xf;
+                    if (this.ObjectData.pieceLayouts.length > this.pieceIndex &&
+                        this.ObjectData.pieceLayouts[this.pieceIndex].pieces.length > 0) {
+                        this.setPieceLayoutIndex(this.pieceIndex);
+                    }
+             */
         }
 
-        public bool Collides(Sonic sonic)
+        public LevelObjectPiece Collides(Sonic sonic)
         {
-//            return this.collision(sonic, false);
-            return false;
+            return Collision(sonic, false);
         }
 
         public void Kill()
         {
-            //this.dead=true;
+            Dead = true;
         }
 
-        public void Collision(Sonic sonic, bool isHurtMap)
+        public LevelObjectPiece Collision(Sonic sonic, bool isHurtMap)
         {
-            /*
-                    if (this.dead || !this.ObjectData || this.ObjectData.pieceLayouts.length == 0) return false;
-                    var pcs = this.pieces;
-                    for (var pieceIndex = 0; pieceIndex < pcs.length; pieceIndex++) {
-                        var j = pcs[pieceIndex];
-                        var piece = this.ObjectData.pieces[j.pieceIndex];
-                        var asset = this.ObjectData.assets[piece.assetIndex];
-                        if (asset.frames.length > 0) {
-                            var frm = asset.frames[j.frameIndex];
-                            var map = isHurtMap ? frm.hurtSonicMap : frm.collisionMap;
-                            if (twoDArray(map, (sonic.x - this.x + frm.offsetX + j.x), (sonic.y - this.y + frm.offsetY + j.y)) == true) {
-                                return j;
-                            }
-                        }
-                    }
+            if (Dead || ObjectData.Falsey() || ObjectData.PieceLayouts.Count == 0) return null;
+            var pcs = Pieces;
+            for (var pieceIndex = 0; pieceIndex < pcs.Count; pieceIndex++) {
+                var j = pcs[pieceIndex];
+                var piece = ObjectData.Pieces[j.PieceIndex];
+                var asset = ObjectData.Assets[piece.AssetIndex];
+                if (asset.Frames.Count > 0) {
+                    var frm = asset.Frames[j.FrameIndex];
+                    var map = isHurtMap ? frm.HurtSonicMap : frm.CollisionMap;
+                    if (twoDArray(map, (int) ( ( sonic.X ) - X + frm.OffsetX + j.X ), (int) ( ( sonic.Y ) - Y + frm.OffsetY + j.Y )) == true)
+                        return j;
+                }
+            }
 
-                    return false;*/
-        }
-
-        public dynamic twoDArray(dynamic map, int x, int y)
-        {
-            /*
-        if (!map || x < 0 || y < 0 || x > map.length)
-            return false;
-        var d = map[x];
-        if (!d || y > d.length)
-            return false;
-        return d[y];*/
             return null;
         }
 
-        public void Collide(Sonic sonic, SensorM sensor, dynamic piece)
+        public bool twoDArray(int[][] map, int x, int y)
         {
-            /* try {
-                        return this.ObjectData.onCollide(this, sonicManager.SonicLevel, sonicManager.sonicToon, sensor, piece);
-                    } catch (EJ) {
-                        this.log(EJ.name + " " + EJ.message + " " + EJ.stack, 0);
-                        return false;
-                    }*/
+            if (map.Falsey() || x < 0 || y < 0 || x > map.Length)
+                return false;
+            var d = map[x];
+            if (d.Falsey() || y > d.Length)
+                return false;
+            return d[y] > 0;
         }
 
-        public void HurtSonic(Sonic sonic, SensorM sensor, dynamic piece)
+        public dynamic Collide(Sonic sonic, SensorM sensor, dynamic piece)
         {
-            /*    try {
-    return this.ObjectData.onHurtSonic(this, sonicManager.SonicLevel, sonicManager.sonicToon, sensor, piece);
-} catch (EJ) {
-    this.log(EJ.name + " " + EJ.message + " " + EJ.stack, 0);
+            try {
+                return ObjectData.OnCollide(this, SonicManager.Instance.SonicLevel, sonic, sensor, piece);
+            } catch (Exception EJ) {
+                //this.log(EJ.name + " " + EJ.message + " " + EJ.stack, 0);
+                return false;
+            }
+        }
 
-    return false;
-}*/
+        public dynamic HurtSonic(Sonic sonic, SensorM sensor, dynamic piece)
+        {
+            try {
+                return ObjectData.OnHurtSonic(this, SonicManager.Instance.SonicLevel, sonic, sensor, piece);
+            } catch (Exception EJ) {
+                //this.log(EJ.name + " " + EJ.message + " " + EJ.stack, 0);
+                return null;
+            }
         }
     }
 }

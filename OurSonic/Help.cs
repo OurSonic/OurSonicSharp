@@ -245,5 +245,36 @@ namespace OurSonic
         {
             return f1 > f2 ? f2 : f1;
         }
+
+        [IgnoreGenericArguments]
+        public static T Clone<T>(T o)
+        {
+            return default( T );
+        }
+
+/*
+        public static T Extend<T>(JsDictionary<string, dynamic> p0, JsDictionary<string, dynamic> p1)
+        {
+            foreach (var p in p0)
+            {
+                p1[p.Key] = p.Value;
+            }
+            return p0.Me();
+        }
+*/
+/*
+        public static T Extend<T>(T p0, dynamic p1)
+        {
+            return Extend<T>(p0.Me(), Extensions.Me(p1));
+        }
+*/
+
+        public static void MergeRect(Rectangle main, Rectangle small)
+        {
+            main.X = Math.Min(small.X, main.X);
+            main.Width = Math.Max(( ( small.X + small.Width ) + main.X ), main.Width);
+            main.Y = Math.Min(small.Y, main.Y);
+            main.Height = Math.Max(( ( small.Y + small.Height ) + main.Y ), main.Height);
+        }
     }
 }

@@ -100,6 +100,7 @@ namespace OurSonic.Tiles
                 RectA.Y < RectB.Y + RectB.Height && RectA.Y + RectA.Height > RectB.Y + RectB.Height) {
                 check = true;
             }*/
+
             /*
 
        localPoint.X = position.X;
