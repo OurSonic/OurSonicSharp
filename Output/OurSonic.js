@@ -3781,7 +3781,7 @@ OurSonic.SonicManager.prototype = {
 			this.$drawAnimations(canvas);
 			this.$drawRings(canvas, localPoint);
 			this.$drawSonic(canvas);
-			this.$drawHightChunks(canvas, fxP, fyP, offs, bounds, localPoint);
+			this.$drawHighChunks(canvas, fxP, fyP, offs, bounds, localPoint);
 		}
 		//drawRings(canvas, localPoint);
 		//editing^
@@ -3881,7 +3881,7 @@ OurSonic.SonicManager.prototype = {
 			}
 			localPoint.x = _xP * 128 * this.scale.x - this.windowLocation.get_x() * this.scale.x;
 			localPoint.y = _yPreal * 128 * this.scale.y - this.windowLocation.get_y() * this.scale.y;
-			if (!chunk.isEmpty()) {
+			if (!chunk.isEmpty() && !chunk.onlyForeground()) {
 				chunk.draw(canvas, localPoint, this.scale, 0, bounds);
 			}
 			if (false && this.currentGameState === 1) {
@@ -3891,7 +3891,7 @@ OurSonic.SonicManager.prototype = {
 			}
 		}
 	},
-	$drawHightChunks: function(canvas, fxP, fyP, offs, bounds, localPoint) {
+	$drawHighChunks: function(canvas, fxP, fyP, offs, bounds, localPoint) {
 		for (var $t1 = 0; $t1 < offs.length; $t1++) {
 			var off = offs[$t1];
 			var _xP = fxP + off.x;
@@ -4870,6 +4870,7 @@ OurSonic.Tiles.Tile.prototype = {
 // OurSonic.Tiles.TileChunk
 OurSonic.Tiles.TileChunk = function() {
 	this.isOnlyBackground = null;
+	this.isOnlyForeground = null;
 	this.empty = null;
 	this.sprites = null;
 	this.hLayers = null;
@@ -4916,24 +4917,46 @@ OurSonic.Tiles.TileChunk.prototype = {
 		return this.tilePieces[ss.Int32.div(x, 16)][ss.Int32.div(y, 16)];
 	},
 	onlyBackground: function() {
-		if (ss.Nullable.eq(this.isOnlyBackground, null)) {
-			var blocks = OurSonic.SonicManager.instance.sonicLevel.blocks;
-			var tpl = this.tilePieces.length;
-			var tph = this.tilePieces[0].length;
-			for (var i = 0; i < tpl; i++) {
-				for (var j = 0; j < tph; j++) {
-					var r = this.tilePieces[i][j];
-					var pm = blocks[r.block];
-					if (pm) {
-						if (!pm.onlyBackground()) {
-							return ss.Nullable.unbox(this.isOnlyBackground = false);
-						}
+		if (ss.isValue(this.isOnlyBackground)) {
+			return ss.Nullable.unbox(this.isOnlyBackground);
+		}
+		var blocks = OurSonic.SonicManager.instance.sonicLevel.blocks;
+		var tpl = this.tilePieces.length;
+		var tph = this.tilePieces[0].length;
+		for (var i = 0; i < tpl; i++) {
+			for (var j = 0; j < tph; j++) {
+				var r = this.tilePieces[i][j];
+				var pm = blocks[r.block];
+				if (pm) {
+					if (!pm.onlyBackground()) {
+						return ss.Nullable.unbox(this.isOnlyBackground = false);
 					}
 				}
 			}
-			this.isOnlyBackground = true;
 		}
+		this.isOnlyBackground = true;
 		return ss.Nullable.unbox(this.isOnlyBackground);
+	},
+	onlyForeground: function() {
+		if (ss.isValue(this.isOnlyForeground)) {
+			return ss.Nullable.unbox(this.isOnlyForeground);
+		}
+		var blocks = OurSonic.SonicManager.instance.sonicLevel.blocks;
+		var tpl = this.tilePieces.length;
+		var tph = this.tilePieces[0].length;
+		for (var i = 0; i < tpl; i++) {
+			for (var j = 0; j < tph; j++) {
+				var r = this.tilePieces[i][j];
+				var pm = blocks[r.block];
+				if (pm) {
+					if (!pm.onlyForeground()) {
+						return ss.Nullable.unbox(this.isOnlyForeground = false);
+					}
+				}
+			}
+		}
+		this.isOnlyForeground = true;
+		return ss.Nullable.unbox(this.isOnlyForeground);
 	},
 	isEmpty: function() {
 		if (!this.empty) {
@@ -4964,6 +4987,16 @@ OurSonic.Tiles.TileChunk.prototype = {
 				var r = this.tilePieces[i][j];
 				var pm = blocks[r.block];
 				if (pm) {
+					if (layer === 1) {
+						if (pm.onlyBackground()) {
+							continue;
+						}
+					}
+					else if (layer === 0) {
+						if (pm.onlyForeground()) {
+							continue;
+						}
+					}
 					var animatedIndex = 0;
 					if (this.animated && this.animated[j * len1 + i]) {
 						animatedIndex = this.animated[j * len1 + i].lastAnimatedIndex;
@@ -5024,6 +5057,8 @@ OurSonic.Tiles.TilePiece = function() {
 	this.index = 0;
 	this.solid1 = 0;
 	this.solid2 = 0;
+	this.$onlyBackground = null;
+	this.$onlyForeground = null;
 	this.image = {};
 };
 OurSonic.Tiles.TilePiece.prototype = {
@@ -5031,6 +5066,9 @@ OurSonic.Tiles.TilePiece.prototype = {
 		this.image = {};
 	},
 	onlyBackground: function() {
+		if (ss.isValue(this.$onlyBackground)) {
+			return ss.Nullable.unbox(this.$onlyBackground);
+		}
 		var tiles = OurSonic.SonicManager.instance.sonicLevel.tiles;
 		var $t1 = this.tiles.getEnumerator();
 		try {
@@ -5038,7 +5076,7 @@ OurSonic.Tiles.TilePiece.prototype = {
 				var mj = $t1.get_current();
 				if (tiles[mj._Tile]) {
 					if (mj.priority) {
-						return false;
+						return ss.Nullable.unbox(this.$onlyBackground = false);
 					}
 				}
 			}
@@ -5046,7 +5084,28 @@ OurSonic.Tiles.TilePiece.prototype = {
 		finally {
 			$t1.dispose();
 		}
-		return true;
+		return ss.Nullable.unbox(this.$onlyBackground = true);
+	},
+	onlyForeground: function() {
+		if (ss.isValue(this.$onlyForeground)) {
+			return ss.Nullable.unbox(this.$onlyForeground);
+		}
+		var tiles = OurSonic.SonicManager.instance.sonicLevel.tiles;
+		var $t1 = this.tiles.getEnumerator();
+		try {
+			while ($t1.moveNext()) {
+				var mj = $t1.get_current();
+				if (tiles[mj._Tile]) {
+					if (!mj.priority) {
+						return ss.Nullable.unbox(this.$onlyForeground = false);
+					}
+				}
+			}
+		}
+		finally {
+			$t1.dispose();
+		}
+		return ss.Nullable.unbox(this.$onlyForeground = true);
 	},
 	drawUI: function(canvas, position, scale, xflip, yflip) {
 		//                var drawOrderIndex = 0;
@@ -5123,8 +5182,8 @@ OurSonic.Tiles.TilePiece.prototype = {
 		return fd;
 	},
 	$setCache: function(layer, scale, drawOrder, animationFrame, palAn, image) {
-		var val = drawOrder + 1 + scale.x * 10 + animationFrame * 1000 + (layer + 1) * 10000;
-		if (!!this.animatedFrames) {
+		var val = (drawOrder << 8) + (scale.x << 16) + (animationFrame << 20) + (layer + 1 << 24);
+		if (this.animatedFrames.length > 0) {
 			for (var index = 0; index < this.animatedFrames.length; index++) {
 				var animatedFrame = this.animatedFrames[index];
 				val += palAn[animatedFrame] + ' ';
@@ -5136,17 +5195,14 @@ OurSonic.Tiles.TilePiece.prototype = {
 		canvas.drawImage(fd, position.x, position.y);
 	},
 	$getCache: function(layer, scale, drawOrder, animationFrame, palAn) {
-		var val = drawOrder + 1 + scale.x * 10 + animationFrame * 1000 + (layer + 1) * 10000;
-		if (this.animatedFrames) {
+		var val = (drawOrder << 8) + (scale.x << 16) + (animationFrame << 20) + (layer + 1 << 24);
+		if (this.animatedFrames.length > 0) {
 			for (var $t1 = 0; $t1 < this.animatedFrames.length; $t1++) {
 				var animatedFrame = this.animatedFrames[$t1];
 				val += palAn[animatedFrame] + ' ';
 			}
 		}
-		if (!!!this.image[val]) {
-			return null;
-		}
-		return Type.cast(this.image[val], Element);
+		return this.image[val];
 	}
 };
 Type.registerNamespace('OurSonic');

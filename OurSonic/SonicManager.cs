@@ -373,7 +373,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 drawRings(canvas, localPoint);
                 drawSonic(canvas);
 
-                drawHightChunks(canvas, fxP, fyP, offs, bounds, localPoint);
+                drawHighChunks(canvas, fxP, fyP, offs, bounds, localPoint);
             }
 
             //drawRings(canvas, localPoint);
@@ -522,7 +522,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 localPoint.X = (_xP * 128 * Scale.X) - WindowLocation.X * Scale.X;
                 localPoint.Y = (_yPreal * 128 * Scale.Y) - WindowLocation.Y * Scale.Y;
 
-                if (!chunk.IsEmpty())
+                if (!chunk.IsEmpty() && !chunk.OnlyForeground())
                     chunk.Draw(canvas, localPoint, Scale, 0, bounds);
 
                 if (false && CurrentGameState == GameState.Editing)
@@ -534,7 +534,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             }
         }
 
-        private void drawHightChunks(CanvasContext2D canvas, int fxP, int fyP, Point[] offs, IntersectingRectangle bounds, Point localPoint)
+        private void drawHighChunks(CanvasContext2D canvas, int fxP, int fyP, Point[] offs, IntersectingRectangle bounds, Point localPoint)
         {
             foreach (Point off in offs)
             {

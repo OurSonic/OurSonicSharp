@@ -9,6 +9,8 @@ namespace OurSonic.Tiles
         [IntrinsicProperty]
         protected bool? isOnlyBackground { get; set; }
         [IntrinsicProperty]
+        protected bool? isOnlyForeground{ get; set; }
+        [IntrinsicProperty]
         protected bool? empty { get; set; }
         [IntrinsicProperty]
         protected List<string> Sprites { get; set; }
@@ -44,25 +46,56 @@ namespace OurSonic.Tiles
 
         public bool OnlyBackground()
         {
-            if (isOnlyBackground == null) {
-                var blocks = SonicManager.Instance.SonicLevel.Blocks;
+            if (isOnlyBackground.HasValue) return isOnlyBackground.Value;
 
-                var tpl = TilePieces.Length;
-                var tph = TilePieces[0].Length;
-                for (int i = 0; i < tpl; i++) {
-                    for (int j = 0; j < tph; j++) {
-                        var r = TilePieces[i][j];
-                        var pm = blocks[r.Block];
-                        if (pm.Truthy()) {
-                            if (!pm.OnlyBackground())
-                                return ( isOnlyBackground = false ).Value;
-                        }
+
+            var blocks = SonicManager.Instance.SonicLevel.Blocks;
+
+            var tpl = TilePieces.Length;
+            var tph = TilePieces[0].Length;
+            for (int i = 0; i < tpl; i++)
+            {
+                for (int j = 0; j < tph; j++)
+                {
+                    var r = TilePieces[i][j];
+                    var pm = blocks[r.Block];
+                    if (pm.Truthy())
+                    {
+                        if (!pm.OnlyBackground())
+                            return (isOnlyBackground = false).Value;
                     }
                 }
-                isOnlyBackground = true;
             }
+            isOnlyBackground = true;
             return isOnlyBackground.Value;
         }
+        public bool OnlyForeground()
+        {
+            if (isOnlyForeground.HasValue) return isOnlyForeground.Value;
+
+
+            var blocks = SonicManager.Instance.SonicLevel.Blocks;
+
+            var tpl = TilePieces.Length;
+            var tph = TilePieces[0].Length;
+            for (int i = 0; i < tpl; i++)
+            {
+                for (int j = 0; j < tph; j++)
+                {
+                    var r = TilePieces[i][j];
+                    var pm = blocks[r.Block];
+                    if (pm.Truthy())
+                    {
+                        if (!pm.OnlyForeground())
+                            return (isOnlyForeground = false).Value;
+                    }
+                }
+            }
+            isOnlyForeground = true;
+            return isOnlyForeground.Value;
+        }
+
+
 
         public bool IsEmpty()
         {
@@ -95,9 +128,20 @@ namespace OurSonic.Tiles
             var blocks = SonicManager.Instance.SonicLevel.Blocks;
             for (int i = 0; i < len1; i++) {
                 for (int j = 0; j < len2; j++) {
+
                     var r = TilePieces[i][j];
                     var pm = blocks[r.Block];
                     if (pm.Truthy()) {
+
+                        if (layer == 1) {
+                            if(pm.OnlyBackground()) continue;
+                        }
+                        else if (layer == 0) {
+                            if (pm.OnlyForeground()) continue;
+                        }
+
+
+
                         int animatedIndex = 0;
                         if (Animated.Truthy() && ( Animated[j * len1 + i].Truthy() ))
                             animatedIndex = Animated[j * len1 + i].LastAnimatedIndex;
