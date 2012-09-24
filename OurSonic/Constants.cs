@@ -20,10 +20,14 @@ namespace OurSonic
             }
             return null;
         }
-    }
-    [Serializable]
-    public class IntersectingRectangle : Rectangle
+    } 
+    public class IntersectingRectangle
     {
+        public int X { get; set; }
+        public int Y { get; set; }
+
+        public int Width { get; set; }
+        public int Height { get; set; }
         public IntersectingRectangle(int x, int y, int width, int height)
         {
             X = x;
@@ -76,6 +80,10 @@ namespace OurSonic
         public Point Negate(Point windowLocation)
         {
             return new Point(X - windowLocation.X, Y - windowLocation.Y);
+        }
+        public Point Negate(int x, int y)
+        {
+            return new Point(X - x, Y - y);
         }
     }
 }

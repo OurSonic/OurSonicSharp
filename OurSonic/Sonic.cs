@@ -954,6 +954,19 @@ namespace OurSonic
 
         public bool CheckCollisionWithObjects(int x, int y, string letter)
         {
+            var me = new Point(x, y);
+            var levelObjectInfos = SonicManager.Instance.InFocusObjects;
+
+            for (int index = 0; index < levelObjectInfos.Count; index++) {
+                var ob = levelObjectInfos[index];
+                var dj = ob.Collides(me);
+                var dj2 = ob.HurtsSonic(me);
+
+                if (dj.Truthy())
+                    return ob.Collide(this, letter, dj);
+                if (dj2.Truthy())
+                    return ob.HurtSonic(this, letter, dj2);
+            }
             return false;
         }
     }

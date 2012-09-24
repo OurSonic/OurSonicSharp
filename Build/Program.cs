@@ -65,6 +65,7 @@ namespace Build
                                                                                  shufSharp + @"\OurSonicNode\",
                                                                                  new Application(true, "new OurSonicNode.Server();", new List<string> {
                                                                                                                                                               @"./RawDeflate.js",
+                                                                                                                                                              @"./RawDeflate.js",
                                                                                                                                                       })
                                                                          },
                                                               };
@@ -72,9 +73,11 @@ namespace Build
                 var to = pre + shufSharp + @"\output\" + depend.Key.Split(new[] {"\\"}, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
                 var output = "";
 
-                if (depend.Value.Node)
+                if (depend.Value.Node) {
                     output += "require('./mscorlib.node.debug.js');";
-                else {
+                    output += "Enumerable=require('./linq.js');";
+                } else
+                {
                     //output += "require('./mscorlib.debug.js');";
                 }
 

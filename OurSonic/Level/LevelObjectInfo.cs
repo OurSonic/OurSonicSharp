@@ -1,32 +1,53 @@
 using System;
 using System.Collections.Generic;
 using System.Html.Media.Graphics;
+using System.Runtime.CompilerServices;
 using OurSonicModels;
 namespace OurSonic.Level
 {
-    [Serializable]
     public class LevelObjectInfo
     {
         private Rectangle _rect = new Rectangle(0, 0, 0, 0);
         public int lastDrawTick;
+        [IntrinsicProperty]
         public SLDataObjectEntry O { get; set; }
+        [IntrinsicProperty]
         public double X { get; set; }
+        [IntrinsicProperty]
         public double Y { get; set; }
+        [IntrinsicProperty]
         public double Xsp { get; set; }
+        [IntrinsicProperty]
         public double Ysp { get; set; }
+        [IntrinsicProperty]
         public bool Xflip { get; set; }
+        [IntrinsicProperty]
         public bool Yflip { get; set; }
+        [IntrinsicProperty]
         public int Subdata { get; set; }
+        [IntrinsicProperty]
         public string Key { get; set; }
+        [IntrinsicProperty]
         public LevelObject ObjectData { get; set; }
+        [IntrinsicProperty]
         public int UpperNibble { get; set; }
+        [IntrinsicProperty]
         public int LowerNibble { get; set; }
+        [IntrinsicProperty]
         public int PieceIndex { get; set; }
+        [IntrinsicProperty]
         public List<LevelObjectPiece> Pieces { get; set; }
+        [IntrinsicProperty]
         public bool Dead { get; set; }
+        [IntrinsicProperty]
         public LevelObjectInfo State { get; set; }
+        [IntrinsicProperty]
         public int Index { get; set; }
+        [IntrinsicProperty]
         public List<string> Debug { get; set; }
+        [IntrinsicProperty]
+        public Action<List<string>> ConsoleLog { get; set; }
+
         public LevelObjectInfo(SLDataObjectEntry o)
         {
             O = o;
@@ -42,38 +63,28 @@ namespace OurSonic.Level
 
         public void Log(string txt, int level = 100)
         {
-
             if (Debug.Falsey())
-            {
                 Debug = new List<string>();
-            }
 
             if (level == 0)
-            {
-                this.Debug.Add(" -- " + txt + " -- ");
-            }
+                Debug.Add(" -- " + txt + " -- ");
             else
-            {
-                this.Debug.Add(txt);
-            }
-            if (this.ConsoleLog.Truthy())
-            {
-                this.ConsoleLog(this.Debug);
-            }
+                Debug.Add(txt);
+            if (ConsoleLog.Truthy())
+                ConsoleLog(Debug);
         }
-
-        protected Action<List<string>> ConsoleLog { get; set; }
 
         public void SetPieceLayoutIndex(int ind)
         {
-            /*            PieceIndex = ind;
+            PieceIndex = ind;
 
-                        var pcs = ObjectData.PieceLayouts[PieceIndex].Pieces;
+            var pcs = ObjectData.PieceLayouts[PieceIndex].Pieces;
 
-                        Pieces = new List<LevelObjectPieceLayoutPiece>();
-                        for (int i = 0; i < pcs.Count; i++) {
-                            Pieces.Add(pcs[i]);
-                        }*/
+            Pieces = new List<LevelObjectPiece>();
+
+            for (int i = 0; i < pcs.Count; i++) {
+                Pieces.Add(pcs[i].Me<LevelObjectPiece>());
+            }
         }
 
         public void SetObjectData(LevelObject obj)
@@ -89,12 +100,9 @@ namespace OurSonic.Level
         {
             if (Dead || ObjectData.Falsey()) return false;
 
-            try
-            {
+            try {
                 return ObjectData.Tick(@object, level, sonic);
-            }
-            catch (Exception EJ)
-            {
+            } catch (Exception EJ) {
                 //this.Log(EJ.name + " " + EJ.message, 0);
 
                 return false;
@@ -108,10 +116,9 @@ namespace OurSonic.Level
 
         public Rectangle GetRect(Point scale)
         {
-            if (ObjectData.PieceLayouts.Count == 0)
-            {
-                _rect.X = (int)X;
-                _rect.Y = (int)Y;
+            if (ObjectData.PieceLayouts.Count == 0) {
+                _rect.X = (int) X;
+                _rect.Y = (int) Y;
                 _rect.Width = ObjectManager.broken.Width;
                 _rect.Height = ObjectManager.broken.Height;
                 return _rect;
@@ -124,13 +131,11 @@ namespace OurSonic.Level
             _rect.Width = 0;
             _rect.Height = 0;
 
-            for (var pieceIndex = 0; pieceIndex < pcs.Count; pieceIndex++)
-            {
+            for (var pieceIndex = 0; pieceIndex < pcs.Count; pieceIndex++) {
                 var j = pcs[pieceIndex];
                 var piece = ObjectData.Pieces[j.PieceIndex];
                 var asset = ObjectData.Assets[piece.AssetIndex];
-                if (asset.Frames.Count > 0)
-                {
+                if (asset.Frames.Count > 0) {
                     var frm = asset.Frames[j.FrameIndex];
                     Help.MergeRect(_rect, new Rectangle(frm.OffsetX + j.Y, frm.OffsetY + j.Y, frm.Width * scale.Y, frm.Height * scale.Y));
                 }
@@ -140,8 +145,8 @@ namespace OurSonic.Level
             _rect.Width -= _rect.X;
             _rect.Height -= _rect.Y;
 
-            _rect.X += (int)X;
-            _rect.Y += (int)Y;
+            _rect.X += (int) X;
+            _rect.Y += (int) Y;
             return _rect;
         }
 
@@ -149,50 +154,51 @@ namespace OurSonic.Level
         {
             if (Dead || ObjectData.Falsey()) return;
 
-            if (ObjectData.PieceLayouts.Count == 0)
-            {
-                canvas.DrawImage(ObjectManager.broken, (x - ObjectManager.broken.Width / 2), (y - ObjectManager.broken.Height / 2),
+            if (ObjectData.PieceLayouts.Count == 0) {
+                canvas.DrawImage(ObjectManager.broken, ( x - ObjectManager.broken.Width / 2 ), ( y - ObjectManager.broken.Height / 2 ),
                                  ObjectManager.broken.Width * scale.X, ObjectManager.broken.Height * scale.Y);
                 return;
             }
 
             MainPieceLayout().Draw(canvas, x, y, scale, ObjectData, this, showHeightMap);
-            if (true /* || this.consoleLog*/)
-            {
+            if (false /* || this.consoleLog*/) {
                 var gr = GetRect(scale);
                 canvas.Save();
                 canvas.FillStyle = "rgba(228,228,12,0.4)";
                 var wd = 1;
-                canvas.FillRect(gr.X - X + x - (gr.Width / 2) - wd, gr.Y - Y + y - (gr.Height / 2) - wd, gr.Width - (gr.X - X) + wd * 2,
-                                gr.Height - (gr.Y - Y) + wd * 2);
+                canvas.FillRect(gr.X - X + x - ( gr.Width / 2 ) - wd, gr.Y - Y + y - ( gr.Height / 2 ) - wd, gr.Width - ( gr.X - X ) + wd * 2,
+                                gr.Height - ( gr.Y - Y ) + wd * 2);
                 canvas.Restore();
             }
         }
 
         public void Reset()
         {
-            this.X = this.O.X;
-            this.Y = this.O.Y;
-            this.Xsp = 0;
-            this.Ysp = 0;
-            this.State = null;
-            this.Xflip = this.O.XFlip;
-            this.Yflip = this.O.YFlip;
-            this.Dead = false;
-            this.PieceIndex = 0; //maybe
-            this.Subdata = this.O.SubType;
-            this.UpperNibble = this.Subdata >> 4;
-            this.LowerNibble = this.Subdata & 0xf;
-            if (this.ObjectData.PieceLayouts.Count > this.PieceIndex &&
-                this.ObjectData.PieceLayouts[this.PieceIndex].Pieces.Count > 0)
-            {
-                this.SetPieceLayoutIndex(this.PieceIndex);
-            }
+            X = O.X;
+            Y = O.Y;
+            Xsp = 0;
+            Ysp = 0;
+            State = null;
+            Xflip = O.XFlip;
+            Yflip = O.YFlip;
+            Dead = false;
+            PieceIndex = 0; //maybe
+            Subdata = O.SubType;
+            UpperNibble = Subdata >> 4;
+            LowerNibble = Subdata & 0xf;
+            if (ObjectData.PieceLayouts.Count > PieceIndex &&
+                ObjectData.PieceLayouts[PieceIndex].Pieces.Count > 0)
+                SetPieceLayoutIndex(PieceIndex);
         }
 
-        public LevelObjectPiece Collides(Sonic sonic)
+        public LevelObjectPiece Collides(Point sonic)
         {
             return Collision(sonic, false);
+        }
+
+        public LevelObjectPiece HurtsSonic(Point sonic)
+        {
+            return Collision(sonic, true);
         }
 
         public void Kill()
@@ -200,20 +206,20 @@ namespace OurSonic.Level
             Dead = true;
         }
 
-        public LevelObjectPiece Collision(Sonic sonic, bool isHurtMap)
+        public LevelObjectPiece Collision(Point sonic, bool isHurtMap)
         {
             if (Dead || ObjectData.Falsey() || ObjectData.PieceLayouts.Count == 0) return null;
             var pcs = Pieces;
-            for (var pieceIndex = 0; pieceIndex < pcs.Count; pieceIndex++)
-            {
+            int mX = (int) ( ( sonic.X ) - X );
+            int mY = (int) ( ( sonic.Y ) - Y );
+            for (var pieceIndex = 0; pieceIndex < pcs.Count; pieceIndex++) {
                 var j = pcs[pieceIndex];
                 var piece = ObjectData.Pieces[j.PieceIndex];
                 var asset = ObjectData.Assets[piece.AssetIndex];
-                if (asset.Frames.Count > 0)
-                {
+                if (asset.Frames.Count > 0) {
                     var frm = asset.Frames[j.FrameIndex];
                     var map = isHurtMap ? frm.HurtSonicMap : frm.CollisionMap;
-                    if (twoDArray(map, (int)((sonic.X) - X + frm.OffsetX + j.X), (int)((sonic.Y) - Y + frm.OffsetY + j.Y)) == true)
+                    if (twoDArray(map, ( mX + frm.OffsetX + j.X ), ( mY + frm.OffsetY + j.Y )) == true)
                         return j;
                 }
             }
@@ -231,27 +237,21 @@ namespace OurSonic.Level
             return d[y] > 0;
         }
 
-        public dynamic Collide(Sonic sonic, SensorM sensor, dynamic piece)
+        public dynamic Collide(Sonic sonic, string sensor, dynamic piece)
         {
-            try
-            {
+            try {
                 return ObjectData.OnCollide(this, SonicManager.Instance.SonicLevel, sonic, sensor, piece);
-            }
-            catch (Exception EJ)
-            {
+            } catch (Exception EJ) {
                 //this.log(EJ.name + " " + EJ.message + " " + EJ.stack, 0);
                 return false;
             }
         }
 
-        public dynamic HurtSonic(Sonic sonic, SensorM sensor, dynamic piece)
+        public dynamic HurtSonic(Sonic sonic, string sensor, dynamic piece)
         {
-            try
-            {
+            try {
                 return ObjectData.OnHurtSonic(this, SonicManager.Instance.SonicLevel, sonic, sensor, piece);
-            }
-            catch (Exception EJ)
-            {
+            } catch (Exception EJ) {
                 //this.log(EJ.name + " " + EJ.message + " " + EJ.stack, 0);
                 return null;
             }

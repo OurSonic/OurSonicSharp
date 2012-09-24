@@ -25,8 +25,7 @@ namespace OurSonic.Level
 
         public void Update()
         {
-            foreach (LevelObjectInfo t in SonicManager.Instance.SonicLevel.Objects)
-            {
+            foreach (LevelObjectInfo t in SonicManager.Instance.SonicLevel.Objects) {
                 t.Reset();
             }
         }
@@ -44,10 +43,10 @@ namespace OurSonic.Level
             canvas.LineWidth = 2;
 
             canvas.FillStyle = "#FFFFFF";
-            canvas.FillRect(pos.X, pos.Y, this.Width, this.Height);
+            canvas.FillRect(pos.X, pos.Y, Width, Height);
 
             canvas.BeginPath();
-            canvas.Rect(pos.X, pos.Y, this.Width, this.Height);
+            canvas.Rect(pos.X, pos.Y, Width, Height);
             canvas.Clip();
             canvas.ClosePath();
 
@@ -66,25 +65,19 @@ namespace OurSonic.Level
             canvas.ClosePath();
             canvas.Stroke();
 
-
-            for (var i = 1; i < this.Pieces.Count; i++)
-            {
-                var j = this.Pieces[i];
+            for (var i = 1; i < Pieces.Count; i++) {
+                var j = Pieces[i];
 
                 canvas.BeginPath();
                 canvas.MoveTo(pos.X + j.X, pos.Y + j.Y);
-                canvas.LineTo(pos.X + this.Pieces[i - 1].X, pos.Y + this.Pieces[i - 1].Y);
+                canvas.LineTo(pos.X + Pieces[i - 1].X, pos.Y + Pieces[i - 1].Y);
                 canvas.Stroke();
-
             }
 
-
             Gradient drawRadial;
-            for (var i = 0; i < this.Pieces.Count; i++)
-            {
-                var j = this.Pieces[i];
-                if (showImages)
-                {
+            for (var i = 0; i < Pieces.Count; i++) {
+                var j = Pieces[i];
+                if (showImages) {
 /*
                     LevelObjectPiece piece = sonicManager.uiManager.objectFrameworkArea.objectFramework.pieces[j.PieceIndex];
                     var asset = sonicManager.uiManager.objectFrameworkArea.objectFramework.assets[piece.AssetIndex];
@@ -108,26 +101,19 @@ namespace OurSonic.Level
                             false, true, true, false, piece.Xflip, piece.Yflip);
                     }
 */
-                }
-                else
-                {
+                } else {
                     drawRadial = SonicManager.Instance.mainCanvas.Context.CreateRadialGradient(0, 0, 0, 10, 10, 50);
                     drawRadial.AddColorStop(0, "white");
                     if (selectedPieceIndex == i)
-                    {
                         drawRadial.AddColorStop(1, "yellow");
-                    }
                     else
-                    {
                         drawRadial.AddColorStop(1, "red");
-                    }
 
                     canvas.FillStyle = drawRadial;
                     canvas.BeginPath();
                     canvas.Arc(pos.X + j.X, pos.Y + j.Y, 10, 0, Math.PI * 2, true);
                     canvas.ClosePath();
                     canvas.Fill();
-
                 }
             }
             canvas.Restore();
@@ -135,14 +121,12 @@ namespace OurSonic.Level
 
         public void Draw(CanvasContext2D canvas, int x, int y, Point scale, LevelObject framework, LevelObjectInfo instance, bool showHeightMap)
         {
-            for (var i = 0; i < instance.Pieces.Count; i++)
-            {
+            for (var i = 0; i < instance.Pieces.Count; i++) {
                 var j = instance.Pieces[i];
                 if (!j.Visible) continue;
                 var piece = framework.Pieces[j.PieceIndex];
                 var asset = framework.Assets[piece.AssetIndex];
-                if (asset.Frames.Count > 0)
-                {
+                if (asset.Frames.Count > 0) {
                     var frm = asset.Frames[j.FrameIndex];
                     frm.DrawUI(canvas, new Point(( x + j.X * scale.X ) - ( frm.OffsetX * scale.X ), ( y + j.Y * scale.Y ) - ( frm.OffsetY * scale.Y )),
                                new Point(frm.Width * scale.X, frm.Height * scale.Y), false, showHeightMap, showHeightMap, false, piece.Xflip,

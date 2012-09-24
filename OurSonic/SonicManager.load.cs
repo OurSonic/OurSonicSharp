@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Serialization;
 using NodeJSLibrary;
 using OurSonic.Level;
 using OurSonic.Tiles;
@@ -10,11 +11,28 @@ namespace OurSonic
 {
     public partial class SonicManager
     {
-        public void loadObjects(dynamic[] objects)
+        public void loadObjects(KeyValuePair<string, string>[] objects)
         {
+            var cachedObjects = new JsDictionary<string, LevelObject>();
+
             for (int l = 0; l < SonicLevel.Objects.Count; l++) {
                 var o = SonicLevel.Objects[l].Key;
-                if()
+                if (cachedObjects.ContainsKey(o)) {
+                    SonicLevel.Objects[l].SetObjectData(cachedObjects[o]);
+                    continue;
+                }
+                var d = objects.First(p => p.Key == o);
+                if (d.Falsey()) {
+                    SonicLevel.Objects[l].SetObjectData(new LevelObject(o));
+                    continue;
+                }
+                LevelObjectData dat;
+                if (d.Value.Length == 0) dat = new LevelObjectData();
+                else dat = (LevelObjectData) Json.Parse(d.Value);
+
+                var dr = ObjectManager.ExtendObject(dat);
+                cachedObjects[o] = dr;
+                SonicLevel.Objects[l].SetObjectData(dr);
             }
 
             /* 
@@ -56,6 +74,12 @@ namespace OurSonic
 
 */
         }
+
+        public void loadObjects(List<string> objects)
+        {
+            SonicEngine.Instance.client.Emit("GetObjects", objects);
+        }
+
         public void Load(string lvl)
         {
             Loading = true;
@@ -83,15 +107,6 @@ namespace OurSonic
             SonicLevel.LevelHeight = sonicLevel.ForegroundHeight;
             SonicLevel.ChunkMap = sonicLevel.Foreground;
             SonicLevel.BGChunkMap = sonicLevel.Background;
-            /*
-        for (l = 0; l < sonicManager.SonicLevel.Objects.length; l++) {
-            o = sonicManager.SonicLevel.Objects[l];
-            _H.ObjectParse(o, (function (r) {
-                return function (rq) {
-                    sonicManager.SonicLevel.Objects[r] = rq;
-                };
-            })(l));
-        }*/
 
             SonicLevel.Objects = new List<LevelObjectInfo>();
 
@@ -100,18 +115,13 @@ namespace OurSonic
                 SonicLevel.Objects[l].Index = l;
             }
 
-
             var objectKeys = new List<string>();
             for (int l = 0; l < SonicLevel.Objects.Count; l++) {
                 var o = SonicLevel.Objects[l].Key;
-                if (objectKeys.Count(p => p == o) == 0) {
-                    objectKeys.Add(o);
-                }
+                if (objectKeys.All(p => p != o)) objectKeys.Add(o);
+            }
+            loadObjects(objectKeys);
 
-            }        
-
-//TODO: LOAD OBJECTS
-            KLOADOBEJCTS
             SonicLevel.CurPaletteIndex = 0;
             SonicLevel.palAn = new List<int>();
             SonicLevel.CurHeightMap = true;

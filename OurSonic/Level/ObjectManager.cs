@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Html;
 namespace OurSonic.Level
 {
@@ -14,7 +15,7 @@ namespace OurSonic.Level
 
         public void Init() {}
 
-        public LevelObject ExtendObject(LevelObjectData d)
+        public static LevelObject ExtendObject(LevelObjectData d)
         {
             LevelObject obj = new LevelObject(d.Key) {
                                                              CollideScript = d.CollideScript,
@@ -23,12 +24,14 @@ namespace OurSonic.Level
                                                              TickScript = d.TickScript
                                                      };
             //d.oldKey = name;
+            obj.Assets = new List<LevelObjectAsset>();
+
             for (int i = 0; i < d.Assets.Count; i++) {
                 var asset = d.Assets[i];
                 var levelObjectAsset = new LevelObjectAsset("") {
                                                                         Name = asset.Name,
                                                                 };
-
+                levelObjectAsset.Frames = new List<LevelObjectAssetFrame>();
                 for (int index = 0; index < asset.Frames.Count; index++) {
                     var fr = asset.Frames[index];
                     levelObjectAsset.Frames[index] = new LevelObjectAssetFrame("") {
@@ -44,10 +47,13 @@ namespace OurSonic.Level
                 }
                 obj.Assets[i] = levelObjectAsset;
             }
+            obj.Pieces = new List<LevelObjectPiece>();
+
             for (int index = 0; index < d.Pieces.Count; index++) {
                 var piece = d.Pieces[index];
                 obj.Pieces[index] = piece;
             }
+            obj.PieceLayouts = new List<LevelObjectPieceLayout>();
             for (int index = 0; index < d.PieceLayouts.Count; index++) {
                 var pl = d.PieceLayouts[index];
                 obj.PieceLayouts[index] = new LevelObjectPieceLayout(pl.Name) {
@@ -55,10 +61,12 @@ namespace OurSonic.Level
                                                                                       Width = pl.Width
                                                                               };
 
+                obj.PieceLayouts[index].Pieces = new List<LevelObjectPieceLayoutPiece>();
                 for (int i = 0; i < d.PieceLayouts[index].Pieces.Count; i++) {
                     obj.PieceLayouts[index].Pieces[i] = d.PieceLayouts[index].Pieces[i];
                 }
             }
+            obj.Projectiles = new List<LevelObjectProjectile>();
             for (int index = 0; index < d.Projectiles.Count; index++) {
                 var proj = d.Projectiles[index];
                 proj = new LevelObjectProjectile(proj.Name) {

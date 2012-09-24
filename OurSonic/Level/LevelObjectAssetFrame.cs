@@ -24,10 +24,12 @@ namespace OurSonic.Level
         [IntrinsicProperty]
         public string Name { get; set; }
         [IntrinsicProperty]
-        public JsDictionary<string, CanvasInformation> Image { get; set; }
+        public JsDictionary<int, CanvasInformation> Image { get; set; }
 
         public LevelObjectAssetFrame(string name)
         {
+            Image = new JsDictionary<int, CanvasInformation>();
+
             Name = name;
 
             /*  for (var i = 0; i < 100; i++) {
@@ -143,18 +145,25 @@ namespace OurSonic.Level
 
         public CanvasInformation GetCache(Point size, bool xflip, bool yflip, bool showOutline, bool showCollideMap, bool showHurtMap)
         {
-            //            return this.image[((xflip + 2) * 13) ^ (size.width * 47) ^ ((yflip + 2) * 71) ^ ((showOutline + 2) * 7) ^ ((showCollideMap + 2) * 89) ^ ((showHurtMap + 2) * 79)];
+            return
+                    Image[
+                            ( ( ( xflip ? 1 : 0 ) + 2 ) * 13 ) ^ ( size.X * 47 ) ^ ( ( ( yflip ? 1 : 0 ) + 2 ) * 71 ) ^
+                            ( ( ( showOutline ? 1 : 0 ) + 2 ) * 7 ) ^ ( ( ( showCollideMap ? 1 : 0 ) + 2 ) * 89 ) ^
+                            ( ( ( showHurtMap ? 1 : 0 ) + 2 ) * 79 )];
             return null;
         }
 
         public void ClearCache()
         {
-            //                 this.image = [];
+            Image = new JsDictionary<int, CanvasInformation>();
         }
 
         public void SetCache(CanvasInformation image, Point size, bool xflip, bool yflip, bool showOutline, bool showCollideMap, bool showHurtMap)
         {
-            //            this.image[((xflip + 2) * 13) ^ (size.width * 47) ^ ((yflip + 2) * 71) ^ ((showOutline + 2) * 7) ^ ((showCollideMap + 2) * 89) ^ ((showHurtMap + 2) * 79)] = image;
+            Image[
+                    ( ( ( xflip ? 1 : 0 ) + 2 ) * 13 ) ^ ( size.X * 47 ) ^ ( ( ( yflip ? 1 : 0 ) + 2 ) * 71 ) ^
+                    ( ( ( showOutline ? 1 : 0 ) + 2 ) * 7 ) ^ ( ( ( showCollideMap ? 1 : 0 ) + 2 ) * 89 ) ^
+                    ( ( ( showHurtMap ? 1 : 0 ) + 2 ) * 79 )] = image;
         }
 
         public void DrawUI(CanvasContext2D _canvas,

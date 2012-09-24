@@ -1,15 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Html;
 using System.Html.Media.Graphics;
+using System.Runtime.CompilerServices;
 using SocketIOWebLibrary;
 using WebLibraries;
 using jQueryApi;
 namespace OurSonic
 {
+    [Imported]
+    [IgnoreGenericArguments]
+    public class DataObject<T>
+    {
+        [IntrinsicProperty]
+        [PreserveCase]
+        public T Data { get; set; }
+    }
     public class SonicEngine
     {
         public int canvasHeight;
         public int canvasWidth;
+        public SocketIOClient client;
         private bool fullscreenMode;
         private CanvasInformation gameCanvas;
         private string gameCanvasName = "gameLayer";
@@ -17,9 +28,12 @@ namespace OurSonic
         private SonicManager sonicManager;
         private CanvasInformation uiCanvas;
         private string uiCanvasName = "uiLayer";
+        [IntrinsicProperty]
+        public static SonicEngine Instance { get; set; }
 
         public SonicEngine()
         {
+            Instance = this;
             /*var pl = @"";
             Window.Instance.Me().console.log(new Compressor().CompressText(pl));*/
             var gameCanvasItem = jQuery.Select(string.Format("#{0}", gameCanvasName));
@@ -59,16 +73,23 @@ namespace OurSonic
                                                         sonicManager.InHaltMode = !sonicManager.InHaltMode;
                                                 }, () => { });
             int levelIndex = 0;
-            SocketIOClient client = SocketIOClient.Connect("50.116.22.241:8998");
+            client = SocketIOClient.Connect("50.116.22.241:8998");
 
-            client.On<dynamic>("SonicLevel", data => {
-                                                 sonicManager.Load(data.Data);
+            client.On<DataObject<string>>("SonicLevel", data => {
+                                                            sonicManager.Load(data.Data);
 
-                                                 sonicManager.WindowLocation.X = 0;
-                                                 sonicManager.WindowLocation.Y = 0;
-                                                 sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
-                                                 sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
-                                             });
+                                                            sonicManager.WindowLocation.X = 0;
+                                                            sonicManager.WindowLocation.Y = 0;
+                                                            sonicManager.BigWindowLocation.X = (int) ( sonicManager.WindowLocation.X - sonicManager.WindowLocation.Width*0.2 );
+                                                            sonicManager.BigWindowLocation.Y = (int) ( sonicManager.WindowLocation.Y - sonicManager.WindowLocation.Height * 0.2 );
+
+                                                            sonicManager.BigWindowLocation.Width = (int)(sonicManager.WindowLocation.Width * 1.8);
+                                                            sonicManager.BigWindowLocation.Height = (int)(sonicManager.WindowLocation.Height * 1.8);
+
+
+                                                        });
+            client.On<DataObject<KeyValuePair<string, string>[]>>("GetObjects.Response", data => { sonicManager.loadObjects(data.Data); }
+                    );
 
             KeyboardJS.Instance().Bind.Key("2", () => { client.Emit("GetSonicLevel", "0"); }, () => { });
             client.Emit("GetSonicLevel", "0");
@@ -126,7 +147,7 @@ namespace OurSonic
                                                          case GameState.Editing:
 
                                                              sonicManager.WindowLocation.Y -= 128;
-                                                             sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
+                                                             sonicManager.BigWindowLocation.Y -= 128;
                                                              break;
                                                      }
                                                  }, () => {
@@ -147,7 +168,7 @@ namespace OurSonic
                                                            case GameState.Editing:
 
                                                                sonicManager.WindowLocation.Y += 128;
-                                                               sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
+                                                               sonicManager.BigWindowLocation.Y += 128;
                                                                break;
                                                        }
                                                    }, () => {
@@ -167,7 +188,7 @@ namespace OurSonic
                                                                break;
                                                            case GameState.Editing:
                                                                sonicManager.WindowLocation.X -= 128;
-                                                               sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
+                                                               sonicManager.BigWindowLocation.X -= 128;
                                                                break;
                                                        }
                                                    }, () => {
@@ -187,7 +208,7 @@ namespace OurSonic
                                                                 break;
                                                             case GameState.Editing:
                                                                 sonicManager.WindowLocation.X += 128;
-                                                                sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
+                                                                sonicManager.BigWindowLocation.X +=128 ;
                                                                 break;
                                                         }
                                                     }, () => {

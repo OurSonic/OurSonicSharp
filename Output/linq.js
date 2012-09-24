@@ -2976,8 +2976,8 @@
     Dictionary.registerClass('$LinqJSDictionary', null, ss.IEnumerable);
 
     // module export
-    if (typeof module !== Types.Undefined && module.exports) {
-        module.exports = Enumerable;
+    if (typeof exports !== Types.Undefined ) {
+        exports.Enumerable = Enumerable;
     }
     else {
         root.Enumerable = Enumerable;

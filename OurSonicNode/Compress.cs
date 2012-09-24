@@ -21,11 +21,12 @@ namespace OurSonicNode
                                                                             fs.ReadFile(__dirname + s1 + "\\" + s2, "utf8", (err, content) => {
                                                                                                                                 if (
                                                                                                                                         s3.EndsWith(
-                                                                                                                                                ".min.js"))
+                                                                                                                                                ".min.js")) {
                                                                                                                                     fs.Unlink(
                                                                                                                                             __dirname +
                                                                                                                                             s1 + "\\" +
                                                                                                                                             s3);
+                                                                                                                                }
                                                                                                                                 var fm =
                                                                                                                                         new Compressor
                                                                                                                                                 ().

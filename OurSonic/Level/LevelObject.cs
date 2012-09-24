@@ -5,6 +5,9 @@ namespace OurSonic.Level
 {
     public class LevelObject
     {
+        private JsDictionary<string, Func<LevelObjectInfo, SonicLevel, Sonic, SensorM, LevelObjectPiece, bool>> cacheCompiled =
+                new JsDictionary<string, Func<LevelObjectInfo, SonicLevel, Sonic, SensorM, LevelObjectPiece, bool>>();
+        private JsDictionary<string, string> cacheLast = new JsDictionary<string, string>();
         [IntrinsicProperty]
         public string Key { get; set; }
         [IntrinsicProperty]
@@ -36,19 +39,18 @@ namespace OurSonic.Level
 
         public void Init(LevelObjectInfo @object, SonicLevel level, Sonic sonic)
         {
-
             @object.Reset();
-            this.evalMe("initScript").Me().apply(@object, new object[] { @object, level, sonic });
+            evalMe("initScript").Me().apply(@object, new object[] {@object, level, sonic});
         }
 
-        public dynamic OnCollide(LevelObjectInfo @object, SonicLevel level, Sonic sonic, SensorM sensor, dynamic piece)
+        public dynamic OnCollide(LevelObjectInfo @object, SonicLevel level, Sonic sonic, string sensor, dynamic piece)
         {
-            return this.evalMe("collideScript").Me().apply(@object, new object[] { @object, level, sonic, sensor, piece });
+            return evalMe("collideScript").Me().apply(@object, new object[] {@object, level, sonic, sensor, piece});
         }
 
-        public dynamic OnHurtSonic(LevelObjectInfo @object, SonicLevel level, Sonic sonic, SensorM sensor, dynamic piece)
+        public dynamic OnHurtSonic(LevelObjectInfo @object, SonicLevel level, Sonic sonic, string sensor, dynamic piece)
         {
-            return this.evalMe("hurtScript").Me().apply(@object, new object[] { @object, level, sonic, sensor, piece });
+            return evalMe("hurtScript").Me().apply(@object, new object[] {@object, level, sonic, sensor, piece});
         }
 
         public bool Tick(LevelObjectInfo @object, SonicLevel level, Sonic sonic)
@@ -58,10 +60,9 @@ namespace OurSonic.Level
 
             @object.lastDrawTick = SonicManager.Instance.tickCount;
 
-            evalMe("tickScript").Me().apply(@object, new object[] { @object, level, sonic });
+            evalMe("tickScript").Me().apply(@object, new object[] {@object, level, sonic});
 
-            if (@object.State.Truthy())
-            {
+            if (@object.State.Truthy()) {
                 @object.Xsp = @object.State.Xsp;
                 @object.Ysp = @object.State.Ysp;
             }
@@ -75,29 +76,21 @@ namespace OurSonic.Level
             //alert('todo death');
         }
 
-        private JsDictionary<string, Func<LevelObjectInfo, SonicLevel, Sonic, SensorM, LevelObjectPiece, bool>> cache = new JsDictionary<string, Func<LevelObjectInfo, SonicLevel, Sonic, SensorM, LevelObjectPiece, bool>>();
-
         private Func<LevelObjectInfo, SonicLevel, Sonic, SensorM, LevelObjectPiece, bool> evalMe(string js)
         {
-            if (Help.Falsey(cache[js + "_last"]))
-            {
-                cache[js + "_last"] = null;
-            }
-            if (cache[js + "_last"] != cache[js])
-            {
-                cache[js + "Compiled"] = null;
-            }
+            if (cacheLast[js] == null)
+                cacheLast[js] = null;
+            if (cacheLast[js] != this.Me<JsDictionary<string, string>>()[js])
+                cacheCompiled[js] = null;
 
-            cache[js + "_last"] = cache[js];
+            cacheLast[js] = this.Me<JsDictionary<string, string>>()[js];
 
-
-            if (cache[js + "Compiled"].Falsey()) {
-                cache[js + "Compiled"] =
+            if (cacheCompiled[js] == null) {
+                cacheCompiled[js] =
                         Script.Reinterpret<Func<LevelObjectInfo, SonicLevel, Sonic, SensorM, LevelObjectPiece, bool>>(
-                                Script.Eval("(function(object,level,sonic,sensor,piece){" + cache[js] + "});"));
-
+                                Script.Eval("(function(object,level,sonic,sensor,piece){" + this.Me<JsDictionary<string, string>>()[js] + "});"));
             }
-            return cache[js + "Compiled"];
+            return cacheCompiled[js];
         }
     }
 }

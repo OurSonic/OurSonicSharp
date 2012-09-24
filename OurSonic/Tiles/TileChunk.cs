@@ -91,39 +91,7 @@ namespace OurSonic.Tiles
             var lX = 16 * scale.X;
             var lY = 16 * scale.Y;
             var localPoint = new Point(0, 0);
-
-            var check = false;
-
-            /*var RectB = new Rectangle(position.X, position.Y, len1 * lX, len2 * lY);
-            var RectA = bounds;
-            if (RectA.X < RectB.X+RectB.Width && RectA.X+RectA.Width > RectB.X+RectB.Width &&
-                RectA.Y < RectB.Y + RectB.Height && RectA.Y + RectA.Height > RectB.Y + RectB.Height) {
-                check = true;
-            }*/
-
-            /*
-
-       localPoint.X = position.X;
-           localPoint.Y = position.Y;
-           if (bounds.Intersects(localPoint)) {
-               localPoint.X = position.X+len1*lX;
-               localPoint.Y = position.Y;
-               if (bounds.Intersects(localPoint))
-               {
-                   localPoint.X = position.X;
-                   localPoint.Y = position.Y + len2 * lY;
-                   if (bounds.Intersects(localPoint))
-                   {
-                       localPoint.X = position.X + len1 * lX;
-                       localPoint.Y = position.Y + len2 * lY;
-                       if (bounds.Intersects(localPoint)) {
-                           check = false;
-                       }
-                   }
-               }   
-           } 
-*/
-
+              
             var blocks = SonicManager.Instance.SonicLevel.Blocks;
             for (int i = 0; i < len1; i++) {
                 for (int j = 0; j < len2; j++) {
@@ -135,9 +103,7 @@ namespace OurSonic.Tiles
                             animatedIndex = Animated[j * len1 + i].LastAnimatedIndex;
 
                         localPoint.X = position.X + i * lX;
-                        localPoint.Y = position.Y + j * lY;
-                        if (check && !bounds.Intersects(localPoint))
-                            continue;
+                        localPoint.Y = position.Y + j * lY; 
                         pm.Draw(canvas, localPoint, scale, layer, r.XFlip, r.YFlip, animatedIndex);
                         //canvas.StrokeStyle = "#FFF";
                         //canvas.StrokeRect(position.X + i * 16 * scale.X, position.Y + j * 16 * scale.Y, scale.X * 16, scale.Y * 16);
