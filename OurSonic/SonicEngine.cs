@@ -80,13 +80,13 @@ namespace OurSonic
 
                                                             sonicManager.WindowLocation.X = 0;
                                                             sonicManager.WindowLocation.Y = 0;
-                                                            sonicManager.BigWindowLocation.X = (int) ( sonicManager.WindowLocation.X - sonicManager.WindowLocation.Width*0.2 );
-                                                            sonicManager.BigWindowLocation.Y = (int) ( sonicManager.WindowLocation.Y - sonicManager.WindowLocation.Height * 0.2 );
+                                                            sonicManager.BigWindowLocation.X =
+                                                                    (int) ( sonicManager.WindowLocation.X - sonicManager.WindowLocation.Width * 0.2 );
+                                                            sonicManager.BigWindowLocation.Y =
+                                                                    (int) ( sonicManager.WindowLocation.Y - sonicManager.WindowLocation.Height * 0.2 );
 
-                                                            sonicManager.BigWindowLocation.Width = (int)(sonicManager.WindowLocation.Width * 1.8);
-                                                            sonicManager.BigWindowLocation.Height = (int)(sonicManager.WindowLocation.Height * 1.8);
-
-
+                                                            sonicManager.BigWindowLocation.Width = (int) ( sonicManager.WindowLocation.Width * 1.8 );
+                                                            sonicManager.BigWindowLocation.Height = (int) ( sonicManager.WindowLocation.Height * 1.8 );
                                                         });
             client.On<DataObject<KeyValuePair<string, string>[]>>("GetObjects.Response", data => { sonicManager.loadObjects(data.Data); }
                     );
@@ -208,7 +208,7 @@ namespace OurSonic
                                                                 break;
                                                             case GameState.Editing:
                                                                 sonicManager.WindowLocation.X += 128;
-                                                                sonicManager.BigWindowLocation.X +=128 ;
+                                                                sonicManager.BigWindowLocation.X += 128;
                                                                 break;
                                                         }
                                                     }, () => {

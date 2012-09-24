@@ -7,9 +7,10 @@ namespace OurSonicNode
 {
     public partial class Server
     {
-        private string objDirectory = "/usr/local/src/sonic/ObjectData/";
-        private JsDictionary<int, string> levelData;
         private FS fs;
+        private JsDictionary<int, string> levelData;
+        private string objDirectory = "/usr/local/src/sonic/ObjectData/";
+
         public Server()
         {
             Global.SetInterval(() => { Global.Console.Log("keep alive " + new DateTime().ToString().Substring(17, 24)); }, 10 * 1000);
@@ -54,7 +55,9 @@ namespace OurSonicNode
                                                                                     new {
                                                                                                 Data =
                                                                                             _getObjects(_objects).Select(
-                                                                                                    a => new {key = _objects[ind++], value = a}).ToArray()});
+                                                                                                    a => new {key = _objects[ind++], value = a}).
+                                                                                            ToArray()
+                                                                                        });
                                                                     });
                                             socket.On("GetAllObjects",
                                                       (string[] _objects) =>
@@ -67,22 +70,13 @@ namespace OurSonicNode
                                         });
         }
 
-
-
-
         private IEnumerable<string> _getObjects(string[] _objects)
         {
-            foreach (var _object in _objects)
-            {
-
+            foreach (var _object in _objects) {
                 if (!fs.ExistsSync(objDirectory + _object + ".js")) yield return "";
                 else
                     yield return fs.ReadFileSync(objDirectory + _object + ".js", "utf8");
-
             }
         }
-
-
-
     }
 }

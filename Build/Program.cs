@@ -76,8 +76,7 @@ namespace Build
                 if (depend.Value.Node) {
                     output += "require('./mscorlib.node.debug.js');";
                     output += "Enumerable=require('./linq.js');";
-                } else
-                {
+                } else {
                     //output += "require('./mscorlib.debug.js');";
                 }
 

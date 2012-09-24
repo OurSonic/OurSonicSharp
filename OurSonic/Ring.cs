@@ -18,6 +18,7 @@ namespace OurSonic
         public double Ysp { get; set; }
         [IntrinsicProperty]
         public double Xsp { get; set; }
+
         public Ring(bool active) : base(0, 0)
         {
             Active = active;
@@ -26,14 +27,13 @@ namespace OurSonic
         public void Draw(CanvasContext2D canvas, Point pos, Point scale)
         {
             if (Active) {
-                this.Ysp += 0.09375;
-                this.X += (int)this.Xsp;
-                this.Y += (int)this.Ysp;
-
+                Ysp += 0.09375;
+                X += (int) Xsp;
+                Y += (int) Ysp;
 
                 var wl = SonicManager.Instance.WindowLocation;
-                if (this.X < wl.X || this.Y < wl.Y || this.X > wl.X + wl.Width || this.Y > wl.Y + wl.Height) {
-                    this.TickCount = 0xfffffff;
+                if (X < wl.X || Y < wl.Y || X > wl.X + wl.Width || Y > wl.Y + wl.Height) {
+                    TickCount = 0xfffffff;
                     return;
                 }
 /*            if (sonicManager.sonicToon.checkCollisionLine(_H.floor(this.x) + 8, _H.floor(this.y) + 8, 16, 1) != -1) {
@@ -46,17 +46,15 @@ namespace OurSonic
 
                 if (SonicManager.Instance.DrawTickCount > SonicManager.Instance.SonicToon.sonicLastHitTick + 64 &&
                     IntersectingRectangle.IntersectsRect(SonicManager.Instance.SonicToon.myRec,
-                                       new Rectangle(this.X - 8 * scale.X, this.Y - 8 * scale.Y, 8 * 2 * scale.X, 2 * 8 * scale.Y)))
-                {
-                    this.TickCount = 0xfffffff;
+                                                         new Rectangle(X - 8 * scale.X, Y - 8 * scale.Y, 8 * 2 * scale.X, 2 * 8 * scale.Y))) {
+                    TickCount = 0xfffffff;
                     SonicManager.Instance.SonicToon.Rings++;
                     return;
                 }
 
-                this.TickCount++;
-
+                TickCount++;
             }
-            if ( SonicManager.Instance.CurrentGameState == GameState.Playing)
+            if (SonicManager.Instance.CurrentGameState == GameState.Playing)
                 AnimationIndex = ( SonicManager.Instance.DrawTickCount % ( ( Active ? 4 : 8 ) * 4 ) ) / ( Active ? 4 : 8 );
             else AnimationIndex = 0;
             List<ImageElement> sprites = null;
@@ -67,6 +65,5 @@ namespace OurSonic
             if (sps.Falsey()) throw new Exception("bad ring animation");
             if (sps.Loaded()) canvas.DrawImage(sps, ( pos.X - 8 ) * scale.X, ( pos.Y - 8 ) * scale.Y);
         }
-
     }
 }
