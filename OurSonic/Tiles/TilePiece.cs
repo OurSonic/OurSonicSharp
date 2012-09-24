@@ -41,38 +41,46 @@ namespace OurSonic.Tiles
             Image = new JsDictionary<string, CanvasElement>();
         }
 
-        private bool? onlyBackground;
+        public bool onlyBackground;
+        private bool onlyBackgroundSet;
         public bool OnlyBackground()
         {
-            if (onlyBackground.HasValue) return onlyBackground.Value;
+            if (onlyBackgroundSet) return onlyBackground;
 
             var tiles = SonicManager.Instance.SonicLevel.Tiles;
             foreach (var mj in Tiles)
             {
                 if (tiles[mj._Tile].Truthy())
                 {
-                    if (mj.Priority)
-                        return (onlyBackground = false).Value;
+                    if (mj.Priority) {
+                        onlyBackgroundSet = true;
+                        return (onlyBackground = false);
+                    }
                 }
             }
-            return (onlyBackground = true).Value;
+            onlyBackgroundSet = true;
+            return (onlyBackground = true);
         } 
         
-        private bool? onlyForeground;
+        public bool onlyForeground;
+        private bool onlyForegroundSet;
         public bool OnlyForeground()
         {
-            if (onlyForeground.HasValue) return onlyForeground.Value;
+            if (onlyForegroundSet) return onlyForeground;
 
             var tiles = SonicManager.Instance.SonicLevel.Tiles;
             foreach (var mj in Tiles)
             {
                 if (tiles[mj._Tile].Truthy())
                 {
-                    if (!mj.Priority)
-                        return (onlyForeground = false).Value;
+                    if (!mj.Priority) {
+                        onlyForegroundSet = true;
+                        return (onlyForeground = false);
+                    }
                 }
             }
-            return (onlyForeground = true).Value;
+            onlyForegroundSet = true;
+            return (onlyForeground = true);
         }
 
         public void DrawUI(CanvasContext2D canvas, Point position, Point scale, bool xflip, bool yflip)
@@ -199,6 +207,13 @@ namespace OurSonic.Tiles
             }
 
            return Script.Reinterpret<CanvasElement>(Image.Me()[val]);
+        }
+
+        public void Init()
+        {
+            this.OnlyBackground();
+            this.OnlyForeground();
+
         }
     }
     public enum RotationMode

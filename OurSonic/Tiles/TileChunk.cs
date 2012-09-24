@@ -6,6 +6,7 @@ namespace OurSonic.Tiles
 {
     public class TileChunk
     {
+        private Point myLocalPoint = new Point(0, 0);
         [IntrinsicProperty]
         protected bool? isOnlyBackground { get; set; }
         [IntrinsicProperty]
@@ -123,7 +124,8 @@ namespace OurSonic.Tiles
 
             var lX = 16 * scale.X;
             var lY = 16 * scale.Y;
-            var localPoint = new Point(0, 0);
+
+            bool isBack = layer == 0;
               
             var blocks = SonicManager.Instance.SonicLevel.Blocks;
             for (int i = 0; i < len1; i++) {
@@ -133,29 +135,39 @@ namespace OurSonic.Tiles
                     var pm = blocks[r.Block];
                     if (pm.Truthy()) {
 
-                        if (layer == 1) {
-                            if(pm.OnlyBackground()) continue;
-                        }
-                        else if (layer == 0) {
-                            if (pm.OnlyForeground()) continue;
-                        }
-
-
-
-                        int animatedIndex = 0;
-                        if (Animated.Truthy() && ( Animated[j * len1 + i].Truthy() ))
-                            animatedIndex = Animated[j * len1 + i].LastAnimatedIndex;
-
-                        localPoint.X = position.X + i * lX;
-                        localPoint.Y = position.Y + j * lY; 
-                        pm.Draw(canvas, localPoint, scale, layer, r.XFlip, r.YFlip, animatedIndex);
-                        //canvas.StrokeStyle = "#FFF";
-                        //canvas.StrokeRect(position.X + i * 16 * scale.X, position.Y + j * 16 * scale.Y, scale.X * 16, scale.Y * 16);
+                        if (drawIt(canvas, position, scale, layer, lX, lY, r, j, pm, isBack, i, len1)) continue;
                     }
                 }
             }
 
             canvas.Restore();
+        }
+
+        private bool drawIt(CanvasContext2D canvas,
+                            Point position,
+                            Point scale,
+                            int layer,
+                            int lX,
+                            int lY,
+                            TilePiece r,
+                            int j,
+                            TilePiece pm,
+                            bool isBack,
+                            int i,
+                            int len1)
+        {
+            if (isBack ? ( pm.onlyForeground ) : ( pm.onlyBackground )) return true;
+
+            int animatedIndex = 0;
+            if (Animated.Truthy() && ( Animated[j * len1 + i].Truthy() ))
+                animatedIndex = Animated[j * len1 + i].LastAnimatedIndex;
+
+            myLocalPoint.X = position.X + i * lX;
+            myLocalPoint.Y = position.Y + j * lY;
+            pm.Draw(canvas, myLocalPoint, scale, layer, r.XFlip, r.YFlip, animatedIndex);
+            //canvas.StrokeStyle = "#FFF";
+            //canvas.StrokeRect(position.X + i * 16 * scale.X, position.Y + j * 16 * scale.Y, scale.X * 16, scale.Y * 16);
+            return false;
         }
 
         public void AnimatedTick()

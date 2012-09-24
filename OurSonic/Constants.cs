@@ -40,6 +40,18 @@ namespace OurSonic
         {
             return X < p.X && X + Width > p.X && Y < p.Y && Y + Height > p.Y;
         }
+        public static bool IntersectsRect(Rectangle r, Point p)
+        {
+            return r.X < p.X && r.X + r.Width > p.X && r.Y < p.Y && r.Y + r.Height > p.Y;
+        } 
+        
+        public static bool IntersectRect(Rectangle r1, Rectangle r2)
+        {
+            return !(r2.X > r1.X + r1.Width ||
+            r2.X + 0 < r1.X ||
+                r2.Y > r1.Y + r1.Height ||
+                    r2.Y + 0 < r1.Y);
+        }
     }
     [Serializable]
     public class Rectangle : Point

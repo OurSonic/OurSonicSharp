@@ -199,7 +199,7 @@ namespace OurSonic
                                                         YFlip = fc[p].YFlip,
                                                 });
                 }
-
+                mj.Init();
                 SonicLevel.Blocks[j] = mj;
             }
 

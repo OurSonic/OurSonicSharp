@@ -647,25 +647,27 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
 
         private void drawRings(CanvasContext2D canvas, Point localPoint)
         {
-            foreach (var r in SonicLevel.Rings)
+            for (int index = 0; index < SonicLevel.Rings.Count; index++)
             {
+                var r = SonicLevel.Rings[index];
+
+
                 switch (CurrentGameState)
                 {
                     case GameState.Playing:
-
-                        for (int i = ActiveRings.Count - 1; i >= 0; i--)
+                        if (!SonicToon.obtainedRing[index])
                         {
-                            Ring ac = ActiveRings[i];
-                            localPoint.X = ac.X - WindowLocation.X;
-                            localPoint.Y = ac.Y - WindowLocation.Y;
-                            ac.Draw(canvas, localPoint, Scale);
-                            if (ac.TickCount > 256)
-                                ActiveRings.Remove(ac);
+                            if (BigWindowLocation.Intersects(r))
+                            {
+                                GoodRing.Draw(canvas, r.Negate(WindowLocation.X, WindowLocation.Y), Scale);
+                            }
                         }
                         break;
                     case GameState.Editing:
                         if (BigWindowLocation.Intersects(r))
+                        {
                             GoodRing.Draw(canvas, r.Negate(WindowLocation.X, WindowLocation.Y), Scale);
+                        }
                         break;
                 }
 
@@ -684,30 +686,50 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                  */
             }
 
+            switch (CurrentGameState)
+            {
+                case GameState.Playing:
+
+                    for (int i = ActiveRings.Count - 1; i >= 0; i--)
+                    {
+                        Ring ac = ActiveRings[i];
+
+                        localPoint.X = ac.X - WindowLocation.X;
+                        localPoint.Y = ac.Y - WindowLocation.Y;
+                        ac.Draw(canvas, localPoint, Scale);
+                        if (ac.TickCount > 256)
+                            ActiveRings.Remove(ac);
+                    }
+                    break;
+                case GameState.Editing:
+                    break;
+            }
         }
 
         private void drawAnimations(CanvasContext2D canvas)
         {
-            foreach (AnimationInstance ano in AnimationInstances)
+            for (int index = 0; index < AnimationInstances.Count; index++)
             {
+                AnimationInstance ano = AnimationInstances[index];
                 ano.Draw(canvas, -WindowLocation.X, -WindowLocation.Y, Scale);
             }
         }
 
         private void drawObjects(CanvasContext2D canvas, Point localPoint)
         {
-            foreach (LevelObjectInfo o in SonicLevel.Objects)
+            List<LevelObjectInfo> levelObjectInfos = SonicLevel.Objects;
+            for (int index = 0; index < levelObjectInfos.Count; index++)
             {
-                localPoint.X = (int)o.X;
-                localPoint.Y = (int)o.Y;
+                LevelObjectInfo o = levelObjectInfos[index];
+                localPoint.X = Script.Reinterpret<int>(o.X);
+                localPoint.Y = Script.Reinterpret<int>(o.Y);
                 if (o.Dead || BigWindowLocation.Intersects(localPoint))
                 {
-                    o.Draw(canvas, (int)((o.X - WindowLocation.X) * Scale.X), (int)((o.Y - WindowLocation.Y) * Scale.Y), Scale,
+                    o.Draw(canvas, ((localPoint.X - WindowLocation.X) * Scale.X), ((localPoint.Y - WindowLocation.Y) * Scale.Y), Scale,
                            ShowHeightMap);
                 }
             }
         }
-
 
         private Animation containsAnimatedTile(int tile, SonicLevel sonLevel)
         {
