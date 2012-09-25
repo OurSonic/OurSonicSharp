@@ -237,7 +237,7 @@ namespace OurSonic.Level
             return d[y] > 0;
         }
 
-        public dynamic Collide(Sonic sonic, string sensor, dynamic piece)
+        public bool Collide(Sonic sonic, string sensor, dynamic piece)
         {
             try {
                 return ObjectData.OnCollide(this, SonicManager.Instance.SonicLevel, sonic, sensor, piece);
@@ -247,13 +247,13 @@ namespace OurSonic.Level
             }
         }
 
-        public dynamic HurtSonic(Sonic sonic, string sensor, dynamic piece)
+        public bool HurtSonic(Sonic sonic, string sensor, dynamic piece)
         {
             try {
                 return ObjectData.OnHurtSonic(this, SonicManager.Instance.SonicLevel, sonic, sensor, piece);
             } catch (Exception EJ) {
                 //this.log(EJ.name + " " + EJ.message + " " + EJ.stack, 0);
-                return null;
+                return false;
             }
         }
     }

@@ -173,7 +173,7 @@ namespace OurSonic.Tiles
                               List<int> palAn,
                               CanvasElement image)
         {
-            dynamic val = ( ( drawOrder << 8 ) + ( scale.X << 16 ) + ( animationFrame << 20 ) + ( ( layer + 1 ) << 24 ) );
+            dynamic val = ( ( drawOrder << 8 ) + ( scale.X << 16 ) + ( animationFrame << 20 ) + ( ( layer + 1 ) << 24 ) );//okay
             if (AnimatedFrames.Length > 0) {
                 for (int index = 0; index < AnimatedFrames.Length; index++) {
                     var animatedFrame = AnimatedFrames[index];
@@ -190,7 +190,7 @@ namespace OurSonic.Tiles
 
         private CanvasElement GetCache(int layer, Point scale, int drawOrder, int animationFrame, List<int> palAn)
         {
-            dynamic val = ( ( drawOrder << 8 ) + ( scale.X << 16 ) + ( animationFrame << 20 ) + ( ( layer + 1 ) << 24 ) );
+            dynamic val = ((drawOrder << 8) + (scale.X << 16) + (animationFrame << 20) + ((layer + 1) << 24));//okay
             if (AnimatedFrames.Length > 0) {
                 foreach (var animatedFrame in AnimatedFrames) {
                     val += palAn[animatedFrame] + " ";

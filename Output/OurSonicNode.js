@@ -35,9 +35,9 @@ OurSonicNode.Compress = function() {
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicNode.Server
 OurSonicNode.Server = function() {
-	this.$objDirectory = '/usr/local/src/sonic/ObjectData/';
-	this.$levelData = null;
 	this.$fs = null;
+	this.$levelData = null;
+	this.$objDirectory = '/usr/local/src/sonic/ObjectData/';
 	setInterval(function() {
 		console.log('keep alive ' + (new Date()).toString().substring(17, 24));
 	}, 10000);

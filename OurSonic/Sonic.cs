@@ -109,9 +109,9 @@ namespace OurSonic
         {
             if (Angle <= 0x22 || Angle >= 0xDE)
                 Mode = RotationMode.Floor;
-            else if (Angle > 0x22 && Angle < 0x56)
+            else if (Angle > 0x22 && Angle < 0x59)
                 Mode = RotationMode.LeftWall;
-            else if (Angle >= 0x56 && Angle < 0xA1)
+            else if (Angle >= 0x59 && Angle < 0xA1)
                 Mode = RotationMode.Ceiling;
             else if (Angle > 0xA1 && Angle < 0xDE)
                 Mode = RotationMode.RightWall;
@@ -533,8 +533,8 @@ namespace OurSonic
                 WasInAir = true;
 
                 var offset = GetOffsetFromImage();
-                X += offset.X;
-                Y += offset.Y;
+              //  X += offset.X;
+              //  Y += offset.Y;
 
                 /*if ((angle >= 0x70 && angle <= 0x90)) {
                 xsp = (gsp);
@@ -720,7 +720,7 @@ namespace OurSonic
                     else if (Mode == RotationMode.Ceiling) Y += 0;
                     var oldMode = Mode;
                     UpdateMode();
-                    Gsp = 0;
+                    //Gsp = 0;NO
                     Mode = RotationMode.Floor;
                     HLock = 30;
                     InAir = true;

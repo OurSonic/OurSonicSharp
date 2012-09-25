@@ -946,7 +946,7 @@ OurSonic.Level.LevelObjectInfo.prototype = {
 		catch ($t1) {
 			var EJ = ss.Exception.wrap($t1);
 			//this.log(EJ.name + " " + EJ.message + " " + EJ.stack, 0);
-			return null;
+			return false;
 		}
 	}
 };
@@ -2078,10 +2078,10 @@ OurSonic.Sonic.prototype = {
 		if (this.angle <= 34 || this.angle >= 222) {
 			this.mode = 134;
 		}
-		else if (this.angle > 34 && this.angle < 86) {
+		else if (this.angle > 34 && this.angle < 89) {
 			this.mode = 44;
 		}
-		else if (this.angle >= 86 && this.angle < 161) {
+		else if (this.angle >= 89 && this.angle < 161) {
 			this.mode = 314;
 		}
 		else if (this.angle > 161 && this.angle < 222) {
@@ -2534,8 +2534,8 @@ OurSonic.Sonic.prototype = {
 		if (this.inAir && !this.wasInAir) {
 			this.wasInAir = true;
 			var offset = this.$getOffsetFromImage();
-			this.x += offset.x;
-			this.y += offset.y;
+			//  X += offset.X;
+			//  Y += offset.Y;
 			//if ((angle >= 0x70 && angle <= 0x90)) {
 			//xsp = (gsp);
 			//}
@@ -2752,7 +2752,7 @@ OurSonic.Sonic.prototype = {
 				}
 				var oldMode = this.mode;
 				this.updateMode();
-				this.gsp = 0;
+				//Gsp = 0;NO
 				this.mode = 134;
 				this.hLock = 30;
 				this.inAir = true;
@@ -2971,10 +2971,10 @@ OurSonic.Sonic.prototype = {
 			var dj = ob.collides(me);
 			var dj2 = ob.hurtsSonic(me);
 			if (dj) {
-				return !!ob.collide(this, letter, dj);
+				return ob.collide(this, letter, dj);
 			}
 			if (dj2) {
-				return !!ob.hurtSonic(this, letter, dj2);
+				return ob.hurtSonic(this, letter, dj2);
 			}
 		}
 		return false;
@@ -3099,6 +3099,10 @@ OurSonic.SonicEngine = function() {
 		this.$sonicManager.bigWindowLocation.y = ss.Int32.trunc(this.$sonicManager.windowLocation.y - this.$sonicManager.windowLocation.height * 0.2);
 		this.$sonicManager.bigWindowLocation.width = ss.Int32.trunc(this.$sonicManager.windowLocation.width * 1.8);
 		this.$sonicManager.bigWindowLocation.height = ss.Int32.trunc(this.$sonicManager.windowLocation.height * 1.8);
+		if (this.$sonicManager.currentGameState === 0) {
+			this.$runGame();
+		}
+		this.$runGame();
 	}));
 	this.client.on('GetObjects.Response', Function.mkdel(this, function(data1) {
 		this.$sonicManager.loadObjects(data1.Data);
@@ -3133,20 +3137,7 @@ OurSonic.SonicEngine = function() {
 	}), function() {
 	});
 	KeyboardJS.bind.key('q', Function.mkdel(this, function() {
-		switch (this.$sonicManager.currentGameState) {
-			case 0: {
-				this.$sonicManager.currentGameState = 1;
-				this.$sonicManager.windowLocation = OurSonic.Constants.defaultWindowLocation(this.$sonicManager.currentGameState, this.$gameCanvas, this.$sonicManager.scale);
-				this.$sonicManager.sonicToon = null;
-				break;
-			}
-			case 1: {
-				this.$sonicManager.currentGameState = 0;
-				this.$sonicManager.windowLocation = OurSonic.Constants.defaultWindowLocation(this.$sonicManager.currentGameState, this.$gameCanvas, this.$sonicManager.scale);
-				this.$sonicManager.sonicToon = new OurSonic.Sonic();
-				break;
-			}
-		}
+		this.$runGame();
 	}), function() {
 	});
 	KeyboardJS.bind.key('p', Function.mkdel(this, function() {
@@ -3301,6 +3292,22 @@ OurSonic.SonicEngine = function() {
 	this.resizeCanvas();
 };
 OurSonic.SonicEngine.prototype = {
+	$runGame: function() {
+		switch (this.$sonicManager.currentGameState) {
+			case 0: {
+				this.$sonicManager.currentGameState = 1;
+				this.$sonicManager.windowLocation = OurSonic.Constants.defaultWindowLocation(this.$sonicManager.currentGameState, this.$gameCanvas, this.$sonicManager.scale);
+				this.$sonicManager.sonicToon = null;
+				break;
+			}
+			case 1: {
+				this.$sonicManager.currentGameState = 0;
+				this.$sonicManager.windowLocation = OurSonic.Constants.defaultWindowLocation(this.$sonicManager.currentGameState, this.$gameCanvas, this.$sonicManager.scale);
+				this.$sonicManager.sonicToon = new OurSonic.Sonic();
+				break;
+			}
+		}
+	},
 	$handleScroll: function(jQueryEvent) {
 		jQueryEvent.preventDefault();
 		var j = ss.Nullable.unbox(Type.cast((!!jQueryEvent.detail ? (jQueryEvent.detail * -120) : jQueryEvent.wheelDelta), ss.Int32));
@@ -3363,8 +3370,6 @@ OurSonic.SonicEngine.prototype = {
 		this.$sonicManager.realScale = (!this.$fullscreenMode ? OurSonic.Point.$ctor1(1, 1) : OurSonic.Point.$ctor1(ss.Int32.div(ss.Int32.div(this.canvasWidth, 320), this.$sonicManager.scale.x), ss.Int32.div(ss.Int32.div(this.canvasHeight, 224), this.$sonicManager.scale.y)));
 		this.$gameCanvas.domCanvas.attr('width', (this.$sonicManager.windowLocation.width * ((this.$sonicManager.currentGameState === 0) ? (this.$sonicManager.scale.x * this.$sonicManager.realScale.x) : 1)).toString());
 		this.$gameCanvas.domCanvas.attr('height', (this.$sonicManager.windowLocation.height * ((this.$sonicManager.currentGameState === 0) ? (this.$sonicManager.scale.y * this.$sonicManager.realScale.y) : 1)).toString());
-		//TODO::            that.uiCanvas.goodWidth = that.canvasWidth;
-		//            that.gameCanvas.goodWidth = (window.sonicManager.windowLocation.width * (window.sonicManager.sonicToon ? window.sonicManager.scale.x * window.sonicManager.realScale.x : 1));
 		var screenOffset = ((this.$sonicManager.currentGameState === 0) ? OurSonic.Point.$ctor1(ss.Int32.div(this.canvasWidth, 2) - ss.Int32.div(this.$sonicManager.windowLocation.width * this.$sonicManager.scale.x * this.$sonicManager.realScale.x, 2), ss.Int32.div(this.canvasHeight, 2) - ss.Int32.div(this.$sonicManager.windowLocation.height * this.$sonicManager.scale.y * this.$sonicManager.realScale.y, 2)) : OurSonic.Point.$ctor1(0, 0));
 		this.$gameCanvas.domCanvas.css('left', OurSonic.Help.toPx(screenOffset.x));
 		this.$gameCanvas.domCanvas.css('top', OurSonic.Help.toPx(screenOffset.y));
@@ -5134,6 +5139,7 @@ OurSonic.Tiles.TilePiece.prototype = {
 	},
 	$setCache: function(layer, scale, drawOrder, animationFrame, palAn, image) {
 		var val = (drawOrder << 8) + (scale.x << 16) + (animationFrame << 20) + (layer + 1 << 24);
+		//okay
 		if (this.animatedFrames.length > 0) {
 			for (var index = 0; index < this.animatedFrames.length; index++) {
 				var animatedFrame = this.animatedFrames[index];
@@ -5147,6 +5153,7 @@ OurSonic.Tiles.TilePiece.prototype = {
 	},
 	$getCache: function(layer, scale, drawOrder, animationFrame, palAn) {
 		var val = (drawOrder << 8) + (scale.x << 16) + (animationFrame << 20) + (layer + 1 << 24);
+		//okay
 		if (this.animatedFrames.length > 0) {
 			for (var $t1 = 0; $t1 < this.animatedFrames.length; $t1++) {
 				var animatedFrame = this.animatedFrames[$t1];

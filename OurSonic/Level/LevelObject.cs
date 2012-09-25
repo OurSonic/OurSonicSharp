@@ -43,14 +43,14 @@ namespace OurSonic.Level
             evalMe("initScript").Me().apply(@object, new object[] {@object, level, sonic});
         }
 
-        public dynamic OnCollide(LevelObjectInfo @object, SonicLevel level, Sonic sonic, string sensor, dynamic piece)
+        public bool OnCollide(LevelObjectInfo @object, SonicLevel level, Sonic sonic, string sensor, dynamic piece)
         {
-            return evalMe("collideScript").Me().apply(@object, new object[] {@object, level, sonic, sensor, piece});
+            return Script.Reinterpret<bool>(evalMe("collideScript").Me().apply(@object, new object[] { @object, level, sonic, sensor, piece }));
         }
 
-        public dynamic OnHurtSonic(LevelObjectInfo @object, SonicLevel level, Sonic sonic, string sensor, dynamic piece)
+        public bool OnHurtSonic(LevelObjectInfo @object, SonicLevel level, Sonic sonic, string sensor, dynamic piece)
         {
-            return evalMe("hurtScript").Me().apply(@object, new object[] {@object, level, sonic, sensor, piece});
+            return Script.Reinterpret<bool>(evalMe("hurtScript").Me().apply(@object, new object[] {@object, level, sonic, sensor, piece}));
         }
 
         public bool Tick(LevelObjectInfo @object, SonicLevel level, Sonic sonic)
