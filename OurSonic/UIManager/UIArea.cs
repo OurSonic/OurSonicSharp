@@ -6,12 +6,40 @@ namespace OurSonic.UIManager
     {
         private bool myClosable;
         [IntrinsicProperty]
-        private UIManager Manager { get; set; }
-        [IntrinsicProperty]
         public Point Dragging { get; set; }
         [IntrinsicProperty]
-        protected bool Closable { get; set; }
-        public UIArea() : base(0, 0) {}
+        public bool Closable { get; set; }
+
+        public UIArea(int x, int y, int width, int height)
+                : base(x, y, width, height)
+        {
+            Closable = true;
+        }
+
+        public override T AddControl<T>(T element)
+        {
+            var fm = base.AddControl(element);
+
+            fm.Construct();
+
+            return fm;
+        }
+
+        public override void Construct()
+        {
+            if (Closable) {
+                AddControl(new Button(Width - 30, 4, 26, 23, "X") {
+                                                                          Font = UIManager.ButtonFont,
+                                                                          Color = "Green",
+                                                                          Click = () => {
+                                                                                      LoseFocus();
+                                                                                      Visible = false;
+                                                                                  }
+                                                                  });
+            }
+
+            base.Construct();
+        }
 
         public override bool OnClick(Pointer e)
         {
@@ -20,16 +48,6 @@ namespace OurSonic.UIManager
             if (!@base && !IsEditMode())
                 Dragging = new Point(e.X, e.Y);
             return @base;
-        }
-
-        public void Construct()
-        {
-            if (Closable) {
-                AddControl(new Button(Width - 30, 4) /*new Button(this.width - 30, 4, 26, 23, "X", this.manager.buttonFont, "Green", function () {
-            that.loseFocus();
-            that.visible = false;
-        })*/);
-            }
         }
 
         public override void Draw(CanvasContext2D canv)

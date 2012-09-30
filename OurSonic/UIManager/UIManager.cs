@@ -1,15 +1,22 @@
 using System.Collections.Generic;
+using System.Html;
 using System.Html.Media.Graphics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using OurSonic.UIManager.Areas;
 using jQueryApi;
 namespace OurSonic.UIManager
 {
     public class UIManager
     {
+        public const string SmallTextFont = "8pt Calibri ";
+        public const string ButtonFont = "12pt Calibri ";
+        public const string SmallButtonFont = "13pt Arial bold ";
+        public const string TextFont = "11pt Arial bold ";
+        private static string _curLevelName;
         private readonly CanvasContext2D mainCanvas;
         private readonly Point scale;
-        private readonly SonicManager sonicManager;
+        public readonly SonicManager sonicManager;
         private List<string> messages = new List<string>();
         [IntrinsicProperty]
         public List<UIArea> UIAreas { get; set; }
@@ -17,21 +24,19 @@ namespace OurSonic.UIManager
         public Dragger dragger { get; set; }
         [IntrinsicProperty]
         public UIManagerData Data { get; set; }
-        [IntrinsicProperty]
-        protected string SmallTextFont { get; set; }
-        [IntrinsicProperty]
-        protected string ButtonFont { get; set; }
-        [IntrinsicProperty]
-        protected string SmallButtonFont { get; set; }
-        [IntrinsicProperty]
-        protected string TextFont { get; set; }
+        public static string CurLevelName
+        {
+            get { return _curLevelName; }
+            set
+            {
+                UpdateTitle("- Our Sonic - " + value);
+
+                _curLevelName = value;
+            }
+        }
 
         public UIManager(SonicManager sonicManager, CanvasContext2D mainCanvas, Point scale)
         {
-            TextFont = "18pt Calibri ";
-            SmallTextFont = "12pt Calibri ";
-            ButtonFont = "13pt Arial bold";
-            SmallButtonFont = "11pt Arial bold";
             mainCanvas.Font = TextFont;
             UIAreas = new List<UIArea>();
 
@@ -45,6 +50,9 @@ namespace OurSonic.UIManager
                                       sonicManager.BigWindowLocation.X = sonicManager.WindowLocation.X;
                                       sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
                                   });
+
+            new LevelInformationArea(this);
+            new ObjectFrameworkArea(this);
         }
 
         public bool OnClick(jQueryEvent e)
@@ -159,6 +167,12 @@ namespace OurSonic.UIManager
             }
         }
 
+        public void AddArea(UIArea uiArea)
+        {
+            uiArea.Construct();
+            UIAreas.Add(uiArea);
+        }
+
         public void Draw(CanvasContext2D canvas)
         {
             dragger.Tick();
@@ -177,7 +191,10 @@ namespace OurSonic.UIManager
             canvas.Restore();
         }
 
-        public void UpdateTitle(string decoding) {}
+        public static void UpdateTitle(string title)
+        {
+            Document.Title = title;
+        }
     }
     public class UIManagerData
     {

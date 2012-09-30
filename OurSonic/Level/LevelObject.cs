@@ -26,6 +26,7 @@ namespace OurSonic.Level
         public string CollideScript { get; set; }
         [IntrinsicProperty]
         public string HurtScript { get; set; }
+        public string Description { get; set; }
 
         public LevelObject(string key)
         {

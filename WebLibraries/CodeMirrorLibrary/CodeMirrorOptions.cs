@@ -29,5 +29,7 @@ namespace CodeMirrorLibrary
         [ScriptName("onBlur")]
         [IntrinsicProperty]
         public Action<ElementEvent> OnBlur { get; set; }
+        [IntrinsicProperty]
+        public Action OnChange { get; set; }
     }
 }

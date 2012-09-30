@@ -1,20 +1,32 @@
 using System;
 using System.Collections.Generic;
 using System.Html.Media.Graphics;
+using System.Runtime.CompilerServices;
 namespace OurSonic.UIManager
 {
     public class ScrollBox : Element
     {
+        [IntrinsicProperty]
         public int ItemWidth { get; set; }
+        [IntrinsicProperty]
         public int ScrollWidth { get; set; }
+        [IntrinsicProperty]
         public int JHeight { get; set; }
+        [IntrinsicProperty]
         public int VisibleItems { get; set; }
+        [IntrinsicProperty]
         public int ItemHeight { get; set; }
+        [IntrinsicProperty]
         public string BackColor { get; set; }
+        [IntrinsicProperty]
         public int ScrollOffset { get; set; }
+        [IntrinsicProperty]
         public int ScrollPosition { get; set; }
+        [IntrinsicProperty]
         public bool Dragging { get; set; }
+        [IntrinsicProperty]
         public List<Element> Controls { get; set; }
+        [IntrinsicProperty]
         protected bool Scrolling { get; set; }
 
         public ScrollBox(int x, int y)
@@ -26,16 +38,17 @@ namespace OurSonic.UIManager
             ItemHeight = 10;
             BackColor = "";
             JHeight = 5;
+            Controls = new List<Element>();
         }
 
-        public void Construct()
+        public override void Construct()
         {
-            Width = VisibleItems * ( ItemWidth + JHeight );
-            Height = ItemHeight + ScrollWidth;
+            Height = VisibleItems * ( ItemHeight + JHeight );
+            Width = ItemWidth + ScrollWidth;
             Scrolling = false;
         }
 
-        public Element AddControl(Element control)
+        public T AddControl<T>(T control) where T : Element
         {
             control.Parent = this;
             Controls.Add(control);
@@ -100,7 +113,7 @@ namespace OurSonic.UIManager
             }
             if (Dragging && e.X > ItemWidth && e.X < ItemWidth + ScrollWidth) {
                 var height = VisibleItems * ( ItemHeight + JHeight ) - 2;
-                ScrollOffset = ( e.Y / height ) * ( Controls.Count - VisibleItems );
+                ScrollOffset = (int) ( ( (double) e.Y / height ) * ( Controls.Count - VisibleItems ) );
 
                 ScrollOffset = Math.Min(Math.Max(ScrollOffset, 0), Controls.Count);
             }
@@ -145,23 +158,23 @@ namespace OurSonic.UIManager
             canv.FillStyle = BackColor;
             canv.LineWidth = 1;
             canv.StrokeStyle = "#333";
-            Help.RoundRect(canv, Parent.X + X, Parent.Y + Y, ItemWidth + ScrollWidth + 6, VisibleItems * ( ItemHeight + JHeight ), 3, true, true);
+            Help.RoundRect(canv, TotalX, TotalY, ItemWidth + ScrollWidth + 6, VisibleItems * ( ItemHeight + JHeight ), 3, true, true);
 
             canv.FillStyle = "grey";
             canv.LineWidth = 1;
             canv.StrokeStyle = "#444";
-            canv.FillRect(Parent.X + X + ItemWidth + 2 + 2, Parent.Y + Y + 2, ScrollWidth, Height);
+            canv.FillRect(TotalX + ItemWidth + 2 + 2, TotalY + 2, ScrollWidth, Height);
 
             canv.FillStyle = "FFDDFF";
             canv.LineWidth = 1;
             canv.StrokeStyle = "#FFDDFF";
             ScrollPosition = height * ScrollOffset / ( Controls.Count - VisibleItems );
 
-            canv.FillRect(Parent.X + X + ItemWidth + 2 + 2 + 2, Parent.Y + Y + 2 + ( ScrollPosition ), ScrollWidth - 2, 5);
+            canv.FillRect(TotalX + ItemWidth + 2 + 2 + 2, TotalY + 2 + ( ScrollPosition ), ScrollWidth - 2, 5);
 
             var curY = 3;
             for (var i = ScrollOffset; i < Math.Min(Controls.Count, ScrollOffset + VisibleItems); i++) {
-                //this.Controls[i].Parent = { x: this.Parent.X + this.X, y: this.Parent.Y + this.Y };
+                Controls[i].Parent = this;
                 Controls[i].X = 2;
                 Controls[i].Y = curY;
                 Controls[i].Height = ItemHeight;
@@ -173,6 +186,11 @@ namespace OurSonic.UIManager
             canv.Restore();
 
             base.Draw(canv);
+        }
+
+        public void ClearControls()
+        {
+            Controls = new List<Element>();
         }
     }
 }

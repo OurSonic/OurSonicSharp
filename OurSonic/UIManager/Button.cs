@@ -2,6 +2,16 @@ using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 namespace OurSonic.UIManager
 {
+    public class Button<T> : Button
+    {
+        [IntrinsicProperty]
+        public T Data { get; set; }
+        public Button(T data, int x, int y, int width, int height, DelegateOrValue<string> text) : base(x, y, width, height, text)
+        {
+
+            Data = data;
+        }
+    }
     public class Button : Element
     {
         private string oldText;
@@ -10,7 +20,7 @@ namespace OurSonic.UIManager
         [IntrinsicProperty]
         public bool Toggle { get; set; }
         [IntrinsicProperty]
-        private bool Toggled { get; set; }
+        public bool Toggled { get; set; }
         [IntrinsicProperty]
         private bool Clicking { get; set; }
         [IntrinsicProperty]
@@ -25,20 +35,25 @@ namespace OurSonic.UIManager
         [IntrinsicProperty]
         public string Color { get; set; }
 
-        public Button(int x, int y)
+        public Button(int x, int y, int width, int height, DelegateOrValue<string> text)
                 : base(x, y)
         {
-            Text = "";
+            Text = text;
             Toggle = false;
             Toggled = false;
-            Font = "";
+            Font = UIManager.ButtonFont;
             Clicking = false;
             created = false;
             Button1Grad = null;
             Button2Grad = null;
             ButtonBorderGrad = null;
-            Width = 50;
-            Height = 50;
+            Width = width;
+            Height = height;
+        }
+
+        public override void Construct()
+        {
+            base.Construct();
         }
 
         public override bool OnClick(Pointer e)
@@ -108,14 +123,14 @@ namespace OurSonic.UIManager
                                            : Button2Grad );
             }
             canv.LineWidth = 2;
-            Help.RoundRect(canv, Parent.X + X, Parent.Y + Y, Width, Height, 2, true, true);
+            Help.RoundRect(canv, TotalX, TotalY, Width, Height, 2, true, true);
             if (canv.Font != Font)
                 canv.Font = Font;
             canv.FillStyle = "#000000";
             string txt = Text;
 
-            canv.FillText(txt, Parent.X + X + ( ( Width / 2 ) - ( canv.MeasureText(txt).Width / 2 ) ),
-                          Parent.Y + Y + ( Height / 3 ) * 2);
+            canv.FillText(txt, TotalX + ( ( Width / 2 ) - ( canv.MeasureText(txt).Width / 2 ) ),
+                          TotalY + ( Height / 3 ) * 2);
 
             canv.Restore();
         }

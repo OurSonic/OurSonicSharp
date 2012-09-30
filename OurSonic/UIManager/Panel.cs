@@ -3,6 +3,16 @@ using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 namespace OurSonic.UIManager
 {
+    public class Panel<T> : Panel
+    {
+        [IntrinsicProperty]
+        public T Data { get; set; }
+        public Panel(T data,int x, int y, int width, int height)
+            : base(x, y, width, height)
+        {
+            Data = data;
+        }
+    }
     public class Panel : Element
     {
         [IntrinsicProperty]
@@ -14,9 +24,11 @@ namespace OurSonic.UIManager
         [IntrinsicProperty]
         public CanvasInformation CachedDrawing { get; set; }
 
-        public Panel(int x, int y)
+        public Panel(int x, int y, int width, int height)
                 : base(x, y)
         {
+            Width = width;
+            Height = height;
             Controls = new List<Element>();
         }
 
@@ -34,12 +46,13 @@ namespace OurSonic.UIManager
 
         public override void Focus(Pointer e)
         {
+            var e2 = new Pointer(0, 0);
             var ch = Controls;
             foreach (Element t in ch) {
                 if (t.Visible && t.Y <= e.Y && t.Y + t.Height > e.Y && t.X <= e.X && t.X + t.Width > e.X) {
-                    e.X -= t.X;
-                    e.Y -= t.Y;
-                    t.Focus(e);
+                    e2.X = e.X - t.X;
+                    e2.Y = e.Y - t.Y;
+                    t.Focus(e2);
                 }
             }
             base.Focus(e);
@@ -52,6 +65,14 @@ namespace OurSonic.UIManager
                 t.LoseFocus();
             }
             base.LoseFocus();
+        }
+
+        public override void Construct()
+        {
+            base.Construct();
+            foreach (var element in Controls) {
+                element.Construct();
+            }
         }
 
         public override void OnKeyDown(object e)
@@ -67,23 +88,24 @@ namespace OurSonic.UIManager
 
         public override bool OnClick(Pointer e)
         {
+            var e2 = new Pointer(0, 0);
+
             if (!Visible) return false;
             var clicked = false;
 
             var ch = Controls;
             foreach (Element control in ch) {
                 if (control.Visible && control.Y <= e.Y && control.Y + control.Height > e.Y && control.X <= e.X && control.X + control.Width > e.X) {
-                    e.X -= control.X;
-                    e.Y -= control.Y;
-                    control.Focus(e);
-                    control.OnClick(e);
+                    e2.X = e.X - control.X;
+                    e2.Y = e.Y - control.Y;
+                    control.Focus(e2);
+                    control.OnClick(e2);
                     clicked = true;
                 } else
                     control.LoseFocus();
             }
 
             if (!clicked && !IsEditMode() && this is UIArea)
-
                 ( (UIArea) this ).Dragging = new Point(e.X, e.Y);
             return clicked;
         }
@@ -156,11 +178,6 @@ namespace OurSonic.UIManager
             var _y = Y;
             canv.Save();
 
-            if (Parent != null) {
-                X += Parent.X;
-                Y += Parent.Y;
-            }
-
             if (Outline) {
                 var lingrad = canv.CreateLinearGradient(0, 0, 0, Height);
                 lingrad.AddColorStop(0, "rgba(220,220,220,0.85)");
@@ -183,9 +200,12 @@ namespace OurSonic.UIManager
             base.Draw(canv);
         }
 
-        public Element AddControl(Element element)
+        public virtual T AddControl<T>(T element) where T : Element
         {
             element.Parent = this;
+
+            element.Construct();
+
             Controls.Add(element);
             return element;
         }

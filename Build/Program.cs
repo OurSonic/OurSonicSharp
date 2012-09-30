@@ -31,6 +31,7 @@ namespace Build
 */
                                       shufSharp + @"\OurSonic\",
                                       shufSharp + @"\OurSonicNode\",
+                                      shufSharp + @"\OurSonicModels\",
                               };
             var md = new DirectoryInfo(Directory.GetCurrentDirectory());
 
@@ -57,15 +58,17 @@ namespace Build
                                 @"./CommonLibraries.js",
                                 @"./CommonShuffleLibrary.js",
                                 @"./ShuffleGameLibrary.js",
-                                @"./Models.js",
                                 @"./RawDeflate.js",
 */
+                                
+
                                                                                                                })
                                                                       }, {
                                                                                  shufSharp + @"\OurSonicNode\",
                                                                                  new Application(true, "new OurSonicNode.Server();", new List<string> {
                                                                                                                                                               @"./RawDeflate.js",
-                                                                                                                                                              @"./RawDeflate.js",
+                                @"./OurSonicModels.js",
+
                                                                                                                                                       })
                                                                          },
                                                               };

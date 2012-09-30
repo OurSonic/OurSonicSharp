@@ -72,6 +72,7 @@
     <Compile Include="SonicManager.load.cs" />
     <Compile Include="SpriteCache.cs" />
     <Compile Include="SpriteLoader.cs" />
+    <Compile Include="UIManager\Areas\LevelInformationArea.cs" />
     <Compile Include="UIManager\Button.cs" />
     <Compile Include="UIManager\DelegateOrValue.cs" />
     <Compile Include="UIManager\EditorEngine.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="UIManager\HScrollBox.cs" />
     <Compile Include="UIManager\HtmlBox.cs" />
     <Compile Include="UIManager\ImageButton.cs" />
+    <Compile Include="UIManager\Areas\ObjectFrameworkArea.cs" />
     <Compile Include="UIManager\PaletteArea.cs" />
     <Compile Include="UIManager\Panel.cs" />
     <Compile Include="UIManager\Pointer.cs" />
@@ -100,6 +102,10 @@
     <ProjectReference Include="..\OurSonicModels\OurSonicModels.csproj">
       <Project>{D16CB407-F890-4670-8DB6-37DF76880297}</Project>
       <Name>OurSonicModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WebLibraries\CodeMirrorLibrary\CodeMirrorLibrary.csproj">
+      <Project>{BBF1829B-3446-4C0D-A75A-9BC713D2A6A1}</Project>
+      <Name>CodeMirrorLibrary</Name>
     </ProjectReference>
     <ProjectReference Include="..\WebLibraries\CommonWebLibraries\CommonWebLibraries.csproj">
       <Project>{6DA30112-FDBD-4E48-9F52-7268FCE19D25}</Project>

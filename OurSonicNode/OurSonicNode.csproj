@@ -59,9 +59,13 @@
       <Project>{BD7C6F4F-3798-4C32-9EE1-306CF197F81E}</Project>
       <Name>SocketIO</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OurSonic\OurSonic.csproj">
-      <Project>{3222B6FB-15F6-4217-8ECD-193BCFCE7D60}</Project>
-      <Name>OurSonic</Name>
+    <ProjectReference Include="..\OurSonicModels\OurSonicModels.csproj">
+      <Project>{D16CB407-F890-4670-8DB6-37DF76880297}</Project>
+      <Name>OurSonicModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WebLibraries\CommonWebLibraries\CommonWebLibraries.csproj">
+      <Project>{6DA30112-FDBD-4E48-9F52-7268FCE19D25}</Project>
+      <Name>CommonWebLibraries</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

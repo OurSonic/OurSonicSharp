@@ -3,6 +3,17 @@ using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 namespace OurSonic.UIManager
 {
+    public class ImageButton<T> : ImageButton
+    {
+        [IntrinsicProperty]
+        public T Data { get; set; }
+        public ImageButton(T data,int x, int y, int width, int height) : base(x, y, width, height)
+        {
+
+
+            Data = data;
+        }
+    }
     public class ImageButton : Element
     {
         private string oldText;
@@ -11,7 +22,7 @@ namespace OurSonic.UIManager
         [IntrinsicProperty]
         public bool Toggle { get; set; }
         [IntrinsicProperty]
-        private bool Toggled { get; set; }
+        public bool Toggled { get; set; }
         [IntrinsicProperty]
         private bool Clicking { get; set; }
         [IntrinsicProperty]
@@ -28,7 +39,7 @@ namespace OurSonic.UIManager
         [IntrinsicProperty]
         public string Color { get; set; }
 
-        public ImageButton(int x, int y)
+        public ImageButton(int x, int y, int width, int height)
                 : base(x, y)
         {
             Text = "";
@@ -42,8 +53,13 @@ namespace OurSonic.UIManager
             Button2Grad = null;
             ButtonBorderGrad = null;
 
-            Width = 50;
-            Height = 50;
+            Width = width;
+            Height = height;
+        }
+
+        public override void Construct()
+        {
+            base.Construct();
         }
 
         public override bool OnClick(Pointer e)
@@ -113,17 +129,17 @@ namespace OurSonic.UIManager
                                            : Button2Grad );
             }
             canv.LineWidth = 2;
-            Help.RoundRect(canv, Parent.X + X, Parent.Y + Y, Width, Height, 2, true, true);
+            Help.RoundRect(canv, TotalX, TotalY, Width, Height, 2, true, true);
             if (canv.Font != Font)
                 canv.Font = Font;
             canv.FillStyle = "#000000";
             string txt = Text;
 
             canv.Save();
-            Image(canv, Parent.X + X, Parent.Y + Y);
+            Image(canv, TotalX, TotalY);
             canv.Restore();
 
-            canv.FillText(txt, Parent.X + X + ( ( Width / 2 ) - ( canv.MeasureText(txt).Width / 2 ) ), Parent.Y + Y + Height - 3);
+            canv.FillText(txt, TotalX + ( ( Width / 2 ) - ( canv.MeasureText(txt).Width / 2 ) ), TotalY + Height - 3);
 
             canv.Restore();
         }

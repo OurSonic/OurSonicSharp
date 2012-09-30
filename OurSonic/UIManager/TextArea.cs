@@ -12,11 +12,11 @@ namespace OurSonic.UIManager
         [IntrinsicProperty]
         public string Color { get; set; }
 
-        public TextArea(int x, int y)
+        public TextArea(int x, int y, DelegateOrValue<string> text)
                 : base(x, y)
         {
-            Text = "";
-            Font = "18pt Calibri";
+            Text = text;
+            Font = UIManager.TextFont;
             Color = "black";
             oldText = "";
         }
@@ -38,7 +38,12 @@ namespace OurSonic.UIManager
 
             canv.FillStyle = Color;
 
-            canv.FillText(txt, Parent.X + X, Parent.Y + Y);
+            canv.FillText(txt, TotalX, TotalY);
+        }
+
+        public override void Construct()
+        {
+            base.Construct();
         }
 
         public override ForceRedrawing ForceDrawing()

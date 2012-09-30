@@ -1,6 +1,7 @@
 using System;
 using System.Html;
 using System.Html.Media.Graphics;
+using System.Runtime.CompilerServices;
 namespace OurSonic.UIManager
 {
     public class TextBox : Element
@@ -8,27 +9,53 @@ namespace OurSonic.UIManager
         private int blinkTick;
         private bool blinked;
         private CanvasContext2D can;
+        [IntrinsicProperty]
         public Action TextChanged { get; set; }
+        [IntrinsicProperty]
         public string Text { get; set; }
+        [IntrinsicProperty]
         public string Font { get; set; }
+        [IntrinsicProperty]
         public bool Clicking { get; set; }
+        [IntrinsicProperty]
         public string Color { get; set; }
+        [IntrinsicProperty]
         public int CursorPosition { get; set; }
+        [IntrinsicProperty]
         public int DragPosition { get; set; }
+        [IntrinsicProperty]
         public int DrawTicks { get; set; }
+        [IntrinsicProperty]
         public int LastClickTick { get; set; }
+        [IntrinsicProperty]
         public bool Created { get; set; }
+        [IntrinsicProperty]
         public bool Blinked { get; set; }
+        [IntrinsicProperty]
         public int BlinkTick { get; set; }
+        [IntrinsicProperty]
         public Gradient Button1Grad { get; set; }
+        [IntrinsicProperty]
         public Gradient Button2Grad { get; set; }
+        [IntrinsicProperty]
         public Gradient ButtonBorderGrad { get; set; }
+        [IntrinsicProperty]
         public bool Can { get; set; }
 
-        public TextBox(int x, int y)
+        public TextBox(int x, int y, int width, int height, DelegateOrValue<string> text)
                 : base(x, y)
         {
+            Text = text;
+            Width = width;
+            Height = height;
+            Font = UIManager.TextFont;
+
             DragPosition = -1;
+        }
+
+        public override void Construct()
+        {
+            base.Construct();
         }
 
         public override void OnKeyDown(object e2)
@@ -224,7 +251,7 @@ namespace OurSonic.UIManager
             canv.StrokeStyle = ButtonBorderGrad;
             canv.FillStyle = Clicking ? Button1Grad : Button2Grad;
             canv.LineWidth = 2;
-            Help.RoundRect(canv, Parent.X + X, Parent.Y + Y, Width, Height, 2, true, true);
+            Help.RoundRect(canv, TotalX, TotalY, Width, Height, 2, true, true);
             if (canv.Font != Font)
                 canv.Font = Font;
 
@@ -233,7 +260,7 @@ namespace OurSonic.UIManager
 
                 var w1 = canv.MeasureText(Text.Substring(0, Math.Min(DragPosition, CursorPosition))).Width;
                 var w2 = canv.MeasureText(Text.Substring(0, Math.Max(DragPosition, CursorPosition))).Width;
-                canv.FillRect(Parent.X + X + 8 + w1, Parent.Y + Y + 3,
+                canv.FillRect(TotalX + 8 + w1, TotalY + 3,
                               w2 - w1, ( Height - 7 ));
             }
             canv.FillStyle = "#000000";
@@ -243,7 +270,7 @@ namespace OurSonic.UIManager
                 hc = int.Parse(canv.Font.Substr(0, canv.Font.IndexOf("pt")));
             else
                 hc = int.Parse(canv.Font.Substr(0, canv.Font.IndexOf("px")));
-            canv.FillText(Text, Parent.X + X + 8, Parent.Y + Y + ( ( Height - hc ) / 2 ) + Height / 2);
+            canv.FillText(Text, TotalX + 8, TotalY + ( ( Height - hc ) / 2 ) + Height / 2);
 
             if (Focused && ( ( blinkTick++ % 35 ) == 0 ))
                 blinked = !blinked;
@@ -251,8 +278,8 @@ namespace OurSonic.UIManager
                 canv.StrokeStyle = "#000000";
                 var w = canv.MeasureText(Text.Substring(0, CursorPosition)).Width;
                 canv.BeginPath();
-                canv.MoveTo(Parent.X + X + 8 + w, Parent.Y + Y + 3);
-                canv.LineTo(Parent.X + X + 8 + w, Parent.Y + Y + ( Height - 7 ));
+                canv.MoveTo(TotalX + 8 + w, TotalY + 3);
+                canv.LineTo(TotalX + 8 + w, TotalY + ( Height - 7 ));
                 canv.LineWidth = 2;
                 canv.Stroke();
             }

@@ -56,6 +56,8 @@ namespace OurSonic.UIManager
             */
         }
 
+        public virtual void Construct() {}
+
         public bool IsEditMode()
         {
             return EditMode || ( Parent != null && Parent.IsEditMode() );

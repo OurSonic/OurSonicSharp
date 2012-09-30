@@ -1,4 +1,4 @@
-require('./mscorlib.node.debug.js');Enumerable=require('./linq.js');require('./RawDeflate.js');require('./RawDeflate.js');
+require('./mscorlib.node.debug.js');Enumerable=require('./linq.js');require('./RawDeflate.js');require('./OurSonicModels.js');
 Type.registerNamespace('OurSonicNode');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicNode.Compress
@@ -56,6 +56,7 @@ OurSonicNode.Server = function() {
 		for (var i = 0; i < files.length; i++) {
 			var i1 = { $: i };
 			fileNames[i1.$] = files[i];
+			console.log(fileNames[i1.$] + ' loaded');
 			this.$fs.readFile(levelsDir + files[i], 'utf8', Function.mkdel({ i1: i1 }, function(er, file) {
 				fileData[this.i1.$] = file;
 			}));
@@ -67,7 +68,15 @@ OurSonicNode.Server = function() {
 		var curLevel = 0;
 		socket.on('GetSonicLevel', function(levelName) {
 			console.log('Serving ' + fileNames[curLevel] + '  ' + curLevel);
-			socket.emit('SonicLevel', { Data: fileData[curLevel++ % fileData.length] });
+			socket.emit('SonicLevel', new (Type.makeGenericType(OurSonicModels.Common.DataObject$1, [String]))(fileData[curLevel++ % fileData.length]));
+		});
+		socket.on('GetLevels.Request', function() {
+			console.log('Serving list');
+			socket.emit('GetLevels.Response', new (Type.makeGenericType(OurSonicModels.Common.DataObject$1, [Array]))(fileNames));
+		});
+		socket.on('LoadLevel.Request', function(levelName1) {
+			console.log('Serving Level ' + levelName1.Data);
+			socket.emit('LoadLevel.Response', new (Type.makeGenericType(OurSonicModels.Common.DataObject$1, [String]))(fileData[fileNames.indexOf(levelName1.Data)]));
 		});
 		socket.on('GetObject', Function.mkdel(this, function(_object) {
 			this.$fs.exists(this.$objDirectory + _object + '.js', Function.mkdel(this, function(er1, exists) {

@@ -67,8 +67,17 @@ namespace CodeMirrorLibrary
             return 0;
         }
 
-        [ScriptName("lineInfo")]
         public CodeMirrorLine LineInfo(int lineIndex)
+        {
+            return null;
+        }
+
+        public Element GetScrollerElement()
+        {
+            return null;
+        }
+
+        public TextAreaElement GetInputField()
         {
             return null;
         }

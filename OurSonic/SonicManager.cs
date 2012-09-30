@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonic.Level;
 using OurSonic.Tiles;
-using OurSonic.UIManager;
 using jQueryApi;
 namespace OurSonic
 {
@@ -77,10 +75,11 @@ namespace OurSonic
             get { return myStatus; }
             set
             {
-                UIManager.UpdateTitle(value);
+                OurSonic.UIManager.UIManager.UpdateTitle(value);
                 myStatus = value;
             }
         }
+        public bool TypingInEditor { get; set; }
 
         static SonicManager()
         {
@@ -134,33 +133,6 @@ namespace OurSonic
 
             UIManager = new UIManager.UIManager(this, mainCanvas.Context, Scale);
             //UIManager.ObjectFrameworkArea.Populate(new LevelObject("Somekey"));
-
-            var uiArea = new UIArea() {Width = 550, Height = 420, X = 190, Y = 70, EditMode = true};
-            UIManager.UIAreas.Add(uiArea);
-
-            string fm = "";
-
-            uiArea.AddControl(new TextArea(50, 50) {Text = ( (Func<string>) ( () => "white nikes" + fm ) )});
-            uiArea.AddControl(new ImageButton(50, 200) {
-                                                               Toggle = true,
-                                                               Text = ( (Func<string>) ( () => "white nikes" + fm ) ),
-                                                               Image = (canv, x, y) => {
-                                                                           canv.MoveTo(x + 20, y + 20);
-                                                                           canv.LineTo(x + 50, y + 50);
-                                                                           canv.Stroke();
-                                                                       }
-                                                       });
-
-            uiArea.AddControl(new Button(50, 300) {
-                                                          Text = ( (Func<string>) ( () => "white nikes" + fm ) ),
-                                                  });
-            uiArea.AddControl(new TextBox(150, 300) {
-                                                            Text = "mike",
-                                                            Width = 150,
-                                                            Height = 30
-                                                    });
-
-            Window.SetInterval(() => { fm += "a1 "; }, 1000);
 
             ClickState = ClickState.Dragging;
             tickCount = 0;

@@ -1,36 +1,50 @@
 using System;
 using System.Collections.Generic;
 using System.Html.Media.Graphics;
+using System.Runtime.CompilerServices;
 namespace OurSonic.UIManager
 {
     public class HScrollBox : Element
     {
+        [IntrinsicProperty]
         public int ItemWidth { get; set; }
+        [IntrinsicProperty]
         public int ScrollWidth { get; set; }
+        [IntrinsicProperty]
         public int JWidth { get; set; }
+        [IntrinsicProperty]
         public int VisibleItems { get; set; }
+        [IntrinsicProperty]
         public int ItemHeight { get; set; }
+        [IntrinsicProperty]
         public string BackColor { get; set; }
+        [IntrinsicProperty]
         public int ScrollOffset { get; set; }
+        [IntrinsicProperty]
         public int ScrollPosition { get; set; }
+        [IntrinsicProperty]
         public bool Dragging { get; set; }
+        [IntrinsicProperty]
         public List<Element> Controls { get; set; }
+        [IntrinsicProperty]
         protected bool Scrolling { get; set; }
 
-        public HScrollBox(int x, int y)
+        public HScrollBox(int x, int y, int itemHeight, int visibleItems, int itemWidth)
                 : base(x, y)
         {
-            ItemWidth = 0;
+            ItemWidth = itemWidth;
             ScrollWidth = 14;
             JWidth = 5;
-            VisibleItems = 5;
-            ItemHeight = 10;
+            VisibleItems = visibleItems;
+            ItemHeight = itemHeight;
         }
 
-        public void Construct()
+        public override void Construct()
         {
             Width = VisibleItems * ( ItemWidth + JWidth );
             Height = ItemHeight + ScrollWidth;
+            Scrolling = false;
+            Scrolling = false;
             Scrolling = false;
         }
 
@@ -99,7 +113,7 @@ namespace OurSonic.UIManager
             }
             if (Dragging && e.Y > ItemHeight && e.Y < ItemHeight + ScrollWidth) {
                 var width = VisibleItems * ( ItemWidth + JWidth ) - 2;
-                ScrollOffset = ( e.X / width ) * ( Controls.Count - VisibleItems );
+                ScrollOffset = (int) ( ( (double) e.X / width ) * ( Controls.Count - VisibleItems ) );
 
                 ScrollOffset = Math.Min(Math.Max(ScrollOffset, 0), Controls.Count);
             }
@@ -144,23 +158,23 @@ namespace OurSonic.UIManager
             canv.FillStyle = BackColor;
             canv.LineWidth = 1;
             canv.StrokeStyle = "#333";
-            Help.RoundRect(canv, Parent.X + X, Parent.Y + Y, VisibleItems * ( ItemWidth + JWidth ) + 2, ItemHeight + ScrollWidth + 6, 3, true, true);
+            Help.RoundRect(canv, TotalX, TotalY, VisibleItems * ( ItemWidth + JWidth ) + 2, ItemHeight + ScrollWidth + 6, 3, true, true);
 
             canv.FillStyle = "grey";
             canv.LineWidth = 1;
             canv.StrokeStyle = "#444";
-            canv.FillRect(Parent.X + X + 2, Parent.Y + Y + ItemHeight + 6, VisibleItems * ( ItemWidth + JWidth ), ScrollWidth);
+            canv.FillRect(TotalX + 2, TotalY + ItemHeight + 6, VisibleItems * ( ItemWidth + JWidth ), ScrollWidth);
 
             canv.FillStyle = "FFDDFF";
             canv.LineWidth = 1;
             canv.StrokeStyle = "#FFDDFF";
             ScrollPosition = width * ScrollOffset / ( Controls.Count - VisibleItems );
 
-            canv.FillRect(Parent.X + X + ( ScrollPosition ) + 2, Parent.Y + Y + ItemHeight + 6, 5, ScrollWidth - 2);
+            canv.FillRect(TotalX + ( ScrollPosition ) + 2, TotalY + ItemHeight + 6, 5, ScrollWidth - 2);
 
             var curX = 3;
             for (var i = ScrollOffset; i < Math.Min(Controls.Count, ScrollOffset + VisibleItems); i++) {
-                //this.Controls[i].Parent = { x: this.Parent.X + this.X, y: this.Parent.Y + this.Y };
+                Controls[i].Parent = this;
                 Controls[i].X = curX;
                 Controls[i].Y = 2;
                 Controls[i].Height = ItemHeight;

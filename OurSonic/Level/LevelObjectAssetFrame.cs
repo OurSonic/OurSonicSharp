@@ -101,46 +101,40 @@ namespace OurSonic.Level
 
     };*/
 
-        public void DrawSimple(CanvasInformation canvas, Point pos, int width, int height, bool xflip, bool yflip)
+        public void DrawSimple(CanvasContext2D canvas, Point pos, int width, int height, bool xflip, bool yflip)
         {
-            /*
-        canvas.save();
-        canvas.translate(pos.x, pos.y);
+            canvas.Save();
+            canvas.Translate(pos.X, pos.Y);
 
-
-        if (xflip) {
-            if (yflip) {
-                canvas.translate(width, height);
-                canvas.scale(-1, -1);
+            if (xflip) {
+                if (yflip) {
+                    canvas.Translate(width, height);
+                    canvas.Scale(-1, -1);
+                } else {
+                    canvas.Translate(width, 0);
+                    canvas.Scale(-1, 1);
+                }
             } else {
-                canvas.translate(width, 0);
-                canvas.scale(-1, 1);
+                if (yflip) {
+                    canvas.Translate(0, height);
+                    canvas.Scale(1, -1);
+                } else {}
             }
-        } else {
-            if (yflip) {
-                canvas.translate(0, height);
-                canvas.scale(1, -1);
-            } else {
 
+            canvas.Scale(( width / Width ), ( height / Height ));
+
+            for (var x = 0; x < Width; x++) {
+                for (var y = 0; y < Height; y++) {
+                    var ex = x;
+                    var ey = y;
+                    var color = Palette[ColorMap[ex][ey]];
+                    if (canvas.FillStyle != "#" + color)
+                        canvas.FillStyle = "#" + color;
+
+                    canvas.FillRect(ex, ey, 1, 1);
+                }
             }
-        }
-
-        canvas.scale((width / this.width), (height / this.height));
-
-
-        for (var x = 0; x < this.width; x++) {
-            for (var y = 0; y < this.height; y++) {
-                var ex = x;
-                var ey = y;
-                var color = this.palette[this.colorMap[ex][ey]];
-                if (canvas.fillStyle != "#" + color)
-                    canvas.fillStyle = "#" + color;
-
-                canvas.fillRect(ex, ey, 1, 1);
-
-            }
-        }
-        canvas.restore();*/
+            canvas.Restore();
         }
 
         public CanvasInformation GetCache(Point size, bool xflip, bool yflip, bool showOutline, bool showCollideMap, bool showHurtMap)

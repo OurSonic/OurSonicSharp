@@ -3,19 +3,12 @@ using System.Collections.Generic;
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonicModels.Common;
 using SocketIOWebLibrary;
 using WebLibraries;
 using jQueryApi;
 namespace OurSonic
 {
-    [Imported]
-    [IgnoreGenericArguments]
-    public class DataObject<T>
-    {
-        [IntrinsicProperty]
-        [PreserveCase]
-        public T Data { get; set; }
-    }
     public class SonicEngine
     {
         public int canvasHeight;
@@ -25,7 +18,7 @@ namespace OurSonic
         private CanvasInformation gameCanvas;
         private string gameCanvasName = "gameLayer";
         private jQueryEvent lastMouseMove;
-        private SonicManager sonicManager;
+        public SonicManager sonicManager;
         private CanvasInformation uiCanvas;
         private string uiCanvasName = "uiLayer";
         [IntrinsicProperty]

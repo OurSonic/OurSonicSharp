@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NodeJSLibrary;
+using OurSonicModels.Common;
 using SocketIONodeLibrary;
 namespace OurSonicNode
 {
@@ -29,6 +30,8 @@ namespace OurSonicNode
                                       for (int i = 0; i < files.Length; i++) {
                                           int i1 = i;
                                           fileNames[i1] = files[i];
+                                          Global.Console.Log(fileNames[i1] + " loaded");
+                                          
                                           fs.ReadFile(levelsDir + files[i], "utf8", (er, file) => { fileData[i1] = file; });
                                       }
                                   });
@@ -36,11 +39,23 @@ namespace OurSonicNode
             app.Listen(8998);
             io.Sockets.On("connection", (SocketIOConnection socket) => {
                                             int curLevel = 0;
-                                            socket.On("GetSonicLevel", (string levelName) => {
-                                                                           Global.Console.Log("Serving " + fileNames[curLevel] + "  " + curLevel);
-                                                                           socket.Emit("SonicLevel",
-                                                                                       new {Data = fileData[curLevel++ % fileData.Length]});
-                                                                       });
+                                            socket.On("GetSonicLevel", (string levelName) =>
+                                            {
+                                                Global.Console.Log("Serving " + fileNames[curLevel] + "  " + curLevel);
+                                                socket.Emit("SonicLevel",new DataObject<string>(fileData[curLevel++ % fileData.Length]));
+                                            });
+                                            socket.On("GetLevels.Request", () =>
+                                            {
+                                                Global.Console.Log("Serving list");
+                                                socket.Emit("GetLevels.Response", new DataObject<string[]>(fileNames));
+                                            });
+
+
+                                            socket.On("LoadLevel.Request", (DataObject<string> levelName) =>
+                                            {
+                                                Global.Console.Log("Serving Level " + levelName.Data);
+                                                socket.Emit("LoadLevel.Response", new DataObject<string>(fileData[fileNames.IndexOf(levelName.Data)]));
+                                            });
 
                                             socket.On("GetObject",
                                                       (string _object) =>
