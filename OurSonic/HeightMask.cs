@@ -18,18 +18,19 @@ namespace OurSonic
         [IntrinsicProperty]
         protected int Index { get; set; }
 
-        public HeightMask(int[] heightMap)
+        public HeightMask(int[] heightMap, int i)
         {
             Items = heightMap;
             Width = 16;
             Height = 16;
             Integer = -1000;
+            Index = i;
         }
 
         public static implicit operator HeightMask(int d)
         {
             var m = d == 0 ? 0 : 16;
-            return new HeightMask(new[] {m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m}); //16 m's
+            return new HeightMask(new[] {m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m}, -1); //16 m's
         }
 
         public static implicit operator int(HeightMask d)
@@ -85,11 +86,13 @@ namespace OurSonic
                 pos.Y = -pos.Y - 16 * scale.Y;
                 canvas.Scale(1, -1);
             }
-            var fd = SonicManager.Instance.SpriteCache.HeightMaps[Index];
-            if (fd.Truthy()) {
-                if (fd.Loaded())
-                    canvas.DrawImage(fd, pos.X, pos.Y);
-            } else {
+            var fd = SonicManager.Instance.SpriteCache.HeightMaps[Index + ( solid << 20 )];
+            if (Index != -1 && fd.Truthy())
+                canvas.DrawImage(fd.Canvas, pos.X, pos.Y);
+            else {
+                var ntcanvas = Help.DefaultCanvas(16 * scale.X, 16 * scale.Y);
+                var ncanvas = ntcanvas.Context;
+
                 if (solid > 0) {
                     for (int x = 0; x < 16; x++) {
                         for (int y = 0; y < 16; y++) {
@@ -98,24 +101,24 @@ namespace OurSonic
                             if (ItemsGood(Items, x, y)) {
                                 jx = x;
                                 jy = y;
-                                var _x = pos.X + jx * scale.X;
-                                var _y = pos.Y + jy * scale.Y;
-                                canvas.LineWidth = 1;
-                                canvas.FillStyle = colors[solid];
-                                canvas.FillRect(_x, _y, scale.X, scale.Y);
+                                var _x = jx * scale.X;
+                                var _y = jy * scale.Y;
+                                ncanvas.LineWidth = 1;
+                                ncanvas.FillStyle = colors[solid];
+                                ncanvas.FillRect(_x, _y, scale.X, scale.Y);
                                 if (angle != 255) {
-                                    canvas.BeginPath();
-                                    canvas.LineWidth = 3;
-                                    canvas.StrokeStyle = "rgba(163,241,255,0.8)";
-                                    canvas.MoveTo(pos.X + scale.X * 16 / 2, pos.Y + scale.Y * 16 / 2);
-                                    canvas.LineTo(pos.X + scale.X * 16 / 2 - Help.Sin(angle) * scale.X * 8,
-                                                  pos.Y + scale.Y * 16 / 2 - Help.Cos(angle) * scale.X * 8);
-                                    canvas.Stroke();
-                                    canvas.BeginPath();
-                                    canvas.FillStyle = "rgba(163,241,255,0.8)";
-                                    canvas.Arc(pos.X + scale.X * 16 / 2 - Help.Sin(angle) * scale.X * 8,
-                                               pos.Y + scale.Y * 16 / 2 - Help.Cos(angle) * scale.X * 8, 5, 0, 2 * Math.PI, true);
-                                    canvas.Fill();
+                                    ncanvas.BeginPath();
+                                    ncanvas.LineWidth = 3;
+                                    ncanvas.StrokeStyle = "rgba(163,241,255,0.8)";
+                                    ncanvas.MoveTo(scale.X * 16 / 2, scale.Y * 16 / 2);
+                                    ncanvas.LineTo(scale.X * 16 / 2 - Help.Sin(angle) * scale.X * 8,
+                                                   scale.Y * 16 / 2 - Help.Cos(angle) * scale.X * 8);
+                                    ncanvas.Stroke();
+                                    ncanvas.BeginPath();
+                                    ncanvas.FillStyle = "rgba(163,241,255,0.8)";
+                                    ncanvas.Arc(scale.X * 16 / 2 - Help.Sin(angle) * scale.X * 8,
+                                                scale.Y * 16 / 2 - Help.Cos(angle) * scale.X * 8, 5, 0, 2 * Math.PI, true);
+                                    ncanvas.Fill();
                                 }
 /*
                                 canvas.LineWidth = 1;
@@ -126,6 +129,9 @@ namespace OurSonic
                         }
                     }
                 }
+                SonicManager.Instance.SpriteCache.HeightMaps[Index + ( solid << 20 )] = ntcanvas;
+
+                canvas.DrawImage(ntcanvas.Canvas, pos.X, pos.Y);
             }
             canvas.Restore();
             pos.X = oPos.X;

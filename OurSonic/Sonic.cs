@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonic.Level;
 using OurSonic.Tiles;
 namespace OurSonic
 {
@@ -533,8 +534,8 @@ namespace OurSonic
                 WasInAir = true;
 
                 var offset = GetOffsetFromImage();
-              //  X += offset.X;
-              //  Y += offset.Y;
+                //  X += offset.X;
+                //  Y += offset.Y;
 
                 /*if ((angle >= 0x70 && angle <= 0x90)) {
                 xsp = (gsp);

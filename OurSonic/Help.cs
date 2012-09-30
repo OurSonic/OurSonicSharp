@@ -3,6 +3,7 @@ using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using CommonWebLibraries;
+using OurSonic.UIManager;
 using jQueryApi;
 namespace OurSonic
 {
@@ -252,22 +253,22 @@ namespace OurSonic
             return default( T );
         }
 
-/*
-        public static T Extend<T>(JsDictionary<string, dynamic> p0, JsDictionary<string, dynamic> p1)
-        {
-            foreach (var p in p0)
-            {
-                p1[p.Key] = p.Value;
-            }
-            return p0.Me();
-        }
-*/
-/*
-        public static T Extend<T>(T p0, dynamic p1)
-        {
-            return Extend<T>(p0.Me(), Extensions.Me(p1));
-        }
-*/
+        /*
+                public static T Extend<T>(JsDictionary<string, dynamic> p0, JsDictionary<string, dynamic> p1)
+                {
+                    foreach (var p in p0)
+                    {
+                        p1[p.Key] = p.Value;
+                    }
+                    return p0.Me();
+                }
+        */
+        /*
+                public static T Extend<T>(T p0, dynamic p1)
+                {
+                    return Extend<T>(p0.Me(), Extensions.Me(p1));
+                }
+        */
 
         public static void MergeRect(Rectangle main, Rectangle small)
         {
@@ -275,6 +276,38 @@ namespace OurSonic
             main.Width = Math.Max(( ( small.X + small.Width ) + main.X ), main.Width);
             main.Y = Math.Min(small.Y, main.Y);
             main.Height = Math.Max(( ( small.Y + small.Height ) + main.Y ), main.Height);
+        }
+
+        public static void RoundRect(CanvasContext2D ctx, int x, int y, int width, int height, int radius = 5, bool fill = true, bool stroke = false)
+        {
+            ctx.Save();
+            ctx.LineWidth = 3;
+            ctx.BeginPath();
+            ctx.MoveTo(x + radius, y);
+            ctx.LineTo(x + width, y);
+            //ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.LineTo(x + width, y + height);
+            // ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.LineTo(x, y + height);
+            // ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.LineTo(x, y + radius);
+            ctx.QuadraticCurveTo(x, y, x + radius, y);
+            ctx.ClosePath();
+            if (stroke)
+                ctx.Stroke();
+            if (fill)
+                ctx.Fill();
+            ctx.Restore();
+        }
+
+        public static Pointer GetCursorPosition(jQueryEvent ev, bool b = false)
+        {
+            if (ev.Me().targetTouches && ev.Me().targetTouches.length > 0) ev = ev.Me().targetTouches[0];
+
+            if (ev.PageX.Me() != null && ev.PageY.Me() != null)
+                return new Pointer(ev.PageX, ev.PageY);
+            //if (ev.x != null && ev.y != null) return new { x: ev.x, y: ev.y };
+            return new Pointer(ev.ClientX, ev.ClientY);
         }
     }
 }

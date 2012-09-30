@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
-namespace OurSonic
+namespace OurSonic.Level
 {
     [Serializable]
     public class Ring : Point

@@ -60,7 +60,7 @@
     <Compile Include="Help.cs" />
     <Compile Include="Level\ObjectManager.cs" />
     <Compile Include="Page.cs" />
-    <Compile Include="Ring.cs" />
+    <Compile Include="Level\Ring.cs" />
     <Compile Include="SensorManager.cs" />
     <Compile Include="Sonic.cs" />
     <Compile Include="SonicBackground.cs" />
@@ -72,7 +72,22 @@
     <Compile Include="SonicManager.load.cs" />
     <Compile Include="SpriteCache.cs" />
     <Compile Include="SpriteLoader.cs" />
-    <Compile Include="UiManager.cs" />
+    <Compile Include="UIManager\Button.cs" />
+    <Compile Include="UIManager\DelegateOrValue.cs" />
+    <Compile Include="UIManager\EditorEngine.cs" />
+    <Compile Include="UIManager\Element.cs" />
+    <Compile Include="UIManager\HScrollBox.cs" />
+    <Compile Include="UIManager\HtmlBox.cs" />
+    <Compile Include="UIManager\ImageButton.cs" />
+    <Compile Include="UIManager\PaletteArea.cs" />
+    <Compile Include="UIManager\Panel.cs" />
+    <Compile Include="UIManager\Pointer.cs" />
+    <Compile Include="UIManager\PropertyButton.cs" />
+    <Compile Include="UIManager\ScrollBox.cs" />
+    <Compile Include="UIManager\TextArea.cs" />
+    <Compile Include="UIManager\TextBox.cs" />
+    <Compile Include="UIManager\UIArea.cs" />
+    <Compile Include="UIManager\UIManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

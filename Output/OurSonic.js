@@ -132,7 +132,7 @@ OurSonic.GameState.prototype = { playing: 0, editing: 1 };
 OurSonic.GameState.registerEnum('OurSonic.GameState', false);
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.HeightMask
-OurSonic.HeightMask = function(heightMap) {
+OurSonic.HeightMask = function(heightMap, i) {
 	this.width = 0;
 	this.height = 0;
 	this.items = null;
@@ -142,6 +142,7 @@ OurSonic.HeightMask = function(heightMap) {
 	this.width = 16;
 	this.height = 16;
 	this.integer = -1000;
+	this.index = i;
 };
 OurSonic.HeightMask.prototype = {
 	setItem: function(x, y, rotationMode) {
@@ -182,46 +183,50 @@ OurSonic.HeightMask.prototype = {
 			pos.y = -pos.y - 16 * scale.y;
 			canvas.scale(1, -1);
 		}
-		var fd = OurSonic.SonicManager.instance.spriteCache.heightMaps[this.index];
-		if (fd) {
-			if (OurSonic.Help.loaded(fd)) {
-				canvas.drawImage(fd, pos.x, pos.y);
-			}
+		var fd = OurSonic.SonicManager.instance.spriteCache.heightMaps[this.index + (solid << 20)];
+		if (this.index !== -1 && fd) {
+			canvas.drawImage(fd.canvas, pos.x, pos.y);
 		}
-		else if (solid > 0) {
-			for (var x = 0; x < 16; x++) {
-				for (var y = 0; y < 16; y++) {
-					var jx = 0;
-					var jy = 0;
-					if (OurSonic.HeightMask.itemsGood(this.items, x, y)) {
-						jx = x;
-						jy = y;
-						var _x = pos.x + jx * scale.x;
-						var _y = pos.y + jy * scale.y;
-						canvas.lineWidth = 1;
-						canvas.fillStyle = OurSonic.HeightMask.colors[solid];
-						canvas.fillRect(_x, _y, scale.x, scale.y);
-						if (angle !== 255) {
-							canvas.beginPath();
-							canvas.lineWidth = 3;
-							canvas.strokeStyle = 'rgba(163,241,255,0.8)';
-							canvas.moveTo(pos.x + ss.Int32.div(scale.x * 16, 2), pos.y + ss.Int32.div(scale.y * 16, 2));
-							canvas.lineTo(pos.x + ss.Int32.div(scale.x * 16, 2) - OurSonic.Help.sin(angle) * scale.x * 8, pos.y + ss.Int32.div(scale.y * 16, 2) - OurSonic.Help.cos(angle) * scale.x * 8);
-							canvas.stroke();
-							canvas.beginPath();
-							canvas.fillStyle = 'rgba(163,241,255,0.8)';
-							canvas.arc(pos.x + ss.Int32.div(scale.x * 16, 2) - OurSonic.Help.sin(angle) * scale.x * 8, pos.y + ss.Int32.div(scale.y * 16, 2) - OurSonic.Help.cos(angle) * scale.x * 8, 5, 0, 2 * Math.PI, true);
-							canvas.fill();
+		else {
+			var ntcanvas = OurSonic.Help.defaultCanvas(16 * scale.x, 16 * scale.y);
+			var ncanvas = ntcanvas.context;
+			if (solid > 0) {
+				for (var x = 0; x < 16; x++) {
+					for (var y = 0; y < 16; y++) {
+						var jx = 0;
+						var jy = 0;
+						if (OurSonic.HeightMask.itemsGood(this.items, x, y)) {
+							jx = x;
+							jy = y;
+							var _x = jx * scale.x;
+							var _y = jy * scale.y;
+							ncanvas.lineWidth = 1;
+							ncanvas.fillStyle = OurSonic.HeightMask.colors[solid];
+							ncanvas.fillRect(_x, _y, scale.x, scale.y);
+							if (angle !== 255) {
+								ncanvas.beginPath();
+								ncanvas.lineWidth = 3;
+								ncanvas.strokeStyle = 'rgba(163,241,255,0.8)';
+								ncanvas.moveTo(ss.Int32.div(scale.x * 16, 2), ss.Int32.div(scale.y * 16, 2));
+								ncanvas.lineTo(ss.Int32.div(scale.x * 16, 2) - OurSonic.Help.sin(angle) * scale.x * 8, ss.Int32.div(scale.y * 16, 2) - OurSonic.Help.cos(angle) * scale.x * 8);
+								ncanvas.stroke();
+								ncanvas.beginPath();
+								ncanvas.fillStyle = 'rgba(163,241,255,0.8)';
+								ncanvas.arc(ss.Int32.div(scale.x * 16, 2) - OurSonic.Help.sin(angle) * scale.x * 8, ss.Int32.div(scale.y * 16, 2) - OurSonic.Help.cos(angle) * scale.x * 8, 5, 0, 2 * Math.PI, true);
+								ncanvas.fill();
+							}
+							//
+							//                                canvas.LineWidth = 1;
+							//
+							//                                canvas.StrokeStyle = "#000000";
+							//
+							//                                canvas.StrokeRect(pos.X, pos.Y, scale.X * 16, scale.Y * 16);
 						}
-						//
-						//                                canvas.LineWidth = 1;
-						//
-						//                                canvas.StrokeStyle = "#000000";
-						//
-						//                                canvas.StrokeRect(pos.X, pos.Y, scale.X * 16, scale.Y * 16);
 					}
 				}
 			}
+			OurSonic.SonicManager.instance.spriteCache.heightMaps[this.index + (solid << 20)] = ntcanvas;
+			canvas.drawImage(ntcanvas.canvas, pos.x, pos.y);
 		}
 		canvas.restore();
 		pos.x = oPos.x;
@@ -230,7 +235,7 @@ OurSonic.HeightMask.prototype = {
 };
 OurSonic.HeightMask.op_Implicit$1 = function(d) {
 	var m = ((d === 0) ? 0 : 16);
-	return new OurSonic.HeightMask([m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m]);
+	return new OurSonic.HeightMask([m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m], -1);
 	//16 m's
 };
 OurSonic.HeightMask.op_Implicit = function(d) {
@@ -407,6 +412,38 @@ OurSonic.Help.mergeRect = function(main, small) {
 	main.width = Math.max(small.x + small.width + main.x, main.width);
 	main.y = Math.min(small.y, main.y);
 	main.height = Math.max(small.y + small.height + main.y, main.height);
+};
+OurSonic.Help.roundRect = function(ctx, x, y, width, height, radius, fill, stroke) {
+	ctx.save();
+	ctx.lineWidth = 3;
+	ctx.beginPath();
+	ctx.moveTo(x + radius, y);
+	ctx.lineTo(x + width, y);
+	//ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+	ctx.lineTo(x + width, y + height);
+	// ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+	ctx.lineTo(x, y + height);
+	// ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+	ctx.lineTo(x, y + radius);
+	ctx.quadraticCurveTo(x, y, x + radius, y);
+	ctx.closePath();
+	if (stroke) {
+		ctx.stroke();
+	}
+	if (fill) {
+		ctx.fill();
+	}
+	ctx.restore();
+};
+OurSonic.Help.getCursorPosition = function(ev, b) {
+	if (!!(ev.targetTouches && ev.targetTouches.length > 0)) {
+		ev = ev.targetTouches[0];
+	}
+	if (!!(ss.isValue(ev.pageX) && ss.isValue(ev.pageY))) {
+		return OurSonic.UIManager.Pointer.$ctor(ev.pageX, ev.pageY, 0);
+	}
+	//if (ev.x != null && ev.y != null) return new { x: ev.x, y: ev.y };
+	return OurSonic.UIManager.Pointer.$ctor(ev.clientX, ev.clientY, 0);
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.IntersectingRectangle
@@ -3099,6 +3136,7 @@ OurSonic.SonicEngine = function() {
 		this.$sonicManager.bigWindowLocation.y = ss.Int32.trunc(this.$sonicManager.windowLocation.y - this.$sonicManager.windowLocation.height * 0.2);
 		this.$sonicManager.bigWindowLocation.width = ss.Int32.trunc(this.$sonicManager.windowLocation.width * 1.8);
 		this.$sonicManager.bigWindowLocation.height = ss.Int32.trunc(this.$sonicManager.windowLocation.height * 1.8);
+		this.$sonicManager.clearCache();
 		if (this.$sonicManager.currentGameState === 0) {
 			this.$runGame();
 		}
@@ -3114,26 +3152,7 @@ OurSonic.SonicEngine = function() {
 	this.client.emit('GetSonicLevel', '0');
 	KeyboardJS.bind.key('1', Function.mkdel(this, function() {
 		this.$sonicManager.indexedPalette++;
-		var $t1 = this.$sonicManager.sonicLevel.tiles.getEnumerator();
-		try {
-			while ($t1.moveNext()) {
-				var tile = $t1.get_current();
-				tile.clearCache();
-			}
-		}
-		finally {
-			$t1.dispose();
-		}
-		var $t2 = this.$sonicManager.sonicLevel.blocks.getEnumerator();
-		try {
-			while ($t2.moveNext()) {
-				var tilePiece = $t2.get_current();
-				tilePiece.clearCache();
-			}
-		}
-		finally {
-			$t2.dispose();
-		}
+		this.$sonicManager.clearCache();
 	}), function() {
 	});
 	KeyboardJS.bind.key('q', Function.mkdel(this, function() {
@@ -3314,26 +3333,7 @@ OurSonic.SonicEngine.prototype = {
 		var rate = ((j < 0) ? -1 : 1);
 		this.$sonicManager.scale.x += rate;
 		this.$sonicManager.scale.y += rate;
-		var $t1 = this.$sonicManager.sonicLevel.tiles.getEnumerator();
-		try {
-			while ($t1.moveNext()) {
-				var tile = $t1.get_current();
-				tile.clearCache();
-			}
-		}
-		finally {
-			$t1.dispose();
-		}
-		var $t2 = this.$sonicManager.sonicLevel.blocks.getEnumerator();
-		try {
-			while ($t2.moveNext()) {
-				var block = $t2.get_current();
-				block.clearCache();
-			}
-		}
-		finally {
-			$t2.dispose();
-		}
+		this.$sonicManager.clearCache();
 		this.$sonicManager.preloadSprites(this.$sonicManager.scale, function() {
 		}, function(a) {
 		});
@@ -3496,8 +3496,46 @@ OurSonic.SonicManager = function(engine, gameCanvas, resize) {
 	this.background = null;
 	this.currentGameState = 1;
 	this.screenOffset = OurSonic.Point.$ctor1(ss.Int32.div(this.mainCanvas.domCanvas.width(), 2) - ss.Int32.div(this.windowLocation.width * this.scale.x, 2), ss.Int32.div(this.mainCanvas.domCanvas.height(), 2) - ss.Int32.div(this.windowLocation.height * this.scale.y, 2));
-	this.uiManager = new OurSonic.UIManager(this, this.mainCanvas, this.scale);
+	this.uiManager = new OurSonic.UIManager.UIManager(this, this.mainCanvas.context, this.scale);
 	//UIManager.ObjectFrameworkArea.Populate(new LevelObject("Somekey"));
+	var $t1 = new OurSonic.UIManager.UIArea();
+	$t1.width = 550;
+	$t1.height = 420;
+	$t1.x = 190;
+	$t1.y = 70;
+	$t1.editMode = true;
+	var uiArea = $t1;
+	this.uiManager.uiAreas.add(uiArea);
+	var fm = '';
+	var $t2 = new OurSonic.UIManager.TextArea(50, 50);
+	$t2.text = Type.makeGenericType(OurSonic.UIManager.DelegateOrValue$1, [String]).op_Implicit$1(function() {
+		return 'white nikes' + fm;
+	});
+	uiArea.addControl($t2);
+	var $t3 = new OurSonic.UIManager.ImageButton(50, 200);
+	$t3.toggle = true;
+	$t3.text = Type.makeGenericType(OurSonic.UIManager.DelegateOrValue$1, [String]).op_Implicit$1(function() {
+		return 'white nikes' + fm;
+	});
+	$t3.image = function(canv, x, y) {
+		canv.moveTo(x + 20, y + 20);
+		canv.lineTo(x + 50, y + 50);
+		canv.stroke();
+	};
+	uiArea.addControl($t3);
+	var $t4 = new OurSonic.UIManager.Button(50, 300);
+	$t4.text = Type.makeGenericType(OurSonic.UIManager.DelegateOrValue$1, [String]).op_Implicit$1(function() {
+		return 'white nikes' + fm;
+	});
+	uiArea.addControl($t4);
+	var $t5 = new OurSonic.UIManager.TextBox(150, 300);
+	$t5.set_text('mike');
+	$t5.width = 150;
+	$t5.height = 30;
+	uiArea.addControl($t5);
+	window.setInterval(function() {
+		fm += 'a1 ';
+	}, 1000);
 	this.clickState = 0;
 	this.tickCount = 0;
 	this.drawTickCount = 0;
@@ -4019,6 +4057,30 @@ OurSonic.SonicManager.prototype = {
 		}
 		return null;
 	},
+	clearCache: function() {
+		var $t1 = this.sonicLevel.tiles.getEnumerator();
+		try {
+			while ($t1.moveNext()) {
+				var tile = $t1.get_current();
+				tile.clearCache();
+			}
+		}
+		finally {
+			$t1.dispose();
+		}
+		var $t2 = this.sonicLevel.blocks.getEnumerator();
+		try {
+			while ($t2.moveNext()) {
+				var tilePiece = $t2.get_current();
+				tilePiece.clearCache();
+			}
+		}
+		finally {
+			$t2.dispose();
+		}
+		OurSonic.SonicManager.instance.spriteCache.heightMaps = [];
+		OurSonic.SonicManager.instance.spriteCache.heightMapChunks = {};
+	},
 	loadObjects: function(objects) {
 		var cachedObjects = {};
 		for (var l = 0; l < this.sonicLevel.objects.length; l++) {
@@ -4268,7 +4330,7 @@ OurSonic.SonicManager.prototype = {
 				this.sonicLevel.heightMaps[i1] = OurSonic.HeightMask.op_Implicit$1(1);
 			}
 			else {
-				this.sonicLevel.heightMaps[i1] = new OurSonic.HeightMask(sonicLevel.HeightMaps[i1]);
+				this.sonicLevel.heightMaps[i1] = new OurSonic.HeightMask(sonicLevel.HeightMaps[i1], i1);
 			}
 		}
 		this.sonicLevel.chunks = [];
@@ -5167,15 +5229,1772 @@ OurSonic.Tiles.TilePiece.prototype = {
 		this.onlyForeground();
 	}
 };
-Type.registerNamespace('OurSonic');
+Type.registerNamespace('OurSonic.UIManager');
 ////////////////////////////////////////////////////////////////////////////////
-// OurSonic.UIManager
-OurSonic.UIManager = function(sonicManager, mainCanvas, scale) {
+// OurSonic.UIManager.Button
+OurSonic.UIManager.Button = function(x, y) {
+	this.$oldText = null;
+	this.font = null;
+	this.toggle = false;
+	this.toggled = false;
+	this.clicking = false;
+	this.button2Grad = null;
+	this.button1Grad = null;
+	this.$2$createdField = false;
+	this.buttonBorderGrad = null;
+	this.text = null;
+	this.color = null;
+	OurSonic.UIManager.Element.call(this, x, y);
+	this.text = Type.makeGenericType(OurSonic.UIManager.DelegateOrValue$1, [String]).op_Implicit$2('');
+	this.toggle = false;
+	this.toggled = false;
+	this.font = '';
+	this.clicking = false;
+	this.set_$created(false);
+	this.button1Grad = null;
+	this.button2Grad = null;
+	this.buttonBorderGrad = null;
+	this.width = 50;
+	this.height = 50;
+};
+OurSonic.UIManager.Button.prototype = {
+	get_$created: function() {
+		return this.$2$createdField;
+	},
+	set_$created: function(value) {
+		this.$2$createdField = value;
+	},
+	onClick: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		this.clicking = true;
+		if (this.toggle) {
+			this.toggled = !this.toggled;
+		}
+		return OurSonic.UIManager.Element.prototype.onClick.call(this, e);
+	},
+	onMouseUp: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		if (this.clicking) {
+			if (ss.isValue(this.click)) {
+				this.click();
+			}
+		}
+		this.clicking = false;
+		if (ss.isValue(this.mouseUp)) {
+			this.mouseUp();
+		}
+		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+	},
+	onMouseOver: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		if (ss.isValue(this.mouseOver)) {
+			this.mouseOver();
+		}
+		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+	},
+	draw: function(canv) {
+		if (!this.visible) {
+			return;
+		}
+		canv.save();
+		if (!this.get_$created()) {
+			this.set_$created(true);
+			this.button1Grad = canv.createLinearGradient(0, 0, 0, 1);
+			this.button1Grad.addColorStop(0, '#FFFFFF');
+			this.button1Grad.addColorStop(1, '#A5A5A5');
+			this.button2Grad = canv.createLinearGradient(0, 0, 0, 1);
+			this.button2Grad.addColorStop(0, '#A5A5A5');
+			this.button2Grad.addColorStop(1, '#FFFFFF');
+			this.buttonBorderGrad = canv.createLinearGradient(0, 0, 0, 1);
+			this.buttonBorderGrad.addColorStop(0, '#AFAFAF');
+			this.buttonBorderGrad.addColorStop(1, '#7a7a7a');
+		}
+		canv.strokeStyle = this.buttonBorderGrad;
+		if (this.toggle) {
+			canv.fillStyle = (this.toggled ? this.button1Grad : this.button2Grad);
+		}
+		else {
+			canv.fillStyle = (this.clicking ? this.button1Grad : this.button2Grad);
+		}
+		canv.lineWidth = 2;
+		OurSonic.Help.roundRect(canv, this.parent.x + this.x, this.parent.y + this.y, this.width, this.height, 2, true, true);
+		if (!ss.referenceEquals(canv.font, this.font)) {
+			canv.font = this.font;
+		}
+		canv.fillStyle = '#000000';
+		var txt = Type.makeGenericType(OurSonic.UIManager.DelegateOrValue$1, [String]).op_Implicit(this.text);
+		canv.fillText(txt, this.parent.x + this.x + (ss.Int32.div(this.width, 2) - canv.measureText(txt).width / 2), this.parent.y + this.y + ss.Int32.div(this.height, 3) * 2);
+		canv.restore();
+	}
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.DelegateOrValue
+OurSonic.UIManager.DelegateOrValue$1 = function(T) {
+	var $type = function(d) {
+		this.isValue = false;
+		this.$value = T.getDefaultValue();
+		this.$method = null;
+		this.$method = d;
+		this.isValue = false;
+	};
+	$type.prototype = {
+		$evaluate: function() {
+			if (this.isValue === true) {
+				return this.$value;
+			}
+			else if (this.isValue === false) {
+				return this.$method();
+			}
+			return T.getDefaultValue();
+		}
+	};
+	$type.$ctor1 = function(d) {
+		this.isValue = false;
+		this.$value = T.getDefaultValue();
+		this.$method = null;
+		this.$value = d;
+		this.isValue = true;
+	};
+	$type.$ctor1.prototype = $type.prototype;
+	$type.op_Implicit$2 = function(d) {
+		return new (Type.makeGenericType(OurSonic.UIManager.DelegateOrValue$1, [T]).$ctor1)(d);
+	};
+	$type.op_Implicit$1 = function(d) {
+		return new (Type.makeGenericType(OurSonic.UIManager.DelegateOrValue$1, [T]))(d);
+	};
+	$type.op_Implicit = function(d) {
+		return d.$evaluate();
+	};
+	$type.registerGenericClassInstance($type, OurSonic.UIManager.DelegateOrValue$1, [T], function() {
+		return Object;
+	}, function() {
+		return [];
+	});
+	return $type;
+};
+OurSonic.UIManager.DelegateOrValue$1.registerGenericClass('OurSonic.UIManager.DelegateOrValue$1', 1);
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.EditorEngine
+OurSonic.UIManager.EditorEngine = function(el) {
+	this.editing = false;
+	this.element = null;
+	this.dragging = false;
+	this.startDragging = null;
+	this.dragg = null;
+	this.points = null;
+	this.element = el;
+	this.points = [OurSonic.UIManager.EditorEnginePoint.$ctor(0, 0, 10, 'nw-resize', Function.mkdel(this, function(dv) {
+		var x = dv.x;
+		var y = dv.y;
+		this.element.width += x;
+		this.element.height += y;
+		this.element.x -= x;
+		this.element.y -= y;
+		this.element.clearCache();
+	})), OurSonic.UIManager.EditorEnginePoint.$ctor(100, 0, 10, 'ne-resize', Function.mkdel(this, function(dv1) {
+		var x1 = dv1.x;
+		var y1 = dv1.y;
+		this.element.width -= x1;
+		this.element.height += y1;
+		this.element.y -= y1;
+		this.element.clearCache();
+		dv1.x = 0;
+	})), OurSonic.UIManager.EditorEnginePoint.$ctor(100, 100, 10, 'se-resize', Function.mkdel(this, function(dv2) {
+		var x2 = dv2.x;
+		var y2 = dv2.y;
+		this.element.width -= x2;
+		this.element.height -= y2;
+		this.element.clearCache();
+		dv2.x = dv2.y = 0;
+	})), OurSonic.UIManager.EditorEnginePoint.$ctor(0, 100, 10, 'sw-resize', Function.mkdel(this, function(dv3) {
+		var x3 = dv3.x;
+		var y3 = dv3.y;
+		this.element.width += x3;
+		this.element.height -= y3;
+		this.element.x -= x3;
+		this.element.clearCache();
+		dv3.y = 0;
+	})), OurSonic.UIManager.EditorEnginePoint.$ctor(50, 0, 5, 'n-resize', Function.mkdel(this, function(dv4) {
+		var x4 = dv4.x;
+		var y4 = dv4.y;
+		this.element.height += y4;
+		this.element.y -= x4;
+		this.element.clearCache();
+	})), OurSonic.UIManager.EditorEnginePoint.$ctor(100, 50, 5, 'e-resize', Function.mkdel(this, function(dv5) {
+		var x5 = dv5.x;
+		var y5 = dv5.y;
+		this.element.width -= y5;
+		this.element.clearCache();
+		dv5.x = dv5.y = 0;
+	})), OurSonic.UIManager.EditorEnginePoint.$ctor(50, 100, 5, 'n-resize', Function.mkdel(this, function(dv6) {
+		var x6 = dv6.x;
+		var y6 = dv6.y;
+		this.element.height -= y6;
+		this.element.clearCache();
+		dv6.x = dv6.y = 0;
+	})), OurSonic.UIManager.EditorEnginePoint.$ctor(0, 50, 5, 'e-resize', Function.mkdel(this, function(dv7) {
+		var x7 = dv7.x;
+		var y7 = dv7.y;
+		this.element.width += x7;
+		this.element.x -= x7;
+		this.element.clearCache();
+	}))];
+};
+OurSonic.UIManager.EditorEngine.prototype = {
+	click: function(e) {
+		var x = 0;
+		var y = 0;
+		var w = this.element.width;
+		var h = this.element.height;
+		//uiManager.propertyList.populate(this.Element);
+		for (var i = 0; i < this.points.length; i++) {
+			var j = this.points[i];
+			j.editing = false;
+		}
+		for (var i1 = 0; i1 < this.points.length; i1++) {
+			var j1 = this.points[i1];
+			var sz = j1.size * 5;
+			var rect = OurSonic.Rectangle.$ctor1(x + ss.Int32.div(w * j1.x, 100) - ss.Int32.div(sz, 2), y + ss.Int32.div(h * j1.y, 100) - ss.Int32.div(sz, 2), sz, sz);
+			if (e.x > rect.x && e.x < rect.x + rect.width && e.y > rect.y && e.y < rect.y + rect.height) {
+				document.body.style.cursor = j1.cursor;
+				this.startDragging = OurSonic.Point.$ctor1(e.x, e.y);
+				this.editing = true;
+				j1.editing = true;
+				return true;
+			}
+		}
+		if (e.x > x && e.x < x + w && e.y > y && e.y < y + h) {
+			this.dragg = OurSonic.Point.$ctor1(e.x, e.y);
+			document.body.style.cursor = 'move';
+			this.dragging = true;
+			return false;
+		}
+		else {
+			document.body.style.cursor = 'default';
+		}
+		return false;
+	},
+	mouseUp: function(e) {
+		for (var i = 0; i < this.points.length; i++) {
+			var j = this.points[i];
+			j.editing = false;
+		}
+		this.editing = false;
+		this.dragging = false;
+		this.startDragging = null;
+		this.dragg = null;
+		return false;
+	},
+	mouseOver: function(e) {
+		var x = 0;
+		var y = 0;
+		var w = this.element.width;
+		var h = this.element.height;
+		document.body.style.cursor = 'move';
+		if (this.dragging) {
+			//
+			//                if (this.Element.ChildrenAreEditing())
+			//
+			//                {
+			//
+			//                return false;
+			//
+			//                }
+			var jx = e.x - this.dragg.x;
+			var jy = e.y - this.dragg.y;
+			this.element.x += jx;
+			this.element.y += jy;
+			//   window.DEBUGLABELS[0] = "E: " + e.X + " " + e.Y;
+			//   window.DEBUGLABELS[1] = "Dragg: " + this.dragg.X + " " + this.dragg.Y;
+			//   window.DEBUGLABELS[2] = "Element: " + this.Element.X + " " + this.Element.Y;
+			//   window.DEBUGLABELS[3] = "Offset: " + jx + " " + jy;
+			//this.dragg.x += jx;
+			//this.dragg.y += jy;
+			return false;
+		}
+		for (var i = 0; i < this.points.length; i++) {
+			var j = this.points[i];
+			var sz = j.size * 5;
+			if (j.editing) {
+				document.body.style.cursor = j.cursor;
+				var dv = OurSonic.Point.$ctor1(this.startDragging.x - e.x, this.startDragging.y - e.y);
+				j.click(dv);
+				this.startDragging = OurSonic.Point.$ctor1(e.x + dv.x, e.y + dv.y);
+				return true;
+			}
+			var rect = OurSonic.Rectangle.$ctor1(x + ss.Int32.div(w * j.x, 100) - ss.Int32.div(sz, 2), y + ss.Int32.div(h * j.y, 100) - ss.Int32.div(sz, 2), sz, sz);
+			if (e.x > rect.x && e.x < rect.x + rect.width && e.y > rect.y && e.y < rect.y + rect.height) {
+				document.body.style.cursor = j.cursor;
+				if (j.editing) {
+					var dv1 = OurSonic.Point.$ctor1(this.startDragging.x - e.x, this.startDragging.y - e.y);
+					j.click(dv1);
+					this.startDragging = OurSonic.Point.$ctor1(e.x + dv1.x, e.y + dv1.y);
+				}
+				return true;
+			}
+		}
+		this.startDragging = OurSonic.Point.$ctor1(e.x, e.y);
+		return this.editing;
+		return false;
+	},
+	draw: function(canv) {
+		canv.save();
+		var size = 0;
+		canv.strokeStyle = canv.fillStyle = 'white';
+		canv.lineWidth = 3;
+		canv.dashedRect(this.element.get_totalX() - size, this.element.get_totalY() - size, this.element.width + size * 2, this.element.height + size * 2, [2, 2]);
+		//canv.strokeRect(this.element.totalX() - size, this.element.totalY() - size, this.element.width + size * 2, this.element.height + size * 2);
+		var x = this.element.get_totalX();
+		var y = this.element.get_totalY();
+		var w = this.element.width;
+		var h = this.element.height;
+		for (var i = 0; i < this.points.length; i++) {
+			var j = this.points[i];
+			canv.fillRect(x + ss.Int32.div(w * j.x, 100) - ss.Int32.div(j.size, 2), y + ss.Int32.div(h * j.y, 100) - ss.Int32.div(j.size, 2), j.size, j.size);
+		}
+		canv.restore();
+	},
+	maxSize: function() {
+		return 10;
+	}
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.EditorEnginePoint
+OurSonic.UIManager.EditorEnginePoint = function() {
+};
+OurSonic.UIManager.EditorEnginePoint.$ctor = function(x, y, size, cursor, click) {
+	var $this = {};
+	$this.x = 0;
+	$this.y = 0;
+	$this.size = 0;
+	$this.cursor = null;
+	$this.click = null;
+	$this.editing = false;
+	$this.x = x;
+	$this.y = y;
+	$this.size = size;
+	$this.cursor = cursor;
+	$this.click = click;
+	return $this;
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.Element
+OurSonic.UIManager.Element = function(x, y) {
+	this.x = 0;
+	this.y = 0;
+	this.width = 0;
+	this.height = 0;
+	this.depth = 0;
+	this.visible = false;
+	this.cachedDrawing = null;
+	this.click = null;
+	this.mouseUp = null;
+	this.mouseOver = null;
+	this.editMode = false;
+	this.editorEngine = null;
+	this.parent = null;
+	this.focused = false;
+	this.x = x;
+	this.y = y;
+	this.editorEngine = new OurSonic.UIManager.EditorEngine(this);
+	this.visible = true;
+	//
+	//                        if (this.Construct) {
+	//
+	//                        this.Construct();
+	//
+	//                        }
+};
+OurSonic.UIManager.Element.prototype = {
+	get_totalX: function() {
+		return this.x + (ss.isValue(this.parent) ? this.parent.get_totalX() : 0);
+	},
+	get_totalY: function() {
+		return this.y + (ss.isValue(this.parent) ? this.parent.get_totalY() : 0);
+	},
+	isEditMode: function() {
+		return this.editMode || ss.isValue(this.parent) && this.parent.isEditMode();
+	},
+	forceDrawing: function() {
+		var $t1 = OurSonic.UIManager.Element$ForceRedrawing.$ctor();
+		$t1.redraw = false;
+		$t1.clearCache = false;
+		return $t1;
+	},
+	onKeyDown: function(e) {
+	},
+	focus: function(e) {
+		this.focused = true;
+	},
+	loseFocus: function() {
+		this.focused = false;
+	},
+	onClick: function(e) {
+		if (this.isEditMode()) {
+			if (this.editorEngine.click(e)) {
+				return true;
+			}
+		}
+		return false;
+	},
+	onMouseUp: function(e) {
+		if (this.isEditMode()) {
+			if (this.editorEngine.mouseUp(e)) {
+				return true;
+			}
+		}
+		return false;
+	},
+	onMouseOver: function(e) {
+		if (this.isEditMode()) {
+			if (this.editorEngine.mouseOver(e)) {
+				return true;
+			}
+		}
+		return false;
+	},
+	draw: function(canv) {
+		if (this.isEditMode()) {
+			this.editorEngine.draw(canv);
+		}
+	},
+	clearCache: function() {
+		this.cachedDrawing = null;
+	},
+	onScroll: function(e) {
+		return false;
+	}
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.Element.ForceRedrawing
+OurSonic.UIManager.Element$ForceRedrawing = function() {
+};
+OurSonic.UIManager.Element$ForceRedrawing.$ctor = function() {
+	var $this = {};
+	$this.redraw = false;
+	$this.clearCache = false;
+	return $this;
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.HScrollBox
+OurSonic.UIManager.HScrollBox = function(x, y) {
+	this.$2$ItemWidthField = 0;
+	this.$2$ScrollWidthField = 0;
+	this.$2$JWidthField = 0;
+	this.$2$VisibleItemsField = 0;
+	this.$2$ItemHeightField = 0;
+	this.$2$BackColorField = null;
+	this.$2$ScrollOffsetField = 0;
+	this.$2$ScrollPositionField = 0;
+	this.$2$DraggingField = false;
+	this.$2$ControlsField = null;
+	this.$2$ScrollingField = false;
+	OurSonic.UIManager.Element.call(this, x, y);
+	this.set_itemWidth(0);
+	this.set_scrollWidth(14);
+	this.set_jWidth(5);
+	this.set_visibleItems(5);
+	this.set_itemHeight(10);
+};
+OurSonic.UIManager.HScrollBox.prototype = {
+	get_itemWidth: function() {
+		return this.$2$ItemWidthField;
+	},
+	set_itemWidth: function(value) {
+		this.$2$ItemWidthField = value;
+	},
+	get_scrollWidth: function() {
+		return this.$2$ScrollWidthField;
+	},
+	set_scrollWidth: function(value) {
+		this.$2$ScrollWidthField = value;
+	},
+	get_jWidth: function() {
+		return this.$2$JWidthField;
+	},
+	set_jWidth: function(value) {
+		this.$2$JWidthField = value;
+	},
+	get_visibleItems: function() {
+		return this.$2$VisibleItemsField;
+	},
+	set_visibleItems: function(value) {
+		this.$2$VisibleItemsField = value;
+	},
+	get_itemHeight: function() {
+		return this.$2$ItemHeightField;
+	},
+	set_itemHeight: function(value) {
+		this.$2$ItemHeightField = value;
+	},
+	get_backColor: function() {
+		return this.$2$BackColorField;
+	},
+	set_backColor: function(value) {
+		this.$2$BackColorField = value;
+	},
+	get_scrollOffset: function() {
+		return this.$2$ScrollOffsetField;
+	},
+	set_scrollOffset: function(value) {
+		this.$2$ScrollOffsetField = value;
+	},
+	get_scrollPosition: function() {
+		return this.$2$ScrollPositionField;
+	},
+	set_scrollPosition: function(value) {
+		this.$2$ScrollPositionField = value;
+	},
+	get_dragging: function() {
+		return this.$2$DraggingField;
+	},
+	set_dragging: function(value) {
+		this.$2$DraggingField = value;
+	},
+	get_controls: function() {
+		return this.$2$ControlsField;
+	},
+	set_controls: function(value) {
+		this.$2$ControlsField = value;
+	},
+	construct: function() {
+		this.width = this.get_visibleItems() * (this.get_itemWidth() + this.get_jWidth());
+		this.height = this.get_itemHeight() + this.get_scrollWidth();
+		this.set_scrolling(false);
+	},
+	addControl: function(control) {
+		control.parent = this;
+		this.get_controls().add(control);
+		return control;
+	},
+	get_scrolling: function() {
+		return this.$2$ScrollingField;
+	},
+	set_scrolling: function(value) {
+		this.$2$ScrollingField = value;
+	},
+	onClick: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		for (var ij = this.get_scrollOffset(); ij < this.get_controls().length; ij++) {
+			var control = this.get_controls()[ij];
+			if (control.y <= e.y && control.y + control.height > e.y && control.x + 2 <= e.x && control.x + control.width + 2 > e.x) {
+				e.x -= control.x;
+				e.y -= control.y;
+				control.onClick(e);
+				return false;
+			}
+		}
+		if (e.y > this.get_itemHeight() && e.y < this.get_itemHeight() + this.get_scrollWidth()) {
+			var width = this.get_visibleItems() * (this.get_itemWidth() + this.get_jWidth()) - 2;
+			this.set_scrollOffset(ss.Int32.div(e.x, width) * (this.get_controls().length - this.get_visibleItems()));
+			this.set_scrollOffset(Math.min(Math.max(this.get_scrollOffset(), 0), this.get_controls().length));
+		}
+		this.set_dragging(true);
+		return false;
+		return OurSonic.UIManager.Element.prototype.onClick.call(this, e);
+	},
+	onMouseUp: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		this.set_dragging(false);
+		for (var ij = this.get_scrollOffset(); ij < this.get_controls().length; ij++) {
+			var control = this.get_controls()[ij];
+			if (control.y <= e.y && control.y + control.height > e.y && control.x <= e.x + 2 && control.x + control.width + 2 > e.x) {
+				e.x -= control.x;
+				e.y -= control.y;
+				control.onMouseUp(e);
+				return false;
+			}
+		}
+		if (ss.isValue(this.mouseUp)) {
+			this.mouseUp();
+		}
+		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+	},
+	onMouseOver: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		for (var ij = 0; ij < this.get_controls().length; ij++) {
+			var control = this.get_controls()[ij];
+			if (control.y <= e.y && control.y + control.height > e.y && control.x + 2 <= e.x && control.x + control.width + 2 > e.x) {
+				e.x -= control.x;
+				e.y -= control.y;
+				control.onMouseOver(e);
+				break;
+			}
+		}
+		if (this.get_dragging() && e.y > this.get_itemHeight() && e.y < this.get_itemHeight() + this.get_scrollWidth()) {
+			var width = this.get_visibleItems() * (this.get_itemWidth() + this.get_jWidth()) - 2;
+			this.set_scrollOffset(ss.Int32.div(e.x, width) * (this.get_controls().length - this.get_visibleItems()));
+			this.set_scrollOffset(Math.min(Math.max(this.get_scrollOffset(), 0), this.get_controls().length));
+		}
+		if (ss.isValue(this.mouseOver)) {
+			this.mouseOver();
+		}
+		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+	},
+	onScroll: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		if (e.delta > 0) {
+			if (this.get_scrollOffset() > 0) {
+				this.set_scrollOffset(this.get_scrollOffset() - 1);
+			}
+		}
+		else if (this.get_scrollOffset() < this.get_controls().length - this.get_visibleItems()) {
+			this.set_scrollOffset(this.get_scrollOffset() + 1);
+		}
+		for (var ij = 0; ij < this.get_controls().length; ij++) {
+			var control = this.get_controls()[ij];
+			if (control.y <= e.y && control.y + control.height > e.y && control.x <= e.x && control.x + control.width > e.x) {
+				e.x -= control.x;
+				e.y -= control.y;
+				control.onScroll(e);
+				return false;
+			}
+		}
+		//if (this.scroll) this.scroll();
+		return OurSonic.UIManager.Element.prototype.onScroll.call(this, e);
+	},
+	draw: function(canv) {
+		if (!this.visible) {
+			return;
+		}
+		canv.save();
+		canv.fillStyle = this.get_backColor();
+		var width = this.get_visibleItems() * (this.get_itemWidth() + this.get_jWidth()) - 2;
+		canv.fillStyle = this.get_backColor();
+		canv.lineWidth = 1;
+		canv.strokeStyle = '#333';
+		OurSonic.Help.roundRect(canv, this.parent.x + this.x, this.parent.y + this.y, this.get_visibleItems() * (this.get_itemWidth() + this.get_jWidth()) + 2, this.get_itemHeight() + this.get_scrollWidth() + 6, 3, true, true);
+		canv.fillStyle = 'grey';
+		canv.lineWidth = 1;
+		canv.strokeStyle = '#444';
+		canv.fillRect(this.parent.x + this.x + 2, this.parent.y + this.y + this.get_itemHeight() + 6, this.get_visibleItems() * (this.get_itemWidth() + this.get_jWidth()), this.get_scrollWidth());
+		canv.fillStyle = 'FFDDFF';
+		canv.lineWidth = 1;
+		canv.strokeStyle = '#FFDDFF';
+		this.set_scrollPosition(ss.Int32.div(width * this.get_scrollOffset(), this.get_controls().length - this.get_visibleItems()));
+		canv.fillRect(this.parent.x + this.x + this.get_scrollPosition() + 2, this.parent.y + this.y + this.get_itemHeight() + 6, 5, this.get_scrollWidth() - 2);
+		var curX = 3;
+		for (var i = this.get_scrollOffset(); i < Math.min(this.get_controls().length, this.get_scrollOffset() + this.get_visibleItems()); i++) {
+			//this.Controls[i].Parent = { x: this.Parent.X + this.X, y: this.Parent.Y + this.Y };
+			this.get_controls()[i].x = curX;
+			this.get_controls()[i].y = 2;
+			this.get_controls()[i].height = this.get_itemHeight();
+			this.get_controls()[i].width = this.get_itemWidth();
+			curX += this.get_itemWidth() + this.get_jWidth();
+			this.get_controls()[i].draw(canv);
+		}
+		canv.restore();
+		OurSonic.UIManager.Element.prototype.draw.call(this, canv);
+	}
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.HtmlBox
+OurSonic.UIManager.HtmlBox = function(x, y) {
+	OurSonic.UIManager.Element.call(this, x, y);
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.ImageButton
+OurSonic.UIManager.ImageButton = function(x, y) {
+	this.$oldText = null;
+	this.font = null;
+	this.toggle = false;
+	this.toggled = false;
+	this.clicking = false;
+	this.button2Grad = null;
+	this.image = null;
+	this.button1Grad = null;
+	this.$2$createdField = false;
+	this.buttonBorderGrad = null;
+	this.text = null;
+	this.color = null;
+	OurSonic.UIManager.Element.call(this, x, y);
+	this.text = Type.makeGenericType(OurSonic.UIManager.DelegateOrValue$1, [String]).op_Implicit$2('');
+	this.toggle = false;
+	this.toggled = false;
+	this.font = '';
+	this.clicking = false;
+	this.image = null;
+	this.set_$created(false);
+	this.button1Grad = null;
+	this.button2Grad = null;
+	this.buttonBorderGrad = null;
+	this.width = 50;
+	this.height = 50;
+};
+OurSonic.UIManager.ImageButton.prototype = {
+	get_$created: function() {
+		return this.$2$createdField;
+	},
+	set_$created: function(value) {
+		this.$2$createdField = value;
+	},
+	onClick: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		this.clicking = true;
+		if (this.toggle) {
+			this.toggled = !this.toggled;
+		}
+		return OurSonic.UIManager.Element.prototype.onClick.call(this, e);
+	},
+	onMouseUp: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		if (this.clicking) {
+			if (ss.isValue(this.click)) {
+				this.click();
+			}
+		}
+		this.clicking = false;
+		if (ss.isValue(this.mouseUp)) {
+			this.mouseUp();
+		}
+		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+	},
+	onMouseOver: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		if (ss.isValue(this.mouseOver)) {
+			this.mouseOver();
+		}
+		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+	},
+	draw: function(canv) {
+		if (!this.visible) {
+			return;
+		}
+		canv.save();
+		if (!this.get_$created()) {
+			this.set_$created(true);
+			this.button1Grad = canv.createLinearGradient(0, 0, 0, 1);
+			this.button1Grad.addColorStop(0, '#FFFFFF');
+			this.button1Grad.addColorStop(1, '#A5A5A5');
+			this.button2Grad = canv.createLinearGradient(0, 0, 0, 1);
+			this.button2Grad.addColorStop(0, '#A5A5A5');
+			this.button2Grad.addColorStop(1, '#FFFFFF');
+			this.buttonBorderGrad = canv.createLinearGradient(0, 0, 0, 1);
+			this.buttonBorderGrad.addColorStop(0, '#AFAFAF');
+			this.buttonBorderGrad.addColorStop(1, '#7a7a7a');
+		}
+		canv.strokeStyle = this.buttonBorderGrad;
+		if (this.toggle) {
+			canv.fillStyle = (this.toggled ? this.button1Grad : this.button2Grad);
+		}
+		else {
+			canv.fillStyle = (this.clicking ? this.button1Grad : this.button2Grad);
+		}
+		canv.lineWidth = 2;
+		OurSonic.Help.roundRect(canv, this.parent.x + this.x, this.parent.y + this.y, this.width, this.height, 2, true, true);
+		if (!ss.referenceEquals(canv.font, this.font)) {
+			canv.font = this.font;
+		}
+		canv.fillStyle = '#000000';
+		var txt = Type.makeGenericType(OurSonic.UIManager.DelegateOrValue$1, [String]).op_Implicit(this.text);
+		canv.save();
+		this.image(canv, this.parent.x + this.x, this.parent.y + this.y);
+		canv.restore();
+		canv.fillText(txt, this.parent.x + this.x + (ss.Int32.div(this.width, 2) - canv.measureText(txt).width / 2), this.parent.y + this.y + this.height - 3);
+		canv.restore();
+	}
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.PaletteArea
+OurSonic.UIManager.PaletteArea = function(x, y) {
+	OurSonic.UIManager.Element.call(this, x, y);
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.Panel
+OurSonic.UIManager.Panel = function(x, y) {
+	this.controls = null;
+	this.outline = false;
+	this.area = null;
+	this.cachedDrawing = null;
+	OurSonic.UIManager.Element.call(this, x, y);
+	this.controls = [];
+};
+OurSonic.UIManager.Panel.prototype = {
+	childrenAreEditing: function() {
+		var ch = this.controls;
+		var $t1 = ch.getEnumerator();
+		try {
+			while ($t1.moveNext()) {
+				var t = $t1.get_current();
+				if (t.editorEngine.dragging || t.editorEngine.editing) {
+					return true;
+				}
+				if (Type.isInstanceOfType(t, OurSonic.UIManager.Panel) && Type.cast(t, OurSonic.UIManager.Panel).childrenAreEditing()) {
+					return true;
+				}
+			}
+		}
+		finally {
+			$t1.dispose();
+		}
+		return false;
+	},
+	focus: function(e) {
+		var ch = this.controls;
+		var $t1 = ch.getEnumerator();
+		try {
+			while ($t1.moveNext()) {
+				var t = $t1.get_current();
+				if (t.visible && t.y <= e.y && t.y + t.height > e.y && t.x <= e.x && t.x + t.width > e.x) {
+					e.x -= t.x;
+					e.y -= t.y;
+					t.focus(e);
+				}
+			}
+		}
+		finally {
+			$t1.dispose();
+		}
+		OurSonic.UIManager.Element.prototype.focus.call(this, e);
+	},
+	loseFocus: function() {
+		var ch = this.controls;
+		var $t1 = ch.getEnumerator();
+		try {
+			while ($t1.moveNext()) {
+				var t = $t1.get_current();
+				t.loseFocus();
+			}
+		}
+		finally {
+			$t1.dispose();
+		}
+		OurSonic.UIManager.Element.prototype.loseFocus.call(this);
+	},
+	onKeyDown: function(e) {
+		OurSonic.UIManager.Element.prototype.onKeyDown.call(this, e);
+		if (!this.visible) {
+			return;
+		}
+		var ch = this.controls;
+		var $t1 = ch.getEnumerator();
+		try {
+			while ($t1.moveNext()) {
+				var t = $t1.get_current();
+				t.onKeyDown(e);
+			}
+		}
+		finally {
+			$t1.dispose();
+		}
+	},
+	onClick: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		var clicked = false;
+		var ch = this.controls;
+		var $t1 = ch.getEnumerator();
+		try {
+			while ($t1.moveNext()) {
+				var control = $t1.get_current();
+				if (control.visible && control.y <= e.y && control.y + control.height > e.y && control.x <= e.x && control.x + control.width > e.x) {
+					e.x -= control.x;
+					e.y -= control.y;
+					control.focus(e);
+					control.onClick(e);
+					clicked = true;
+				}
+				else {
+					control.loseFocus();
+				}
+			}
+		}
+		finally {
+			$t1.dispose();
+		}
+		if (!clicked && !this.isEditMode() && Type.isInstanceOfType(this, OurSonic.UIManager.UIArea)) {
+			Type.cast(this, OurSonic.UIManager.UIArea).dragging = OurSonic.Point.$ctor1(e.x, e.y);
+		}
+		return clicked;
+	},
+	onMouseOver: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		var dragging = null;
+		var uiArea = Type.safeCast(this, OurSonic.UIManager.UIArea);
+		if (ss.isValue(uiArea)) {
+			dragging = uiArea.dragging;
+		}
+		if (ss.isNullOrUndefined(dragging)) {
+			var $t1 = this.controls.getEnumerator();
+			try {
+				while ($t1.moveNext()) {
+					var control = $t1.get_current();
+					if (control.visible && (control.editorEngine.editing || control.y <= e.y && control.y + control.height > e.y && control.x <= e.x && control.x + control.width > e.x)) {
+						e.x -= control.x;
+						e.y -= control.y;
+						control.onMouseOver(e);
+						return true;
+					}
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+			return true;
+		}
+		this.x += e.x - dragging.x;
+		this.y += e.y - dragging.y;
+		//this.onMove(); 
+		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+	},
+	onMouseUp: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		for (var ij = 0; ij < this.controls.length; ij++) {
+			var control = this.controls[ij];
+			control.onMouseUp(OurSonic.UIManager.Pointer.$ctor(e.x - control.x, e.y - control.y, 0));
+		}
+		var uiArea = Type.safeCast(this, OurSonic.UIManager.UIArea);
+		if (ss.isValue(uiArea)) {
+			uiArea.dragging = null;
+		}
+		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+	},
+	onScroll: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		var $t1 = this.controls.getEnumerator();
+		try {
+			while ($t1.moveNext()) {
+				var control = $t1.get_current();
+				if (control.visible && (control.editorEngine.editing || control.y <= e.y && control.y + control.height > e.y && control.x <= e.x && control.x + control.width > e.x)) {
+					e.x -= control.x;
+					e.y -= control.y;
+					control.onScroll(e);
+					return false;
+				}
+			}
+		}
+		finally {
+			$t1.dispose();
+		}
+		return OurSonic.UIManager.Element.prototype.onScroll.call(this, e);
+	},
+	draw: function(canv) {
+		if (!this.visible) {
+			return;
+		}
+		var _x = this.x;
+		var _y = this.y;
+		canv.save();
+		if (ss.isValue(this.parent)) {
+			this.x += this.parent.x;
+			this.y += this.parent.y;
+		}
+		if (this.outline) {
+			var lingrad = canv.createLinearGradient(0, 0, 0, this.height);
+			lingrad.addColorStop(0, 'rgba(220,220,220,0.85)');
+			lingrad.addColorStop(1, 'rgba(142,142,142,0.85)');
+			canv.fillStyle = lingrad;
+			canv.strokeStyle = '#333';
+			var rad = 5;
+			OurSonic.Help.roundRect(canv, this.x, this.y, this.width, this.height, rad, true, true);
+		}
+		var $t1 = this.controls.getEnumerator();
+		try {
+			while ($t1.moveNext()) {
+				var t = $t1.get_current();
+				t.draw(canv);
+			}
+		}
+		finally {
+			$t1.dispose();
+		}
+		this.x = _x;
+		this.y = _y;
+		canv.restore();
+		OurSonic.UIManager.Element.prototype.draw.call(this, canv);
+	},
+	addControl: function(element) {
+		element.parent = this;
+		this.controls.add(element);
+		return element;
+	}
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.Pointer
+OurSonic.UIManager.Pointer = function() {
+};
+OurSonic.UIManager.Pointer.$ctor = function(x, y, delta) {
+	var $this = {};
+	$this.x = 0;
+	$this.y = 0;
+	$this.delta = 0;
+	$this.x = x;
+	$this.y = y;
+	$this.delta = delta;
+	return $this;
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.PropertyButton
+OurSonic.UIManager.PropertyButton = function(x, y) {
+	OurSonic.UIManager.Element.call(this, x, y);
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.ScrollBox
+OurSonic.UIManager.ScrollBox = function(x, y) {
+	this.$2$ItemWidthField = 0;
+	this.$2$ScrollWidthField = 0;
+	this.$2$JHeightField = 0;
+	this.$2$VisibleItemsField = 0;
+	this.$2$ItemHeightField = 0;
+	this.$2$BackColorField = null;
+	this.$2$ScrollOffsetField = 0;
+	this.$2$ScrollPositionField = 0;
+	this.$2$DraggingField = false;
+	this.$2$ControlsField = null;
+	this.$2$ScrollingField = false;
+	OurSonic.UIManager.Element.call(this, x, y);
+	this.set_itemWidth(10);
+	this.set_scrollWidth(14);
+	this.set_visibleItems(3);
+	this.set_itemHeight(10);
+	this.set_backColor('');
+	this.set_jHeight(5);
+};
+OurSonic.UIManager.ScrollBox.prototype = {
+	get_itemWidth: function() {
+		return this.$2$ItemWidthField;
+	},
+	set_itemWidth: function(value) {
+		this.$2$ItemWidthField = value;
+	},
+	get_scrollWidth: function() {
+		return this.$2$ScrollWidthField;
+	},
+	set_scrollWidth: function(value) {
+		this.$2$ScrollWidthField = value;
+	},
+	get_jHeight: function() {
+		return this.$2$JHeightField;
+	},
+	set_jHeight: function(value) {
+		this.$2$JHeightField = value;
+	},
+	get_visibleItems: function() {
+		return this.$2$VisibleItemsField;
+	},
+	set_visibleItems: function(value) {
+		this.$2$VisibleItemsField = value;
+	},
+	get_itemHeight: function() {
+		return this.$2$ItemHeightField;
+	},
+	set_itemHeight: function(value) {
+		this.$2$ItemHeightField = value;
+	},
+	get_backColor: function() {
+		return this.$2$BackColorField;
+	},
+	set_backColor: function(value) {
+		this.$2$BackColorField = value;
+	},
+	get_scrollOffset: function() {
+		return this.$2$ScrollOffsetField;
+	},
+	set_scrollOffset: function(value) {
+		this.$2$ScrollOffsetField = value;
+	},
+	get_scrollPosition: function() {
+		return this.$2$ScrollPositionField;
+	},
+	set_scrollPosition: function(value) {
+		this.$2$ScrollPositionField = value;
+	},
+	get_dragging: function() {
+		return this.$2$DraggingField;
+	},
+	set_dragging: function(value) {
+		this.$2$DraggingField = value;
+	},
+	get_controls: function() {
+		return this.$2$ControlsField;
+	},
+	set_controls: function(value) {
+		this.$2$ControlsField = value;
+	},
+	construct: function() {
+		this.width = this.get_visibleItems() * (this.get_itemWidth() + this.get_jHeight());
+		this.height = this.get_itemHeight() + this.get_scrollWidth();
+		this.set_scrolling(false);
+	},
+	addControl: function(control) {
+		control.parent = this;
+		this.get_controls().add(control);
+		return control;
+	},
+	get_scrolling: function() {
+		return this.$2$ScrollingField;
+	},
+	set_scrolling: function(value) {
+		this.$2$ScrollingField = value;
+	},
+	onClick: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		for (var ij = this.get_scrollOffset(); ij < this.get_controls().length; ij++) {
+			var control = this.get_controls()[ij];
+			if (control.y <= e.y && control.y + control.height > e.y && control.x + 2 <= e.x && control.x + control.width + 2 > e.x) {
+				e.x -= control.x;
+				e.y -= control.y;
+				control.onClick(e);
+				return false;
+			}
+		}
+		if (e.x > this.get_itemWidth() && e.x < this.get_itemWidth() + this.get_scrollWidth()) {
+			var height = this.get_visibleItems() * (this.get_itemHeight() + this.get_jHeight()) - 2;
+			this.set_scrollOffset(ss.Int32.div(e.y, height) * (this.get_controls().length - this.get_visibleItems()));
+			this.set_scrollOffset(Math.min(Math.max(this.get_scrollOffset(), 0), this.get_controls().length));
+		}
+		this.set_dragging(true);
+		return false;
+		return OurSonic.UIManager.Element.prototype.onClick.call(this, e);
+	},
+	onMouseUp: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		this.set_dragging(false);
+		for (var ij = this.get_scrollOffset(); ij < this.get_controls().length; ij++) {
+			var control = this.get_controls()[ij];
+			if (control.y <= e.y && control.y + control.height > e.y && control.x <= e.x + 2 && control.x + control.width + 2 > e.x) {
+				e.x -= control.x;
+				e.y -= control.y;
+				control.onMouseUp(e);
+				return false;
+			}
+		}
+		if (ss.isValue(this.mouseUp)) {
+			this.mouseUp();
+		}
+		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+	},
+	onMouseOver: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		for (var ij = 0; ij < this.get_controls().length; ij++) {
+			var control = this.get_controls()[ij];
+			if (control.y <= e.y && control.y + control.height > e.y && control.x + 2 <= e.x && control.x + control.width + 2 > e.x) {
+				e.x -= control.x;
+				e.y -= control.y;
+				control.onMouseOver(e);
+				break;
+			}
+		}
+		if (this.get_dragging() && e.x > this.get_itemWidth() && e.x < this.get_itemWidth() + this.get_scrollWidth()) {
+			var height = this.get_visibleItems() * (this.get_itemHeight() + this.get_jHeight()) - 2;
+			this.set_scrollOffset(ss.Int32.div(e.y, height) * (this.get_controls().length - this.get_visibleItems()));
+			this.set_scrollOffset(Math.min(Math.max(this.get_scrollOffset(), 0), this.get_controls().length));
+		}
+		if (ss.isValue(this.mouseOver)) {
+			this.mouseOver();
+		}
+		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+	},
+	onScroll: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		if (e.delta > 0) {
+			if (this.get_scrollOffset() > 0) {
+				this.set_scrollOffset(this.get_scrollOffset() - 1);
+			}
+		}
+		else if (this.get_scrollOffset() < this.get_controls().length - this.get_visibleItems()) {
+			this.set_scrollOffset(this.get_scrollOffset() + 1);
+		}
+		for (var ij = 0; ij < this.get_controls().length; ij++) {
+			var control = this.get_controls()[ij];
+			if (control.y <= e.y && control.y + control.height > e.y && control.x <= e.x && control.x + control.width > e.x) {
+				e.x -= control.x;
+				e.y -= control.y;
+				control.onScroll(e);
+				return false;
+			}
+		}
+		//if (this.scroll) this.scroll();
+		return OurSonic.UIManager.Element.prototype.onScroll.call(this, e);
+	},
+	draw: function(canv) {
+		if (!this.visible) {
+			return;
+		}
+		canv.save();
+		canv.fillStyle = this.get_backColor();
+		var height = this.get_visibleItems() * (this.get_itemHeight() + this.get_jHeight()) - 2;
+		canv.fillStyle = this.get_backColor();
+		canv.lineWidth = 1;
+		canv.strokeStyle = '#333';
+		OurSonic.Help.roundRect(canv, this.parent.x + this.x, this.parent.y + this.y, this.get_itemWidth() + this.get_scrollWidth() + 6, this.get_visibleItems() * (this.get_itemHeight() + this.get_jHeight()), 3, true, true);
+		canv.fillStyle = 'grey';
+		canv.lineWidth = 1;
+		canv.strokeStyle = '#444';
+		canv.fillRect(this.parent.x + this.x + this.get_itemWidth() + 2 + 2, this.parent.y + this.y + 2, this.get_scrollWidth(), this.height);
+		canv.fillStyle = 'FFDDFF';
+		canv.lineWidth = 1;
+		canv.strokeStyle = '#FFDDFF';
+		this.set_scrollPosition(ss.Int32.div(height * this.get_scrollOffset(), this.get_controls().length - this.get_visibleItems()));
+		canv.fillRect(this.parent.x + this.x + this.get_itemWidth() + 2 + 2 + 2, this.parent.y + this.y + 2 + this.get_scrollPosition(), this.get_scrollWidth() - 2, 5);
+		var curY = 3;
+		for (var i = this.get_scrollOffset(); i < Math.min(this.get_controls().length, this.get_scrollOffset() + this.get_visibleItems()); i++) {
+			//this.Controls[i].Parent = { x: this.Parent.X + this.X, y: this.Parent.Y + this.Y };
+			this.get_controls()[i].x = 2;
+			this.get_controls()[i].y = curY;
+			this.get_controls()[i].height = this.get_itemHeight();
+			this.get_controls()[i].width = this.get_itemWidth();
+			curY += this.get_itemHeight() + this.get_jHeight();
+			this.get_controls()[i].draw(canv);
+		}
+		canv.restore();
+		OurSonic.UIManager.Element.prototype.draw.call(this, canv);
+	}
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.TextArea
+OurSonic.UIManager.TextArea = function(x, y) {
+	this.$oldText = null;
+	this.text = null;
+	this.font = null;
+	this.color = null;
+	OurSonic.UIManager.Element.call(this, x, y);
+	this.text = Type.makeGenericType(OurSonic.UIManager.DelegateOrValue$1, [String]).op_Implicit$2('');
+	this.font = '18pt Calibri';
+	this.color = 'black';
+	this.$oldText = '';
+};
+OurSonic.UIManager.TextArea.prototype = {
+	draw: function(canv) {
+		if (!this.visible) {
+			return;
+		}
+		var txt = Type.makeGenericType(OurSonic.UIManager.DelegateOrValue$1, [String]).op_Implicit(this.text);
+		if (!ss.referenceEquals(canv.font, this.font)) {
+			canv.font = this.font;
+		}
+		var w = canv.measureText(txt).width;
+		var h = parseInt(canv.font.split('pt')[0]);
+		//   canv.fillStyle = "rgba(255,255,255,0.78)";
+		var pad = 3;
+		//     canv.fillRect(this.parent.x + this.x - pad, this.parent.y + this.y - h - pad, w + (pad * 2), h + (pad * 2));
+		canv.fillStyle = this.color;
+		canv.fillText(txt, this.parent.x + this.x, this.parent.y + this.y);
+	},
+	forceDrawing: function() {
+		var txt = Type.makeGenericType(OurSonic.UIManager.DelegateOrValue$1, [String]).op_Implicit(this.text);
+		if (ss.referenceEquals(txt, this.$oldText)) {
+			var $t1 = OurSonic.UIManager.Element$ForceRedrawing.$ctor();
+			$t1.redraw = true;
+			$t1.clearCache = false;
+			return $t1;
+		}
+		this.$oldText = txt;
+		var $t2 = OurSonic.UIManager.Element$ForceRedrawing.$ctor();
+		$t2.redraw = true;
+		$t2.clearCache = true;
+		return $t2;
+	}
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.TextBox
+OurSonic.UIManager.TextBox = function(x, y) {
+	this.$blinkTick = 0;
+	this.$blinked = false;
+	this.$can = null;
+	this.$2$TextChangedField = null;
+	this.$2$TextField = null;
+	this.$2$FontField = null;
+	this.$2$ClickingField = false;
+	this.$2$ColorField = null;
+	this.$2$CursorPositionField = 0;
+	this.$2$DragPositionField = 0;
+	this.$2$DrawTicksField = 0;
+	this.$2$LastClickTickField = 0;
+	this.$2$CreatedField = false;
+	this.$2$BlinkedField = false;
+	this.$2$BlinkTickField = 0;
+	this.$2$Button1GradField = null;
+	this.$2$Button2GradField = null;
+	this.$2$ButtonBorderGradField = null;
+	this.$2$CanField = false;
+	OurSonic.UIManager.Element.call(this, x, y);
+	this.set_dragPosition(-1);
+};
+OurSonic.UIManager.TextBox.prototype = {
+	get_textChanged: function() {
+		return this.$2$TextChangedField;
+	},
+	set_textChanged: function(value) {
+		this.$2$TextChangedField = value;
+	},
+	get_text: function() {
+		return this.$2$TextField;
+	},
+	set_text: function(value) {
+		this.$2$TextField = value;
+	},
+	get_font: function() {
+		return this.$2$FontField;
+	},
+	set_font: function(value) {
+		this.$2$FontField = value;
+	},
+	get_clicking: function() {
+		return this.$2$ClickingField;
+	},
+	set_clicking: function(value) {
+		this.$2$ClickingField = value;
+	},
+	get_color: function() {
+		return this.$2$ColorField;
+	},
+	set_color: function(value) {
+		this.$2$ColorField = value;
+	},
+	get_cursorPosition: function() {
+		return this.$2$CursorPositionField;
+	},
+	set_cursorPosition: function(value) {
+		this.$2$CursorPositionField = value;
+	},
+	get_dragPosition: function() {
+		return this.$2$DragPositionField;
+	},
+	set_dragPosition: function(value) {
+		this.$2$DragPositionField = value;
+	},
+	get_drawTicks: function() {
+		return this.$2$DrawTicksField;
+	},
+	set_drawTicks: function(value) {
+		this.$2$DrawTicksField = value;
+	},
+	get_lastClickTick: function() {
+		return this.$2$LastClickTickField;
+	},
+	set_lastClickTick: function(value) {
+		this.$2$LastClickTickField = value;
+	},
+	get_created: function() {
+		return this.$2$CreatedField;
+	},
+	set_created: function(value) {
+		this.$2$CreatedField = value;
+	},
+	get_blinked: function() {
+		return this.$2$BlinkedField;
+	},
+	set_blinked: function(value) {
+		this.$2$BlinkedField = value;
+	},
+	get_blinkTick: function() {
+		return this.$2$BlinkTickField;
+	},
+	set_blinkTick: function(value) {
+		this.$2$BlinkTickField = value;
+	},
+	get_button1Grad: function() {
+		return this.$2$Button1GradField;
+	},
+	set_button1Grad: function(value) {
+		this.$2$Button1GradField = value;
+	},
+	get_button2Grad: function() {
+		return this.$2$Button2GradField;
+	},
+	set_button2Grad: function(value) {
+		this.$2$Button2GradField = value;
+	},
+	get_buttonBorderGrad: function() {
+		return this.$2$ButtonBorderGradField;
+	},
+	set_buttonBorderGrad: function(value) {
+		this.$2$ButtonBorderGradField = value;
+	},
+	get_can: function() {
+		return this.$2$CanField;
+	},
+	set_can: function(value) {
+		this.$2$CanField = value;
+	},
+	onKeyDown: function(e2) {
+		var e = e2;
+		if (!!e.altKey) {
+			return;
+		}
+		if (this.focused) {
+			if (!!e.ctrlKey) {
+				if (!!ss.referenceEquals(e.keyCode, 65)) {
+					this.set_dragPosition(0);
+					this.set_cursorPosition(this.get_text().length);
+				}
+				else if (!!ss.referenceEquals(e.keyCode, 67)) {
+					// _H.copy_to_clipboard(this.text.substring(Math.min(this.cursorPosition, this.dragPosition), Math.max(this.cursorPosition, this.dragPosition)));
+				}
+				else if (!!ss.referenceEquals(e.keyCode, 88)) {
+					//  _H.copy_to_clipboard(this.text.substring(Math.min(this.cursorPosition, this.dragPosition), Math.max(this.cursorPosition, this.dragPosition)));
+					this.set_text(this.get_text().substring(0, Math.min(this.get_cursorPosition(), this.get_dragPosition())) + this.get_text().substring(Math.max(this.get_cursorPosition(), this.get_dragPosition()), this.get_text().length));
+					this.set_cursorPosition(Math.min(this.get_cursorPosition(), this.get_dragPosition()));
+					this.set_dragPosition(-1);
+				}
+			}
+			else if (!!ss.referenceEquals(e.keyCode, 37)) {
+				if (!!e.shiftKey) {
+					if (this.get_dragPosition() === -1) {
+						this.set_dragPosition(this.get_cursorPosition());
+					}
+					this.set_cursorPosition(Math.max(this.get_cursorPosition() - 1, 0));
+				}
+				else {
+					this.set_dragPosition(-1);
+					this.set_cursorPosition(Math.max(this.get_cursorPosition() - 1, 0));
+				}
+			}
+			else if (!!ss.referenceEquals(e.keyCode, 39)) {
+				if (!!e.shiftKey) {
+					if (this.get_dragPosition() === -1) {
+						this.set_dragPosition(this.get_cursorPosition());
+					}
+					this.set_cursorPosition(Math.min(this.get_cursorPosition() + 1, this.get_text().length));
+				}
+				else {
+					this.set_dragPosition(-1);
+					this.set_cursorPosition(Math.min(this.get_cursorPosition() + 1, this.get_text().length));
+				}
+			}
+			else {
+				if (!!ss.referenceEquals(e.keyCode, 8)) {
+					if (this.get_dragPosition() === -1) {
+						this.set_text(this.get_text().substring(0, this.get_cursorPosition() - 1) + this.get_text().substring(this.get_cursorPosition(), this.get_text().length));
+					}
+					else {
+						this.set_text(this.get_text().substring(0, Math.min(this.get_cursorPosition(), this.get_dragPosition())) + this.get_text().substring(Math.max(this.get_cursorPosition(), this.get_dragPosition()), this.get_text().length));
+					}
+					if (this.get_dragPosition() === -1) {
+						if (this.get_cursorPosition() > 0) {
+							this.set_cursorPosition(this.get_cursorPosition() - 1);
+						}
+					}
+					else {
+						this.set_cursorPosition(Math.min(this.get_cursorPosition(), this.get_dragPosition()));
+					}
+				}
+				else if (!!ss.referenceEquals(e.keyCode, 46)) {
+					if (this.get_dragPosition() === -1) {
+						this.set_text(this.get_text().substring(0, this.get_cursorPosition()) + this.get_text().substring(Math.min(this.get_cursorPosition() + 1, this.get_text().length), this.get_text().length));
+					}
+					else {
+						this.set_text(this.get_text().substring(0, Math.min(this.get_cursorPosition(), this.get_dragPosition())) + this.get_text().substring(Math.max(this.get_cursorPosition(), this.get_dragPosition()), this.get_text().length));
+					}
+					if (this.get_dragPosition() === -1) {
+					}
+					else {
+						this.set_cursorPosition(Math.min(this.get_cursorPosition(), this.get_dragPosition()));
+					}
+				}
+				else {
+					var m = ss.Nullable.unbox(Type.cast(e.keyCode, ss.Int32));
+					var t = String.fromCharCode(m);
+					if (this.get_dragPosition() === -1) {
+						this.set_text(this.get_text().substring(0, this.get_cursorPosition()) + t + this.get_text().substring(this.get_cursorPosition(), this.get_text().length));
+					}
+					else {
+						this.set_text(this.get_text().substring(0, Math.min(this.get_cursorPosition(), this.get_dragPosition())) + t + this.get_text().substring(Math.max(this.get_cursorPosition(), this.get_dragPosition()), this.get_text().length));
+					}
+					if (this.get_dragPosition() === -1) {
+						this.set_cursorPosition(this.get_cursorPosition() + 1);
+					}
+					else {
+						this.set_cursorPosition(Math.max(this.get_cursorPosition(), this.get_dragPosition()));
+					}
+				}
+				this.set_dragPosition(-1);
+			}
+			if (ss.isValue(this.get_textChanged())) {
+				this.get_textChanged()();
+			}
+			e.preventDefault();
+		}
+	},
+	onClick: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		this.set_clicking(true);
+		this.$can.save();
+		if (!ss.referenceEquals(this.$can.font, this.get_font())) {
+			this.$can.font = this.get_font();
+		}
+		for (var i = 0; i < this.get_text().length; i++) {
+			this.set_dragPosition(-1);
+			var w = this.$can.measureText(this.get_text().substring(0, i)).width;
+			if (w > e.x - 14) {
+				this.set_cursorPosition(i);
+				if (this.get_drawTicks() - this.get_lastClickTick() < 15) {
+					this.$selectWord();
+				}
+				this.set_lastClickTick(this.get_drawTicks());
+				return false;
+			}
+		}
+		this.set_cursorPosition(this.get_text().length);
+		if (this.get_drawTicks() - this.get_lastClickTick() < 20) {
+			this.$selectWord();
+		}
+		this.set_lastClickTick(this.get_drawTicks());
+		this.$can.restore();
+		return OurSonic.UIManager.Element.prototype.onClick.call(this, e);
+	},
+	$selectWord: function() {
+		var j = this.get_text().split(' ');
+		var pos = 0;
+		for (var i = 0; i < j.length; i++) {
+			if (this.get_cursorPosition() < j[i].length + pos) {
+				this.set_dragPosition(pos);
+				this.set_cursorPosition(j[i].length + pos);
+				return;
+			}
+			else {
+				pos += j[i].length + 1;
+			}
+		}
+		this.set_dragPosition(pos - j[j.length - 1].length);
+		this.set_cursorPosition(this.get_text().length);
+	},
+	onMouseUp: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		if (this.get_clicking()) {
+		}
+		this.set_clicking(false);
+		if (ss.isValue(this.mouseUp)) {
+			this.mouseUp();
+		}
+		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+	},
+	onMouseOver: function(e) {
+		if (!this.visible) {
+			return false;
+		}
+		document.body.style.cursor = 'text';
+		if (this.get_clicking()) {
+			if (this.get_dragPosition() === -1) {
+				this.set_dragPosition(this.get_cursorPosition());
+			}
+			this.$can.save();
+			if (!ss.referenceEquals(this.$can.font, this.get_font())) {
+				this.$can.font = this.get_font();
+			}
+			for (var i = 0; i < this.get_text().length; i++) {
+				var w = this.$can.measureText(this.get_text().substring(0, i)).width;
+				if (w > e.x - 14) {
+					this.set_cursorPosition(i);
+					return false;
+				}
+			}
+			this.$can.restore();
+			this.set_cursorPosition(this.get_text().length);
+		}
+		if (ss.isValue(this.mouseOver)) {
+			this.mouseOver();
+		}
+		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+	},
+	draw: function(canv) {
+		if (!this.visible) {
+			return;
+		}
+		canv.save();
+		if (!this.focused) {
+			this.set_cursorPosition(-1);
+			this.set_dragPosition(-1);
+		}
+		this.set_drawTicks(this.get_drawTicks() + 1);
+		this.$can = canv;
+		if (!this.get_created()) {
+			this.set_created(true);
+			this.set_button1Grad(canv.createLinearGradient(0, 0, 0, 1));
+			this.get_button1Grad().addColorStop(0, '#FFFFFF');
+			this.get_button1Grad().addColorStop(1, '#A5A5A5');
+			this.set_button2Grad(canv.createLinearGradient(0, 0, 0, 1));
+			this.get_button2Grad().addColorStop(0, '#A5A5A5');
+			this.get_button2Grad().addColorStop(1, '#FFFFFF');
+			this.set_buttonBorderGrad(canv.createLinearGradient(0, 0, 0, 1));
+			this.get_buttonBorderGrad().addColorStop(0, '#AFAFAF');
+			this.get_buttonBorderGrad().addColorStop(1, '#7a7a7a');
+		}
+		canv.strokeStyle = this.get_buttonBorderGrad();
+		canv.fillStyle = (this.get_clicking() ? this.get_button1Grad() : this.get_button2Grad());
+		canv.lineWidth = 2;
+		OurSonic.Help.roundRect(canv, this.parent.x + this.x, this.parent.y + this.y, this.width, this.height, 2, true, true);
+		if (!ss.referenceEquals(canv.font, this.get_font())) {
+			canv.font = this.get_font();
+		}
+		if (this.get_dragPosition() !== -1) {
+			canv.fillStyle = '#598AFF';
+			var w1 = canv.measureText(this.get_text().substring(0, Math.min(this.get_dragPosition(), this.get_cursorPosition()))).width;
+			var w2 = canv.measureText(this.get_text().substring(0, Math.max(this.get_dragPosition(), this.get_cursorPosition()))).width;
+			canv.fillRect(this.parent.x + this.x + 8 + w1, this.parent.y + this.y + 3, w2 - w1, this.height - 7);
+		}
+		canv.fillStyle = '#000000';
+		var hc;
+		if (canv.font.indexOf('pt') !== -1) {
+			hc = parseInt(canv.font.substr(0, canv.font.indexOf('pt')));
+		}
+		else {
+			hc = parseInt(canv.font.substr(0, canv.font.indexOf('px')));
+		}
+		canv.fillText(this.get_text(), this.parent.x + this.x + 8, this.parent.y + this.y + ss.Int32.div(this.height - hc, 2) + ss.Int32.div(this.height, 2));
+		if (this.focused && this.$blinkTick++ % 35 === 0) {
+			this.$blinked = !this.$blinked;
+		}
+		if (this.focused && this.$blinked) {
+			canv.strokeStyle = '#000000';
+			var w = canv.measureText(this.get_text().substring(0, this.get_cursorPosition())).width;
+			canv.beginPath();
+			canv.moveTo(this.parent.x + this.x + 8 + w, this.parent.y + this.y + 3);
+			canv.lineTo(this.parent.x + this.x + 8 + w, this.parent.y + this.y + (this.height - 7));
+			canv.lineWidth = 2;
+			canv.stroke();
+		}
+		canv.restore();
+		OurSonic.UIManager.Element.prototype.draw.call(this, canv);
+	}
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.UIArea
+OurSonic.UIManager.UIArea = function() {
+	this.$myClosable = false;
+	this.manager = null;
+	this.dragging = null;
+	this.closable = false;
+	OurSonic.UIManager.Panel.call(this, 0, 0);
+};
+OurSonic.UIManager.UIArea.prototype = {
+	onClick: function(e) {
+		var base = OurSonic.UIManager.Panel.prototype.onClick.call(this, e);
+		if (!base && !this.isEditMode()) {
+			this.dragging = OurSonic.Point.$ctor1(e.x, e.y);
+		}
+		return base;
+	},
+	construct: function() {
+		if (this.closable) {
+			this.addControl(new OurSonic.UIManager.Button(this.width - 30, 4));
+		}
+	},
+	draw: function(canv) {
+		if (!this.visible) {
+			return;
+		}
+		canv.save();
+		if (!this.cachedDrawing) {
+			var cg = OurSonic.Help.defaultCanvas(this.width, this.height);
+			var cv = cg.context;
+			var lingrad = cv.createLinearGradient(0, 0, 0, this.height);
+			lingrad.addColorStop(0, 'rgba(220,220,220,0.85)');
+			lingrad.addColorStop(1, 'rgba(142,142,142,0.85)');
+			cv.fillStyle = lingrad;
+			cv.strokeStyle = '#333';
+			var xy = OurSonic.Point.$ctor1(this.x, this.y);
+			this.x = 0;
+			this.y = 0;
+			var rad = 30;
+			OurSonic.Help.roundRect(cv, this.x, this.y, this.width, this.height, rad, true, true);
+			cv.beginPath();
+			cv.moveTo(this.x, this.y + rad);
+			cv.lineTo(this.x + this.width, this.y + rad);
+			cv.lineWidth = 2;
+			cv.strokeStyle = '#000000';
+			cv.stroke();
+			var $t1 = this.controls.getEnumerator();
+			try {
+				while ($t1.moveNext()) {
+					var t1 = $t1.get_current();
+					var good = t1.forceDrawing();
+					if (good.redraw) {
+						t1.draw(cv);
+					}
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+			this.x = xy.x;
+			this.y = xy.y;
+			this.cachedDrawing = cg;
+		}
+		canv.drawImage(this.cachedDrawing.canvas, this.x, this.y);
+		if (this.cachedDrawing.canvas.width !== this.width || this.cachedDrawing.canvas.height !== this.height) {
+			this.cachedDrawing = null;
+		}
+		var $t2 = this.controls.getEnumerator();
+		try {
+			while ($t2.moveNext()) {
+				var t = $t2.get_current();
+				var good1 = t.forceDrawing();
+				if (!good1.redraw) {
+					t.draw(canv);
+				}
+				if (good1.clearCache) {
+					this.cachedDrawing = null;
+				}
+			}
+		}
+		finally {
+			$t2.dispose();
+		}
+		canv.restore();
+		OurSonic.UIManager.Panel.prototype.draw.call(this, canv);
+	}
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.UIManager
+OurSonic.UIManager.UIManager = function(sonicManager, mainCanvas, scale) {
 	this.$mainCanvas = null;
 	this.$scale = null;
 	this.$sonicManager = null;
+	this.$messages = [];
+	this.uiAreas = null;
 	this.dragger = null;
 	this.data = null;
+	this.smallTextFont = null;
+	this.buttonFont = null;
+	this.smallButtonFont = null;
+	this.textFont = null;
+	this.textFont = '18pt Calibri ';
+	this.smallTextFont = '12pt Calibri ';
+	this.buttonFont = '13pt Arial bold';
+	this.smallButtonFont = '11pt Arial bold';
+	mainCanvas.font = this.textFont;
+	this.uiAreas = [];
 	this.$sonicManager = sonicManager;
 	this.$mainCanvas = mainCanvas;
 	this.$scale = scale;
@@ -5186,12 +7005,72 @@ OurSonic.UIManager = function(sonicManager, mainCanvas, scale) {
 		sonicManager.bigWindowLocation.y = sonicManager.windowLocation.y;
 	});
 };
-OurSonic.UIManager.prototype = {
+OurSonic.UIManager.UIManager.prototype = {
 	onClick: function(e) {
+		var cell = OurSonic.Help.getCursorPosition(e, false);
+		var goodArea = null;
+		var cl = Enumerable.from(this.uiAreas).orderBy(function(f) {
+			return -f.depth;
+		}).toArray();
+		for (var ij = 0; ij < cl.length; ij++) {
+			var are = cl[ij];
+			if (are.visible && (are.isEditMode() ? (are.y - are.editorEngine.maxSize() <= cell.y && are.y + are.editorEngine.maxSize() + are.height > cell.y && are.x - are.editorEngine.maxSize() <= cell.x && are.x + are.editorEngine.maxSize() + are.width > cell.x) : (are.y <= cell.y && are.y + are.height > cell.y && are.x <= cell.x && are.x + are.width > cell.x))) {
+				goodArea = are;
+				var ec = OurSonic.UIManager.Pointer.$ctor(cell.x - are.x, cell.y - are.y, 0);
+				are.onClick(ec);
+				break;
+			}
+		}
+		if (goodArea) {
+			var $t1 = this.uiAreas.getEnumerator();
+			try {
+				while ($t1.moveNext()) {
+					var are1 = $t1.get_current();
+					if (ss.referenceEquals(goodArea, are1)) {
+						are1.depth = 1;
+						are1.focus(cell);
+					}
+					else if (are1.visible) {
+						are1.depth = 0;
+						are1.loseFocus();
+					}
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+			return true;
+		}
+		else {
+			var $t2 = this.uiAreas.getEnumerator();
+			try {
+				while ($t2.moveNext()) {
+					var are2 = $t2.get_current();
+					if (are2.visible) {
+						are2.depth = 0;
+						are2.loseFocus();
+					}
+				}
+			}
+			finally {
+				$t2.dispose();
+			}
+		}
 		this.$sonicManager.uiManager.dragger.click(e);
 		return false;
 	},
 	onMouseMove: function(e) {
+		var cell = OurSonic.Help.getCursorPosition(e, false);
+		var cl = Enumerable.from(this.uiAreas).orderBy(function(f) {
+			return -f.depth;
+		}).toArray();
+		for (var ij = 0; ij < cl.length; ij++) {
+			var are = cl[ij];
+			if (are.dragging || are.isEditMode() || are.visible && are.y <= cell.y && are.y + are.height > cell.y && are.x <= cell.x && are.x + are.width > cell.x) {
+				var cell2 = OurSonic.UIManager.Pointer.$ctor(cell.x - are.x, cell.y - are.y, 0);
+				return are.onMouseOver(cell2);
+			}
+		}
 		if (this.dragger.isDragging(e)) {
 			this.dragger.mouseMove(e);
 			return false;
@@ -5200,31 +7079,83 @@ OurSonic.UIManager.prototype = {
 		return false;
 	},
 	onMouseUp: function(e) {
+		var cell = OurSonic.Help.getCursorPosition(e, true);
+		var $t1 = this.uiAreas.getEnumerator();
+		try {
+			while ($t1.moveNext()) {
+				var are = $t1.get_current();
+				var ec = OurSonic.UIManager.Pointer.$ctor(cell.x - are.x, cell.y - are.y, 0);
+				are.onMouseUp(ec);
+			}
+		}
+		finally {
+			$t1.dispose();
+		}
 		this.dragger.mouseUp(e);
 	},
 	onMouseScroll: function(e) {
+		var delta = ss.Nullable.unbox(Type.cast((!!e.wheelDelta ? (e.wheelDelta / 40) : (!!e.detail ? -e.detail : 0)), ss.Int32));
+		var cell = OurSonic.Help.getCursorPosition(e, true);
+		var $t1 = this.uiAreas.getEnumerator();
+		try {
+			while ($t1.moveNext()) {
+				var are = $t1.get_current();
+				if (are.visible && are.y <= cell.y && are.y + are.height > cell.y && are.x <= cell.x && are.x + are.width > cell.x) {
+					var cell2 = OurSonic.UIManager.Pointer.$ctor(cell.x - are.x, cell.y - are.y, delta);
+					return are.onScroll(cell2);
+				}
+			}
+		}
+		finally {
+			$t1.dispose();
+		}
 		return false;
 	},
 	onKeyDown: function(jQueryEvent) {
+		var $t1 = this.uiAreas.getEnumerator();
+		try {
+			while ($t1.moveNext()) {
+				var are = $t1.get_current();
+				are.onKeyDown(jQueryEvent);
+			}
+		}
+		finally {
+			$t1.dispose();
+		}
 	},
-	draw: function(gameCanvas) {
+	draw: function(canvas) {
 		this.dragger.tick();
+		canvas.save();
+		var cl = Enumerable.from(this.uiAreas).orderBy(function(f) {
+			return f.depth;
+		}).toArray();
+		for (var $t1 = 0; $t1 < cl.length; $t1++) {
+			var are = cl[$t1];
+			are.draw(canvas);
+		}
+		if (true) {
+			for (var i = 0; i < this.$messages.length; i++) {
+				canvas.fillText(this.$messages[i], 10, 25 + i * 30);
+			}
+		}
+		canvas.restore();
 	},
 	updateTitle: function(decoding) {
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
-// OurSonic.UIManagerData
-OurSonic.UIManagerData = function() {
+// OurSonic.UIManager.UIManagerData
+OurSonic.UIManager.UIManagerData = function() {
 	this.indexes = null;
 	this.solidTileArea = null;
 	this.modifyTilePieceArea = null;
 };
 ////////////////////////////////////////////////////////////////////////////////
-// OurSonic.UIManagerDataIndexes
-OurSonic.UIManagerDataIndexes = function() {
+// OurSonic.UIManager.UIManagerDataIndexes
+OurSonic.UIManager.UIManagerDataIndexes = function() {
 	this.tpIndex = 0;
 };
+Type.registerNamespace('OurSonic');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Watcher
 OurSonic.Watcher = function() {
@@ -5282,10 +7213,26 @@ OurSonic.Tiles.Tile.registerClass('OurSonic.Tiles.Tile', Object);
 OurSonic.Tiles.TileChunk.registerClass('OurSonic.Tiles.TileChunk', Object);
 OurSonic.Tiles.TileItem.registerClass('OurSonic.Tiles.TileItem', Object);
 OurSonic.Tiles.TilePiece.registerClass('OurSonic.Tiles.TilePiece', Object);
-OurSonic.UIManager.registerClass('OurSonic.UIManager', Object);
-OurSonic.UIManagerData.registerClass('OurSonic.UIManagerData', Object);
-OurSonic.UIManagerDataIndexes.registerClass('OurSonic.UIManagerDataIndexes', Object);
+OurSonic.UIManager.EditorEngine.registerClass('OurSonic.UIManager.EditorEngine', Object);
+OurSonic.UIManager.EditorEnginePoint.registerClass('OurSonic.UIManager.EditorEnginePoint', Object);
+OurSonic.UIManager.Element.registerClass('OurSonic.UIManager.Element', Object);
+OurSonic.UIManager.Element$ForceRedrawing.registerClass('OurSonic.UIManager.Element$ForceRedrawing', Object);
+OurSonic.UIManager.HScrollBox.registerClass('OurSonic.UIManager.HScrollBox', OurSonic.UIManager.Element);
+OurSonic.UIManager.HtmlBox.registerClass('OurSonic.UIManager.HtmlBox', OurSonic.UIManager.Element);
+OurSonic.UIManager.ImageButton.registerClass('OurSonic.UIManager.ImageButton', OurSonic.UIManager.Element);
+OurSonic.UIManager.PaletteArea.registerClass('OurSonic.UIManager.PaletteArea', OurSonic.UIManager.Element);
+OurSonic.UIManager.Panel.registerClass('OurSonic.UIManager.Panel', OurSonic.UIManager.Element);
+OurSonic.UIManager.Pointer.registerClass('OurSonic.UIManager.Pointer', Object);
+OurSonic.UIManager.PropertyButton.registerClass('OurSonic.UIManager.PropertyButton', OurSonic.UIManager.Element);
+OurSonic.UIManager.ScrollBox.registerClass('OurSonic.UIManager.ScrollBox', OurSonic.UIManager.Element);
+OurSonic.UIManager.TextArea.registerClass('OurSonic.UIManager.TextArea', OurSonic.UIManager.Element);
+OurSonic.UIManager.TextBox.registerClass('OurSonic.UIManager.TextBox', OurSonic.UIManager.Element);
+OurSonic.UIManager.UIArea.registerClass('OurSonic.UIManager.UIArea', OurSonic.UIManager.Panel);
+OurSonic.UIManager.UIManager.registerClass('OurSonic.UIManager.UIManager', Object);
+OurSonic.UIManager.UIManagerData.registerClass('OurSonic.UIManager.UIManagerData', Object);
+OurSonic.UIManager.UIManagerDataIndexes.registerClass('OurSonic.UIManager.UIManagerDataIndexes', Object);
 OurSonic.Watcher.registerClass('OurSonic.Watcher', Object);
+OurSonic.UIManager.Button.registerClass('OurSonic.UIManager.Button', OurSonic.UIManager.Element);
 OurSonic.HeightMask.colors = ['', 'rgba(255,98,235,0.6)', 'rgba(24,218,235,0.6)', 'rgba(24,98,235,0.6)'];
 OurSonic.Help.cos_table = [1, 0.9997, 0.9988, 0.99729, 0.99518, 0.99248, 0.98918, 0.98528, 0.98079, 0.9757, 0.97003, 0.96378, 0.95694, 0.94953, 0.94154, 0.93299, 0.92388, 0.91421, 0.90399, 0.89322, 0.88192, 0.87009, 0.85773, 0.84485, 0.83147, 0.81758, 0.80321, 0.78835, 0.77301, 0.75721, 0.74095, 0.72425, 0.70711, 0.68954, 0.67156, 0.65317, 0.63439, 0.61523, 0.5957, 0.57581, 0.55557, 0.535, 0.5141, 0.4929, 0.4714, 0.44961, 0.42755, 0.40524, 0.38268, 0.3599, 0.33689, 0.31368, 0.29028, 0.26671, 0.24298, 0.2191, 0.19509, 0.17096, 0.14673, 0.12241, 0.09802, 0.07356, 0.04907, 0.02454, 0, -0.02454, -0.04907, -0.07356, -0.09802, -0.12241, -0.14673, -0.17096, -0.19509, -0.2191, -0.24298, -0.26671, -0.29028, -0.31368, -0.33689, -0.3599, -0.38268, -0.40524, -0.42755, -0.44961, -0.4714, -0.4929, -0.5141, -0.535, -0.55557, -0.57581, -0.5957, -0.61523, -0.63439, -0.65317, -0.67156, -0.68954, -0.70711, -0.72425, -0.74095, -0.75721, -0.77301, -0.78835, -0.80321, -0.81758, -0.83147, -0.84485, -0.85773, -0.87009, -0.88192, -0.89322, -0.90399, -0.91421, -0.92388, -0.93299, -0.94154, -0.94953, -0.95694, -0.96378, -0.97003, -0.9757, -0.98079, -0.98528, -0.98918, -0.99248, -0.99518, -0.99729, -0.9988, -0.9997, -1, -0.9997, -0.9988, -0.99729, -0.99518, -0.99248, -0.98918, -0.98528, -0.98079, -0.9757, -0.97003, -0.96378, -0.95694, -0.94953, -0.94154, -0.93299, -0.92388, -0.91421, -0.90399, -0.89322, -0.88192, -0.87009, -0.85773, -0.84485, -0.83147, -0.81758, -0.80321, -0.78835, -0.77301, -0.75721, -0.74095, -0.72425, -0.70711, -0.68954, -0.67156, -0.65317, -0.63439, -0.61523, -0.5957, -0.57581, -0.55557, -0.535, -0.5141, -0.4929, -0.4714, -0.44961, -0.42756, -0.40524, -0.38268, -0.3599, -0.33689, -0.31368, -0.29028, -0.26671, -0.24298, -0.2191, -0.19509, -0.17096, -0.14673, -0.12241, -0.09802, -0.07356, -0.04907, -0.02454, 0, 0.02454, 0.04907, 0.07356, 0.09802, 0.12241, 0.14673, 0.17096, 0.19509, 0.2191, 0.24298, 0.26671, 0.29028, 0.31368, 0.33689, 0.3599, 0.38268, 0.40524, 0.42756, 0.44961, 0.4714, 0.4929, 0.5141, 0.535, 0.55557, 0.57581, 0.5957, 0.61523, 0.63439, 0.65317, 0.67156, 0.68954, 0.70711, 0.72425, 0.74095, 0.75721, 0.77301, 0.78835, 0.80321, 0.81758, 0.83147, 0.84485, 0.85773, 0.87009, 0.88192, 0.89322, 0.90399, 0.91421, 0.92388, 0.93299, 0.94154, 0.94953, 0.95694, 0.96378, 0.97003, 0.9757, 0.98079, 0.98528, 0.98918, 0.99248, 0.99518, 0.99729, 0.9988, 0.9997];
 OurSonic.Level.ObjectManager.broken = OurSonic.Help.loadSprite('assets/Sprites/broken.png', function(e) {

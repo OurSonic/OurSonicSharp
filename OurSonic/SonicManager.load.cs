@@ -239,7 +239,7 @@ namespace OurSonic
                 else if (b2)
                     SonicLevel.HeightMaps[i] = 1;
                 else
-                    SonicLevel.HeightMaps[i] = new HeightMask(sonicLevel.HeightMaps[i]);
+                    SonicLevel.HeightMaps[i] = new HeightMask(sonicLevel.HeightMaps[i], i);
             }
             SonicLevel.Chunks = new List<TileChunk>();
 

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonic.Level;
 using OurSonic.Tiles;
+using OurSonic.UIManager;
 using jQueryApi;
 namespace OurSonic
 {
@@ -29,7 +31,7 @@ namespace OurSonic
         [IntrinsicProperty]
         public IntersectingRectangle BigWindowLocation { get; set; }
         [IntrinsicProperty]
-        public UIManager UIManager { get; set; }
+        public UIManager.UIManager UIManager { get; set; }
         [IntrinsicProperty]
         public Sonic SonicToon { get; set; }
         [IntrinsicProperty]
@@ -130,8 +132,35 @@ namespace OurSonic
             ScreenOffset = new Point(mainCanvas.DomCanvas.GetWidth() / 2 - WindowLocation.Width * Scale.X / 2,
                                      mainCanvas.DomCanvas.GetHeight() / 2 - WindowLocation.Height * Scale.Y / 2);
 
-            UIManager = new UIManager(this, mainCanvas, Scale);
+            UIManager = new UIManager.UIManager(this, mainCanvas.Context, Scale);
             //UIManager.ObjectFrameworkArea.Populate(new LevelObject("Somekey"));
+
+            var uiArea = new UIArea() {Width = 550, Height = 420, X = 190, Y = 70, EditMode = true};
+            UIManager.UIAreas.Add(uiArea);
+
+            string fm = "";
+
+            uiArea.AddControl(new TextArea(50, 50) {Text = ( (Func<string>) ( () => "white nikes" + fm ) )});
+            uiArea.AddControl(new ImageButton(50, 200) {
+                                                               Toggle = true,
+                                                               Text = ( (Func<string>) ( () => "white nikes" + fm ) ),
+                                                               Image = (canv, x, y) => {
+                                                                           canv.MoveTo(x + 20, y + 20);
+                                                                           canv.LineTo(x + 50, y + 50);
+                                                                           canv.Stroke();
+                                                                       }
+                                                       });
+
+            uiArea.AddControl(new Button(50, 300) {
+                                                          Text = ( (Func<string>) ( () => "white nikes" + fm ) ),
+                                                  });
+            uiArea.AddControl(new TextBox(150, 300) {
+                                                            Text = "mike",
+                                                            Width = 150,
+                                                            Height = 30
+                                                    });
+
+            Window.SetInterval(() => { fm += "a1 "; }, 1000);
 
             ClickState = ClickState.Dragging;
             tickCount = 0;
@@ -237,19 +266,19 @@ namespace OurSonic
                     SonicToon.Tick(SonicLevel, Scale);
                 }
                         /*
-                        catch (Exception exc)
-                        {
-                            string txt = "There was an error on this page.\n\n";
-                            txt += "Error description: " + exc.Message + "\n\n";
-                            txt += "Stack: " + exc.InnerException + "\n\n"; //todo::callstack
-                            txt += "Click OK to continue.\n\n";
+                catch (Exception exc)
+                {
+                    string txt = "There was an error on this page.\n\n";
+                    txt += "Error description: " + exc.Message + "\n\n";
+                    txt += "Stack: " + exc.InnerException + "\n\n"; //todo::callstack
+                    txt += "Click OK to continue.\n\n";
 
 
-                            Global.Console.Log(exc.Me());
-                            Window.Alert(txt);
-                            throw exc;
-                        }
-        */
+                    Global.Console.Log(exc.Me());
+                    Window.Alert(txt);
+                    throw exc;
+                }
+*/
                 finally {
                     SonicToon.Ticking = false;
                 }
@@ -682,6 +711,17 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                     return an;
             }
             return null;
+        }
+
+        public void ClearCache()
+        {
+            foreach (var tile in SonicLevel.Tiles)
+                tile.ClearCache();
+            foreach (var tilePiece in SonicLevel.Blocks) {
+                tilePiece.ClearCache();
+            }
+            Instance.SpriteCache.HeightMaps = new List<CanvasInformation>();
+            Instance.SpriteCache.HeightMapChunks = new JsDictionary<string, CanvasInformation>();
         }
     }
 }

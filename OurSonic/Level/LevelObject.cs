@@ -45,7 +45,7 @@ namespace OurSonic.Level
 
         public bool OnCollide(LevelObjectInfo @object, SonicLevel level, Sonic sonic, string sensor, dynamic piece)
         {
-            return Script.Reinterpret<bool>(evalMe("collideScript").Me().apply(@object, new object[] { @object, level, sonic, sensor, piece }));
+            return Script.Reinterpret<bool>(evalMe("collideScript").Me().apply(@object, new object[] {@object, level, sonic, sensor, piece}));
         }
 
         public bool OnHurtSonic(LevelObjectInfo @object, SonicLevel level, Sonic sonic, string sensor, dynamic piece)
