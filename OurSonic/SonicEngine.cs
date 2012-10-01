@@ -32,12 +32,12 @@ namespace OurSonic
             var gameCanvasItem = jQuery.Select(string.Format("#{0}", gameCanvasName));
             gameCanvas =
                     new CanvasInformation(
-                            (CanvasContext2D) gameCanvasItem[0].As<CanvasElement>().GetContext(Rendering.Render2D),
+                            (CanvasContext2D)gameCanvasItem[0].As<CanvasElement>().GetContext(Rendering.Render2D),
                             gameCanvasItem);
             var uiCanvasItem = jQuery.Select(string.Format("#{0}", uiCanvasName));
             uiCanvas =
                     new CanvasInformation(
-                            (CanvasContext2D) uiCanvasItem[0].As<CanvasElement>().GetContext(Rendering.Render2D), uiCanvasItem);
+                            (CanvasContext2D)uiCanvasItem[0].As<CanvasElement>().GetContext(Rendering.Render2D), uiCanvasItem);
 
             canvasWidth = 0;
             canvasHeight = 0;
@@ -53,16 +53,52 @@ namespace OurSonic
             uiCanvas.DomCanvas.Bind("DOMMouseScroll", handleScroll);
             uiCanvas.DomCanvas.Bind("mousewheel", handleScroll);
             uiCanvas.DomCanvas.Bind("contextmenu", (e) => e.PreventDefault());
+            bool dontPress = false;
+            Document.AddEventListener("keydown", e =>
+            {
+                //if (sonicManager.CurrentGameState == GameState.Editing)
+                dontPress = sonicManager.UIManager.OnKeyDown(e);
+            }, true);
+            Document.AddEventListener("keyup", e =>
+            {
+                //if (sonicManager.CurrentGameState == GameState.Editing)
+                dontPress = false;
+            }, true);
 
-            jQuery.Document.Keydown(e => {
-                                        if (sonicManager.CurrentGameState == GameState.Editing)
-                                            sonicManager.UIManager.OnKeyDown(e);
-                                    });
+            Document.AddEventListener("onkeydown", e =>
+            {
+                //if (sonicManager.CurrentGameState == GameState.Editing)
+                dontPress = sonicManager.UIManager.OnKeyDown(e);
+            }, true);
+            Document.AddEventListener("onkeyup", e =>
+            {
+                //if (sonicManager.CurrentGameState == GameState.Editing)
+                dontPress = false;
+            }, true);
 
-            KeyboardJS.Instance().Bind.Key("f", () => { sonicManager.ShowHeightMap = !sonicManager.ShowHeightMap; }, () => { });
+/*
+
+            jQuery.Document.Keydown(e =>
+            {
+                //if (sonicManager.CurrentGameState == GameState.Editing)
+                dontPress = sonicManager.UIManager.OnKeyDown(e);
+            });
+
+            jQuery.Document.Keyup(e =>
+            {
+                dontPress = false;
+            });
+*/
+
+            KeyboardJS.Instance().Bind.Key("f", () => {
+                if (dontPress) return;
+                sonicManager.ShowHeightMap = !sonicManager.ShowHeightMap;
+                                                }, () => { });
 
             KeyboardJS.Instance().Bind.Key("o",
-                                           () => {
+                                           () =>
+                                           {
+                                               if (dontPress) return;
                                                if (sonicManager.CurrentGameState == GameState.Playing)
                                                    sonicManager.InHaltMode = !sonicManager.InHaltMode;
                                            },
@@ -71,18 +107,19 @@ namespace OurSonic
             client = SocketIOClient.Connect("50.116.22.241:8998");
 
             client.On<DataObject<string>>("SonicLevel",
-                                          data => {
+                                          data =>
+                                          {
                                               sonicManager.Load(data.Data);
 
                                               sonicManager.WindowLocation.X = 0;
                                               sonicManager.WindowLocation.Y = 0;
                                               sonicManager.BigWindowLocation.X =
-                                                      (int) ( sonicManager.WindowLocation.X - sonicManager.WindowLocation.Width * 0.2 );
+                                                      (int)(sonicManager.WindowLocation.X - sonicManager.WindowLocation.Width * 0.2);
                                               sonicManager.BigWindowLocation.Y =
-                                                      (int) ( sonicManager.WindowLocation.Y - sonicManager.WindowLocation.Height * 0.2 );
+                                                      (int)(sonicManager.WindowLocation.Y - sonicManager.WindowLocation.Height * 0.2);
 
-                                              sonicManager.BigWindowLocation.Width = (int) ( sonicManager.WindowLocation.Width * 1.8 );
-                                              sonicManager.BigWindowLocation.Height = (int) ( sonicManager.WindowLocation.Height * 1.8 );
+                                              sonicManager.BigWindowLocation.Width = (int)(sonicManager.WindowLocation.Width * 1.8);
+                                              sonicManager.BigWindowLocation.Height = (int)(sonicManager.WindowLocation.Height * 1.8);
                                               sonicManager.ClearCache();
 
                                               if (sonicManager.CurrentGameState == GameState.Playing)
@@ -92,44 +129,55 @@ namespace OurSonic
             client.On<DataObject<KeyValuePair<string, string>[]>>("GetObjects.Response", data => { sonicManager.loadObjects(data.Data); }
                     );
 
-            KeyboardJS.Instance().Bind.Key("2", () => { client.Emit("GetSonicLevel", "0"); }, () => { });
+            KeyboardJS.Instance().Bind.Key("2", () => { if (dontPress) return; client.Emit("GetSonicLevel", "0"); }, () => { });
             client.Emit("GetSonicLevel", "0");
 
             KeyboardJS.Instance().Bind.Key("1",
-                                           () => {
+                                           () =>
+                                           {
+                                               if (dontPress) return;
                                                sonicManager.IndexedPalette++;
                                                sonicManager.ClearCache();
                                            },
                                            () => { });
 
             KeyboardJS.Instance().Bind.Key("q",
-                                           () => { runGame(); },
+                                           () => { if (dontPress) return; runGame(); },
                                            () => { });
 
             KeyboardJS.Instance().Bind.Key("p",
-                                           () => {
+                                           () =>
+                                           {
+                                               if (dontPress) return;
                                                if (sonicManager.CurrentGameState == GameState.Playing)
                                                    if (sonicManager.InHaltMode) sonicManager.waitingForTickContinue = false;
                                            },
                                            () => { });
 
             KeyboardJS.Instance().Bind.Key("h",
-                                           () => {
+                                           () =>
+                                           {
+                                               if (dontPress) return;
                                                if (sonicManager.CurrentGameState == GameState.Playing)
                                                    sonicManager.SonicToon.Hit(sonicManager.SonicToon.X, sonicManager.SonicToon.Y);
                                            },
                                            () => { });
 
             KeyboardJS.Instance().Bind.Key("c",
-                                           () => {
+                                           () =>
+                                           {
+                                               if (dontPress) return;
                                                if (sonicManager.CurrentGameState == GameState.Playing)
                                                    sonicManager.SonicToon.Debug();
                                            },
                                            () => { });
 
             KeyboardJS.Instance().Bind.Key("up",
-                                           () => {
-                                               switch (sonicManager.CurrentGameState) {
+                                           () =>
+                                           {
+                                               if (dontPress) return;
+                                               switch (sonicManager.CurrentGameState)
+                                               {
                                                    case GameState.Playing:
                                                        sonicManager.SonicToon.PressUp();
                                                        break;
@@ -140,8 +188,10 @@ namespace OurSonic
                                                        break;
                                                }
                                            },
-                                           () => {
-                                               switch (sonicManager.CurrentGameState) {
+                                           () =>
+                                           {
+                                               switch (sonicManager.CurrentGameState)
+                                               {
                                                    case GameState.Playing:
                                                        sonicManager.SonicToon.ReleaseUp();
                                                        break;
@@ -151,8 +201,11 @@ namespace OurSonic
                                            });
 
             KeyboardJS.Instance().Bind.Key("down",
-                                           () => {
-                                               switch (sonicManager.CurrentGameState) {
+                                           () =>
+                                           {
+                                               if (dontPress) return;
+                                               switch (sonicManager.CurrentGameState)
+                                               {
                                                    case GameState.Playing:
                                                        sonicManager.SonicToon.PressCrouch();
                                                        break;
@@ -163,8 +216,10 @@ namespace OurSonic
                                                        break;
                                                }
                                            },
-                                           () => {
-                                               switch (sonicManager.CurrentGameState) {
+                                           () =>
+                                           {
+                                               switch (sonicManager.CurrentGameState)
+                                               {
                                                    case GameState.Playing:
                                                        sonicManager.SonicToon.ReleaseCrouch();
                                                        break;
@@ -174,8 +229,11 @@ namespace OurSonic
                                            });
 
             KeyboardJS.Instance().Bind.Key("left",
-                                           () => {
-                                               switch (sonicManager.CurrentGameState) {
+                                           () =>
+                                           {
+                                               if (dontPress) return;
+                                               switch (sonicManager.CurrentGameState)
+                                               {
                                                    case GameState.Playing:
                                                        sonicManager.SonicToon.PressLeft();
                                                        break;
@@ -185,8 +243,10 @@ namespace OurSonic
                                                        break;
                                                }
                                            },
-                                           () => {
-                                               switch (sonicManager.CurrentGameState) {
+                                           () =>
+                                           {
+                                               switch (sonicManager.CurrentGameState)
+                                               {
                                                    case GameState.Playing:
                                                        sonicManager.SonicToon.ReleaseLeft();
                                                        break;
@@ -196,8 +256,11 @@ namespace OurSonic
                                            });
 
             KeyboardJS.Instance().Bind.Key("right",
-                                           () => {
-                                               switch (sonicManager.CurrentGameState) {
+                                           () =>
+                                           {
+                                               if (dontPress) return;
+                                               switch (sonicManager.CurrentGameState)
+                                               {
                                                    case GameState.Playing:
                                                        sonicManager.SonicToon.PressRight();
                                                        break;
@@ -207,8 +270,10 @@ namespace OurSonic
                                                        break;
                                                }
                                            },
-                                           () => {
-                                               switch (sonicManager.CurrentGameState) {
+                                           () =>
+                                           {
+                                               switch (sonicManager.CurrentGameState)
+                                               {
                                                    case GameState.Playing:
                                                        sonicManager.SonicToon.ReleaseRight();
                                                        break;
@@ -218,8 +283,11 @@ namespace OurSonic
                                            });
 
             KeyboardJS.Instance().Bind.Key("space",
-                                           () => {
-                                               switch (sonicManager.CurrentGameState) {
+                                           () =>
+                                           {
+                                               if (dontPress) return;
+                                               switch (sonicManager.CurrentGameState)
+                                               {
                                                    case GameState.Playing:
                                                        sonicManager.SonicToon.PressJump();
 
@@ -228,8 +296,10 @@ namespace OurSonic
                                                        break;
                                                }
                                            },
-                                           () => {
-                                               switch (sonicManager.CurrentGameState) {
+                                           () =>
+                                           {
+                                               switch (sonicManager.CurrentGameState)
+                                               {
                                                    case GameState.Playing:
                                                        sonicManager.SonicToon.ReleaseJump();
                                                        break;
@@ -238,7 +308,9 @@ namespace OurSonic
                                                }
                                            });
 
-            KeyboardJS.Instance().Bind.Key("e", () => { sonicManager.SonicLevel.CurHeightMap = !sonicManager.SonicLevel.CurHeightMap; }, () => { });
+            KeyboardJS.Instance().Bind.Key("e", () => {
+                                                    if (dontPress) return; sonicManager.SonicLevel.CurHeightMap = !sonicManager.SonicLevel.CurHeightMap;
+                                                }, () => { });
 
             fullscreenMode = true;
 
@@ -255,7 +327,8 @@ namespace OurSonic
 
         private void runGame()
         {
-            switch (sonicManager.CurrentGameState) {
+            switch (sonicManager.CurrentGameState)
+            {
                 case GameState.Playing:
                     sonicManager.CurrentGameState = GameState.Editing;
                     sonicManager.WindowLocation = Constants.DefaultWindowLocation(sonicManager.CurrentGameState, gameCanvas, sonicManager.Scale);
@@ -273,14 +346,15 @@ namespace OurSonic
         {
             jQueryEvent.PreventDefault();
 
-            int j = jQueryEvent.Me().detail ? jQueryEvent.Me().detail * ( -120 ) : jQueryEvent.Me().wheelDelta;
+            int j = jQueryEvent.Me().detail ? jQueryEvent.Me().detail * (-120) : jQueryEvent.Me().wheelDelta;
+            /*
+                        double rate = j < 0 ? -1 : 1;
+                        sonicManager.Scale.X += Script.Reinterpret<int>(rate);
+                        sonicManager.Scale.Y += Script.Reinterpret<int>(rate);
+                        sonicManager.ClearCache();
 
-            double rate = j < 0 ? -1 : 1;
-            sonicManager.Scale.X += Script.Reinterpret<int>(rate);
-            sonicManager.Scale.Y += Script.Reinterpret<int>(rate);
-            sonicManager.ClearCache();
+                        sonicManager.PreloadSprites(sonicManager.Scale, () => { }, (a) => { });*/
 
-            sonicManager.PreloadSprites(sonicManager.Scale, () => { }, (a) => { });
             sonicManager.UIManager.OnMouseScroll(jQueryEvent);
         }
 
@@ -324,15 +398,15 @@ namespace OurSonic
                                                          canvasHeight / 224 / sonicManager.Scale.Y);
 
             gameCanvas.DomCanvas.Attribute("width",
-                                           ( sonicManager.WindowLocation.Width *
-                                             ( sonicManager.CurrentGameState == GameState.Playing
+                                           (sonicManager.WindowLocation.Width *
+                                             (sonicManager.CurrentGameState == GameState.Playing
                                                        ? sonicManager.Scale.X * sonicManager.RealScale.X
-                                                       : 1 ) ).ToString());
+                                                       : 1)).ToString());
             gameCanvas.DomCanvas.Attribute("height",
-                                           ( sonicManager.WindowLocation.Height *
-                                             ( sonicManager.CurrentGameState == GameState.Playing
+                                           (sonicManager.WindowLocation.Height *
+                                             (sonicManager.CurrentGameState == GameState.Playing
                                                        ? sonicManager.Scale.Y * sonicManager.RealScale.Y
-                                                       : 1 ) ).ToString());
+                                                       : 1)).ToString());
 
             var screenOffset = sonicManager.CurrentGameState == GameState.Playing
                                        ? new Point(canvasWidth / 2 -
@@ -348,7 +422,7 @@ namespace OurSonic
 
         public void Clear(CanvasInformation canv)
         {
-            canv.DomCanvas[0].Me().width = ( gameCanvas.DomCanvas.GetWidth() );
+            canv.DomCanvas[0].Me().width = (gameCanvas.DomCanvas.GetWidth());
         }
 
         public void GameDraw()

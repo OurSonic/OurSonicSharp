@@ -220,6 +220,7 @@ namespace OurSonic.UIManager.Areas
                                                                                                         sc.Style.Visibility = "visible";
                                                                                                 },
                                                                                        _Hide = () => {
+
                                                                                                    var sc = objectFrameworkArea.Data.Editor.GetScrollerElement();
                                                                                                    objectFrameworkArea.Data.Editor.GetInputField().Blur();
                                                                                                    //            Engine.uiCanvasItem.focus();

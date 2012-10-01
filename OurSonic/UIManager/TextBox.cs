@@ -3,6 +3,7 @@ using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonicModels.Common;
+using jQueryApi;
 namespace OurSonic.UIManager
 {
     public class TextBox : Element
@@ -59,10 +60,10 @@ namespace OurSonic.UIManager
             base.Construct();
         }
 
-        public override void OnKeyDown(object e2)
+        public override bool OnKeyDown(ElementEvent e2)
         {
             var e = e2.Me();
-            if (e.altKey) return;
+            if (e.altKey) return false;
             if (Focused) {
                 if (e.ctrlKey) {
                     if (e.keyCode == 65) {
@@ -140,7 +141,9 @@ namespace OurSonic.UIManager
                     TextChanged();
 
                 e.preventDefault();
+                return true;
             }
+            return false;
         }
 
         public override bool OnClick(Pointer e)

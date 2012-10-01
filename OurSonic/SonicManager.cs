@@ -70,6 +70,8 @@ namespace OurSonic
         public SpriteCache SpriteCache { get; set; }
         [IntrinsicProperty]
         protected SpriteLoader SpriteLoader { get; set; }
+        [IntrinsicProperty]
+        public bool TypingInEditor { get; set; }
         protected string Status
         {
             get { return myStatus; }
@@ -79,7 +81,6 @@ namespace OurSonic
                 myStatus = value;
             }
         }
-        public bool TypingInEditor { get; set; }
 
         static SonicManager()
         {

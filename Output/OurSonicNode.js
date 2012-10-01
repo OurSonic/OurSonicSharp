@@ -55,7 +55,7 @@ OurSonicNode.Server = function() {
 	this.$fs.readdir(levelsDir, Function.mkdel(this, function(err, files) {
 		for (var i = 0; i < files.length; i++) {
 			var i1 = { $: i };
-			fileNames[i1.$] = files[i];
+			fileNames[i1.$] = files[i].replaceAll('.min.js', '');
 			console.log(fileNames[i1.$] + ' loaded');
 			this.$fs.readFile(levelsDir + files[i], 'utf8', Function.mkdel({ i1: i1 }, function(er, file) {
 				fileData[this.i1.$] = file;

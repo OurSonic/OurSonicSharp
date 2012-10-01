@@ -3045,16 +3045,64 @@ OurSonic.SonicEngine = function() {
 	this.$uiCanvas.domCanvas.bind('contextmenu', function(e) {
 		e.preventDefault();
 	});
-	$(document).keydown(Function.mkdel(this, function(e1) {
-		if (this.sonicManager.currentGameState === 1) {
-			this.sonicManager.uiManager.onKeyDown(e1);
-		}
-	}));
+	var dontPress = false;
+	document.addEventListener('keydown', Function.mkdel(this, function(e1) {
+		//if (sonicManager.CurrentGameState == GameState.Editing)
+		dontPress = this.sonicManager.uiManager.onKeyDown(e1);
+	}), true);
+	document.addEventListener('keyup', function(e2) {
+		//if (sonicManager.CurrentGameState == GameState.Editing)
+		dontPress = false;
+	}, true);
+	document.addEventListener('onkeydown', Function.mkdel(this, function(e3) {
+		//if (sonicManager.CurrentGameState == GameState.Editing)
+		dontPress = this.sonicManager.uiManager.onKeyDown(e3);
+	}), true);
+	document.addEventListener('onkeyup', function(e4) {
+		//if (sonicManager.CurrentGameState == GameState.Editing)
+		dontPress = false;
+	}, true);
+	//
+	//
+	//            jQuery.Document.Keydown(e =>
+	//
+	//
+	//            {
+	//
+	//
+	//            //if (sonicManager.CurrentGameState == GameState.Editing)
+	//
+	//
+	//            dontPress = sonicManager.UIManager.OnKeyDown(e);
+	//
+	//
+	//            });
+	//
+	//
+	//            
+	//
+	//
+	//            jQuery.Document.Keyup(e =>
+	//
+	//
+	//            {
+	//
+	//
+	//            dontPress = false;
+	//
+	//
+	//            });
 	KeyboardJS.bind.key('f', Function.mkdel(this, function() {
+		if (dontPress) {
+			return;
+		}
 		this.sonicManager.showHeightMap = !this.sonicManager.showHeightMap;
 	}), function() {
 	});
 	KeyboardJS.bind.key('o', Function.mkdel(this, function() {
+		if (dontPress) {
+			return;
+		}
 		if (this.sonicManager.currentGameState === 0) {
 			this.sonicManager.inHaltMode = !this.sonicManager.inHaltMode;
 		}
@@ -3080,20 +3128,32 @@ OurSonic.SonicEngine = function() {
 		this.sonicManager.loadObjects(data1.Data);
 	}));
 	KeyboardJS.bind.key('2', Function.mkdel(this, function() {
+		if (dontPress) {
+			return;
+		}
 		this.client.emit('GetSonicLevel', '0');
 	}), function() {
 	});
 	this.client.emit('GetSonicLevel', '0');
 	KeyboardJS.bind.key('1', Function.mkdel(this, function() {
+		if (dontPress) {
+			return;
+		}
 		this.sonicManager.indexedPalette++;
 		this.sonicManager.clearCache();
 	}), function() {
 	});
 	KeyboardJS.bind.key('q', Function.mkdel(this, function() {
+		if (dontPress) {
+			return;
+		}
 		this.$runGame();
 	}), function() {
 	});
 	KeyboardJS.bind.key('p', Function.mkdel(this, function() {
+		if (dontPress) {
+			return;
+		}
 		if (this.sonicManager.currentGameState === 0) {
 			if (this.sonicManager.inHaltMode) {
 				this.sonicManager.waitingForTickContinue = false;
@@ -3102,18 +3162,27 @@ OurSonic.SonicEngine = function() {
 	}), function() {
 	});
 	KeyboardJS.bind.key('h', Function.mkdel(this, function() {
+		if (dontPress) {
+			return;
+		}
 		if (this.sonicManager.currentGameState === 0) {
 			this.sonicManager.sonicToon.hit(this.sonicManager.sonicToon.x, this.sonicManager.sonicToon.y);
 		}
 	}), function() {
 	});
 	KeyboardJS.bind.key('c', Function.mkdel(this, function() {
+		if (dontPress) {
+			return;
+		}
 		if (this.sonicManager.currentGameState === 0) {
 			this.sonicManager.sonicToon.debug();
 		}
 	}), function() {
 	});
 	KeyboardJS.bind.key('up', Function.mkdel(this, function() {
+		if (dontPress) {
+			return;
+		}
 		switch (this.sonicManager.currentGameState) {
 			case 0: {
 				this.sonicManager.sonicToon.pressUp();
@@ -3137,6 +3206,9 @@ OurSonic.SonicEngine = function() {
 		}
 	}));
 	KeyboardJS.bind.key('down', Function.mkdel(this, function() {
+		if (dontPress) {
+			return;
+		}
 		switch (this.sonicManager.currentGameState) {
 			case 0: {
 				this.sonicManager.sonicToon.pressCrouch();
@@ -3160,6 +3232,9 @@ OurSonic.SonicEngine = function() {
 		}
 	}));
 	KeyboardJS.bind.key('left', Function.mkdel(this, function() {
+		if (dontPress) {
+			return;
+		}
 		switch (this.sonicManager.currentGameState) {
 			case 0: {
 				this.sonicManager.sonicToon.pressLeft();
@@ -3183,6 +3258,9 @@ OurSonic.SonicEngine = function() {
 		}
 	}));
 	KeyboardJS.bind.key('right', Function.mkdel(this, function() {
+		if (dontPress) {
+			return;
+		}
 		switch (this.sonicManager.currentGameState) {
 			case 0: {
 				this.sonicManager.sonicToon.pressRight();
@@ -3206,6 +3284,9 @@ OurSonic.SonicEngine = function() {
 		}
 	}));
 	KeyboardJS.bind.key('space', Function.mkdel(this, function() {
+		if (dontPress) {
+			return;
+		}
 		switch (this.sonicManager.currentGameState) {
 			case 0: {
 				this.sonicManager.sonicToon.pressJump();
@@ -3227,14 +3308,17 @@ OurSonic.SonicEngine = function() {
 		}
 	}));
 	KeyboardJS.bind.key('e', Function.mkdel(this, function() {
+		if (dontPress) {
+			return;
+		}
 		this.sonicManager.sonicLevel.curHeightMap = !this.sonicManager.sonicLevel.curHeightMap;
 	}), function() {
 	});
 	this.$fullscreenMode = true;
-	window.addEventListener('resize', Function.mkdel(this, function(e2) {
+	window.addEventListener('resize', Function.mkdel(this, function(e5) {
 		this.resizeCanvas();
 	}));
-	$(document).resize(Function.mkdel(this, function(e3) {
+	$(document).resize(Function.mkdel(this, function(e6) {
 		this.resizeCanvas();
 	}));
 	this.sonicManager = new OurSonic.SonicManager(this, this.$gameCanvas, Function.mkdel(this, this.resizeCanvas));
@@ -3264,13 +3348,18 @@ OurSonic.SonicEngine.prototype = {
 	$handleScroll: function(jQueryEvent) {
 		jQueryEvent.preventDefault();
 		var j = ss.Nullable.unbox(Type.cast((!!jQueryEvent.detail ? (jQueryEvent.detail * -120) : jQueryEvent.wheelDelta), ss.Int32));
-		var rate = ((j < 0) ? -1 : 1);
-		this.sonicManager.scale.x += rate;
-		this.sonicManager.scale.y += rate;
-		this.sonicManager.clearCache();
-		this.sonicManager.preloadSprites(this.sonicManager.scale, function() {
-		}, function(a) {
-		});
+		//
+		//                        double rate = j < 0 ? -1 : 1;
+		//
+		//                        sonicManager.Scale.X += Script.Reinterpret<int>(rate);
+		//
+		//                        sonicManager.Scale.Y += Script.Reinterpret<int>(rate);
+		//
+		//                        sonicManager.ClearCache();
+		//
+		//                        
+		//
+		//                        sonicManager.PreloadSprites(sonicManager.Scale, () => { }, (a) => { });
 		this.sonicManager.uiManager.onMouseScroll(jQueryEvent);
 	},
 	$canvasMouseMove: function(queryEvent) {
@@ -3399,7 +3488,7 @@ OurSonic.SonicManager = function(engine, gameCanvas, resize) {
 	this.loading = false;
 	this.spriteCache = null;
 	this.spriteLoader = null;
-	this.$1$TypingInEditorField = false;
+	this.typingInEditor = false;
 	this.cachedObjects = null;
 	OurSonic.SonicManager.instance = this;
 	//            SonicToon = new Sonic();
@@ -3449,12 +3538,6 @@ OurSonic.SonicManager.prototype = {
 	set_status: function(value) {
 		OurSonic.UIManager.UIManager.updateTitle(value);
 		this.$myStatus = value;
-	},
-	get_typingInEditor: function() {
-		return this.$1$TypingInEditorField;
-	},
-	set_typingInEditor: function(value) {
-		this.$1$TypingInEditorField = value;
 	},
 	onClick: function(elementEvent) {
 		var e = OurSonic.Point.$ctor1(ss.Int32.div(ss.Int32.div(ss.Int32.div(elementEvent.clientX, this.scale.x), this.realScale.x), this.windowLocation.x), ss.Int32.div(ss.Int32.div(elementEvent.clientY, this.scale.y), this.realScale.y) + this.windowLocation.y);
@@ -5156,10 +5239,6 @@ OurSonic.UIManager.Areas.ColorEditingArea = function(x, y, width, height) {
 	this.set_editable(true);
 };
 OurSonic.UIManager.Areas.ColorEditingArea.prototype = {
-	init: function(frame) {
-		this.set_frame(frame);
-		this.set_editor(new OurSonic.UIManager.Areas.Editor(frame, this.get_showOffset()));
-	},
 	get_frame: function() {
 		return this.$3$FrameField;
 	},
@@ -5207,6 +5286,28 @@ OurSonic.UIManager.Areas.ColorEditingArea.prototype = {
 	},
 	set_scale: function(value) {
 		this.$3$ScaleField = value;
+	},
+	get_clicking: function() {
+		return this.$3$ClickingField;
+	},
+	set_clicking: function(value) {
+		this.$3$ClickingField = value;
+	},
+	get_clickHandled: function() {
+		return this.$3$ClickHandledField;
+	},
+	set_clickHandled: function(value) {
+		this.$3$ClickHandledField = value;
+	},
+	get_lastPosition: function() {
+		return this.$3$LastPositionField;
+	},
+	set_lastPosition: function(value) {
+		this.$3$LastPositionField = value;
+	},
+	init: function(frame) {
+		this.set_frame(frame);
+		this.set_editor(new OurSonic.UIManager.Areas.Editor(frame, this.get_showOffset()));
 	},
 	onClick: function(e) {
 		if (!this.visible) {
@@ -5273,24 +5374,6 @@ OurSonic.UIManager.Areas.ColorEditingArea.prototype = {
 			}
 		}
 		return OurSonic.UIManager.Panel.prototype.onMouseUp.call(this, e);
-	},
-	get_clicking: function() {
-		return this.$3$ClickingField;
-	},
-	set_clicking: function(value) {
-		this.$3$ClickingField = value;
-	},
-	get_clickHandled: function() {
-		return this.$3$ClickHandledField;
-	},
-	set_clickHandled: function(value) {
-		this.$3$ClickHandledField = value;
-	},
-	get_lastPosition: function() {
-		return this.$3$LastPositionField;
-	},
-	set_lastPosition: function(value) {
-		this.$3$LastPositionField = value;
 	},
 	draw: function(canv) {
 		OurSonic.UIManager.Panel.prototype.draw.call(this, canv);
@@ -6007,10 +6090,10 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 					hlLine = this.objectFrameworkArea.get_data().editor.setLineClass(this.objectFrameworkArea.get_data().editor.getCursor().line, 'activeline');
 				}),
 				onFocus: function(editor) {
-					OurSonic.SonicManager.instance.set_typingInEditor(true);
+					OurSonic.SonicManager.instance.typingInEditor = true;
 				},
 				onBlur: function(editor1) {
-					OurSonic.SonicManager.instance.set_typingInEditor(false);
+					OurSonic.SonicManager.instance.typingInEditor = false;
 				}
 			};
 			this.objectFrameworkArea.get_data().editor = CodeMirror.fromTextArea(this.objectFrameworkArea.get_data().codeMirror, codeMirrorOptions);
@@ -6923,6 +7006,30 @@ OurSonic.UIManager.Areas.PaletteArea.prototype = {
 	set_clickHandled: function(value) {
 		this.$3$ClickHandledField = value;
 	},
+	get_showCurrent: function() {
+		return this.$3$ShowCurrentField;
+	},
+	set_showCurrent: function(value) {
+		this.$3$ShowCurrentField = value;
+	},
+	get_wide: function() {
+		return this.$3$WideField;
+	},
+	set_wide: function(value) {
+		this.$3$WideField = value;
+	},
+	get_selectedIndex: function() {
+		return this.$3$SelectedIndexField;
+	},
+	set_selectedIndex: function(value) {
+		this.$3$SelectedIndexField = value;
+	},
+	get_clicking: function() {
+		return this.$3$ClickingField;
+	},
+	set_clicking: function(value) {
+		this.$3$ClickingField = value;
+	},
 	onClick: function(e) {
 		if (!this.visible) {
 			return false;
@@ -7003,12 +7110,6 @@ OurSonic.UIManager.Areas.PaletteArea.prototype = {
 		}
 		canv.restore();
 	},
-	get_showCurrent: function() {
-		return this.$3$ShowCurrentField;
-	},
-	set_showCurrent: function(value) {
-		this.$3$ShowCurrentField = value;
-	},
 	construct: function() {
 		OurSonic.UIManager.Panel.prototype.construct.call(this);
 	},
@@ -7025,24 +7126,6 @@ OurSonic.UIManager.Areas.PaletteArea.prototype = {
 			this.height = this.get_scale().y * 2;
 		}
 		this.set_$palette(palette);
-	},
-	get_wide: function() {
-		return this.$3$WideField;
-	},
-	set_wide: function(value) {
-		this.$3$WideField = value;
-	},
-	get_selectedIndex: function() {
-		return this.$3$SelectedIndexField;
-	},
-	set_selectedIndex: function(value) {
-		this.$3$SelectedIndexField = value;
-	},
-	get_clicking: function() {
-		return this.$3$ClickingField;
-	},
-	set_clicking: function(value) {
-		this.$3$ClickingField = value;
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
@@ -7102,6 +7185,18 @@ OurSonic.UIManager.Areas.PieceLayoutEditor.prototype = {
 	set_pieceLayout: function(value) {
 		this.$2$PieceLayoutField = value;
 	},
+	get_lastPosition: function() {
+		return this.$2$LastPositionField;
+	},
+	set_lastPosition: function(value) {
+		this.$2$LastPositionField = value;
+	},
+	get_clickHandled: function() {
+		return this.$2$ClickHandledField;
+	},
+	set_clickHandled: function(value) {
+		this.$2$ClickHandledField = value;
+	},
 	init: function(pieceLayout) {
 		this.set_pieceLayout(pieceLayout);
 		this.width = this.get_size().x;
@@ -7141,18 +7236,6 @@ OurSonic.UIManager.Areas.PieceLayoutEditor.prototype = {
 			this.set_lastPosition(OurSonic.Point.$ctor1(e.x, e.y));
 		}
 		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
-	},
-	get_lastPosition: function() {
-		return this.$2$LastPositionField;
-	},
-	set_lastPosition: function(value) {
-		this.$2$LastPositionField = value;
-	},
-	get_clickHandled: function() {
-		return this.$2$ClickHandledField;
-	},
-	set_clickHandled: function(value) {
-		this.$2$ClickHandledField = value;
 	},
 	draw: function(canv) {
 		if (!this.visible) {
@@ -7662,6 +7745,7 @@ OurSonic.UIManager.Element.prototype = {
 		return $t1;
 	},
 	onKeyDown: function(e) {
+		return false;
 	},
 	focus: function(e) {
 		this.focused = true;
@@ -8149,19 +8233,22 @@ OurSonic.UIManager.Panel.prototype = {
 	onKeyDown: function(e) {
 		OurSonic.UIManager.Element.prototype.onKeyDown.call(this, e);
 		if (!this.visible) {
-			return;
+			return false;
 		}
 		var ch = this.controls;
 		var $t1 = ch.getEnumerator();
 		try {
 			while ($t1.moveNext()) {
 				var t = $t1.get_current();
-				t.onKeyDown(e);
+				if (t.onKeyDown(e)) {
+					return true;
+				}
 			}
 		}
 		finally {
 			$t1.dispose();
 		}
+		return false;
 	},
 	onClick: function(e) {
 		var e2 = OurSonic.UIManager.Pointer.$ctor(0, 0, 0, false);
@@ -8589,7 +8676,7 @@ OurSonic.UIManager.TextBox.prototype = {
 	onKeyDown: function(e2) {
 		var e = e2;
 		if (!!e.altKey) {
-			return;
+			return false;
 		}
 		if (this.focused) {
 			if (!!e.ctrlKey) {
@@ -8683,7 +8770,9 @@ OurSonic.UIManager.TextBox.prototype = {
 				this.textChanged();
 			}
 			e.preventDefault();
+			return true;
 		}
+		return false;
 	},
 	onClick: function(e) {
 		if (!this.visible) {
@@ -9124,12 +9213,15 @@ OurSonic.UIManager.UIManager.prototype = {
 		try {
 			while ($t1.moveNext()) {
 				var are = $t1.get_current();
-				are.onKeyDown(jQueryEvent);
+				if (are.onKeyDown(jQueryEvent)) {
+					return true;
+				}
 			}
 		}
 		finally {
 			$t1.dispose();
 		}
+		return false;
 	},
 	addArea: function(uiArea) {
 		uiArea.construct();

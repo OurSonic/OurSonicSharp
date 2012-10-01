@@ -167,11 +167,14 @@ namespace OurSonic.UIManager
             return false;
         }
 
-        public void OnKeyDown(jQueryEvent jQueryEvent)
+        public bool OnKeyDown(ElementEvent jQueryEvent)
         {
             foreach (var are in UIAreas) {
-                are.OnKeyDown(jQueryEvent);
+                if (are.OnKeyDown(jQueryEvent)) {
+                    return true;
+                }
             }
+            return false;
         }
 
         public void AddArea(UIArea uiArea)

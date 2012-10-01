@@ -1,6 +1,8 @@
 using System;
+using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using jQueryApi;
 namespace OurSonic.UIManager
 {
     public class Element
@@ -68,7 +70,10 @@ namespace OurSonic.UIManager
             return new ForceRedrawing {Redraw = false, ClearCache = false};
         }
 
-        public virtual void OnKeyDown(object e) {}
+        public virtual bool OnKeyDown(ElementEvent e)
+        {
+            return false;
+        }
 
         public virtual void Focus(Pointer e)
         {

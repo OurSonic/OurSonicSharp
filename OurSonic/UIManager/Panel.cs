@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using jQueryApi;
 namespace OurSonic.UIManager
 {
     public class Panel<T> : Panel
@@ -80,15 +82,18 @@ namespace OurSonic.UIManager
             }
         }
 
-        public override void OnKeyDown(object e)
+        public override bool OnKeyDown(ElementEvent e)
         {
             base.OnKeyDown(e);
-            if (!Visible) return;
+            if (!Visible) return false;
 
             var ch = Controls;
             foreach (Element t in ch) {
-                t.OnKeyDown(e);
+                if (t.OnKeyDown(e)) {
+                    return true;
+                }
             }
+            return false;
         }
 
         public override bool OnClick(Pointer e)

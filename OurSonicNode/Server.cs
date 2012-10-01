@@ -30,10 +30,10 @@ namespace OurSonicNode
             fs.Readdir(levelsDir, (err, files) => {
                                       for (int i = 0; i < files.Length; i++) {
                                           int i1 = i;
-                                          fileNames[i1] = files[i];
+                                          fileNames[i1] = files[i].Replace(".min.js", "");
                                           Global.Console.Log(fileNames[i1] + " loaded");
-                                          
-                                          fs.ReadFile(levelsDir + files[i], "utf8", (er, file) => { fileData[i1] = file; });
+
+                                          fs.ReadFile(levelsDir + files[i] , "utf8", (er, file) => { fileData[i1] = file; });
                                       }
                                   });
             io.Set("log level", 1);
