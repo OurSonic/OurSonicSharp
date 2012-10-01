@@ -7,10 +7,16 @@ namespace OurSonic.UIManager
     {
         [IntrinsicProperty]
         public T Data { get; set; }
-        public Panel(T data,int x, int y, int width, int height)
-            : base(x, y, width, height)
+
+        public Panel(T data, int x, int y, int width, int height)
+                : base(x, y, width, height)
         {
             Data = data;
+        }
+
+        public void Clear()
+        {
+            Controls.Clear();
         }
     }
     public class Panel : Element
@@ -20,10 +26,12 @@ namespace OurSonic.UIManager
         [IntrinsicProperty]
         public bool Outline { get; set; }
         [IntrinsicProperty]
-        public UIArea Area { get; set; }  
+        public UIArea Area { get; set; }
+
         public Panel(int x, int y, int width, int height)
                 : base(x, y)
         {
+            Outline = true;
             Width = width;
             Height = height;
             Controls = new List<Element>();
@@ -184,7 +192,7 @@ namespace OurSonic.UIManager
                 canv.StrokeStyle = "#333";
 
                 var rad = 5;
-                Help.RoundRect(canv, X, Y, Width, Height, rad, true, true);
+                Help.RoundRect(canv, TotalX, TotalY, Width, Height, rad, true, true);
             }
 
             foreach (var t in Controls) {

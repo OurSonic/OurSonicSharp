@@ -79,10 +79,19 @@ OurSonicNode.Server = function() {
 			socket.emit('LoadLevel.Response', new (Type.makeGenericType(OurSonicModels.Common.DataObject$1, [String]))(fileData[fileNames.indexOf(levelName1.Data)]));
 		});
 		socket.on('GetObject', Function.mkdel(this, function(_object) {
-			this.$fs.exists(this.$objDirectory + _object + '.js', Function.mkdel(this, function(er1, exists) {
-				this.$fs.readFile(this.$objDirectory + _object + '.js', 'utf8', function(err1, result) {
-					socket.emit('GetObject.Response', { Data: result });
+			this.$fs.exists(this.$objDirectory + _object.Data + '.js', Function.mkdel(this, function(er1, exists) {
+				this.$fs.readFile(this.$objDirectory + _object.Data + '.js', 'utf8', function(err1, result) {
+					socket.emit('GetObject.Response', new (Type.makeGenericType(OurSonicModels.Common.DataObject$1, [String]))(result));
 				});
+			}));
+		}));
+		socket.on('SaveObject', Function.mkdel(this, function(_object1) {
+			this.$fs.exists(this.$objDirectory + _object1.oldKey + '.js', Function.mkdel(this, function(er2, exists1) {
+				if (exists1) {
+					this.$fs.truncateSync(this.$objDirectory + _object1.oldKey + '.js', 0);
+				}
+				this.$fs.writeFileSync(this.$objDirectory + _object1.key + '.js', _object1.data);
+				socket.emit('SaveObject.Response', { Data: true });
 			}));
 		}));
 		socket.on('GetObjects', Function.mkdel(this, function(_objects) {

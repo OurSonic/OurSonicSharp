@@ -34,6 +34,10 @@ namespace OurSonic.UIManager
                 _curLevelName = value;
             }
         }
+        public UIArea<ColorEditorAreaData> ColorEditorArea { get; set; }
+        public ObjectFrameworkArea ObjectFrameworkArea { get; set; }
+        public UIArea ObjectFrameworkListArea { get; set; }
+        public UIArea<LiveObjectsAreaData> LiveObjectsArea { get; set; }
 
         public UIManager(SonicManager sonicManager, CanvasContext2D mainCanvas, Point scale)
         {
@@ -52,12 +56,12 @@ namespace OurSonic.UIManager
                                   });
 
             new LevelInformationArea(this);
+            new ColorEditorArea(this);
             new ObjectFrameworkArea(this);
             new ObjectFrameworkListArea(this);
             new LiveObjectsArea(this);
         }
 
-        public ColorEditorArea ColorEditorArea { get; set; }
         public bool OnClick(jQueryEvent e)
         {
             var cell = Help.GetCursorPosition(e);

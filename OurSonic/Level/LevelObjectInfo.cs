@@ -155,18 +155,23 @@ namespace OurSonic.Level
             if (Dead || ObjectData.Falsey()) return;
 
             if (ObjectData.PieceLayouts.Count == 0) {
-                canvas.DrawImage(ObjectManager.broken, ( x - ObjectManager.broken.Width / 2 ), ( y - ObjectManager.broken.Height / 2 ),
-                                 ObjectManager.broken.Width * scale.X, ObjectManager.broken.Height * scale.Y);
+                canvas.DrawImage(ObjectManager.broken,
+                                 ( x - ObjectManager.broken.Width / 2 ),
+                                 ( y - ObjectManager.broken.Height / 2 ),
+                                 ObjectManager.broken.Width * scale.X,
+                                 ObjectManager.broken.Height * scale.Y);
                 return;
             }
 
             MainPieceLayout().Draw(canvas, x, y, scale, ObjectData, this, showHeightMap);
-            if (false /* || this.consoleLog*/) {
+            if (ConsoleLog != null) {
                 var gr = GetRect(scale);
                 canvas.Save();
                 canvas.FillStyle = "rgba(228,228,12,0.4)";
                 var wd = 1;
-                canvas.FillRect(gr.X - X + x - ( gr.Width / 2 ) - wd, gr.Y - Y + y - ( gr.Height / 2 ) - wd, gr.Width - ( gr.X - X ) + wd * 2,
+                canvas.FillRect(gr.X - X + x - ( gr.Width / 2 ) - wd,
+                                gr.Y - Y + y - ( gr.Height / 2 ) - wd,
+                                gr.Width - ( gr.X - X ) + wd * 2,
                                 gr.Height - ( gr.Y - Y ) + wd * 2);
                 canvas.Restore();
             }

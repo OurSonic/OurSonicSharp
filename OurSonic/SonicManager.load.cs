@@ -11,9 +11,11 @@ namespace OurSonic
 {
     public partial class SonicManager
     {
+        public JsDictionary<string, LevelObject> cachedObjects;
+
         public void loadObjects(KeyValuePair<string, string>[] objects)
         {
-            var cachedObjects = new JsDictionary<string, LevelObject>();
+            cachedObjects = new JsDictionary<string, LevelObject>();
 
             for (int l = 0; l < SonicLevel.Objects.Count; l++) {
                 var o = SonicLevel.Objects[l].Key;
@@ -337,10 +339,12 @@ namespace OurSonic
             }
 
             var finished = new Action(() => { Loading = false; });
-            PreloadSprites(Scale, () => {
-                                      finished();
-                                      ForceResize();
-                                  }, (s) => { Global.Console.Log("ff " + s); });
+            PreloadSprites(Scale,
+                           () => {
+                               finished();
+                               ForceResize();
+                           },
+                           (s) => { Global.Console.Log("ff " + s); });
             ForceResize();
 
             /* 

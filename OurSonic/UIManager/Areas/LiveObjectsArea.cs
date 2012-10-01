@@ -1,135 +1,133 @@
 using System;
 using System.Collections.Generic;
 using System.Html;
-using System.Runtime.CompilerServices;
-using CodeMirrorLibrary;
 using OurSonic.Level;
 using jQueryApi;
 namespace OurSonic.UIManager.Areas
 {
     public class LiveObjectsArea
     {
-        public LiveObjectsArea(UIManager uiManager) { }
+        public LiveObjectsArea(UIManager uiManager)
+        {
+            var liveObjectsArea = uiManager.LiveObjectsArea = new UIArea<LiveObjectsAreaData>(new LiveObjectsAreaData(), 947, 95, 770, 700) {Closable = true};
+            uiManager.AddArea(liveObjectsArea);
+            liveObjectsArea.AddControl(new TextArea(30, 25, "Live Objects") {Color = "blue"});
+            HScrollBox scl;
+            liveObjectsArea.AddControl(scl = new HScrollBox(20, 60, 85, 8, 85) {BackColor = "rgb(50,150,50)"});
 
+            liveObjectsArea.Data.Populate = (liveObjects) => {
+                                                for (var i = 0; i < scl.Controls.Count; i++) {
+                                                    ( (ImageButton<LivePopulateModel>) scl.Controls[i] ).Data.@checked = false;
+                                                }
 
-        /*     window. LiveObjectsArea = function () {
+                                                foreach (var lo in liveObjects) {
+                                                    var satisfied = false;
+                                                    for (var i = 0; i < scl.Controls.Count; i++) {
+                                                        if (lo.Index == ( (ImageButton<LivePopulateModel>) scl.Controls[i] ).Data.@object.Index) {
+                                                            ( (ImageButton<LivePopulateModel>) scl.Controls[i] ).Data.@checked = true;
+                                                            satisfied = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (!satisfied) {
+                                                        var obj = lo;
 
+                                                        ImageButton<LivePopulateModel> dm = null;
+                                                        ImageButton<LivePopulateModel> imageButton = new ImageButton<LivePopulateModel>(new LivePopulateModel(), 0, 0, 0, 0);
+                                                        imageButton.Text = obj.ObjectData.Description + "(" + obj.ObjectData.Key + ")";
+                                                        imageButton.Image = (canv, x, y) => { obj.Draw(canv, x + dm.Width / 2, y + dm.Height / 2, new Point(1, 1), false); };
+                                                        imageButton.Click = (p) => { liveObjectsArea.Data.DebugConsole.Data.Populate(obj); };
+                                                        scl.AddControl(dm = imageButton);
+                                                        dm.Data.@checked = true;
+                                                        dm.Data.@object = obj;
+                                                    }
+                                                }
+                                                for (var i = scl.Controls.Count - 1; i >= 0; i--) {
+                                                    if (!( (ImageButton<LivePopulateModel>) scl.Controls[i] ).Data.@checked)
+                                                        scl.Controls.RemoveAt(i);
+                                                }
+                                            };
+            liveObjectsArea.AddControl(liveObjectsArea.Data.DebugConsole = new Panel<DebugConsoleData>(new DebugConsoleData(), 20, 200, 730, 450));
 
-    var liveObjectsArea = sonicManager.uiManager.liveObjectsArea = new UiArea(947, 95, 770, 700, sonicManager.uiManager, true);
-    liveObjectsArea.visible = true;
-    sonicManager.uiManager.UIAreas.push(liveObjectsArea);
+            liveObjectsArea.Data.DebugConsole.Data.Populate = (obj) => {
+                                                                  liveObjectsArea.Data.DebugConsole.Clear();
+                                                                  liveObjectsArea.Data.DebugConsole.AddControl(liveObjectsArea.Data.DebugConsole.Data.Watch = new ScrollBox(10, 15, 30, 12, 210) {BackColor = "rgb(50,150,50)"});
 
+                                                                  var o = JsDictionary<string, object>.GetDictionary(obj);
 
-    liveObjectsArea.addControl(new TextArea(30, 25, "Live Objects", sonicManager.uiManager.textFont, "blue"));
-    var scl;
-    liveObjectsArea.addControl(scl = new HScrollBox(20, 60, 85, 8, 85, "rgb(50,150,50)"));
+                                                                  foreach (var pr in o) {
+                                                                      if (true /*!Help.IsFunction(pr.Value)*/) {
+                                                                          KeyValuePair<string, object> pr1 = pr;
+                                                                          liveObjectsArea.Data.DebugConsole.Data.Watch.AddControl(new Button(0, 0, 0, 0, (Func<string>) ( () => pr1.Key + ": " + pr1.Value )) {Color = "rgb(50,190,90)"});
+                                                                      }
+                                                                  }
 
-    liveObjectsArea.populate = function (liveObjects) {
-        for (var i = 0; i < scl.controls.length; i++) {
-            scl.controls[i].checked = false;
+                                                                  for (var l = 0; l < SonicManager.Instance.SonicLevel.Objects.Count; l++) {
+                                                                      SonicManager.Instance.SonicLevel.Objects[l].ConsoleLog = null;
+                                                                  }
+
+                                                                  obj.ConsoleLog = (txt) => {
+                                                                                       liveObjectsArea.Data.DebugConsole.Data.Element.InnerHTML = txt.Join("\n");
+                                                                                       liveObjectsArea.Data.DebugConsole.Data.Element.ScrollTop = liveObjectsArea.Data.DebugConsole.Data.Element.ScrollHeight;
+                                                                                   };
+
+                                                                  liveObjectsArea.Data.DebugConsole.AddControl(new HtmlBox(270, 15) {
+                                                                                                                                            Width = 445,
+                                                                                                                                            Height = 430,
+                                                                                                                                            Init = () => {
+                                                                                                                                                       var gm = liveObjectsArea.Data.DebugConsole.Data.Element;
+                                                                                                                                                       if (gm != null)
+                                                                                                                                                           gm.ParentNode.RemoveChild(gm);
+
+                                                                                                                                                       jQuery.FromElement(Document.Body).Append(
+                                                                                                                                                               @"<textarea id=""console"" name=""console"" style=""position:absolute;width:445px;height:430px;""></textarea>");
+                                                                                                                                                       liveObjectsArea.Data.DebugConsole.Data.Element = Document.GetElementById("console");
+                                                                                                                                                   },
+                                                                                                                                            UpdatePosition = (x, y) => {
+                                                                                                                                                                 var scroller = liveObjectsArea.Data.DebugConsole.Data.Element;
+                                                                                                                                                                 if (scroller.Style.Left == x + "px" && scroller.Style.Top == y + "px")
+                                                                                                                                                                     return;
+                                                                                                                                                                 scroller.Style.Left = x + "px";
+                                                                                                                                                                 scroller.Style.Top = y + "px";
+                                                                                                                                                             },
+                                                                                                                                            _Focus = () => {
+                                                                                                                                                         var sc = liveObjectsArea.Data.DebugConsole.Data.Element;
+                                                                                                                                                         if (sc != null)
+                                                                                                                                                             sc.Style.Visibility = "visible";
+                                                                                                                                                     },
+                                                                                                                                            _Hide = () => {
+                                                                                                                                                        var sc = liveObjectsArea.Data.DebugConsole.Data.Element;
+                                                                                                                                                        sc.Blur();
+                                                                                                                                                        //            Engine.uiCanvasItem.focus();
+                                                                                                                                                        //            document.body.focus();
+
+                                                                                                                                                        //            editor.onBlur();
+
+                                                                                                                                                        if (sc != null) {
+                                                                                                                                                            sc.Style.Left = "-100px";
+                                                                                                                                                            sc.Style.Top = "-100px";
+                                                                                                                                                            sc.Style.Visibility = "hidden";
+                                                                                                                                                        }
+                                                                                                                                                    }
+                                                                                                                                    });
+                                                              };
         }
-
-
-        for (var lo in liveObjects) {
-            var satisfied = false;
-            for (var i = 0; i < scl.controls.length; i++) {
-                if (liveObjects[lo].index == scl.controls[i].object.index) {
-                    scl.controls[i].checked = true;
-                    satisfied = true;
-                    break;
-                }
-            }
-            if (!satisfied) {
-                (function (obj) {
-                    var dm;
-                    scl.addControl(dm = new ImageButton(0, 0, 0, 0, obj.ObjectData.description + "(" + obj.ObjectData.key + ")", "9pt Arial bold", function (canv, x, y) {
-                        obj.draw(canv, x + this.width / 2, y + this.height / 2, { x: 1, y: 1 }, false);
-                    }, function () {
-                        liveObjectsArea.debugConsole.populate(obj);
-                    }));
-                    dm.checked = true;
-                    dm.object = obj;
-
-                })(liveObjects[lo]);
-            }
-        }
-        for (var i = scl.controls.length - 1; i >= 0; i--) {
-            if (!scl.controls[i].checked) {
-                _H.removeAt(scl.controls, i);
-            }
-        }
-    };
-    liveObjectsArea.addControl(liveObjectsArea.debugConsole = new Panel(20, 200, 730, 450, liveObjectsArea));
-
-    liveObjectsArea.debugConsole.populate = function (obj) {
-        liveObjectsArea.debugConsole.empty();
-        liveObjectsArea.debugConsole.addControl(liveObjectsArea.debugConsole.watch = new ScrollBox(10, 15, 30, 12, 210, "rgb(50,150,50)"));
-        for (var pr in obj) {
-            if (!_H.isFunction(obj[pr])) {
-                liveObjectsArea.debugConsole.watch.addControl(new Button(0, 0, 0, 0,
-                    (function (_obj, _pr) {
-                        return function () {
-                            return _pr + ": " + _obj[_pr];
-                        };
-                    })(obj, pr),
-                    "8pt Arial",
-                    "rgb(50,190,90)",
-                    function () {
-
-                    }
-                ));
-            }
-        }
-
-
-        for (var l = 0; l < sonicManager.SonicLevel.Objects.length; l++) {
-            sonicManager.SonicLevel.Objects[l].consoleLog = null;
-        }
-
-        obj.consoleLog = function (txt) {
-            liveObjectsArea.debugConsole.element.innerHTML = txt.lines.join('\n');
-            liveObjectsArea.debugConsole.element.scrollTop = liveObjectsArea.debugConsole.element.scrollHeight;
-        };
-
-
-        liveObjectsArea.debugConsole.addControl(new HtmlBox(270, 15, 445, 430, function () {
-
-            var gm = liveObjectsArea.debugConsole.element;
-            if (gm)
-                gm.parentNode.removeChild(gm);
-
-            $(document.body).append('<textarea id="console" name="console" style="position:absolute;width:445px;height:430px;"></textarea>');
-            liveObjectsArea.debugConsole.element = document.getElementById('console');
-
-        }, function (x, y) {
-
-            var scroller = liveObjectsArea.debugConsole.element;
-            if (scroller.style.left == x + "px" && scroller.style.top == y + "px")
-                return;
-            scroller.style.left = x + "px";
-            scroller.style.top = y + "px";
-        }, function () {
-            var sc = liveObjectsArea.debugConsole.element;
-            if (sc) {
-                sc.style.visibility = "visible";
-            }
-        }, function () {
-            var sc = liveObjectsArea.debugConsole.element;
-            sc.blur();
-            //            Engine.uiCanvasItem.focus();
-            //            document.body.focus();
-
-            //            editor.onBlur();
-
-            if (sc) {
-                sc.style.left = "-100px";
-                sc.style.top = "-100px";
-                sc.style.visibility = "hidden";
-            }
-        }));
-
-    };
-
-}*/
+    }
+    [Serializable]
+    public class LivePopulateModel
+    {
+        public bool @checked { get; set; }
+        public LevelObjectInfo @object { get; set; }
+    }
+    public class DebugConsoleData
+    {
+        public Action<LevelObjectInfo> Populate { get; set; }
+        public ScrollBox Watch { get; set; }
+        public System.Html.Element Element { get; set; }
+    }
+    public class LiveObjectsAreaData
+    {
+        public Panel<DebugConsoleData> DebugConsole { get; set; }
+        public Action<List<LevelObjectInfo>> Populate { get; set; }
     }
 }

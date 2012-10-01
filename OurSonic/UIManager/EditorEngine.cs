@@ -22,69 +22,101 @@ namespace OurSonic.UIManager
         {
             Element = el;
             points = new EditorEnginePoint[] {
-                                                     new EditorEnginePoint(0, 0, 10, "nw-resize", (dv) => {
-                                                                                                      var x = dv.X;
-                                                                                                      var y = dv.Y;
-                                                                                                      Element.Width += x;
-                                                                                                      Element.Height += y;
-                                                                                                      Element.X -= x;
-                                                                                                      Element.Y -= y;
-                                                                                                      Element.ClearCache();
-                                                                                                  }),
-                                                     new EditorEnginePoint(100, 0, 10, "ne-resize", (dv) => {
-                                                                                                        var x = dv.X;
-                                                                                                        var y = dv.Y;
-                                                                                                        Element.Width -= x;
-                                                                                                        Element.Height += y;
-                                                                                                        Element.Y -= y;
-                                                                                                        Element.ClearCache();
-                                                                                                        dv.X = 0;
-                                                                                                    }),
-                                                     new EditorEnginePoint(100, 100, 10, "se-resize", (dv) => {
-                                                                                                          var x = dv.X;
-                                                                                                          var y = dv.Y;
-                                                                                                          Element.Width -= x;
-                                                                                                          Element.Height -= y;
-                                                                                                          Element.ClearCache();
-                                                                                                          dv.X = dv.Y = 0;
-                                                                                                      }),
-                                                     new EditorEnginePoint(0, 100, 10, "sw-resize", (dv) => {
-                                                                                                        var x = dv.X;
-                                                                                                        var y = dv.Y;
-                                                                                                        Element.Width += x;
-                                                                                                        Element.Height -= y;
-                                                                                                        Element.X -= x;
-                                                                                                        Element.ClearCache();
-                                                                                                        dv.Y = 0;
-                                                                                                    }),
-                                                     new EditorEnginePoint(50, 0, 5, "n-resize", (dv) => {
-                                                                                                     var x = dv.X;
-                                                                                                     var y = dv.Y;
-                                                                                                     Element.Height += y;
-                                                                                                     Element.Y -= x;
-                                                                                                     Element.ClearCache();
-                                                                                                 }),
-                                                     new EditorEnginePoint(100, 50, 5, "e-resize", (dv) => {
-                                                                                                       var x = dv.X;
-                                                                                                       var y = dv.Y;
-                                                                                                       Element.Width -= y;
-                                                                                                       Element.ClearCache();
-                                                                                                       dv.X = dv.Y = 0;
-                                                                                                   }),
-                                                     new EditorEnginePoint(50, 100, 5, "n-resize", (dv) => {
-                                                                                                       var x = dv.X;
-                                                                                                       var y = dv.Y;
-                                                                                                       Element.Height -= y;
-                                                                                                       Element.ClearCache();
-                                                                                                       dv.X = dv.Y = 0;
-                                                                                                   }),
-                                                     new EditorEnginePoint(0, 50, 5, "e-resize", (dv) => {
-                                                                                                     var x = dv.X;
-                                                                                                     var y = dv.Y;
-                                                                                                     Element.Width += x;
-                                                                                                     Element.X -= x;
-                                                                                                     Element.ClearCache();
-                                                                                                 }),
+                                                     new EditorEnginePoint(0,
+                                                                           0,
+                                                                           10,
+                                                                           "nw-resize",
+                                                                           (dv) => {
+                                                                               var x = dv.X;
+                                                                               var y = dv.Y;
+                                                                               Element.Width += x;
+                                                                               Element.Height += y;
+                                                                               Element.X -= x;
+                                                                               Element.Y -= y;
+                                                                               Element.ClearCache();
+                                                                           }),
+                                                     new EditorEnginePoint(100,
+                                                                           0,
+                                                                           10,
+                                                                           "ne-resize",
+                                                                           (dv) => {
+                                                                               var x = dv.X;
+                                                                               var y = dv.Y;
+                                                                               Element.Width -= x;
+                                                                               Element.Height += y;
+                                                                               Element.Y -= y;
+                                                                               Element.ClearCache();
+                                                                               dv.X = 0;
+                                                                           }),
+                                                     new EditorEnginePoint(100,
+                                                                           100,
+                                                                           10,
+                                                                           "se-resize",
+                                                                           (dv) => {
+                                                                               var x = dv.X;
+                                                                               var y = dv.Y;
+                                                                               Element.Width -= x;
+                                                                               Element.Height -= y;
+                                                                               Element.ClearCache();
+                                                                               dv.X = dv.Y = 0;
+                                                                           }),
+                                                     new EditorEnginePoint(0,
+                                                                           100,
+                                                                           10,
+                                                                           "sw-resize",
+                                                                           (dv) => {
+                                                                               var x = dv.X;
+                                                                               var y = dv.Y;
+                                                                               Element.Width += x;
+                                                                               Element.Height -= y;
+                                                                               Element.X -= x;
+                                                                               Element.ClearCache();
+                                                                               dv.Y = 0;
+                                                                           }),
+                                                     new EditorEnginePoint(50,
+                                                                           0,
+                                                                           5,
+                                                                           "n-resize",
+                                                                           (dv) => {
+                                                                               var x = dv.X;
+                                                                               var y = dv.Y;
+                                                                               Element.Height += y;
+                                                                               Element.Y -= x;
+                                                                               Element.ClearCache();
+                                                                           }),
+                                                     new EditorEnginePoint(100,
+                                                                           50,
+                                                                           5,
+                                                                           "e-resize",
+                                                                           (dv) => {
+                                                                               var x = dv.X;
+                                                                               var y = dv.Y;
+                                                                               Element.Width -= y;
+                                                                               Element.ClearCache();
+                                                                               dv.X = dv.Y = 0;
+                                                                           }),
+                                                     new EditorEnginePoint(50,
+                                                                           100,
+                                                                           5,
+                                                                           "n-resize",
+                                                                           (dv) => {
+                                                                               var x = dv.X;
+                                                                               var y = dv.Y;
+                                                                               Element.Height -= y;
+                                                                               Element.ClearCache();
+                                                                               dv.X = dv.Y = 0;
+                                                                           }),
+                                                     new EditorEnginePoint(0,
+                                                                           50,
+                                                                           5,
+                                                                           "e-resize",
+                                                                           (dv) => {
+                                                                               var x = dv.X;
+                                                                               var y = dv.Y;
+                                                                               Element.Width += x;
+                                                                               Element.X -= x;
+                                                                               Element.ClearCache();
+                                                                           }),
                                              };
         }
 
@@ -209,7 +241,10 @@ namespace OurSonic.UIManager
             canv.StrokeStyle = canv.FillStyle = "white";
             canv.LineWidth = 3;
 
-            canv.Me().dashedRect(Element.TotalX - size, Element.TotalY - size, Element.Width + size * 2, Element.Height + size * 2,
+            canv.Me().dashedRect(Element.TotalX - size,
+                                 Element.TotalY - size,
+                                 Element.Width + size * 2,
+                                 Element.Height + size * 2,
                                  new int[] {2, 2});
 
             //canv.strokeRect(this.element.totalX() - size, this.element.totalY() - size, this.element.width + size * 2, this.element.height + size * 2);

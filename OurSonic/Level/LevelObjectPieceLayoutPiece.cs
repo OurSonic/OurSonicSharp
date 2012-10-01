@@ -1,5 +1,7 @@
+using System;
 namespace OurSonic.Level
 {
+    [Serializable]
     public class LevelObjectPieceLayoutPiece
     {
         public int PieceIndex { get; set; }

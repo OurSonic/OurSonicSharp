@@ -117,7 +117,11 @@ namespace OurSonic
                                     ncanvas.BeginPath();
                                     ncanvas.FillStyle = "rgba(163,241,255,0.8)";
                                     ncanvas.Arc(scale.X * 16 / 2 - Help.Sin(angle) * scale.X * 8,
-                                                scale.Y * 16 / 2 - Help.Cos(angle) * scale.X * 8, 5, 0, 2 * Math.PI, true);
+                                                scale.Y * 16 / 2 - Help.Cos(angle) * scale.X * 8,
+                                                5,
+                                                0,
+                                                2 * Math.PI,
+                                                true);
                                     ncanvas.Fill();
                                 }
 /*

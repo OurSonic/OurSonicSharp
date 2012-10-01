@@ -31,36 +31,37 @@ namespace OurSonic.Level
             Image = new JsDictionary<int, CanvasInformation>();
 
             Name = name;
+            CollisionMap = new int[100][];
+            HurtSonicMap = new int[100][];
 
-            /*  for (var i = 0; i < 100; i++) {
-                    this.collisionMap[i] = [];
-                    this.hurtSonicMap[i] = [];
-
-                }*/
+            for (var i = 0; i < 100; i++) {
+                CollisionMap[i] = new int[100];
+                HurtSonicMap[i] = new int[100];
+            }
         }
 
         public void SetWidth(int w)
         {
-            /*  this.width = w;
-                        this.collisionMap = this.collisionMap.slice(0, w);
-                        this.clearCache();*/
+            Width = w;
+            CollisionMap = (int[][]) CollisionMap.Slice(0, w);
+            ClearCache();
         }
 
         public void SetHeight(int h)
         {
-            /*      this.height = h;
-        for (var j = 0; j < this.width; j++) {
-            this.collisionMap[j] = this.collisionMap[j].slice(0, h);
-        }
-        this.clearCache();*/
+            Height = h;
+            for (var j = 0; j < Width; j++) {
+                CollisionMap[j] = (int[]) CollisionMap[j].Slice(0, h);
+            }
+            ClearCache();
         }
 
         public void SetOffset(int ex, int ey)
         {
-            /*         this.offsetX = ex;
-        this.offsetY = ey;
+            OffsetX = ex;
+            OffsetY = ey;
 
-        this.clearCache();*/
+            ClearCache();
         }
 
         /* this.uploadImage = function (sprite) {

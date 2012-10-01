@@ -1,99 +1,90 @@
 using System;
 using System.Collections.Generic;
-using System.Html;
-using System.Runtime.CompilerServices;
-using CodeMirrorLibrary;
 using OurSonic.Level;
+using OurSonicModels;
+using OurSonicModels.Common;
 using jQueryApi;
 namespace OurSonic.UIManager.Areas
 {
     public class ObjectFrameworkListArea
     {
-        public ObjectFrameworkListArea(UIManager uiManager) {}
+        public ObjectFrameworkListArea(UIManager uiManager)
+        {
+            Action<string> loadObject = null;
 
+            var size = 40 * 4;
 
-        /*    window.ObjectFrameworkListArea = function () {
-                var size = 40 * 4;
+            var objectFrameworkListArea = uiManager.ObjectFrameworkListArea = new UIArea(90, 500, 390, 300) {Closable = true};
+            uiManager.AddArea(objectFrameworkListArea);
+            objectFrameworkListArea.AddControl(new TextArea(30, 25, "Object Frameworks") {Color = "blue"});
+            ScrollBox fList;
+            objectFrameworkListArea.AddControl(fList = new ScrollBox(30, 90, 25, 6, 315) {BackColor = "rgb(50,60,127)"});
+            objectFrameworkListArea.AddControl(new Button(35, 50, 160, 25, "Create Framework") {
+                                                                                                       Color = "rgb(50,150,50)",
+                                                                                                       Click = (p) => {
+                                                                                                                   uiManager.ObjectFrameworkArea.Populate(new LevelObject("SomeKey"));
+                                                                                                                   uiManager.ObjectFrameworkArea.objectFrameworkArea.Visible = true;
+                                                                                                               }
+                                                                                               });
+            Action getObjects = () => {
+                                    SonicEngine.Instance.client.Emit("GetAllObjects", "");
+                                    SonicEngine.Instance.client.On<DataObject<string[]>>("GetAllObjects.Response",
+                                                                                         (data) => {
+                                                                                             var obj = data.Data;
 
-                var objectFrameworkListArea = sonicManager.uiManager.objectFrameworkListArea = new UiArea(90, 500, 390, 300, sonicManager.uiManager, true);
-                objectFrameworkListArea.visible = true;
-                sonicManager.uiManager.UIAreas.push(objectFrameworkListArea);
-                objectFrameworkListArea.addControl(new TextArea(30, 25, "Object Frameworks", sonicManager.uiManager.textFont, "blue"));
-                var fList;
-                objectFrameworkListArea.addControl(fList = new ScrollBox(30, 90, 25, 6, 315, "rgb(50,60,127)"));
-                objectFrameworkListArea.addControl(new Button(35, 50, 160, 25, "Create Framework", sonicManager.uiManager.buttonFont, "rgb(50,150,50)", function () {
+                                                                                             fList.Controls = new List<Element>();
+                                                                                             foreach (var itm in obj) {
+                                                                                                 Button d;
+                                                                                                 string name = itm;
+                                                                                                 fList.AddControl(d = new Button(0, 0, 0, 0, itm) {
+                                                                                                                                                          Color = "rgb(50,190,90)",
+                                                                                                                                                          Click = (p) => { loadObject(name); }
+                                                                                                                                                  });
+                                                                                             }
+                                                                                         });
+                                };
 
+            objectFrameworkListArea.AddControl(new Button(200, 50, 160, 25, "Save Framework") {
+                                                                                                      Color = "rgb(50,150,50)",
+                                                                                                      Click = (p) => {
+                                                                                                                  var oldTitle = UIManager.CurLevelName;
+                                                                                                                  UIManager.UpdateTitle("Saving Object");
 
-                    sonicManager.uiManager.objectFrameworkArea.populate(new LevelObject('SomeKey'));
-                    sonicManager.uiManager.objectFrameworkArea.visible = true;
+                                                                                                                  var k = uiManager.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Key;
+                                                                                                                  var o = uiManager.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.oldKey ?? uiManager.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Key;
+                                                                                                                  var v = Help.Stringify(uiManager.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework);
 
+                                                                                                                  SonicEngine.Instance.client.Emit("SaveObject", new SaveObjectModel {Key = k, OldKey = o, Data = v});
+                                                                                                                  SonicEngine.Instance.client.On<bool>("SaveObject.Response", (data) => { UIManager.UpdateTitle(oldTitle); });
 
-                }));
-                getObjects = function () {
-                    OurSonic.SonicLevels.getAllObjects(function (obj) {
+                                                                                                                  getObjects();
+                                                                                                              }
+                                                                                              });
 
-                        fList.controls = [];
-                        for (var itm in obj) {
-                            var name = obj[itm];
-                            var d;
-                            fList.addControl(d = new Button(0, 0, 0, 0, name, "10pt Arial", "rgb(50,190,90)", function () {
+            getObjects();
+            loadObject = (name) => {
+                             var objects = SonicManager.Instance.cachedObjects;
+                             if (objects != null) {
+                                 if (objects[name] != null) {
+                                     uiManager.ObjectFrameworkArea.Populate(objects[name]);
+                                     uiManager.ObjectFrameworkArea.objectFrameworkArea.Visible = true;
+                                     return;
+                                 }
+                             }
 
-                                loadObject(this.key);
-                            }));
-                            d.key = name;
+                             var oldTitle = UIManager.CurLevelName;
 
-                        }
+                             UIManager.UpdateTitle("Downloading Object:" + name);
 
-                    });
-                };
-
-                objectFrameworkListArea.addControl(new Button(200, 50, 160, 25, "Save Framework", sonicManager.uiManager.buttonFont, "rgb(50,150,50)", function () {
-
-                    var oldTitle = sonicManager.uiManager.curLevelName;
-                    sonicManager.uiManager.updateTitle("Saving Object");
-
-                    var k = sonicManager.uiManager.objectFrameworkArea.objectFramework.key;
-                    var o = sonicManager.uiManager.objectFrameworkArea.objectFramework.oldKey ? sonicManager.uiManager.objectFrameworkArea.objectFramework.oldKey : sonicManager.uiManager.objectFrameworkArea.objectFramework.key;
-                    var v = _H.stringify(sonicManager.uiManager.objectFrameworkArea.objectFramework);
-
-                    OurSonic.SonicLevels.saveObject(k, o, v, function () {
-                        sonicManager.uiManager.updateTitle(oldTitle);
-                    });
-
-                    getObjects();
-
-                }));
-
-
-
-                getObjects();
-                var loadObject = function (name) {
-
-                    var objects = window.CachedObjects;
-                    if (objects) {
-
-                        if (objects[name]) {
-
-                            sonicManager.uiManager.objectFrameworkArea.populate(objects[name]);
-                            sonicManager.uiManager.objectFrameworkArea.visible = true;
-                            return;
-                        }
-                    }
-
-
-                    var oldTitle = sonicManager.uiManager.curLevelName;
-
-                    sonicManager.uiManager.updateTitle("Downloading Object:" + name);
-                    OurSonic.SonicLevels.getObject(name, function (lvl) {
-                        sonicManager.uiManager.updateTitle(oldTitle);
-                        var d = _H.extend(new LevelObject(""), jQuery.parseJSON(lvl));
-
-                        d = sonicManager.objectManager.extendObject(d);
-                        sonicManager.uiManager.objectFrameworkArea.populate(d);
-                        sonicManager.uiManager.objectFrameworkArea.visible = true;
-
-                    });
-                };
-            };*/
+                             SonicEngine.Instance.client.Emit("GetObject", new DataObject<string>(name));
+                             SonicEngine.Instance.client.On<DataObject<string>>("GetObject.Response",
+                                                                                (lvl) => {
+                                                                                    UIManager.UpdateTitle(oldTitle);
+                                                                                    var d = ObjectManager.ExtendObject(jQuery.ParseJsonData<LevelObjectData>(lvl.Data));
+                                                                                    uiManager.ObjectFrameworkArea.Populate(d);
+                                                                                    uiManager.ObjectFrameworkArea.objectFrameworkArea.Visible = true;
+                                                                                });
+                         };
+        }
     }
 }

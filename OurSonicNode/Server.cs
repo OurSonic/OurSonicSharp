@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NodeJSLibrary;
+using OurSonicModels;
 using OurSonicModels.Common;
 using SocketIONodeLibrary;
 namespace OurSonicNode
@@ -58,11 +59,31 @@ namespace OurSonicNode
                                             });
 
                                             socket.On("GetObject",
-                                                      (string _object) =>
-                                                      fs.Exists(objDirectory + _object + ".js",
+                                                      (DataObject<string> _object) =>
+                                                      fs.Exists(objDirectory + _object.Data + ".js",
                                                                 (er, exists) =>
-                                                                fs.ReadFile(objDirectory + _object + ".js", "utf8",
-                                                                            (err, result) => socket.Emit("GetObject.Response", new {Data = result}))));
+                                                                fs.ReadFile(objDirectory + _object.Data + ".js", "utf8",
+                                                                            (err, result) => socket.Emit("GetObject.Response", new DataObject<string>(result)))));
+
+                                            socket.On("SaveObject",
+                                                      (SaveObjectModel _object) => {
+
+
+
+                                                          fs.Exists(objDirectory + _object.OldKey + ".js",
+                                                                    (er, exists) =>
+                                                                    {
+                                                                        if(exists)
+                                                                            fs.TruncateSync(objDirectory + _object.OldKey + ".js", 0);
+                                                                        fs.WriteFileSync(objDirectory + _object.Key + ".js", _object.Data);
+                                                                        socket.Emit("SaveObject.Response", new { Data = true });
+                                                                    });
+
+
+                                                           
+
+
+                                                      });
 
                                             socket.On("GetObjects", (string[] _objects) => {
                                                                         int ind = 0;

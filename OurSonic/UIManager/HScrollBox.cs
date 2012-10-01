@@ -37,6 +37,7 @@ namespace OurSonic.UIManager
             JWidth = 5;
             VisibleItems = visibleItems;
             ItemHeight = itemHeight;
+            Controls = new List<Element>();
         }
 
         public override void Construct()

@@ -32,12 +32,13 @@ namespace OurSonic
             if (tickIndex % stp.Iterations.Count / 12 == 0)
                 myUpdate("Caching: " + stp.Title + " " + ( ( tickIndex / stp.Iterations.Count ) * 100 ) + "%");
             if (stp.Iterations.Count > tickIndex) {
-                stp.Method(stp.Iterations[tickIndex++], () => {
-                                                            if (stp.OnFinish()) {
-                                                                stepIndex++;
-                                                                tickIndex = 0;
-                                                            }
-                                                        });
+                stp.Method(stp.Iterations[tickIndex++],
+                           () => {
+                               if (stp.OnFinish()) {
+                                   stepIndex++;
+                                   tickIndex = 0;
+                               }
+                           });
             }
 
             return false;

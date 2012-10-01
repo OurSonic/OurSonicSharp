@@ -789,7 +789,10 @@ namespace OurSonic
                         canvas.DrawImage(
                                 SonicManager.Instance.SpriteCache.SonicSprites[
                                         ( "spinsmoke" + ( SonicManager.Instance.DrawTickCount % 14 ) / 2 ) + scale.X + scale.Y],
-                                ( -cur.Width / 2 ) - 25 * scale.X, -cur.Height / 2 + ( offset.Y * scale.Y ) - 14, cur.Width, cur.Height);
+                                ( -cur.Width / 2 ) - 25 * scale.X,
+                                -cur.Height / 2 + ( offset.Y * scale.Y ) - 14,
+                                cur.Width,
+                                cur.Height);
                     }
                 } else {
                     if (!CurrentlyBall && !SpinDash)
@@ -800,7 +803,10 @@ namespace OurSonic
                         canvas.DrawImage(
                                 SonicManager.Instance.SpriteCache.SonicSprites[
                                         ( "spinsmoke" + ( SonicManager.Instance.DrawTickCount % 14 ) / 2 ) + scale.X + scale.Y],
-                                ( -cur.Width / 2 ) - 25 * scale.X, -cur.Height / 2 + ( offset.Y * scale.Y ) - 14, cur.Width, cur.Height);
+                                ( -cur.Width / 2 ) - 25 * scale.X,
+                                -cur.Height / 2 + ( offset.Y * scale.Y ) - 14,
+                                cur.Width,
+                                cur.Height);
                     }
                 }
 
@@ -988,6 +994,11 @@ namespace OurSonic
                     obtainedRing[index] = true;
                 }
             }
+        }
+
+        public SensorM CheckCollisionLine(int p0, int p1, int p2, int p3)
+        {
+            return null;
         }
     }
     public class Watcher

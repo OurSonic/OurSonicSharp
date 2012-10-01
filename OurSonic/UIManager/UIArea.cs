@@ -2,6 +2,15 @@ using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 namespace OurSonic.UIManager
 {
+    public class UIArea<T> : UIArea
+    {
+        public T Data { get; set; }
+
+        public UIArea(T data, int x, int y, int width, int height) : base(x, y, width, height)
+        {
+            Data = data;
+        }
+    }
     public class UIArea : Panel
     {
         private bool myClosable;
@@ -14,6 +23,7 @@ namespace OurSonic.UIManager
                 : base(x, y, width, height)
         {
             Closable = true;
+            Outline = false;
         }
 
         public override T AddControl<T>(T element)

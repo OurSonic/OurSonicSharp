@@ -1,97 +1,80 @@
+using System.Html.Media.Graphics;
 using OurSonic.Level;
 namespace OurSonic.UIManager.Areas
 {
-    public class PieceLayoutEditor:Element {
+    public class PieceLayoutEditor : Element
+    {
         public Point Size { get; set; }
+        protected bool ShowHurtMap { get; set; }
+        protected bool ShowCollideMap { get; set; }
+        protected bool Clicking { get; set; }
+        public PieceLayoutMaker PieceLayoutMaker { get; set; }
+        protected LevelObjectPieceLayout PieceLayout { get; set; }
+        protected Point LastPosition { get; set; }
+        protected bool ClickHandled { get; set; }
 
-        public PieceLayoutEditor(int x, int y, Point size) : base(x,y)
+        public PieceLayoutEditor(int x, int y, Point size) : base(x, y)
         {
             Size = size;
-
+            ShowHurtMap = false;
+            ShowCollideMap = false;
+            Visible = true;
+            Size = size;
+            Clicking = false;
+            PieceLayoutMaker = null;
         }
-
-        public PieceLayoutMaker PieceLayoutMaker { get; set; }
-
-        /*function PieceLayoutEditor(x, y, size) {
-            this.forceDrawing = function () {
-                return { redraw: false, clearCache: false };
-            };
-            this.lastPosition = null;
-            this.x = x;
-            this.y = y;
-            this.showHurtMap = false;
-            this.showCollideMap = false;
-            this.visible = true;
-            this.size = size;
-            this.clicking = false;
-            this.parent = null;
-            this.pieceLayoutMaker = null;
-            this.init = function (pieceLayout) {
-                this.pieceLayout = pieceLayout;
-                this.width = size.width;
-                this.height = size.height;
-                this.pieceLayoutMaker = new PieceLayoutMaker(pieceLayout);
-            };
-            this.focus = function () {
-
-            };
-            this.loseFocus = function () {
-
-            };
-
-            this.onClick = function (e) {
-                if (!this.visible) return;
-                if (!this.pieceLayoutMaker) return;
-                this.clicking = true;
-                this.clickHandled = false;
-                this.lastPosition = e;
-                this.pieceLayoutMaker.placeItem(e);
-
-            };
-            this.onKeyDown = function (e) {
-
-            };
-            this.onMouseUp = function (e) {
-                if (!this.visible) return;
-
-                this.lastPosition = null;
-                this.clickHandled = false;
-                this.clicking = false;
-                this.pieceLayoutMaker.mouseUp();
-            };
-            this.clickHandled = false;
-            this.onMouseOver = function (e) {
-                if (!this.pieceLayoutMaker) return;
-
-                if (this.clicking) {
-                    this.clickHandled = true;
-                    this.pieceLayoutMaker.placeItem(e, this.lastPosition);
-                    this.lastPosition = { x: e.x, y: e.y };
-
-
-                }
-            };
-            this.draw = function (canv) {
-                if (!this.visible) return;
-                if (!this.pieceLayoutMaker) return;
-                var pos = { x: this.parent.x + this.x, y: this.parent.y + this.y };
-
-                this.pieceLayoutMaker.draw(canv, pos, this.size);
-
-            };
-            return this;
-        }
-         */
 
         public void Init(LevelObjectPieceLayout pieceLayout)
         {
-
-            this.PieceLayout = pieceLayout;
-            this.Width = Size.X;
-            this.Height = Size.Y;
-            this.PieceLayoutMaker = new PieceLayoutMaker(pieceLayout);
+            PieceLayout = pieceLayout;
+            Width = Size.X;
+            Height = Size.Y;
+            PieceLayoutMaker = new PieceLayoutMaker(pieceLayout);
         }
 
-        protected LevelObjectPieceLayout PieceLayout { get; set; }
+        public override bool OnClick(Pointer e)
+        {
+            if (!Visible) return false;
+            if (PieceLayoutMaker == null) return false;
+            Clicking = true;
+            ClickHandled = false;
+            LastPosition = e;
+            PieceLayoutMaker.PlaceItem(e, null);
+            return base.OnClick(e);
+        }
+
+        public override bool OnMouseUp(Pointer e)
+        {
+            if (!Visible) return false;
+
+            LastPosition = null;
+            ClickHandled = false;
+            Clicking = false;
+            PieceLayoutMaker.MouseUp();
+            return base.OnMouseUp(e);
+        }
+
+        public override bool OnMouseOver(Pointer e)
+        {
+            if (PieceLayoutMaker == null) return false;
+
+            if (Clicking) {
+                ClickHandled = true;
+                PieceLayoutMaker.PlaceItem(e, LastPosition);
+                LastPosition = new Point(e.X, e.Y);
+            }
+            return base.OnMouseOver(e);
+        }
+
+        public override void Draw(CanvasContext2D canv)
+        {
+            if (!Visible) return;
+            if (PieceLayoutMaker == null) return;
+            var pos = new Point(TotalX, TotalY);
+
+            PieceLayoutMaker.Draw(canv, pos, Size);
+
+            base.Draw(canv);
+        }
     }
 }

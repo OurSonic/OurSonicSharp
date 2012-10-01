@@ -36,13 +36,14 @@ namespace OurSonic.Level
                     TickCount = 0xfffffff;
                     return;
                 }
-/*            if (sonicManager.sonicToon.checkCollisionLine(_H.floor(this.x) + 8, _H.floor(this.y) + 8, 16, 1) != -1) {
-                this.ysp *= -0.75;
+                /*       if (SonicManager.Instance.SonicToon.CheckCollisionLine((this.X) + 8, (this.Y) + 8, 16, 1) != -1)
+                {
+                this.Ysp *= -0.75;
             }
 
-            if (sonicManager.sonicToon.checkCollisionLine(_H.floor(this.x) - 8, _H.floor(this.y) + 8, 26, 0) != -1) {
-                this.xsp *= -0.75;
-            }*/
+            if (SonicManager.Instance.SonicToon.CheckCollisionLine((this.X) - 8, (this.Y) + 8, 26, 0) != -1) {
+                this.Xsp *= -0.75;
+            } */
 
                 if (SonicManager.Instance.DrawTickCount > SonicManager.Instance.SonicToon.sonicLastHitTick + 64 &&
                     IntersectingRectangle.IntersectsRect(SonicManager.Instance.SonicToon.myRec,

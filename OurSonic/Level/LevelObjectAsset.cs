@@ -11,7 +11,7 @@ namespace OurSonic.Level
 
         public LevelObjectAsset(string name)
         {
-            Frames=new List<LevelObjectAssetFrame>();
+            Frames = new List<LevelObjectAssetFrame>();
             Name = name;
         }
     }

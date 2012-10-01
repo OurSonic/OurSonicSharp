@@ -1,3 +1,5 @@
+using System;
+using System.Html.Media.Graphics;
 using OurSonic.Level;
 namespace OurSonic.UIManager.Areas
 {
@@ -5,72 +7,70 @@ namespace OurSonic.UIManager.Areas
     {
         public LevelObjectAssetFrame AssetFrame { get; set; }
         public bool ShowOutline { get; set; }
+        public bool ShowOffset { get; set; }
+        public bool ShowHurtMap { get; set; }
+        public int LineWidth { get; set; }
+        public int CurrentColor { get; set; }
+        public bool ShowCollideMap { get; set; }
 
-        public Editor(LevelObjectAssetFrame frame, bool showOffset)
+        public Editor(LevelObjectAssetFrame assetFrame, bool showOffset)
         {
-            AssetFrame = frame;
+            AssetFrame = assetFrame;
+            ShowOffset = showOffset;
+            LineWidth = 1;
+            CurrentColor = 0;
+            ShowOutline = true;
         }
 
-        /*function Editor(assetFrame,showOffset) {
-    this.assetFrame = assetFrame;
+        public void Draw(CanvasContext2D canvas, Point pos, Point size, bool showCollideMap, bool showHurtMap)
+        {
+            AssetFrame.DrawUI(canvas, pos, size, ShowOutline, showCollideMap, showHurtMap, ShowOffset, false, false);
+        }
 
-    this.showHurtMap = false;
-    this.showCollideMap = false;
-    
-    this.lineWidth = 1;
-    this.currentColor = 0;
-    this.showOutline = true;
-    this.draw = function (canvas, pos, size,showCollideMap,showHurtMap) {
-        this.assetFrame.drawUI(canvas, pos, size, this.showOutline, showCollideMap, showHurtMap, showOffset);
-    };
-    this.drawPixel = function (location1) {
+        public void DrawPixel(Point location1)
+        {
+            var halfwidth = ( LineWidth / 2 );
+            var map = !ShowHurtMap && !ShowCollideMap ? AssetFrame.ColorMap : ( ShowHurtMap ? AssetFrame.HurtSonicMap : AssetFrame.CollisionMap );
 
-        var halfwidth = _H.floor(this.lineWidth / 2);
-        var map = !this.showHurtMap && !this.showCollideMap ? this.assetFrame.colorMap : (this.showHurtMap ? this.assetFrame.hurtSonicMap : this.assetFrame.collisionMap);
+            if (LineWidth == 1)
+                map[location1.X][location1.Y] = CurrentColor;
+            else {
+                for (var k = -halfwidth; k < halfwidth; k++) {
+                    for (var c = -halfwidth; c < halfwidth; c++) {
+                        map[Math.Min(Math.Max(0, location1.X + k), AssetFrame.Width)][Math.Min(Math.Max(0, location1.Y + c), AssetFrame.Height)] = CurrentColor;
+                    }
+                }
+            }
 
-        
+            AssetFrame.ClearCache();
+        }
 
-        if (this.lineWidth == 1) {
-            map[location1.x][location1.y] = this.currentColor;
-        } else {
-            var k, c;
-            for (k = -halfwidth; k < halfwidth; k++) {
-                for (c = -halfwidth; c < halfwidth; c++) {
-                    map[Math.min(Math.max(0, location1.x + k), this.assetFrame.width)][Math.min(Math.max(0, location1.y + c), this.assetFrame.height)] = this.currentColor;
+        public void DrawLine(Point location1, Point location2)
+        {
+            var dx = Math.Abs(( location2.X ) - ( location1.X ));
+            var dy = Math.Abs(( location2.Y ) - ( location1.Y ));
+            var sx = 1;
+            var sy = 1;
+            var error = dx - dy;
+            if (location1.X > location2.X)
+                sx = -1;
+            if (location1.Y > location2.Y)
+                sy = -1;
+            while (true) {
+                DrawPixel(location1);
+
+                if (location1.X == location2.X && location1.Y == location2.Y)
+                    break;
+                var e2 = error * 2;
+                if (e2 > -dy) {
+                    error -= dy;
+                    location1.X += sx;
+                }
+                if (e2 < dx) {
+                    error += dx;
+                    location1.Y += sy;
                 }
             }
         }
-        
-        this.assetFrame.clearCache();
-    };
-    this.drawLine = function (location1, location2) {
-
-        location1 = { x: location1.x, y: location1.y };
-
-        var dx = Math.abs((location2.x) - (location1.x));
-        var dy = Math.abs((location2.y) - (location1.y));
-        var sx = 1, sy = 1, e2;
-        var error = dx - dy;
-        if (location1.x > location2.x)
-            sx = -1;
-        if (location1.y > location2.y)
-            sy = -1;
-        while (true) {
-           this. drawPixel(location1);
-           
-            if (location1.x == location2.x && location1.y == location2.y)
-                break;
-            e2 = error * 2;
-            if (e2 > -dy) {
-                error -= dy;
-                location1.x += sx;
-            }
-            if (e2 < dx) {
-                error += dx;
-                location1.y += sy;
-            }
-        }
-    };
-}*/
     }
 }

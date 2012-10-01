@@ -8,6 +8,7 @@ namespace OurSonic.Level
         private JsDictionary<string, Func<LevelObjectInfo, SonicLevel, Sonic, SensorM, LevelObjectPiece, bool>> cacheCompiled =
                 new JsDictionary<string, Func<LevelObjectInfo, SonicLevel, Sonic, SensorM, LevelObjectPiece, bool>>();
         private JsDictionary<string, string> cacheLast = new JsDictionary<string, string>();
+        public string oldKey;
         [IntrinsicProperty]
         public string Key { get; set; }
         [IntrinsicProperty]

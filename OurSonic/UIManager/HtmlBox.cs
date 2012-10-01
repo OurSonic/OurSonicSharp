@@ -8,14 +8,12 @@ namespace OurSonic.UIManager
         public Action<int, int> UpdatePosition { get; set; }
         public Action _Focus { get; set; }
         public Action _Hide { get; set; }
-        public HtmlBox(int x, int y) : base(x, y)
-        {
-        }
+        public HtmlBox(int x, int y) : base(x, y) {}
 
         public override void Construct()
         {
             Init();
-              base.Construct();
+            base.Construct();
         }
 
         public override void Focus(Pointer e)
@@ -37,24 +35,22 @@ namespace OurSonic.UIManager
 
         public override bool OnMouseUp(Pointer e)
         {
-
-            if (this.MouseUp != null) this.MouseUp(new Point(e.X, e.Y));
+            if (MouseUp != null) MouseUp(new Point(e.X, e.Y));
             return base.OnMouseUp(e);
         }
 
         public override bool OnMouseOver(Pointer e)
         {
-            if (this.MouseOver != null) this.MouseOver(new Point(e.X, e.Y));
+            if (MouseOver != null) MouseOver(new Point(e.X, e.Y));
             return base.OnMouseOver(e);
         }
 
         public override void Draw(CanvasContext2D canv)
         {
-            if (!this.Visible) return;
-            UpdatePosition(this.TotalX, this.TotalY);
+            if (!Visible) return;
+            UpdatePosition(TotalX, TotalY);
 
             base.Draw(canv);
         }
-
     }
 }

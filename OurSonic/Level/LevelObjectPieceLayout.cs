@@ -78,29 +78,29 @@ namespace OurSonic.Level
             for (var i = 0; i < Pieces.Count; i++) {
                 var j = Pieces[i];
                 if (showImages) {
-/*
-                    LevelObjectPiece piece = sonicManager.uiManager.objectFrameworkArea.objectFramework.pieces[j.PieceIndex];
-                    var asset = sonicManager.uiManager.objectFrameworkArea.objectFramework.assets[piece.AssetIndex];
-                    if (asset.Frames.length > 0)
-                    {
+                    LevelObjectPiece piece = SonicManager.Instance.UIManager.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Pieces[j.PieceIndex];
+                    var asset = SonicManager.Instance.UIManager.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Assets[piece.AssetIndex];
+                    if (asset.Frames.Count > 0) {
                         LevelObjectAssetFrame frm = asset.Frames[j.FrameIndex];
                         drawRadial = SonicManager.Instance.mainCanvas.Context.CreateRadialGradient(0, 0, 0, 10, 10, 50);
                         drawRadial.AddColorStop(0, "white");
                         if (selectedPieceIndex == i)
-                        {
                             drawRadial.AddColorStop(1, "yellow");
-                        }
                         else
-                        {
                             drawRadial.AddColorStop(1, "red");
-                        }
                         var borderSize = 3;
                         canvas.FillStyle = drawRadial;
                         //   canvas.fillRect(pos.x + j.x - frm.offsetX - borderSize, pos.y + j.y - frm.offsetY - borderSize, frm.width + borderSize * 2, frm.height + borderSize*2);
-                        frm.DrawUI(canvas, new Point(pos.X + j.X - frm.OffsetX, pos.Y + j.Y - frm.OffsetY), new Point(frm.Width, frm.Height),
-                            false, true, true, false, piece.Xflip, piece.Yflip);
+                        frm.DrawUI(canvas,
+                                   new Point(pos.X + j.X - frm.OffsetX, pos.Y + j.Y - frm.OffsetY),
+                                   new Point(frm.Width, frm.Height),
+                                   false,
+                                   true,
+                                   true,
+                                   false,
+                                   piece.Xflip,
+                                   piece.Yflip);
                     }
-*/
                 } else {
                     drawRadial = SonicManager.Instance.mainCanvas.Context.CreateRadialGradient(0, 0, 0, 10, 10, 50);
                     drawRadial.AddColorStop(0, "white");
@@ -128,8 +128,14 @@ namespace OurSonic.Level
                 var asset = framework.Assets[piece.AssetIndex];
                 if (asset.Frames.Count > 0) {
                     var frm = asset.Frames[j.FrameIndex];
-                    frm.DrawUI(canvas, new Point(( x + j.X * scale.X ) - ( frm.OffsetX * scale.X ), ( y + j.Y * scale.Y ) - ( frm.OffsetY * scale.Y )),
-                               new Point(frm.Width * scale.X, frm.Height * scale.Y), false, showHeightMap, showHeightMap, false, piece.Xflip,
+                    frm.DrawUI(canvas,
+                               new Point(( x + j.X * scale.X ) - ( frm.OffsetX * scale.X ), ( y + j.Y * scale.Y ) - ( frm.OffsetY * scale.Y )),
+                               new Point(frm.Width * scale.X, frm.Height * scale.Y),
+                               false,
+                               showHeightMap,
+                               showHeightMap,
+                               false,
+                               piece.Xflip,
                                piece.Yflip);
                 }
             }

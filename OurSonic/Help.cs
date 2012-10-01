@@ -2,6 +2,7 @@
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using System.Serialization;
 using CommonWebLibraries;
 using OurSonic.UIManager;
 using jQueryApi;
@@ -174,10 +175,12 @@ namespace OurSonic
         public static ImageElement LoadSprite(string src, Action<ImageElement> complete)
         {
             var sprite1 = new ImageElement();
-            sprite1.AddEventListener("load", e => {
-                                                 sprite1.Loaded(true);
-                                                 if (complete.Truthy()) complete(sprite1);
-                                             }, false);
+            sprite1.AddEventListener("load",
+                                     e => {
+                                         sprite1.Loaded(true);
+                                         if (complete.Truthy()) complete(sprite1);
+                                     },
+                                     false);
             sprite1.Src = src;
             return sprite1;
         }
@@ -308,6 +311,22 @@ namespace OurSonic
                 return new Pointer(ev.PageX, ev.PageY);
             //if (ev.x != null && ev.y != null) return new { x: ev.x, y: ev.y };
             return new Pointer(ev.ClientX, ev.ClientY);
+        }
+
+        public static string Stringify(object obj)
+        {
+            return Json.Stringify(obj,
+                                  (key, value) => {
+                                      if (key == "image") return null;
+                                      if (key == "imageData") return null;
+                                      if (key == "oldScale") return null;
+                                      if (key == "sprite") return null;
+                                      if (key == "sprites") return null;
+                                      if (key == "index") return null;
+                                      if (key == "_style") return null;
+
+                                      else return value;
+                                  }); //.replaceAll("false", "0").replaceAll("true", "1");
         }
     }
 }

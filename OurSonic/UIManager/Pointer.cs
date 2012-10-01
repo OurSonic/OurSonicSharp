@@ -2,17 +2,15 @@ using System;
 namespace OurSonic.UIManager
 {
     [Serializable]
-    public class Pointer
+    public class Pointer : Point
     {
-        public int X { get; set; }
-        public int Y { get; set; }
         public int Delta { get; set; }
+        public bool Right { get; set; }
 
-        public Pointer(int x, int y, int delta = 0)
+        public Pointer(int x, int y, int delta = 0, bool right = false) : base(x, y)
         {
-            X = x;
-            Y = y;
             Delta = delta;
+            Right = right;
         }
     }
 }

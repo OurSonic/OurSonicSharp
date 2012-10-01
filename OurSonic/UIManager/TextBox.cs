@@ -261,8 +261,10 @@ namespace OurSonic.UIManager
 
                 var w1 = canv.MeasureText(Text.Substring(0, Math.Min(DragPosition, CursorPosition))).Width;
                 var w2 = canv.MeasureText(Text.Substring(0, Math.Max(DragPosition, CursorPosition))).Width;
-                canv.FillRect(TotalX + 8 + w1, TotalY + 3,
-                              w2 - w1, ( Height - 7 ));
+                canv.FillRect(TotalX + 8 + w1,
+                              TotalY + 3,
+                              w2 - w1,
+                              ( Height - 7 ));
             }
             canv.FillStyle = "#000000";
 

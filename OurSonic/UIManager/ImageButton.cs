@@ -8,10 +8,9 @@ namespace OurSonic.UIManager
     {
         [IntrinsicProperty]
         public T Data { get; set; }
-        public ImageButton(T data,int x, int y, int width, int height) : base(x, y, width, height)
+
+        public ImageButton(T data, int x, int y, int width, int height) : base(x, y, width, height)
         {
-
-
             Data = data;
         }
     }

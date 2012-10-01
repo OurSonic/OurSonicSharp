@@ -16,7 +16,7 @@ namespace OurSonic
         private static JsDictionary<int, Point[]> _cachedOffs = new JsDictionary<int, Point[]>();
         public readonly CanvasInformation mainCanvas;
         private readonly SonicEngine myEngine;
-        private readonly ObjectManager objectManager;
+        public readonly ObjectManager objectManager;
         public int DrawTickCount;
         private int imageLength;
         private string myStatus;
@@ -215,7 +215,7 @@ namespace OurSonic
                     obj.Tick(obj, SonicLevel, SonicToon);
                 }
             }
-            //sonicManager.uiManager.liveObjectsArea.populate(sonicManager.inFocusObjects);TODO:::
+            UIManager.LiveObjectsArea.Data.Populate(InFocusObjects);
             foreach (AnimationInstance animationInstance in AnimationInstances) {
                 animationInstance.Tick();
             }
@@ -267,6 +267,11 @@ namespace OurSonic
 
         public void PreloadSprites(Point scale, Action completed, Action<string> update)
         {
+            if (SpriteCache != null) {
+                completed();
+                return;
+            }
+
             SpriteCache = SpriteCache ?? new SpriteCache();
             var ci = SpriteCache.Rings;
             var inj = 0;
@@ -280,20 +285,23 @@ namespace OurSonic
             var ind_ = SpriteCache.Indexes;
             var sl = SpriteLoader = new SpriteLoader(completed, update);
             if (ci.Count == 0) {
-                var spriteStep = SpriteLoader.AddStep("Sprites", (i, done) => {
-                                                                     var sp = i * 200;
-                                                                     ci[sp] = Help.LoadSprite(spriteLocations[i],
-                                                                                              jd => {
-                                                                                                  ci[jd.Me().Tag * 200 + scale.X * 100 + scale.Y] =
-                                                                                                          Help.ScaleSprite(jd, scale, jc => done());
-                                                                                              });
-                                                                     ci[sp].Me().Tag = i;
-                                                                 }, () => {
-                                                                        ind_.Sprites++;
-                                                                        if (ind_.Sprites == 4)
-                                                                            return true;
-                                                                        return false;
-                                                                    }, false);
+                var spriteStep = SpriteLoader.AddStep("Sprites",
+                                                      (i, done) => {
+                                                          var sp = i * 200;
+                                                          ci[sp] = Help.LoadSprite(spriteLocations[i],
+                                                                                   jd => {
+                                                                                       ci[jd.Me().Tag * 200 + scale.X * 100 + scale.Y] =
+                                                                                               Help.ScaleSprite(jd, scale, jc => done());
+                                                                                   });
+                                                          ci[sp].Me().Tag = i;
+                                                      },
+                                                      () => {
+                                                          ind_.Sprites++;
+                                                          if (ind_.Sprites == 4)
+                                                              return true;
+                                                          return false;
+                                                      },
+                                                      false);
                 for (var i = 0; i < spriteLocations.Count; i++) {
                     SpriteLoader.AddIterationToStep(spriteStep, i);
                 }
@@ -302,13 +310,14 @@ namespace OurSonic
             var cci = SpriteCache.SonicSprites;
 
             if (cci.Count == 0) {
-                var sonicStep = SpriteLoader.AddStep("Sonic Sprites", (sp, done) => {
-                                                                          foreach (var sonicSprite in sonicSprites) {
-                                                                              cci[sonicSprite.Key + scale.X + scale.Y] =
-                                                                                      Help.ScaleCsImage(sonicSprite.Value, scale, (ec) => { });
-                                                                          }
+                var sonicStep = SpriteLoader.AddStep("Sonic Sprites",
+                                                     (sp, done) => {
+                                                         foreach (var sonicSprite in sonicSprites) {
+                                                             cci[sonicSprite.Key + scale.X + scale.Y] =
+                                                                     Help.ScaleCsImage(sonicSprite.Value, scale, (ec) => { });
+                                                         }
 
-                                                                          /*var cji = SpriteCache.AnimationSprites = new JsDictionary<string, CanvasInformation>();
+                                                         /*var cji = SpriteCache.AnimationSprites = new JsDictionary<string, CanvasInformation>();
 
 foreach (var anni in Animations)
 {
@@ -318,8 +327,10 @@ foreach (var image in anni.Images)
 cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManager.animations[anni].images[image], scale);
 }
 }*/
-                                                                          done();
-                                                                      }, () => true, false);
+                                                         done();
+                                                     },
+                                                     () => true,
+                                                     false);
 
                 SpriteLoader.AddIterationToStep(sonicStep, 0);
             }
@@ -551,7 +562,9 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                                 if (hd == 0) {} else if (hd == 1) {
                                     if (solid > 0) {
                                         ctx.FillStyle = HeightMask.colors[solid];
-                                        ctx.FillRect(posj1.X + ( __x * 16 ) * Scale.X, posj1.Y + ( __y * 16 ) * Scale.Y, Scale.X * 16,
+                                        ctx.FillRect(posj1.X + ( __x * 16 ) * Scale.X,
+                                                     posj1.Y + ( __y * 16 ) * Scale.Y,
+                                                     Scale.X * 16,
                                                      Scale.Y * 16);
                                     }
                                 } else {
@@ -667,7 +680,10 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 localPoint.X = Script.Reinterpret<int>(o.X);
                 localPoint.Y = Script.Reinterpret<int>(o.Y);
                 if (o.Dead || BigWindowLocation.Intersects(localPoint)) {
-                    o.Draw(canvas, ( ( localPoint.X - WindowLocation.X ) * Scale.X ), ( ( localPoint.Y - WindowLocation.Y ) * Scale.Y ), Scale,
+                    o.Draw(canvas,
+                           ( ( localPoint.X - WindowLocation.X ) * Scale.X ),
+                           ( ( localPoint.Y - WindowLocation.Y ) * Scale.Y ),
+                           Scale,
                            ShowHeightMap);
                 }
             }

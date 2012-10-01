@@ -71,6 +71,17 @@ OurSonicModels.Common.DelegateOrValue$1 = function(T) {
 OurSonicModels.Common.DelegateOrValue$1.registerGenericClass('OurSonicModels.Common.DelegateOrValue$1', 1);
 Type.registerNamespace('OurSonicModels');
 ////////////////////////////////////////////////////////////////////////////////
+// OurSonicModels.SaveObjectModel
+OurSonicModels.SaveObjectModel = function() {
+};
+OurSonicModels.SaveObjectModel.$ctor = function() {
+	var $this = {};
+	$this.key = null;
+	$this.oldKey = null;
+	$this.data = null;
+	return $this;
+};
+////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.SLData
 OurSonicModels.SLData = function() {
 };
@@ -114,6 +125,7 @@ OurSonicModels.Solidity.prototype = { NotSolid: 0, TopSolid: 1, LRBSolid: 2, All
 OurSonicModels.Solidity.registerEnum('OurSonicModels.Solidity', false);
 OurSonicModels.AnimatedPaletteItem.registerClass('OurSonicModels.AnimatedPaletteItem', Object);
 OurSonicModels.AnimatedPalettePiece.registerClass('OurSonicModels.AnimatedPalettePiece', Object);
+OurSonicModels.SaveObjectModel.registerClass('OurSonicModels.SaveObjectModel', Object);
 OurSonicModels.SLData.registerClass('OurSonicModels.SLData', Object);
 OurSonicModels.SLDataAnimation.registerClass('OurSonicModels.SLDataAnimation', Object);
 OurSonicModels.SLDataAnimationFrame.registerClass('OurSonicModels.SLDataAnimationFrame', Object);

@@ -7,9 +7,9 @@ namespace OurSonic.UIManager
     {
         [IntrinsicProperty]
         public T Data { get; set; }
+
         public Button(T data, int x, int y, int width, int height, DelegateOrValue<string> text) : base(x, y, width, height, text)
         {
-
             Data = data;
         }
     }
@@ -74,7 +74,7 @@ namespace OurSonic.UIManager
                 return false;
             if (Clicking) {
                 if (Click != null)
-                    Click(new Point(e.X,e.Y));
+                    Click(new Point(e.X, e.Y));
             }
             Clicking = false;
             if (MouseUp != null)
@@ -130,7 +130,8 @@ namespace OurSonic.UIManager
             canv.FillStyle = "#000000";
             string txt = Text;
 
-            canv.FillText(txt, TotalX + ( ( Width / 2 ) - ( canv.MeasureText(txt).Width / 2 ) ),
+            canv.FillText(txt,
+                          TotalX + ( ( Width / 2 ) - ( canv.MeasureText(txt).Width / 2 ) ),
                           TotalY + ( Height / 3 ) * 2);
 
             canv.Restore();
