@@ -2,6 +2,7 @@ using System;
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonicModels.Common;
 namespace OurSonic.UIManager
 {
     public class TextBox : Element
@@ -192,7 +193,7 @@ namespace OurSonic.UIManager
             if (!Visible) return false;
             if (Clicking) {}
             Clicking = false;
-            if (MouseUp != null) MouseUp();
+            if (MouseUp != null) MouseUp(new Point(e.X, e.Y));
 
             return base.OnMouseUp(e);
         }
@@ -219,7 +220,7 @@ namespace OurSonic.UIManager
 
                 CursorPosition = Text.Length;
             }
-            if (MouseOver != null) MouseOver();
+            if (MouseOver != null) MouseOver(new Point(e.X, e.Y));
             return base.OnMouseOver(e);
         }
 

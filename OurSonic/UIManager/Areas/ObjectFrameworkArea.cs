@@ -9,6 +9,7 @@ namespace OurSonic.UIManager.Areas
 {
     public class ObjectFrameworkArea
     {
+        private UIArea objectFrameworkArea;
         [IntrinsicProperty]
         public ObjectFrameworkData Data { get; set; }
         public ObjectFrameworkArea(UIManager manager)
@@ -18,7 +19,7 @@ namespace OurSonic.UIManager.Areas
 
             var size = 40 * 4;
 
-            var objectFrameworkArea = new UIArea(540, 75, 850, 690) { Closable = true };
+            objectFrameworkArea = new UIArea(540, 75, 850, 690) { Closable = true };
             manager.AddArea(objectFrameworkArea);
 
             objectFrameworkArea.AddControl(new TextArea(30, 25, "Object Framework") { Color = "blue" });
@@ -29,7 +30,7 @@ namespace OurSonic.UIManager.Areas
             {
 
                 Color = "rgb(50,150,50)",
-                Click = () =>
+                Click = (p) =>
                 {
                     Data.ObjectFramework.Assets.Add(
                             new LevelObjectAsset("Asset " +
@@ -41,7 +42,7 @@ namespace OurSonic.UIManager.Areas
             });
 
             objectFrameworkArea.AddControl(
-                    Data.Assets = new ScrollBox(30, 60 + 10) { ItemHeight = 25, VisibleItems = 4, ItemWidth = 250, BackColor = "rgb(50, 60, 127)", });
+                    Data.Assets = new ScrollBox(30, 60 + 10, 25, 4, 250) { BackColor = "rgb(50, 60, 127)", });
 
 
 
@@ -52,7 +53,7 @@ namespace OurSonic.UIManager.Areas
             {
 
                 Color = "rgb(50,150,50)",
-                Click = () =>
+                Click = (p) =>
                 {
 
                     Data.ObjectFramework.Pieces.Add(
@@ -67,7 +68,7 @@ namespace OurSonic.UIManager.Areas
 
             objectFrameworkArea.AddControl(
                     Data.Pieces =
-                    new ScrollBox(30, 60 + 10 + (size * 1)) { ItemHeight = 25, VisibleItems = 4, ItemWidth = 250, BackColor = "rgb(50, 60, 127)", });
+                    new ScrollBox(30, 60 + 10 + (size * 1), 25, 4, 250) { BackColor = "rgb(50, 60, 127)", });
 
 
 
@@ -77,7 +78,7 @@ namespace OurSonic.UIManager.Areas
             {
 
                 Color = "rgb(50,150,50)",
-                Click = () =>
+                Click = (p) =>
                 {
                     Data.ObjectFramework.PieceLayouts.Add(
                             new LevelObjectPieceLayout("Piece Layout " +
@@ -93,7 +94,7 @@ namespace OurSonic.UIManager.Areas
 
             objectFrameworkArea.AddControl(
                     Data.PieceLayouts =
-                    new ScrollBox(30, 60 + 10 + (size * 2)) { ItemHeight = 25, VisibleItems = 4, ItemWidth = 250, BackColor = "rgb(50, 60, 127)", });
+                    new ScrollBox(30, 60 + 10 + (size * 2), 25, 4, 250) { BackColor = "rgb(50, 60, 127)", });
 
 
 
@@ -103,7 +104,7 @@ namespace OurSonic.UIManager.Areas
             {
 
                 Color = "rgb(50,150,50)",
-                Click = () =>
+                Click = (p) =>
                 {
                     Data.ObjectFramework.Projectiles.Add(
                             new LevelObjectProjectile(
@@ -116,17 +117,17 @@ namespace OurSonic.UIManager.Areas
 
             objectFrameworkArea.AddControl(
                     Data.Projectiles =
-                    new ScrollBox(30, 60 + 10 + (size * 3)) { ItemHeight = 25, VisibleItems = 4, ItemWidth = 250, BackColor = "rgb(50, 60, 127)", });
+                    new ScrollBox(30, 60 + 10 + (size * 3), 25, 4, 250) { BackColor = "rgb(50, 60, 127)", });
 
             objectFrameworkArea.AddControl(new TextArea(320, 80 - 20, "Key: ") { Font = UIManager.SmallTextFont, Color = "black" });
             objectFrameworkArea.AddControl(
                     Data.Key =
-                    new TextBox(370, 60 - 20, 150, 25, "") { Color = "rgb(50,150,50)", Click = () => { Data.ObjectFramework.Key = Data.Key.Text; } });
+                    new TextBox(370, 60 - 20, 150, 25, "") { Color = "rgb(50,150,50)", Click = (p) => { Data.ObjectFramework.Key = Data.Key.Text; } });
 
             objectFrameworkArea.AddControl(new TextArea(320 + 205, 80 - 24, "Description: ") { Font = UIManager.SmallTextFont, Color = "black" });
             objectFrameworkArea.AddControl(
                     Data.Description =
-                    new TextBox(370 + 240, 60 - 20, 220, 25, "") { Color = "rgb(50,150,50)", Click = () => { Data.ObjectFramework.Description = Data.Description.Text; } });
+                    new TextBox(370 + 240, 60 - 20, 220, 25, "") { Color = "rgb(50,150,50)", Click = (p) => { Data.ObjectFramework.Description = Data.Description.Text; } });
 
 
 
@@ -135,7 +136,7 @@ namespace OurSonic.UIManager.Areas
             {
 
                 Color = "rgb(50,150,50)",
-                Click = () =>
+                Click = (p) =>
                 {
                     Data.b2.Toggled = false;
                     Data.b3.Toggled = false;
@@ -159,7 +160,7 @@ namespace OurSonic.UIManager.Areas
             {
 
                 Color = "rgb(50,150,50)",
-                Click = () =>
+                Click = (p) =>
                 {
                     Data.b1.Toggled = false;
                     Data.b3.Toggled = false;
@@ -184,7 +185,7 @@ namespace OurSonic.UIManager.Areas
             {
 
                 Color = "rgb(50,150,50)",
-                Click = () =>
+                Click = (p) =>
                 {
                     Data.b1.Toggled = false;
                     Data.b2.Toggled = false;
@@ -209,7 +210,7 @@ namespace OurSonic.UIManager.Areas
             {
 
                 Color = "rgb(50,150,50)",
-                Click = () =>
+                Click = (p) =>
                 {
                     Data.b1.Toggled = false;
                     Data.b2.Toggled = false;
@@ -247,8 +248,7 @@ namespace OurSonic.UIManager.Areas
                                           Height = 485,
                                           Init = () =>
                                           {
-                                              jQuery.Document.Append(
-                                                      @"<textarea id=""code"" name=""code"" style=""position:absolute;width:485px;height:485px;""></textarea>");
+                                              jQuery.FromElement(Document.Body).Append(@"<textarea id=""code"" name=""code"" style=""position:absolute;width:485px;height:485px;""></textarea>");
                                               Data.CodeMirror = (TextAreaElement)Document.GetElementById("code");
                                               Data.CodeMirror.Value = value;
                                               CodeMirrorLine hlLine = null;
@@ -350,15 +350,16 @@ namespace OurSonic.UIManager.Areas
             foreach (var t in objectFramework.Assets)
             {
                 Button<LevelObjectAsset> b = null;
-                b = new Button<LevelObjectAsset>(null,0, 0, 0, 0, (Func<string>)(() => b.Data.Name));
+                b = new Button<LevelObjectAsset>(null, 0, 0, 0, 0, (Func<string>)(() => b.Data.Name));
                 b.Color = "rgb(50,190,90)";
-                b.Click = () =>
+                Button<LevelObjectAsset> b1 = b;
+                b.Click = (p) =>
                 {
                     Data.b1.Toggled = false;
                     Data.b2.Toggled = false;
                     Data.b3.Toggled = false;
                     Data.b4.Toggled = false;
-                    loadAsset(b.Data);
+                    loadAsset(b1.Data);
 
                 };
                 b.Data = t;
@@ -368,16 +369,18 @@ namespace OurSonic.UIManager.Areas
             Data.Pieces.ClearControls();
             foreach (var t in objectFramework.Pieces)
             {
-                Button<LevelObjectPiece> b = null; b = new Button<LevelObjectPiece>(null,0, 0, 0, 0, (Func<string>)(() => b.Data.Name));
-                
+                Button<LevelObjectPiece> b = null;
+                b = new Button<LevelObjectPiece>(null, 0, 0, 0, 0, (Func<string>)(() => b.Data.Name));
+
                 b.Color = "rgb(50,190,90)";
-                b.Click = () =>
+                Button<LevelObjectPiece> b1 = b;
+                b.Click = (p) =>
                           {
                               Data.b1.Toggled = false;
                               Data.b2.Toggled = false;
                               Data.b3.Toggled = false;
                               Data.b4.Toggled = false;
-                              loadPiece(b.Data);
+                              loadPiece(b1.Data);
 
                           };
                 Data.Pieces.AddControl(b);
@@ -387,16 +390,17 @@ namespace OurSonic.UIManager.Areas
             Data.PieceLayouts.ClearControls();
             foreach (var t in objectFramework.PieceLayouts)
             {
-                Button<LevelObjectPieceLayout> b = null; b = new Button<LevelObjectPieceLayout>(null,0, 0, 0, 0, (Func<string>)(() => b.Data.Name));
-                
+                Button<LevelObjectPieceLayout> b = null; b = new Button<LevelObjectPieceLayout>(null, 0, 0, 0, 0, (Func<string>)(() => b.Data.Name));
+
                 b.Color = "rgb(50,190,90)";
-                b.Click = () =>
+                Button<LevelObjectPieceLayout> b1 = b;
+                b.Click = (p) =>
                           {
                               Data.b1.Toggled = false;
                               Data.b2.Toggled = false;
                               Data.b3.Toggled = false;
                               Data.b4.Toggled = false;
-                              loadPieceLayout(b.Data);
+                              loadPieceLayout(b1.Data);
 
                           };
                 Data.PieceLayouts.AddControl(b);
@@ -406,16 +410,17 @@ namespace OurSonic.UIManager.Areas
             Data.Projectiles.ClearControls();
             foreach (var t in objectFramework.Projectiles)
             {
-                Button<LevelObjectProjectile> b = null; b = new Button<LevelObjectProjectile>(null,0, 0, 0, 0, (Func<string>)(() => b.Data.Name));
-                
+                Button<LevelObjectProjectile> b = null; b = new Button<LevelObjectProjectile>(null, 0, 0, 0, 0, (Func<string>)(() => b.Data.Name));
+
                 b.Color = "rgb(50,190,90)";
-                b.Click = () =>
+                Button<LevelObjectProjectile> b1 = b;
+                b.Click = (p) =>
                           {
                               Data.b1.Toggled = false;
                               Data.b2.Toggled = false;
                               Data.b3.Toggled = false;
                               Data.b4.Toggled = false;
-                              loadProjectile(b.Data);
+                              loadProjectile(b1.Data);
 
                           };
                 Data.Projectiles.AddControl(b);
@@ -424,202 +429,262 @@ namespace OurSonic.UIManager.Areas
 
         }
 
-        private void loadProjectile(LevelObjectProjectile data)
+        private void loadProjectile(LevelObjectProjectile projectile)
         {
-            /*
-                    objectFrameworkArea.clearMainArea();
+            ClearMainArea();
 
 
-                    objectFrameworkArea.mainPanel.addControl(new TextArea(25, 25, "Name: ", sonicManager.uiManager.textFont, "black"));
-                    objectFrameworkArea.mainPanel.addControl(new TextBox(100, 5, 290, 25, projectile.name, sonicManager.uiManager.buttonFont, "rgb(50,150,50)", function () { projectile.name = this.text; }));
-                    var b;
-                    objectFrameworkArea.mainPanel.addControl(b = new Button(40, 160, 70, 25, "XFlip", sonicManager.uiManager.buttonFont, "rgb(50,150,50)", function () {
-                        projectile.xflip = b.toggled;
-                    }));
-                    b.toggle = true;
-                    b.toggled = projectile.xflip;
+            Data.MainPanel.AddControl(new TextArea(25, 25, "Name= ") { Color = "black" });
+            TextBox fm = null;
+            Data.MainPanel.AddControl(fm = new TextBox(100, 5, 290, 25, projectile.Name) { Color = "rgb(50,150,50)", Click = (p) => { projectile.Name = fm.Text; } });
+            Button b=null;
+            Data.MainPanel.AddControl(b = new Button(40, 160, 70, 25, "XFlip")
+            {
+                Color = "rgb(50,150,50)",
+                Click = (p) =>
+                {
+                    projectile.Xflip = b.Toggled;
+                }
+            });
+            b.Toggle = true;
+            b.Toggled = projectile.Xflip;
 
-                    var c;
-                    objectFrameworkArea.mainPanel.addControl(c = new Button(115, 160, 70, 25, "YFlip", sonicManager.uiManager.buttonFont, "rgb(50,150,50)", function () {
-                        projectile.yflip = c.toggled;
-                    }));
-                    c.toggle = true;
-                    c.toggled = projectile.yflip;
+            Button c = null;
+            Data.MainPanel.AddControl(c = new Button(115, 160, 70, 25, "YFlip")
+            {
+                Color = "rgb(50,150,50)",
+                Click = (p) =>
+                    {
+                        projectile.Yflip = c.Toggled;
+                    }
+            });
+            c.Toggle = true;
+            c.Toggled = projectile.Yflip;
 
 
-                    var jd;
-                    objectFrameworkArea.mainPanel.addControl(jd = new HScrollBox(20, 35, 70, 4, 112, "rgb(50,60,127)"));
-                    var bd;
-                    jd.controls = [];
-                    for (var i = 0; i < objectFrameworkArea.objectFramework.assets.length; i++) {
-                        jd.addControl(bd = new ImageButton(0, 0, 0, 0, function () { return this.state.name; }, "10pt Arial", function (canvas, x, y) {
-                            if (this.state.frames.length == 0) return;
-                            this.state.frames[0].drawSimple(canvas, { x: x, y: y }, this.width, this.height - 15, projectile.xflip, projectile.yflip);
-                        }, function () {
+            HScrollBox jd;
+            Data.MainPanel.AddControl(jd = new HScrollBox(20, 35, 70, 4, 112) { BackColor = "rgb(50,60,127)" });
+            jd.Controls = new List<Element>();
+            for (var i = 0; i < Data.ObjectFramework.Assets.Count; i++)
+            {
+                ImageButton<LevelObjectAsset> bd = new ImageButton<LevelObjectAsset>(null, 0, 0, 0, 0);
+                bd.Text = ((Func<string>)(() => { return bd.Data.Name; }));
+                bd.Image = (canvas, x, y) =>
+                           {
+                               if (bd.Data.Frames.Count == 0) return;
+                               bd.Data.Frames[0].DrawSimple(canvas, new Point(x, y), bd.Width, bd.Height - 15, projectile.Xflip, projectile.Yflip);
+                           };
+                bd.Click = (p) =>
+                           {
 
 
-                            for (var j = 0; j < jd.controls.length; j++) {
-                                if (jd.controls[j] == this) {
-                                    if (projectile.assetIndex == j)
-                                        this.toggled = true;
+                               for (var j = 0; j < jd.Controls.Count; j++)
+                               {
+                                   if (jd.Controls[j] == bd)
+                                   {
+                                       if (projectile.AssetIndex == j)
+                                           bd.Toggled = true;
 
-                                    projectile.assetIndex = j;
-                                    continue;
+                                       projectile.AssetIndex = j;
+                                       continue;
+                                   }
+                                   ((ImageButton)jd.Controls[j]).Toggled = false;
+                               }
+
+                           };
+
+                jd.AddControl(bd   );
+                bd.Toggle = true;
+                bd.Data = Data.ObjectFramework.Assets[i];
+                if (projectile.AssetIndex == i)
+                {
+                    bd.Toggled = true;
+                }
+            }
+        }
+
+        public class ObjectFrameworkAreaPiece
+        {
+            public LevelObjectPieceLayoutPiece piece { get; set; }
+            public int index { get; set; }
+        }
+
+        private void loadPieceLayout(LevelObjectPieceLayout pieceLayout)
+        {
+            ClearMainArea();
+
+
+            Data.MainPanel.AddControl(new TextArea(25, 25, "Name= ") { Color = "black" });
+            TextBox textBox = null;
+            textBox = new TextBox(100, 5, 390, 25, pieceLayout.Name) { Color = "rgb(50,150,50)", Click = (p) => { pieceLayout.Name = textBox.Text; } };
+            Data.MainPanel.AddControl(textBox);
+
+
+            Data.MainPanel.AddControl(Data.MainPanel.Data.pe = new PieceLayoutEditor(145, 105, new Point(350, 280)));
+            Data.MainPanel.Data.pe.Init(pieceLayout);
+
+            Data.MainPanel.AddControl(Data.ListOfPieces = new ScrollBox(10, 105, 70, 5, 112) { BackColor = "rgb(50,60,127)" });
+
+
+            HScrollBox selectPieceScroll;
+            Data.MainPanel.AddControl(Data.MainPanel.Data.SelectPieceScroll = selectPieceScroll = new HScrollBox(145, 390, 70, 3, 112) { BackColor = "rgb(50,60,127)" });
+            selectPieceScroll.Controls = new List<Element>(); ;
+             
+
+            Data.MainPanel.AddControl(Data.MainPanel.Data.PriorityDrawing = new Button(148, 38, 140, 25, "Foreground")
+            {
+                Color = "rgb(50,150,50)",
+                Click = (p) =>
+                {
+                    Data.MainPanel.Data.pe.PieceLayoutMaker.SetPriority(Data.MainPanel.Data.PriorityDrawing.Toggled);
+                }
+            });
+            Data.MainPanel.Data.PriorityDrawing.Toggle = true;
+
+
+            for (var i = 0; i < Data.ObjectFramework.Pieces.Count; i++)
+            {
+                ImageButton<ObjectFrameworkAreaPiece> bdc = new ImageButton<ObjectFrameworkAreaPiece>(null, 0, 0, 0, 0);
+                bdc.Text = ((Func<string>)(() => Data.ObjectFramework.Pieces[bdc.Data.index].Name));
+                bdc.Image = (canvas, x, y) =>
+                            {
+                                var d = Data.ObjectFramework.Pieces[bdc.Data.index];
+                                var ast = Data.ObjectFramework.Assets[d.AssetIndex];
+                                if (ast.Frames.Count == 0) return;
+                                ast.Frames[0].DrawSimple(canvas, new Point(x, y), bdc.Width, bdc.Height - 15, d.Xflip, d.Yflip);
+                            };
+                bdc.Click = (p) =>
+                            {
+                                ((ImageButton<LevelObjectPieceLayoutPiece>)Data.ListOfPieces.Controls[Data.MainPanel.Data.pe.PieceLayoutMaker.SelectedPieceIndex]).Data.PieceIndex = bdc.Data.index;
+
+                                foreach (ImageButton<ObjectFrameworkAreaPiece> t in selectPieceScroll.Controls)
+                                {
+                                    if (t == bdc)
+                                        t.Toggled = true;
+                                    else
+                                        t.Toggled = false;
                                 }
-                                jd.controls[j].toggled = false;
-                            }
+                            };
 
-                        }));
-                        bd.toggle = true;
-                        bd.state = objectFrameworkArea.objectFramework.assets[i];
-                        if (projectile.assetIndex == i) {
-                            bd.toggled = true;
-                        }
+                selectPieceScroll.AddControl(bdc );
+
+                bdc.Data = new ObjectFrameworkAreaPiece { piece = pieceLayout.Pieces[0], index = i };
+                bdc.Toggle = true;
+                if (pieceLayout.Pieces.Count > 0)
+                    bdc.Toggled = pieceLayout.Pieces[0].PieceIndex == i;
+            }
+
+            Button showB = null;
+            Data.MainPanel.AddControl(showB = new Button(348, 38, 140, 25, "Show Images")
+            {
+                Color = "rgb(50,150,50)",
+                Click = (p) =>
+                {
+                    Data.MainPanel.Data.pe.PieceLayoutMaker.ShowImages = showB.Toggled;
+                }
+            });
+            showB.Toggle = true;
+
+            Data.MainPanel.AddControl(new Button(348, 68, 140, 25, "Add Branch")
+            {
+                Color = "rgb(50,150,50)",
+                Click = (p) =>
+                {
+                    LevelObjectPieceLayoutPiece pc;
+                    Data.MainPanel.Data.pe.PieceLayoutMaker.PieceLayout.Pieces.Add(pc = new LevelObjectPieceLayoutPiece((int)(Data.ObjectFramework.Pieces.Count * Math.Random())));
+                    pc.X = (int)(Math.Random() * Data.MainPanel.Data.pe.PieceLayoutMaker.PieceLayout.Width);
+                    pc.Y = (int)(Math.Random() * Data.MainPanel.Data.pe.PieceLayoutMaker.PieceLayout.Height);
+
+                    Data.MainPanel.Data.pe.PieceLayoutMaker.SelectedPieceIndex = Data.MainPanel.Data.pe.PieceLayoutMaker.PieceLayout.Pieces.Count - 1;
+
+                    buildleftScroll(pieceLayout);
+                }
+            });
+
+
+            buildleftScroll(pieceLayout);
+
+/*
+            Data.MainPanel.Data.UpdatePieces = () =>
+            {
+                ImageButton<ObjectFrameworkAreaPiece> df=null;
+                for (var j = 0; j < Data.ListOfPieces.Controls.Count; j++)
+                {
+
+
+                    if (j == Data.MainPanel.Data.pe.PieceLayoutMaker.SelectedPieceIndex)
+                    {
+                        ((ImageButton<ObjectFrameworkAreaPiece>)Data.MainPanel.Data.SelectPieceScroll.Controls[j]).Toggled = true;
+                        df = ((ImageButton<ObjectFrameworkAreaPiece>)Data.MainPanel.Data.SelectPieceScroll.Controls[j]);
                     }
-            */
-        }
-
-        private void loadPieceLayout(LevelObjectPieceLayout data)
-        { /*
-        objectFrameworkArea.clearMainArea();
-
-
-        objectFrameworkArea.mainPanel.addControl(new TextArea(25, 25, "Name: ", sonicManager.uiManager.textFont, "black"));
-        objectFrameworkArea.mainPanel.addControl(new TextBox(100, 5, 390, 25, pieceLayout.name, sonicManager.uiManager.buttonFont, "rgb(50,150,50)", function () { pieceLayout.name = this.text; }));
-
-
-        objectFrameworkArea.mainPanel.addControl(pe = new PieceLayoutEditor(145, 105, { width: 350, height: 280 }));
-        pe.init(pieceLayout);
-
-        var listOfPieces;
-        objectFrameworkArea.mainPanel.addControl(listOfPieces = new ScrollBox(10, 105, 70, 5, 112, "rgb(50,60,127)"));
-
-
-        var selectPieceScroll;
-        objectFrameworkArea.mainPanel.addControl(objectFrameworkArea.mainPanel.selectPieceScroll = selectPieceScroll = new HScrollBox(145, 390, 70, 3, 112, "rgb(50,60,127)"));
-        var bdc;
-        selectPieceScroll.controls = [];
-
-
-        objectFrameworkArea.mainPanel.addControl(objectFrameworkArea.mainPanel.priorityDrawing = new Button(148, 38, 140, 25, "Foreground", sonicManager.uiManager.buttonFont, "rgb(50,150,50)", function () {
-            pe.pieceLayoutMaker.setPriority(this.toggled);
-        }));
-        objectFrameworkArea.mainPanel.priorityDrawing.toggle = true;
-
-
-        for (var i = 0; i < objectFrameworkArea.objectFramework.pieces.length; i++) {
-
-            selectPieceScroll.addControl(bdc = new ImageButton(0, 0, 0, 0,
-                function () {
-                    return objectFrameworkArea.objectFramework.pieces[this.state.index].name;
-                }, "10pt Arial",
-                function (canvas, x, y) {
-                    var d = objectFrameworkArea.objectFramework.pieces[this.state.index];
-                    var ast = objectFrameworkArea.objectFramework.assets[d.assetIndex];
-                    if (ast.frames.length == 0) return;
-                    ast.frames[0].drawSimple(canvas, { x: x, y: y }, this.width, this.height - 15, d.xflip, d.yflip);
-                }, function () {
-                    listOfPieces.controls[pe.pieceLayoutMaker.selectedPieceIndex].state.pieceIndex = this.state.index;
-
-                    for (var i = 0; i < selectPieceScroll.controls.length; i++) {
-                        if (selectPieceScroll.controls[i] == this)
-                            selectPieceScroll.controls[i].toggled = true;
-                        else
-                            selectPieceScroll.controls[i].toggled = false;
+                    else
+                    {
+                        ((ImageButton<ObjectFrameworkAreaPiece>)Data.MainPanel.Data.SelectPieceScroll.Controls[j]).Toggled = false;
                     }
-                }));
+                }
 
-            bdc.state = {
-                piece: pieceLayout.pieces[0],
-                index: i
+                for (var j = 0; j < Data.MainPanel.Data.SelectPieceScroll.Controls.Count; j++)
+                {
+                    df.Data.piece = ??this??;
+                    if (df.Data.piece.PieceIndex == j)
+                        ((ImageButton<ObjectFrameworkAreaPiece>)Data.MainPanel.Data.SelectPieceScroll.Controls[j]).Toggled = true;
+                    else
+                        ((ImageButton<ObjectFrameworkAreaPiece>)Data.MainPanel.Data.SelectPieceScroll.Controls[j]).Toggled = false;
+                }
+
+
             };
-            bdc.toggle = true;
-            if (pieceLayout.pieces[0])
-                bdc.toggled = pieceLayout.pieces[0].pieceIndex == i;
-        }
-
-        var pe;
-        var showB;
-        objectFrameworkArea.mainPanel.addControl(showB = new Button(348, 38, 140, 25, "Show Images", sonicManager.uiManager.buttonFont, "rgb(50,150,50)", function () {
-            pe.pieceLayoutMaker.showImages = this.toggled;
-        }));
-        showB.toggle = true;
-
-        objectFrameworkArea.mainPanel.addControl(new Button(348, 68, 140, 25, "Add Branch", sonicManager.uiManager.buttonFont, "rgb(50,150,50)", function () {
-            var pc;
-            pe.pieceLayoutMaker.pieceLayout.pieces.push(pc = new LevelObjectPieceLayoutPiece(_H.floor(objectFrameworkArea.objectFramework.pieces.length * Math.random())));
-            pc.x = _H.floor(Math.random() * pe.pieceLayoutMaker.pieceLayout.width);
-            pc.y = _H.floor(Math.random() * pe.pieceLayoutMaker.pieceLayout.height);
-
-            pe.pieceLayoutMaker.selectedPieceIndex = pe.pieceLayoutMaker.pieceLayout.pieces.length - 1;
-
-            buildleftScroll();
-        }));
-
-        function buildleftScroll() {
-            var bd;
-
-            listOfPieces.controls = [];
-            for (var i = 0; i < pieceLayout.pieces.length; i++) {
-
-                listOfPieces.addControl(bd = new ImageButton(0, 0, 0, 0, function () {
-                    return objectFrameworkArea.objectFramework.pieces[this.state.pieceIndex].name;
-                }, "10pt Arial", function (canvas, x, y) {
-                    var pc = objectFrameworkArea.objectFramework.pieces[this.state.pieceIndex];
-                    var ast = objectFrameworkArea.objectFramework.assets[pc.assetIndex];
-                    if (ast.frames.length == 0) return;
-                    ast.frames[0].drawSimple(canvas, { x: x, y: y }, this.width, this.height - 15, pc.xflip, pc.yflip);
-                }, function () {
-
-                    for (var j = 0; j < listOfPieces.controls.length; j++) {
-                        if (this == listOfPieces.controls[j]) {
-                            listOfPieces.controls[j].toggled = true;
-                            pe.pieceLayoutMaker.selectedPieceIndex = j;
-                        } else {
-                            listOfPieces.controls[j].toggled = false;
-                        }
-                    }
-
-                    for (var j = 0; j < selectPieceScroll.controls.length; j++) {
-
-                        selectPieceScroll.controls[j].state.piece = this.state;
-                        selectPieceScroll.controls[j].toggled = (j == pieceLayout.pieces[pe.pieceLayoutMaker.selectedPieceIndex].pieceIndex);
-
-                    }
-
-                }));
-                bd.toggle = true;
-                bd.state = pieceLayout.pieces[i];
-                if (i == pe.pieceLayoutMaker.selectedPieceIndex) bd.toggled = true;
-            }
-        }
-
-        buildleftScroll();
-
-        objectFrameworkArea.mainPanel.updatePieces = function () {
-            var df;
-            for (var j = 0; j < listOfPieces.controls.length; j++) {
-                if (j == pe.pieceLayoutMaker.selectedPieceIndex) {
-                    listOfPieces.controls[j].toggled = true;
-                    df = listOfPieces.controls[j];
-                }
-                else {
-                    listOfPieces.controls[j].toggled = false;
-                }
-            }
-
-            for (var j = 0; j < objectFrameworkArea.mainPanel.selectPieceScroll.controls.length; j++) {
-                df.piece = this;
-                if (df.piece.pieceIndex == j)
-                    objectFrameworkArea.mainPanel.selectPieceScroll.controls[j].toggled = true;
-                else
-                    objectFrameworkArea.mainPanel.selectPieceScroll.controls[j].toggled = false;
-            }
-
-
-        };
-
 */
+
+        }
+        private void buildleftScroll(LevelObjectPieceLayout pieceLayout)
+        {
+
+            Data.ListOfPieces.Controls = new List<Element>();
+            for (var i = 0; i < pieceLayout.Pieces.Count; i++)
+            {
+                ImageButton<LevelObjectPieceLayoutPiece> bd = new ImageButton<LevelObjectPieceLayoutPiece>(null, 0, 0, 0, 0);
+                bd.Text = (Func<string>)(() =>
+                                         {
+                                             return Data.ObjectFramework.Pieces[bd.Data.PieceIndex].Name;
+                                         });
+                bd.Image = (canvas, x, y) =>
+                           {
+                               var pc = Data.ObjectFramework.Pieces[bd.Data.PieceIndex];
+                               var ast = Data.ObjectFramework.Assets[pc.AssetIndex];
+                               if (ast.Frames.Count == 0) return;
+                               ast.Frames[0].DrawSimple(canvas, new Point(x, y), bd.Width, bd.Height - 15, pc.Xflip, pc.Yflip);
+                           };
+                bd.Click = (p) =>
+                           {
+
+                               for (var j = 0; j < Data.ListOfPieces.Controls.Count; j++)
+                               {
+                                   if (bd == Data.ListOfPieces.Controls[j])
+                                   {
+                                       ((ImageButton)Data.ListOfPieces.Controls[j]).Toggled = true;
+                                       Data.MainPanel.Data.pe.PieceLayoutMaker.SelectedPieceIndex = j;
+                                   }
+                                   else
+                                   {
+                                       ((ImageButton)Data.ListOfPieces.Controls[j]).Toggled = false;
+                                   }
+                               }
+
+                               for (var j = 0; j < Data.MainPanel.Data.SelectPieceScroll.Controls.Count; j++)
+                               {
+                                   var fm = ((ImageButton<ObjectFrameworkAreaPiece>)Data.MainPanel.Data.SelectPieceScroll.Controls[j]);
+                                   fm.Data.piece = bd.Data;
+                                   fm.Toggled = (j == pieceLayout.Pieces[Data.MainPanel.Data.pe.PieceLayoutMaker.SelectedPieceIndex].PieceIndex);
+
+                               }
+
+                           };
+                Data.ListOfPieces.AddControl(bd );
+                bd.Toggle = true;
+                bd.Data = pieceLayout.Pieces[i];
+                if (i == Data.MainPanel.Data.pe.PieceLayoutMaker.SelectedPieceIndex) bd.Toggled = true;
+            }
         }
 
         private void loadPiece(LevelObjectPiece piece)
@@ -629,13 +694,13 @@ namespace OurSonic.UIManager.Areas
 
             Data.MainPanel.AddControl(new TextArea(25, 25, "Name: ") { Color = "black" });
             TextBox textBox = null;
-            Data.MainPanel.AddControl(textBox = new TextBox(100, 5, 290, 25, piece.Name) { Color = "rgb(50,150,50)", Click = () => { piece.Name = textBox.Text; } });
+            Data.MainPanel.AddControl(textBox = new TextBox(100, 5, 290, 25, piece.Name) { Color = "rgb(50,150,50)", Click = (p) => { piece.Name = textBox.Text; } });
 
             Button b = null;
             Data.MainPanel.AddControl(b = new Button(40, 160, 70, 25, "XFlip")
             {
                 Color = "rgb(50,150,50)",
-                Click = () =>
+                Click = (p) =>
                 {
                     piece.Xflip = b.Toggled;
                 }
@@ -647,7 +712,7 @@ namespace OurSonic.UIManager.Areas
             Data.MainPanel.AddControl(c = new Button(115, 160, 70, 25, "YFlip")
             {
                 Color = "rgb(50,150,50)",
-                Click = () =>
+                Click = (p) =>
                 {
                     piece.Yflip = c.Toggled;
                 }
@@ -657,41 +722,42 @@ namespace OurSonic.UIManager.Areas
 
 
             HScrollBox jd;
-            Data.MainPanel.AddControl(jd = new HScrollBox(20, 35,70,4,112) { BackColor = "rgb(50,60,127)" });
+            Data.MainPanel.AddControl(jd = new HScrollBox(20, 35, 70, 4, 112) { BackColor = "rgb(50,60,127)" });
             ImageButton<LevelObjectAsset> bd = null;
             jd.Controls = new List<Element>();
 
+
             for (var i = 0; i < Data.ObjectFramework.Assets.Count; i++)
             {
-                jd.AddControl(bd = new ImageButton<LevelObjectAsset>(null,0, 0, 0, 0)
-                {
-                    Text = ((Func<string>)(() => bd.Data.Name)),
-                    Image = (canvas, x, y) =>
-                    {
-                        if (bd.Data.Frames.Count == 0) return;
-                        bd.Data.Frames[0].DrawSimple(canvas, new Point(x, y), bd.Width, bd.Height - 15, piece.Xflip, piece.Yflip);
-                    },
-                    Click = () =>
-                    {
 
+                bd = new ImageButton<LevelObjectAsset>(Data.ObjectFramework.Assets[i], 0, 0, 0, 0);
+                ImageButton<LevelObjectAsset> bd1 = bd;
+                bd.Text = ((Func<string>)(() => bd1.Data.Name));
 
-                        for (var j = 0; j < jd.Controls.Count; j++)
-                        {
-                            if (jd.Controls[j] == bd)
-                            {
-                                if (piece.AssetIndex == j)
-                                    bd.Toggled = true;
+                bd.Image = (canvas, x, y) =>
+                           {
+                               if (bd1.Data.Frames.Count == 0) return;
+                               bd1.Data.Frames[0].DrawSimple(canvas, new Point(x, y), bd1.Width, bd1.Height - 15, piece.Xflip, piece.Yflip);
+                           };
+                bd.Click = (p) =>
+                           {
+                               for (var j = 0; j < jd.Controls.Count; j++)
+                               {
+                                   if (jd.Controls[j] == bd1)
+                                   {
+                                       if (piece.AssetIndex == j)
+                                           bd1.Toggled = true;
 
-                                piece.AssetIndex = j;
-                                continue;
-                            }
-                            ((ImageButton)jd.Controls[j]).Toggled = false;
-                        }
+                                       piece.AssetIndex = j;
+                                       continue;
+                                   }
+                                   ((ImageButton)jd.Controls[j]).Toggled = false;
+                               }
 
-                    }
-                });
+                           };
+
+                jd.AddControl(bd);
                 bd.Toggle = true;
-                bd.Data = Data.ObjectFramework.Assets[i];
                 if (piece.AssetIndex == i)
                 {
                     bd.Toggled = true;
@@ -705,185 +771,188 @@ namespace OurSonic.UIManager.Areas
             ClearMainArea();
 
 
-            Data.MainPanel.AddControl(new TextArea(25, 25, "Name: ") { Color = "black" });
+            Data.MainPanel.AddControl(new TextArea(25, 25, "Name: ") {Color = "black"});
             TextBox tb = null;
-            Data.MainPanel.AddControl(tb = new TextBox(100, 5, 290, 25, asset.Name) { Color = "rgb(50,150,50)", Click = () => { asset.Name = tb.Text; } });
+            Data.MainPanel.AddControl(tb = new TextBox(100, 5, 290, 25, asset.Name) { Color = "rgb(50,150,50)", Click = (p) => { asset.Name = tb.Text; } });
 
-            Data.MainPanel.AddControl(new Button(400, 5, 100, 25, "Add Frame")
-            {
-                Color = "rgb(50,150,50)",
-                Click = () =>
-                {
+            Data.MainPanel.AddControl(new Button(400, 5, 100, 25, "Add Frame") {
+                                                                                       Color = "rgb(50,150,50)",
+                                                                                       Click = (p) =>
+                                                                                       {
 
-                    LevelObjectAssetFrame vs;
-                    asset.Frames.Add(vs = new LevelObjectAssetFrame("Frame " + (asset.Frames.Count + 1)));
-                    vs.Palette = new string[] { "000", "111", "222", "333", "444", "555", "666", "777", "888", "999", "AAA", "BBB", "CCC", "DDD", "EEE", "FFF" };
-                    vs.Width = (int)(Math.Floor(Math.Random() * 40) + 20);
-                    vs.Height = (int)(Math.Floor(Math.Random() * 40) + 20);
-                    vs.ColorMap=new int[vs.Width][];
-                    for (var i = 0; i < vs.Width; i++)
-                    {
-                        vs.ColorMap[i] = new int[vs.Height];
-                        for (var j = 0; j < vs.Height; j++)
-                        {
-                            vs.ColorMap[i][j] = (int)Math.Floor(Math.Random() * vs.Palette.Length);
-                        }
-                    }
+                                                                                                   LevelObjectAssetFrame vs;
+                                                                                                   asset.Frames.Add(vs = new LevelObjectAssetFrame("Frame " + ( asset.Frames.Count + 1 )));
+                                                                                                   vs.Palette = new string[] {"000", "111", "222", "333", "444", "555", "666", "777", "888", "999", "AAA", "BBB", "CCC", "DDD", "EEE", "FFF"};
+                                                                                                   vs.Width = (int) ( Math.Floor(Math.Random() * 40) + 20 );
+                                                                                                   vs.Height = (int) ( Math.Floor(Math.Random() * 40) + 20 );
+                                                                                                   vs.ColorMap = new int[vs.Width][];
+                                                                                                   for (var i = 0; i < vs.Width; i++) {
+                                                                                                       vs.ColorMap[i] = new int[vs.Height];
+                                                                                                       for (var j = 0; j < vs.Height; j++) {
+                                                                                                           vs.ColorMap[i][j] = (int) Math.Floor(Math.Random() * vs.Palette.Length);
+                                                                                                       }
+                                                                                                   }
 
-                    //Data.MainPanel.populate(asset);
-                }
-            });
+                                                                                                   Data.MainPanel.Data.AssetPopulate(asset);
+                                                                                               }
+                                                                               });
 
             HScrollBox jd;
-            Data.MainPanel.AddControl(jd = new HScrollBox(20, 35, 70, 4, 112) { BackColor = "rgb(50,60,127)" });
-            Data.MainPanel.Data.AssetPopulate = (ast) =>
-            {
-                ImageButton<LevelObjectAssetFrame> bd = null;
-                jd.Controls = new List<Element>();
-                for (var i = 0; i < ast.Frames.Count; i++)
-                {
-                    jd.AddControl(bd = new ImageButton<LevelObjectAssetFrame>(null,0, 0, 0, 0)
-                    {
-                        Text = ((Func<string>)(() => { return ast.Name; })),
-                        Image = (canvas, x, y) =>
-                        {
-                            bd.Data.DrawSimple(canvas, new Point(x, y), bd.Width, bd.Height - 15, false, false);
-                        },
-                        Click = () =>
-                        {
-                            Data.MainPanel.Data.LoadFrame(bd.Data);
-                        }
-                    });
-                    bd.Data = ast.Frames[i];
-                }
-            };
+            Data.MainPanel.AddControl(jd = new HScrollBox(20, 35, 70, 4, 112) {BackColor = "rgb(50,60,127)"});
+            Data.MainPanel.Data.AssetPopulate = (ast) => {
+                                                    jd.Controls = new List<Element>();
+                                                    foreach (LevelObjectAssetFrame t in ast.Frames) {
+                                                        ImageButton<LevelObjectAssetFrame> bd = null;
+                                                        bd = new ImageButton<LevelObjectAssetFrame>(null, 0, 0, 0, 0);
+
+                                                        bd.Text = ( (Func<string>) ( () => { return bd.Data.Name; } ) );
+                                                        bd.Image = (canvas, x, y) => bd.Data.DrawSimple(canvas, new Point(x, y), bd.Width, bd.Height - 15, false, false);
+
+                                                        bd.Click = (p) => Data.MainPanel.Data.LoadFrame(bd.Data);
+
+                                                        jd.AddControl(bd);
+                                                        bd.Data = t;
+                                                    }
+                                                };
 
 
             Data.MainPanel.Data.AssetPopulate(asset);
 
-            Data.MainPanel.AddControl(Data.MainPanel.Data.FrameArea = new Panel(7, 155, 480, 350));
+            Data.MainPanel.AddControl(Data.MainPanel.Data.FrameArea = new Panel<FrameAreaData>(new FrameAreaData(), 7, 155, 480, 350));
             Data.MainPanel.Data.FrameArea.Outline = false;
 
 
-            Data.MainPanel.Data.LoadFrame = (frame) =>
-            {
-                Data.MainPanel.Data.FrameArea.Controls = new List<Element>();
-                //Data.MainPanel.Data.FrameArea.currentFrame = frame;
-                //var ce;
-                Data.MainPanel.Data.FrameArea.AddControl(new TextArea(15, 21, "Name: ") { Color = "black" });
-                TextBox textBox = null;
-                Data.MainPanel.Data.FrameArea.AddControl(new TextBox(90, 0, 395, 25, frame.Name)
-                {
-                    Color = "rgb(50,150,50)",
-                    Click = () => { frame.Name = textBox.Text; }
-                });
+            Data.MainPanel.Data.LoadFrame = (frame) => {
+                                                Data.MainPanel.Data.FrameArea.Controls = new List<Element>();
+                                                //Data.MainPanel.Data.FrameArea.currentFrame = frame;
+                                                //var ce;
+                                                Data.MainPanel.Data.FrameArea.AddControl(new TextArea(15, 21, "Name: ") {Color = "black"});
+                                                TextBox textBox = null;
+                                                Data.MainPanel.Data.FrameArea.AddControl(new TextBox(90, 0, 395, 25, frame.Name) {
+                                                                                                                                         Color = "rgb(50,150,50)",
+                                                                                                                                         Click = (p) => { frame.Name = textBox.Text; }
+                                                                                                                                 });
 
 
-                Data.MainPanel.Data.FrameArea.AddControl(new TextArea(0, 275, (Func<string>)(() => { return "Width:  " + frame.Width; })) { Color = "Black" });
+                                                Data.MainPanel.Data.FrameArea.AddControl(new TextArea(0, 275, (Func<string>) ( () => { return "Width:  " + frame.Width; } )) {Color = "Black"});
 
-                Data.MainPanel.Data.FrameArea.AddControl(new Button(75, 275 - 25, 14, 17, "^"){Color="rgb(50,150,50)", Click=() =>
-                {
-                    frame.SetWidth(frame.Width + 1);
-                }});
-                Data.MainPanel.Data.FrameArea.AddControl(new Button(75, 275 - 5, 14, 20, "v")
-                {
-                    Color = "rgb(50,150,50)",
-                    Click = () =>
-                        {
-                            frame.SetWidth(frame.Width - 1);
+                                                Data.MainPanel.Data.FrameArea.AddControl(new Button(75, 275 - 25, 14, 17, "^") {
+                                                                                                                                       Color = "rgb(50,150,50)",
+                                                                                                                                       Click = (p) =>
+                                                                                                                                       {
+                                                                                                                                                   frame.SetWidth(frame.Width + 1);
+                                                                                                                                               }
+                                                                                                                               });
+                                                Data.MainPanel.Data.FrameArea.AddControl(new Button(75, 275 - 5, 14, 20, "v") {
+                                                                                                                                      Color = "rgb(50,150,50)",
+                                                                                                                                      Click = (p) =>
+                                                                                                                                      {
+                                                                                                                                                  frame.SetWidth(frame.Width - 1);
 
-                        }
-                });
+                                                                                                                                              }
+                                                                                                                              });
 
-                Data.MainPanel.Data.FrameArea.AddControl(new TextArea(0, 320, ((Func<string>)(() => { return "Height: " + frame.Height; }))) { Color = "Black" });
-
-
-                Data.MainPanel.Data.FrameArea.AddControl(new Button(75, 320 - 25, 14, 17, "^"){Color= "rgb(50,150,50)",Click= () =>
-                {
-                    frame.SetHeight(frame.Height + 1);
-
-                }});
-                Data.MainPanel.Data.FrameArea.AddControl(new Button(75, 320 - 5, 14, 20, "v"){Color="rgb(50,150,50)", Click=() =>
-                {
-                    frame.SetHeight(frame.Height - 1);
-
-                }});
-
-                Button bt;
-                Data.MainPanel.Data.FrameArea.AddControl(bt = new Button(230 - 55, 35, 150, 25, "Collide Map"){Color="rgb(50,150,50)", Click=() =>
-                {
-                //    ce.showCollideMap = this.toggled;
-                }});
-                bt.Toggle = true;
-                Data.MainPanel.Data.FrameArea.AddControl(bt = new Button(390 - 55, 35, 150, 25, "Hurt Map"){Color="rgb(50,150,50)",Click= () =>
-                {
-                //    ce.showHurtMap = this.toggled;
-                }});
-                bt.Toggle = true;
-
-      /*          Data.MainPanel.Data.FrameArea.AddControl(Data.MainPanel.Data.FrameArea.colorEditor = new ColorEditingArea(230 - 55, 65, new Point(310, 225), true));
-                var ce = Data.MainPanel.Data.FrameArea.colorEditor;
-                ce.init(frame);
-                ce.editor.showOutline = false;
-                ce.editable = false;
-                ce.click = (e) =>
-                {
-                    frame.setOffset(e.x, e.y);
-
-                };*/
-/*
-                Data.MainPanel.Data.FrameArea.AddControl(new HtmlBox(19, 64, 120, 31, () =>
-                {
-                    var sc = document.getElementById("picFieldUploader");
-
-                    sc.style.left = (objectFrameworkArea.x + 320 + 7 + 19) + "px";
-                    sc.style.top = (objectFrameworkArea.y + 150 + 155 + 64) + "px";
-                    sc.style.position = "absolute";
-                    sc.style.visibility = "visible";
-                }, (x, y) =>
-                {
-                    var sc = document.getElementById("picFieldUploader");
-                    if (sc)
-                    {
-                        if (sc.style.left == x + "px" && sc.style.top == y + "px")
-                            return;
-                        sc.style.left = x + "px";
-                        sc.style.top = y + "px";
-                    }
-                }, () =>
-                {
-                    var sc = document.getElementById("picFieldUploader");
-                    if (sc)
-                    {
-                        sc.style.visibility = "visible";
-                    }
-                }, () =>
-                {
-                    var sc = document.getElementById("picFieldUploader");
-                    if (sc)
-                    {
-                        sc.style.left = "-100px";
-                        sc.style.top = "-100px";
-                        sc.style.visibility = "hidden";
-                    }
-                }));
-*/
+                                                Data.MainPanel.Data.FrameArea.AddControl(new TextArea(0, 320, ( (Func<string>) ( () => { return "Height: " + frame.Height; } ) )) {Color = "Black"});
 
 
-             /*   var pa;
-                Data.MainPanel.Data.FrameArea.AddControl(Data.MainPanel.Data.FrameArea.palatteArea = new PaletteArea(230 - 55, 300, new Point(39, 11), false));
-                Data.MainPanel.Data.FrameArea.palatteArea.init(frame.palette, true);
+                                                Data.MainPanel.Data.FrameArea.AddControl(new Button(75, 320 - 25, 14, 17, "^") {
+                                                                                                                                       Color = "rgb(50,150,50)",
+                                                                                                                                       Click = (p) =>
+                                                                                                                                       {
+                                                                                                                                                   frame.SetHeight(frame.Height + 1);
 
-                Data.MainPanel.Data.FrameArea.AddControl(new Button(230 - 55, 305 + 11 * 2, 310, 25, "Edit Map"){Color="rgb(50,150,50)", Click=() =>
-                {
-                    sonicManager.uiManager.colorEditorArea.init(frame);
-                    sonicManager.uiManager.colorEditorArea.visible = true;
-                    sonicManager.uiManager.colorEditorArea.depth = objectFrameworkArea.depth + 1;
-                    objectFrameworkArea.loseFocus();
+                                                                                                                                               }
+                                                                                                                               });
+                                                Data.MainPanel.Data.FrameArea.AddControl(new Button(75, 320 - 5, 14, 20, "v") {
+                                                                                                                                      Color = "rgb(50,150,50)",
+                                                                                                                                      Click = (p) =>
+                                                                                                                                      {
+                                                                                                                                                  frame.SetHeight(frame.Height - 1);
 
-                }});*/
+                                                                                                                                              }
+                                                                                                                              });
 
-            };
+                                                Button bt;
+                                                Data.MainPanel.Data.FrameArea.AddControl(bt = new Button(230 - 55, 35, 150, 25, "Collide Map") {
+                                                                                                                                                       Color = "rgb(50,150,50)",
+                                                                                                                                                       Click = (p) =>
+                                                                                                                                                       {
+                                                                                                                                                                   //    ce.showCollideMap = this.toggled;
+                                                                                                                                                               }
+                                                                                                                                               });
+                                                bt.Toggle = true;
+                                                Data.MainPanel.Data.FrameArea.AddControl(bt = new Button(390 - 55, 35, 150, 25, "Hurt Map") {
+                                                                                                                                                    Color = "rgb(50,150,50)",
+                                                                                                                                                    Click = (p) => {
+                                                                                                                                                                //    ce.showHurtMap = this.toggled;
+                                                                                                                                                            }
+                                                                                                                                            });
+                                                bt.Toggle = true;
+
+                                                          Data.MainPanel.Data.FrameArea.AddControl(Data.MainPanel.Data.FrameArea.Data.ColorEditor = new ColorEditingArea(230 - 55, 65, 310,225){ShowOffset=true});
+                          var ce = Data.MainPanel.Data.FrameArea.Data.ColorEditor;
+                          ce.Init(frame);
+                          ce.Editor.ShowOutline = false;
+                          ce.Editable = false;
+                          ce.Click = (p) =>
+                          {
+                              frame.SetOffset(p.X, p.Y);
+
+                          };
+                                                /*
+                                Data.MainPanel.Data.FrameArea.AddControl(new HtmlBox(19, 64, 120, 31, () =>
+                                {
+                                    var sc = document.getElementById("picFieldUploader");
+
+                                    sc.style.left = (objectFrameworkArea.x + 320 + 7 + 19) + "px";
+                                    sc.style.top = (objectFrameworkArea.y + 150 + 155 + 64) + "px";
+                                    sc.style.position = "absolute";
+                                    sc.style.visibility = "visible";
+                                }, (x, y) =>
+                                {
+                                    var sc = document.getElementById("picFieldUploader");
+                                    if (sc)
+                                    {
+                                        if (sc.style.left == x + "px" && sc.style.top == y + "px")
+                                            return;
+                                        sc.style.left = x + "px";
+                                        sc.style.top = y + "px";
+                                    }
+                                }, () =>
+                                {
+                                    var sc = document.getElementById("picFieldUploader");
+                                    if (sc)
+                                    {
+                                        sc.style.visibility = "visible";
+                                    }
+                                }, () =>
+                                {
+                                    var sc = document.getElementById("picFieldUploader");
+                                    if (sc)
+                                    {
+                                        sc.style.left = "-100px";
+                                        sc.style.top = "-100px";
+                                        sc.style.visibility = "hidden";
+                                    }
+                                }));
+                */
+
+
+                                                Data.MainPanel.Data.FrameArea.AddControl(Data.MainPanel.Data.FrameArea.Data.PalatteArea = new PaletteArea(230 - 55, 300,39,11){Size=new Point(39, 11),ShowCurrent=  false});
+                                                Data.MainPanel.Data.FrameArea.Data.PalatteArea.Init(frame.Palette, true);
+
+                                                Data.MainPanel.Data.FrameArea.AddControl(new Button(230 - 55, 305 + 11 * 2, 310, 25, "Edit Map") {
+                                                                                                                                                         Color = "rgb(50,150,50)",
+                                                                                                                                                         Click = (p) => {
+                                                                                                                                                                     SonicManager.Instance.UIManager.ColorEditorArea.Init(frame);
+                                                                                                                                                                     SonicManager.Instance.UIManager.ColorEditorArea.Visible = true;
+                                                                                                                                                                     SonicManager.Instance.UIManager.ColorEditorArea.Depth = /*this.Depth + 1*/ 10;
+                                                                                                                                                                     objectFrameworkArea.LoseFocus();
+
+                                                                                                                                                                 }
+                                                                                                                                                 });
+
+                                            };
         }
 
         /*
@@ -925,12 +994,22 @@ namespace OurSonic.UIManager.Areas
         public CodeMirror Editor { get; set; }
         public Panel<MainPanelData> MainPanel { get; set; }
         public TextAreaElement CodeMirror { get; set; }
+        public ScrollBox ListOfPieces { get; set; }
     }
+    [Serializable]
     public class MainPanelData
     {
         public Action<LevelObjectAsset> AssetPopulate { get; set; }
-        public Panel FrameArea { get; set; }
+        public Panel<FrameAreaData> FrameArea { get; set; }
 
         public Action<LevelObjectAssetFrame> LoadFrame { get; set; }
+        public HScrollBox SelectPieceScroll { get; set; }
+        public Button PriorityDrawing { get; set; }
+        public PieceLayoutEditor pe { get; set; }
+        public Action UpdatePieces { get; set; }
+    }
+    public class FrameAreaData {
+        public PaletteArea PalatteArea { get; set; }
+        public ColorEditingArea ColorEditor { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonicModels.Common;
 namespace OurSonic.UIManager
 {
     public class TextArea : Element

@@ -1,5 +1,6 @@
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonicModels.Common;
 namespace OurSonic.UIManager
 {
     public class Button<T> : Button
@@ -73,11 +74,11 @@ namespace OurSonic.UIManager
                 return false;
             if (Clicking) {
                 if (Click != null)
-                    Click();
+                    Click(new Point(e.X,e.Y));
             }
             Clicking = false;
             if (MouseUp != null)
-                MouseUp();
+                MouseUp(new Point(e.X, e.Y));
 
             return base.OnMouseUp(e);
         }
@@ -86,7 +87,7 @@ namespace OurSonic.UIManager
         {
             if (!Visible) return false;
             if (MouseOver != null)
-                MouseOver();
+                MouseOver(new Point(e.X, e.Y));
             return base.OnMouseOver(e);
         }
 

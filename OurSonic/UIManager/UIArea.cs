@@ -31,7 +31,7 @@ namespace OurSonic.UIManager
                 AddControl(new Button(Width - 30, 4, 26, 23, "X") {
                                                                           Font = UIManager.ButtonFont,
                                                                           Color = "Green",
-                                                                          Click = () => {
+                                                                          Click = (p) => {
                                                                                       LoseFocus();
                                                                                       Visible = false;
                                                                                   }

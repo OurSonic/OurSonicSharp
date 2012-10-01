@@ -18,7 +18,7 @@ namespace OurSonic.UIManager.Areas
             levelInformation.AddControl(new Button(320, 105, 160, 22, "Load Empty Level") {
                                                                                                   Font = UIManager.ButtonFont,
                                                                                                   Color = "rgb(50,150,50)",
-                                                                                                  Click = () => {
+                                                                                                  Click = (p) => {
                                                                                                               /*  levelManagerArea.visible = true;
                                 loadingText.visible = true;
                                 var index = 0;
@@ -48,8 +48,8 @@ namespace OurSonic.UIManager.Areas
                                                                                           });
 
             var ctls =
-                    levelInformation.AddControl(new ScrollBox(30, 70)
-                                                {ItemHeight = 25, VisibleItems = 11, ItemWidth = 250, BackColor = "rgb(50, 60, 127)",});
+                    levelInformation.AddControl(new ScrollBox(30, 70,25,11,250)
+                                                {BackColor = "rgb(50, 60, 127)",});
             var loadLevel = (Action<string>) ( name => {
                                                    UIManager.UpdateTitle("Downloading " + name);
                                                    SonicEngine.Instance.client.Emit("LoadLevel.Request", new DataObject<string>(name));
@@ -72,7 +72,7 @@ namespace OurSonic.UIManager.Areas
                                                                                                                                                               "rgb(50,190,90)",
                                                                                                                                                       Click
                                                                                                                                                               =
-                                                                                                                                                              ()
+                                                                                                                                                              (p)
                                                                                                                                                               => {
                                                                                                                                                                   loadLevel
                                                                                                                                                                           (area);

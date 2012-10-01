@@ -1,5 +1,5 @@
 using System;
-namespace OurSonic.UIManager
+namespace OurSonicModels.Common
 {
     public class DelegateOrValue<T>
     {

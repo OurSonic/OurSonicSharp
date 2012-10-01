@@ -20,10 +20,7 @@ namespace OurSonic.UIManager
         [IntrinsicProperty]
         public bool Outline { get; set; }
         [IntrinsicProperty]
-        public UIArea Area { get; set; }
-        [IntrinsicProperty]
-        public CanvasInformation CachedDrawing { get; set; }
-
+        public UIArea Area { get; set; }  
         public Panel(int x, int y, int width, int height)
                 : base(x, y)
         {

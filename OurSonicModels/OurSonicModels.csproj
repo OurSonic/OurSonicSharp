@@ -33,6 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Common\DataObject.cs" />
+    <Compile Include="Common\DelegateOrValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SLData.cs" />
   </ItemGroup>

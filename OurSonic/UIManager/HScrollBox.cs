@@ -95,7 +95,7 @@ namespace OurSonic.UIManager
                 }
             }
 
-            if (MouseUp != null) MouseUp();
+            if (MouseUp != null) MouseUp(new Point(e.X, e.Y));
             return base.OnMouseUp(e);
         }
 
@@ -117,7 +117,7 @@ namespace OurSonic.UIManager
 
                 ScrollOffset = Math.Min(Math.Max(ScrollOffset, 0), Controls.Count);
             }
-            if (MouseOver != null) MouseOver();
+            if (MouseOver != null) MouseOver(new Point(e.X, e.Y));
             return base.OnMouseOver(e);
         }
 

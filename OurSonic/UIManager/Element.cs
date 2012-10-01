@@ -18,13 +18,13 @@ namespace OurSonic.UIManager
         [IntrinsicProperty]
         public bool Visible { get; set; }
         [IntrinsicProperty]
-        public object CachedDrawing { get; set; }
+        public CanvasInformation CachedDrawing { get; set; }
         [IntrinsicProperty]
-        public Action Click { get; set; }
+        public Action<Point> Click { get; set; }
         [IntrinsicProperty]
-        public Action MouseUp { get; set; }
+        public Action<Point> MouseUp { get; set; }
         [IntrinsicProperty]
-        public Action MouseOver { get; set; }
+        public Action<Point> MouseOver { get; set; }
         [IntrinsicProperty]
         public bool EditMode { get; set; }
         [IntrinsicProperty]

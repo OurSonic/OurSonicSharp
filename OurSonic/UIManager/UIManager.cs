@@ -53,8 +53,11 @@ namespace OurSonic.UIManager
 
             new LevelInformationArea(this);
             new ObjectFrameworkArea(this);
+            new ObjectFrameworkListArea(this);
+            new LiveObjectsArea(this);
         }
 
+        public ColorEditorArea ColorEditorArea { get; set; }
         public bool OnClick(jQueryEvent e)
         {
             var cell = Help.GetCursorPosition(e);

@@ -29,13 +29,13 @@ namespace OurSonic.UIManager
         [IntrinsicProperty]
         protected bool Scrolling { get; set; }
 
-        public ScrollBox(int x, int y)
+        public ScrollBox(int x, int y, int itemHeight, int visibleItems, int itemWidth)
                 : base(x, y)
         {
-            ItemWidth = 10;
+            ItemWidth = itemWidth;
             ScrollWidth = 14;
-            VisibleItems = 3;
-            ItemHeight = 10;
+            VisibleItems = visibleItems;
+            ItemHeight = itemHeight;
             BackColor = "";
             JHeight = 5;
             Controls = new List<Element>();
@@ -95,7 +95,7 @@ namespace OurSonic.UIManager
                 }
             }
 
-            if (MouseUp != null) MouseUp();
+            if (MouseUp != null) MouseUp(new Point(e.X, e.Y));
             return base.OnMouseUp(e);
         }
 
@@ -117,7 +117,7 @@ namespace OurSonic.UIManager
 
                 ScrollOffset = Math.Min(Math.Max(ScrollOffset, 0), Controls.Count);
             }
-            if (MouseOver != null) MouseOver();
+            if (MouseOver != null) MouseOver(new Point(e.X, e.Y));
             return base.OnMouseOver(e);
         }
 

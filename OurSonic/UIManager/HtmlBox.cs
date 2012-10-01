@@ -1,4 +1,5 @@
 using System;
+using System.Html.Media.Graphics;
 namespace OurSonic.UIManager
 {
     public class HtmlBox : Element
@@ -7,11 +8,53 @@ namespace OurSonic.UIManager
         public Action<int, int> UpdatePosition { get; set; }
         public Action _Focus { get; set; }
         public Action _Hide { get; set; }
-        public HtmlBox(int x, int y) : base(x, y) {}
+        public HtmlBox(int x, int y) : base(x, y)
+        {
+        }
 
         public override void Construct()
         {
-            base.Construct();
+            Init();
+              base.Construct();
         }
+
+        public override void Focus(Pointer e)
+        {
+            _Focus();
+            base.Focus(e);
+        }
+
+        public override void LoseFocus()
+        {
+            _Hide();
+            base.LoseFocus();
+        }
+
+        public override bool OnClick(Pointer e)
+        {
+            return false;
+        }
+
+        public override bool OnMouseUp(Pointer e)
+        {
+
+            if (this.MouseUp != null) this.MouseUp(new Point(e.X, e.Y));
+            return base.OnMouseUp(e);
+        }
+
+        public override bool OnMouseOver(Pointer e)
+        {
+            if (this.MouseOver != null) this.MouseOver(new Point(e.X, e.Y));
+            return base.OnMouseOver(e);
+        }
+
+        public override void Draw(CanvasContext2D canv)
+        {
+            if (!this.Visible) return;
+            UpdatePosition(this.TotalX, this.TotalY);
+
+            base.Draw(canv);
+        }
+
     }
 }
