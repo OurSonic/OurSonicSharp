@@ -3,10 +3,99 @@
 // OurSonicModels.AnimatedPaletteItem
 OurSonicModels.AnimatedPaletteItem = function() {
 };
+OurSonicModels.AnimatedPaletteItem.createInstance = function() {
+	return {};
+};
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.AnimatedPalettePiece
 OurSonicModels.AnimatedPalettePiece = function() {
 };
+OurSonicModels.AnimatedPalettePiece.createInstance = function() {
+	return {};
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonicModels.SaveObjectModel
+OurSonicModels.SaveObjectModel = function() {
+};
+OurSonicModels.SaveObjectModel.createInstance = function() {
+	return OurSonicModels.SaveObjectModel.$ctor();
+};
+OurSonicModels.SaveObjectModel.$ctor = function() {
+	var $this = {};
+	$this.key = null;
+	$this.oldKey = null;
+	$this.data = null;
+	return $this;
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonicModels.SLData
+OurSonicModels.SLData = function() {
+};
+OurSonicModels.SLData.createInstance = function() {
+	return {};
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonicModels.SLDataAnimation
+OurSonicModels.SLDataAnimation = function() {
+};
+OurSonicModels.SLDataAnimation.createInstance = function() {
+	return {};
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonicModels.SLDataAnimationFrame
+OurSonicModels.SLDataAnimationFrame = function() {
+};
+OurSonicModels.SLDataAnimationFrame.createInstance = function() {
+	return {};
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonicModels.SLDataChunkBlock
+OurSonicModels.SLDataChunkBlock = function() {
+};
+OurSonicModels.SLDataChunkBlock.createInstance = function() {
+	return {};
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonicModels.SLDataCNZBumperEntry
+OurSonicModels.SLDataCNZBumperEntry = function() {
+};
+OurSonicModels.SLDataCNZBumperEntry.createInstance = function() {
+	return {};
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonicModels.SLDataObjectEntry
+OurSonicModels.SLDataObjectEntry = function() {
+};
+OurSonicModels.SLDataObjectEntry.createInstance = function() {
+	return {};
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonicModels.SLDataPatternIndex
+OurSonicModels.SLDataPatternIndex = function() {
+};
+OurSonicModels.SLDataPatternIndex.createInstance = function() {
+	return {};
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonicModels.SLDataRingEntry
+OurSonicModels.SLDataRingEntry = function() {
+};
+OurSonicModels.SLDataRingEntry.createInstance = function() {
+	return {};
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonicModels.SLDataStartPositionEntry
+OurSonicModels.SLDataStartPositionEntry = function() {
+};
+OurSonicModels.SLDataStartPositionEntry.createInstance = function() {
+	return {};
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonicModels.Solidity
+OurSonicModels.Solidity = function() {
+};
+OurSonicModels.Solidity.prototype = { NotSolid: 0, TopSolid: 1, LRBSolid: 2, AllSolid: 3 };
+OurSonicModels.Solidity.registerEnum('OurSonicModels.Solidity', false);
 Type.registerNamespace('OurSonicModels.Common');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.Common.DataObject
@@ -69,60 +158,6 @@ OurSonicModels.Common.DelegateOrValue$1 = function(T) {
 	return $type;
 };
 OurSonicModels.Common.DelegateOrValue$1.registerGenericClass('OurSonicModels.Common.DelegateOrValue$1', 1);
-Type.registerNamespace('OurSonicModels');
-////////////////////////////////////////////////////////////////////////////////
-// OurSonicModels.SaveObjectModel
-OurSonicModels.SaveObjectModel = function() {
-};
-OurSonicModels.SaveObjectModel.$ctor = function() {
-	var $this = {};
-	$this.key = null;
-	$this.oldKey = null;
-	$this.data = null;
-	return $this;
-};
-////////////////////////////////////////////////////////////////////////////////
-// OurSonicModels.SLData
-OurSonicModels.SLData = function() {
-};
-////////////////////////////////////////////////////////////////////////////////
-// OurSonicModels.SLDataAnimation
-OurSonicModels.SLDataAnimation = function() {
-};
-////////////////////////////////////////////////////////////////////////////////
-// OurSonicModels.SLDataAnimationFrame
-OurSonicModels.SLDataAnimationFrame = function() {
-};
-////////////////////////////////////////////////////////////////////////////////
-// OurSonicModels.SLDataChunkBlock
-OurSonicModels.SLDataChunkBlock = function() {
-};
-////////////////////////////////////////////////////////////////////////////////
-// OurSonicModels.SLDataCNZBumperEntry
-OurSonicModels.SLDataCNZBumperEntry = function() {
-};
-////////////////////////////////////////////////////////////////////////////////
-// OurSonicModels.SLDataObjectEntry
-OurSonicModels.SLDataObjectEntry = function() {
-};
-////////////////////////////////////////////////////////////////////////////////
-// OurSonicModels.SLDataPatternIndex
-OurSonicModels.SLDataPatternIndex = function() {
-};
-////////////////////////////////////////////////////////////////////////////////
-// OurSonicModels.SLDataRingEntry
-OurSonicModels.SLDataRingEntry = function() {
-};
-////////////////////////////////////////////////////////////////////////////////
-// OurSonicModels.SLDataStartPositionEntry
-OurSonicModels.SLDataStartPositionEntry = function() {
-};
-////////////////////////////////////////////////////////////////////////////////
-// OurSonicModels.Solidity
-OurSonicModels.Solidity = function() {
-};
-OurSonicModels.Solidity.prototype = { NotSolid: 0, TopSolid: 1, LRBSolid: 2, AllSolid: 3 };
-OurSonicModels.Solidity.registerEnum('OurSonicModels.Solidity', false);
 OurSonicModels.AnimatedPaletteItem.registerClass('OurSonicModels.AnimatedPaletteItem', Object);
 OurSonicModels.AnimatedPalettePiece.registerClass('OurSonicModels.AnimatedPalettePiece', Object);
 OurSonicModels.SaveObjectModel.registerClass('OurSonicModels.SaveObjectModel', Object);

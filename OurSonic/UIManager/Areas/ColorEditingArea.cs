@@ -60,30 +60,24 @@ namespace OurSonic.UIManager.Areas
 
         public override bool OnMouseOver(Pointer e)
         {
-            if (!Visible) return false;
-
-            LastPosition = null;
-            ClickHandled = false;
-            Clicking = false;
-            return base.OnMouseOver(e);
-        }
-
-        public override bool OnMouseUp(Pointer e)
-        {
             if (Editor == null) return false;
 
             var scalex = Width / Editor.AssetFrame.Width;
             var scaley = Height / Editor.AssetFrame.Height;
 
-            var pos = new Point(( e.X / scalex ), ( e.Y / scaley ));
+            var pos = new Point((e.X / scalex), (e.Y / scaley));
             Editor.ShowHurtMap = ShowHurtMap;
             Editor.ShowCollideMap = ShowCollideMap;
 
-            if (Clicking) {
-                if (!Editable) {
+            if (Clicking)
+            {
+                if (!Editable)
+                {
                     if (Click != null)
                         Click(pos);
-                } else {
+                }
+                else
+                {
                     ClickHandled = true;
                     if (ShowHurtMap || ShowCollideMap)
                         Editor.CurrentColor = e.Right ? 0 : 1;
@@ -91,6 +85,16 @@ namespace OurSonic.UIManager.Areas
                     LastPosition = pos;
                 }
             }
+            return base.OnMouseOver(e);
+        }
+
+        public override bool OnMouseUp(Pointer e)
+        {
+            if (!Visible) return false;
+
+            LastPosition = null;
+            ClickHandled = false;
+            Clicking = false;
             return base.OnMouseUp(e);
         }
 

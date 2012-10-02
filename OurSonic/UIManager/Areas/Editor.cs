@@ -45,8 +45,9 @@ namespace OurSonic.UIManager.Areas
             AssetFrame.ClearCache();
         }
 
-        public void DrawLine(Point location1, Point location2)
+        public void DrawLine(Point locationa, Point location2)
         {
+            var location1 = new Point(locationa);
             var dx = Math.Abs(( location2.X ) - ( location1.X ));
             var dy = Math.Abs(( location2.Y ) - ( location1.Y ));
             var sx = 1;

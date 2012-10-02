@@ -37,13 +37,14 @@ namespace OurSonic
 
             xsp += ( lastPos.X - e.ClientX ) * 2.7f;
             ysp += ( lastPos.Y - e.ClientY ) * 2.7f;
-            xsp = (double) ( ( xsp > 0 ? 1 : -1 ) * Math.Min(Math.Abs(xsp), 60) );
-            ysp = (double) ( ( ysp > 0 ? 1 : -1 ) * Math.Min(Math.Abs(ysp), 60) );
+            xsp =  ( ( xsp > 0 ? 1 : -1 ) * Math.Min(Math.Abs(xsp), 60) );
+            ysp =  ( ( ysp > 0 ? 1 : -1 ) * Math.Min(Math.Abs(ysp), 60) );
             lastPos = new Point(e.ClientX, e.ClientY);
         }
 
         public void Tick()
         {
+            if (xsp == 0d && ysp == 0d) return;
             myOnFling(xsp, ysp);
             if (xsp > 0)
                 xsp *= lag;

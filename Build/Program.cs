@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Limilabs.FTP.Client;
 namespace Build
 {
     public class Program
@@ -36,16 +37,19 @@ namespace Build
             var md = new DirectoryInfo(Directory.GetCurrentDirectory());
 
             var pre = md.Parent.Parent.Parent.Parent.FullName + "\\";
+            Console.WriteLine("starting");
 
-            foreach (var proj in projs) {
+            foreach (var proj in projs)
+            {
 #if DEBUG
-                var from = pre + proj + @"\bin\debug\" + proj.Split(new[] {"\\"}, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
+                var from = pre + proj + @"\bin\debug\" + proj.Split(new[] { "\\" }, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
 #else
                 var from = pre + proj + @"\bin\release\" + proj.Split(new[] {"\\"}, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
 #endif
-                var to = pre + shufSharp + @"\output\" + proj.Split(new[] {"\\"}, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
+                var to = pre + shufSharp + @"\output\" + proj.Split(new[] { "\\" }, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
                 if (File.Exists(to)) File.Delete(to);
                 File.Copy(from, to);
+                Console.WriteLine("copying " + to);
             }
 
             //client happens in buildsite.cs
@@ -72,18 +76,41 @@ namespace Build
                                                                                                                                                       })
                                                                          },
                                                               };
-            foreach (var depend in depends) {
-                var to = pre + shufSharp + @"\output\" + depend.Key.Split(new[] {"\\"}, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
+
+            Console.WriteLine("connecting ftp");
+
+            Ftp webftp = new Ftp();
+            webftp.Connect("dested.com");
+            webftp.Login("dested", "Ddested");
+            Console.WriteLine("connected");
+
+            webftp.Progress += (e,c) => {
+
+
+                Console.WriteLine(c.Percentage);
+            };
+
+/*            Ftp serverftp = new Ftp();
+            serverftp.Connect("50.116.22.241");
+            serverftp.Login("dested", "FuckYou1!");*/
+
+            foreach (var depend in depends)
+            {
+                var to = pre + shufSharp + @"\output\" + depend.Key.Split(new[] { "\\" }, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
                 var output = "";
 
-                if (depend.Value.Node) {
+                if (depend.Value.Node)
+                {
                     output += "require('./mscorlib.node.debug.js');";
                     output += "Enumerable=require('./linq.js');";
-                } else {
+                }
+                else
+                {
                     //output += "require('./mscorlib.debug.js');";
                 }
 
-                foreach (var depe in depend.Value.IncludesAfter) {
+                foreach (var depe in depend.Value.IncludesAfter)
+                {
                     output += string.Format("require('{0}');", depe);
                 }
 
@@ -94,22 +121,30 @@ namespace Build
                 lines.Add(depend.Value.After);
 
                 File.WriteAllLines(to, lines);
+                Console.WriteLine("writing "+to);
+
+                Console.WriteLine("ftp start " + lines.Sum(a=>a.Length).ToString("d"));
+                webftp.Upload("/httpdocs/nsonic/" + to.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries).Last(), to);
+                Console.WriteLine("ftp complete " + to);
+
+                //serverftp.Upload("/usr/local/src/sonic/" + to.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries).Last(), to);
+
             }
 
-/*
-            foreach (var d in Directory.GetDirectories(pre + shufSharp + @"\ShuffleGames\"))
-            {
-                var to = pre + shufSharp + @"\output\Games\" + d.Split('\\').Last();
-                if (!Directory.Exists(to))
+            /*
+                        foreach (var d in Directory.GetDirectories(pre + shufSharp + @"\ShuffleGames\"))
+                        {
+                            var to = pre + shufSharp + @"\output\Games\" + d.Split('\\').Last();
+                            if (!Directory.Exists(to))
 
-                    Directory.CreateDirectory(to);
-                if (d.EndsWith("bin") || d.EndsWith("obj"))
-                {
-                    continue;
-                }
-                File.WriteAllText(to + @"\app.js", File.ReadAllText(d + @"\app.js"));
-            }
-*/
+                                Directory.CreateDirectory(to);
+                            if (d.EndsWith("bin") || d.EndsWith("obj"))
+                            {
+                                continue;
+                            }
+                            File.WriteAllText(to + @"\app.js", File.ReadAllText(d + @"\app.js"));
+                        }
+            */
         }
 
         #region Nested type: Application

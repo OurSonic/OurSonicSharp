@@ -15,6 +15,7 @@ namespace OurSonic.UIManager.Areas
             var size = 40 * 4;
 
             objectFrameworkArea = new UIArea<ObjectFrameworkData>(new ObjectFrameworkData() {ObjectFramework = new LevelObject("Foo")}, 540, 75, 850, 690) {Closable = true};
+            objectFrameworkArea.Visible = false;
             manager.AddArea(objectFrameworkArea);
             manager.ObjectFrameworkArea = this;
 
@@ -625,7 +626,10 @@ namespace OurSonic.UIManager.Areas
                                                                             bd = new ImageButton<LevelObjectAssetFrame>(null, 0, 0, 0, 0);
 
                                                                             bd.Text = ( (Func<string>) ( () => { return bd.Data.Name; } ) );
-                                                                            bd.Image = (canvas, x, y) => bd.Data.DrawSimple(canvas, new Point(x, y), bd.Width, bd.Height - 15, false, false);
+                                                                            bd.Image = (canvas, x, y) =>
+                                                                                
+                                                                                
+                                                                                bd.Data.DrawSimple(canvas, new Point(x, y), bd.Width, bd.Height - 15, false, false);
 
                                                                             bd.Click = (p) => objectFrameworkArea.Data.MainPanel.Data.LoadFrame(bd.Data);
 

@@ -219,12 +219,13 @@ namespace OurSonic.Level
             int mY = (int) ( ( sonic.Y ) - Y );
             for (var pieceIndex = 0; pieceIndex < pcs.Count; pieceIndex++) {
                 var j = pcs[pieceIndex];
+                
                 var piece = ObjectData.Pieces[j.PieceIndex];
                 var asset = ObjectData.Assets[piece.AssetIndex];
                 if (asset.Frames.Count > 0) {
                     var frm = asset.Frames[j.FrameIndex];
                     var map = isHurtMap ? frm.HurtSonicMap : frm.CollisionMap;
-                    if (twoDArray(map, ( mX + frm.OffsetX + j.X ), ( mY + frm.OffsetY + j.Y )) == true)
+                    if (twoDArray(map, (mX + frm.OffsetX + j.X), (mY + frm.OffsetY + j.Y), this.Xflip ^ piece.Xflip, this.Yflip ^ piece.Yflip) == true)
                         return j;
                 }
             }
@@ -232,8 +233,33 @@ namespace OurSonic.Level
             return null;
         }
 
-        public bool twoDArray(int[][] map, int x, int y)
+        public bool twoDArray(int[][] map, int x, int y,bool xflip, bool yflip)
         {
+            var height= map.Length;
+            var width = map[0].Length;
+
+            if (yflip) {
+                if (xflip)
+                {
+                    y = height - y;
+                
+                    var oldx = x;
+                    x = height - y;
+                    y = oldx;
+                }
+                else {
+                    y = height - y;
+                }
+            }else {
+                if (xflip) {
+                    var oldx = x;
+                    x = height - y;
+                    y =  oldx;
+               } else {
+                    
+                }
+            }
+
             if (map.Falsey() || x < 0 || y < 0 || x > map.Length)
                 return false;
             var d = map[x];

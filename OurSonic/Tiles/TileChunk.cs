@@ -24,7 +24,7 @@ namespace OurSonic.Tiles
         [IntrinsicProperty]
         public int Index { get; set; }
         public Solidity[][] HeightBlocks1 { get; set; }
-        public Solidity[][] HeightBlocks2 { get; set; }
+        public Solidity[][] HeightBlocks2 { get; set; } 
         public int[][] AngleMap1 { get; set; }
         public int[][] AngleMap2 { get; set; }
 
@@ -33,6 +33,8 @@ namespace OurSonic.Tiles
             HLayers = new bool[0][];
             Sprites = new List<string>();
             isOnlyBackground = null;
+
+         
         }
 
         public TilePiece GetBlock(int x, int y)

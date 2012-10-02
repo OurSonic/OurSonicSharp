@@ -60,18 +60,17 @@ namespace OurSonic.UIManager
             base.Construct();
         }
 
-        public override bool OnKeyDown(ElementEvent e2)
-        {
-            var e = e2.Me();
-            if (e.altKey) return false;
+        public override bool OnKeyDown(ElementEvent e)
+        { 
+            if (e.AltKey) return false;
             if (Focused) {
-                if (e.ctrlKey) {
-                    if (e.keyCode == 65) {
+                if (e.CtrlKey) {
+                    if (e.KeyCode == 65) {
                         DragPosition = 0;
                         CursorPosition = Text.Length;
-                    } else if (e.keyCode == 67) {
+                    } else if (e.KeyCode == 67) {
                         // _H.copy_to_clipboard(this.text.substring(Math.min(this.cursorPosition, this.dragPosition), Math.max(this.cursorPosition, this.dragPosition)));
-                    } else if (e.keyCode == 88) {
+                    } else if (e.KeyCode == 88) {
                         //  _H.copy_to_clipboard(this.text.substring(Math.min(this.cursorPosition, this.dragPosition), Math.max(this.cursorPosition, this.dragPosition)));
 
                         Text = Text.Substring(0, Math.Min(CursorPosition, DragPosition)) +
@@ -80,8 +79,8 @@ namespace OurSonic.UIManager
                         CursorPosition = Math.Min(CursorPosition, DragPosition);
                         DragPosition = -1;
                     }
-                } else if (e.keyCode == 37) {
-                    if (e.shiftKey) {
+                } else if (e.KeyCode == 37) {
+                    if (e.ShiftKey) {
                         if (DragPosition == -1)
                             DragPosition = CursorPosition;
                         CursorPosition = Math.Max(CursorPosition - 1, 0);
@@ -89,8 +88,8 @@ namespace OurSonic.UIManager
                         DragPosition = -1;
                         CursorPosition = Math.Max(CursorPosition - 1, 0);
                     }
-                } else if (e.keyCode == 39) {
-                    if (e.shiftKey) {
+                } else if (e.KeyCode == 39) {
+                    if (e.ShiftKey) {
                         if (DragPosition == -1)
                             DragPosition = CursorPosition;
                         CursorPosition = Math.Min(CursorPosition + 1, Text.Length);
@@ -99,7 +98,7 @@ namespace OurSonic.UIManager
                         CursorPosition = Math.Min(CursorPosition + 1, Text.Length);
                     }
                 } else {
-                    if (e.keyCode == 8) {
+                    if (e.KeyCode == 8) {
                         if (DragPosition == -1)
                             Text = Text.Substring(0, CursorPosition - 1) + Text.Substring(CursorPosition, Text.Length);
                         else {
@@ -111,7 +110,7 @@ namespace OurSonic.UIManager
                                 CursorPosition--;
                         } else
                             CursorPosition = Math.Min(CursorPosition, DragPosition);
-                    } else if (e.keyCode == 46) {
+                    } else if (e.KeyCode == 46) {
                         if (DragPosition == -1)
                             Text = Text.Substring(0, CursorPosition) + Text.Substring(Math.Min(CursorPosition + 1, Text.Length), Text.Length);
                         else {
@@ -121,7 +120,7 @@ namespace OurSonic.UIManager
                         if (DragPosition == -1) {} else
                             CursorPosition = Math.Min(CursorPosition, DragPosition);
                     } else {
-                        char m = e.keyCode;
+                        var m = (char)e.KeyCode;
                         var t = String.FromCharCode(m);
                         if (DragPosition == -1)
                             Text = Text.Substring(0, CursorPosition) + t + Text.Substring(CursorPosition, Text.Length);
@@ -140,7 +139,7 @@ namespace OurSonic.UIManager
                 if (TextChanged != null)
                     TextChanged();
 
-                e.preventDefault();
+                e.PreventDefault();
                 return true;
             }
             return false;

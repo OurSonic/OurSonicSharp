@@ -10,7 +10,6 @@ namespace OurSonic.Level
         public ObjectManager(SonicManager sonicManager)
         {
             this.sonicManager = sonicManager;
-            Window.Instance.Me().objectManager = this;
         }
 
         public void Init() {}

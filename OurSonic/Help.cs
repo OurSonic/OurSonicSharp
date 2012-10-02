@@ -49,6 +49,10 @@ namespace OurSonic
         {
             return number + "px";
         }
+        public static string ToPx(this double number)
+        {
+            return number + "px";
+        }
 
         public static double Sin(int f)
         {
@@ -308,9 +312,9 @@ namespace OurSonic
             if (ev.Me().targetTouches && ev.Me().targetTouches.length > 0) ev = ev.Me().targetTouches[0];
 
             if (ev.PageX.Me() != null && ev.PageY.Me() != null)
-                return new Pointer(ev.PageX, ev.PageY);
+                return new Pointer(ev.PageX, ev.PageY, 0, ev.Which == 3);
             //if (ev.x != null && ev.y != null) return new { x: ev.x, y: ev.y };
-            return new Pointer(ev.ClientX, ev.ClientY);
+            return new Pointer(ev.ClientX, ev.ClientY, 0, ev.Which == 3);
         }
 
         public static string Stringify(object obj)

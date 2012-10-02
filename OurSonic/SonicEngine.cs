@@ -54,7 +54,7 @@ namespace OurSonic
             uiCanvas.DomCanvas.Bind("mousewheel", handleScroll);
             uiCanvas.DomCanvas.Bind("contextmenu", (e) => e.PreventDefault());
             bool dontPress = false;
-            Document.AddEventListener("keydown", e =>
+            Document.AddEventListener("keypress", e =>
             {
                 //if (sonicManager.CurrentGameState == GameState.Editing)
                 dontPress = sonicManager.UIManager.OnKeyDown(e);
@@ -130,7 +130,6 @@ namespace OurSonic
                     );
 
             KeyboardJS.Instance().Bind.Key("2", () => { if (dontPress) return; client.Emit("GetSonicLevel", "0"); }, () => { });
-            client.Emit("GetSonicLevel", "0");
 
             KeyboardJS.Instance().Bind.Key("1",
                                            () =>
@@ -325,18 +324,19 @@ namespace OurSonic
             resizeCanvas();
         }
 
-        private void runGame()
+        public static  void runGame()
         {
+            var sonicManager = SonicManager.Instance;
             switch (sonicManager.CurrentGameState)
             {
                 case GameState.Playing:
                     sonicManager.CurrentGameState = GameState.Editing;
-                    sonicManager.WindowLocation = Constants.DefaultWindowLocation(sonicManager.CurrentGameState, gameCanvas, sonicManager.Scale);
+                    sonicManager.WindowLocation = Constants.DefaultWindowLocation(sonicManager.CurrentGameState, Instance. gameCanvas, sonicManager.Scale);
                     sonicManager.SonicToon = null;
                     break;
                 case GameState.Editing:
                     sonicManager.CurrentGameState = GameState.Playing;
-                    sonicManager.WindowLocation = Constants.DefaultWindowLocation(sonicManager.CurrentGameState, gameCanvas, sonicManager.Scale);
+                    sonicManager.WindowLocation = Constants.DefaultWindowLocation(sonicManager.CurrentGameState, Instance. gameCanvas, sonicManager.Scale);
                     sonicManager.SonicToon = new Sonic();
                     break;
             }
@@ -393,9 +393,8 @@ namespace OurSonic
                                                                           uiCanvas,
                                                                           sonicManager.Scale);
             sonicManager.RealScale = !fullscreenMode
-                                             ? new Point(1, 1)
-                                             : new Point(canvasWidth / 320 / sonicManager.Scale.X,
-                                                         canvasHeight / 224 / sonicManager.Scale.Y);
+                                             ? new DoublePoint(1, 1)
+                                             : new DoublePoint( (canvasWidth / 320d / sonicManager.Scale.X), ( canvasHeight / 224d / sonicManager.Scale.Y ));
 
             gameCanvas.DomCanvas.Attribute("width",
                                            (sonicManager.WindowLocation.Width *
@@ -409,13 +408,13 @@ namespace OurSonic
                                                        : 1)).ToString());
 
             var screenOffset = sonicManager.CurrentGameState == GameState.Playing
-                                       ? new Point(canvasWidth / 2 -
-                                                   sonicManager.WindowLocation.Width * sonicManager.Scale.X *
-                                                   sonicManager.RealScale.X / 2,
-                                                   canvasHeight / 2 -
-                                                   sonicManager.WindowLocation.Height * sonicManager.Scale.Y *
-                                                   sonicManager.RealScale.Y / 2)
-                                       : new Point(0, 0);
+                                       ? new DoublePoint(( ( canvasWidth / 2d -
+                                                           sonicManager.WindowLocation.Width * sonicManager.Scale.X *
+                                                           sonicManager.RealScale.X / 2 )),
+                                                     ( canvasHeight / 2d -
+                                                           sonicManager.WindowLocation.Height * sonicManager.Scale.Y *
+                                                           sonicManager.RealScale.Y / 2 ))
+                                       : new DoublePoint(0, 0);
             gameCanvas.DomCanvas.CSS("left", screenOffset.X.ToPx());
             gameCanvas.DomCanvas.CSS("top", screenOffset.Y.ToPx());
         }

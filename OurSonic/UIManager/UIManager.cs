@@ -81,7 +81,7 @@ namespace OurSonic.UIManager
                                 are.X <= cell.X &&
                                 are.X + are.Width > cell.X )) {
                     goodArea = are;
-                    var ec = new Pointer(cell.X - are.X, cell.Y - are.Y);
+                    var ec = new Pointer(cell.X - are.X, cell.Y - are.Y,0,cell.Right);
                     are.OnClick(ec);
                     break;
                 }
@@ -126,7 +126,7 @@ namespace OurSonic.UIManager
                                                                    are.Y + are.Height > cell.Y &&
                                                                    are.X <= cell.X &&
                                                                    are.X + are.Width > cell.X )) {
-                    var cell2 = new Pointer(cell.X - are.X, cell.Y - are.Y);
+                                                                       var cell2 = new Pointer(cell.X - are.X, cell.Y - are.Y, 0, cell.Right);
                     return are.OnMouseOver(cell2);
                 }
             }
@@ -145,7 +145,7 @@ namespace OurSonic.UIManager
             var cell = Help.GetCursorPosition(e, true);
 
             foreach (var are in UIAreas) {
-                var ec = new Pointer(cell.X - are.X, cell.Y - are.Y);
+                var ec = new Pointer(cell.X - are.X, cell.Y - are.Y, 0, cell.Right);
                 are.OnMouseUp(ec);
             }
 
@@ -160,7 +160,7 @@ namespace OurSonic.UIManager
 
             foreach (var are in UIAreas) {
                 if (are.Visible && are.Y <= cell.Y && are.Y + are.Height > cell.Y && are.X <= cell.X && are.X + are.Width > cell.X) {
-                    var cell2 = new Pointer(cell.X - are.X, cell.Y - are.Y, delta);
+                    var cell2 = new Pointer(cell.X - are.X, cell.Y - are.Y, delta,cell.Right);
                     return are.OnScroll(cell2);
                 }
             }

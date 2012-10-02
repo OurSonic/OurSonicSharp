@@ -37,7 +37,7 @@ namespace OurSonic
         [IntrinsicProperty]
         public IntersectingRectangle WindowLocation { get; set; }
         [IntrinsicProperty]
-        public Point RealScale { get; set; }
+        public DoublePoint RealScale { get; set; }
         [IntrinsicProperty]
         public bool InHaltMode { get; set; }
         [IntrinsicProperty]
@@ -110,7 +110,7 @@ namespace OurSonic
             objectManager.Init();
             int scl = 2;
             Scale = new Point(scl, scl);
-            RealScale = new Point(1, 1);
+            RealScale = new DoublePoint(1, 1);
             mainCanvas = gameCanvas;
 
             WindowLocation = Constants.DefaultWindowLocation(GameState.Editing, mainCanvas, Scale);
@@ -146,8 +146,8 @@ namespace OurSonic
 
         public bool OnClick(jQueryEvent elementEvent)
         {
-            var e = new Point(elementEvent.ClientX / Scale.X / RealScale.X / WindowLocation.X,
-                              elementEvent.ClientY / Scale.Y / RealScale.Y + WindowLocation.Y);
+            var e = new Point(elementEvent.ClientX / Scale.X /  WindowLocation.X,
+                              elementEvent.ClientY / Scale.Y /  WindowLocation.Y);
 
             if (elementEvent.Button == 0) {
                 int ey;

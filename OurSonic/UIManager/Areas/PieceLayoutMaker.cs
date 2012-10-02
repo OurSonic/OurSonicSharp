@@ -4,6 +4,8 @@ namespace OurSonic.UIManager.Areas
 {
     public class PieceLayoutMaker
     {
+
+        private double largeScale=1;
         public LevelObjectPieceLayout PieceLayout { get; set; }
         public int SelectedPieceIndex { get; set; }
         public bool ShowImages { get; set; }
@@ -27,7 +29,7 @@ namespace OurSonic.UIManager.Areas
 
         public void Draw(CanvasContext2D canvas, Point pos, Point scale)
         {
-            PieceLayout.DrawUI(canvas, pos, scale, ShowOutline, ShowImages, SelectedPieceIndex, ZeroPosition);
+            PieceLayout.DrawUI(canvas, pos, scale, ShowOutline, ShowImages, SelectedPieceIndex, ZeroPosition, largeScale);
         }
 
         public void MouseUp()
@@ -47,6 +49,7 @@ namespace OurSonic.UIManager.Areas
                 goodPosition = position;
                 position = lastPosition;
             }
+
 
             for (var i = 0; i < PieceLayout.Pieces.Count; i++) {
                 var j = PieceLayout.Pieces[i];
@@ -90,6 +93,13 @@ namespace OurSonic.UIManager.Areas
             }
 
             //sonicManager.uiManager.objectFrameworkArea.mainPanel.updatePieces();
+        }
+
+        public void OffsetScale(bool positive)
+        {
+            /*ZeroPosition.X = (int)(largeScale * 30) * (positive ? -1 : 1);
+            ZeroPosition.Y = (int)(largeScale * 30) * (positive ? -1 : 1);*/
+            largeScale += positive ? .1 : -.1;
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using OurSonic.Level;
 using OurSonicModels;
 using OurSonicModels.Common;
@@ -33,7 +34,8 @@ namespace OurSonic.UIManager.Areas
                                                                                              var obj = data.Data;
 
                                                                                              fList.Controls = new List<Element>();
-                                                                                             foreach (var itm in obj) {
+                                                                                             foreach (var itm in obj.OrderBy(a => a))
+                                                                                             {
                                                                                                  Button d;
                                                                                                  string name = itm;
                                                                                                  fList.AddControl(d = new Button(0, 0, 0, 0, itm) {

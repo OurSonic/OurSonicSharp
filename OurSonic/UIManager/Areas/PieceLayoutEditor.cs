@@ -32,6 +32,14 @@ namespace OurSonic.UIManager.Areas
             PieceLayoutMaker = new PieceLayoutMaker(pieceLayout);
         }
 
+        public override bool OnScroll(Pointer e)
+        {
+
+            PieceLayoutMaker.OffsetScale(e.Delta>0);
+
+            return base.OnScroll(e);
+        }
+
         public override bool OnClick(Pointer e)
         {
             if (!Visible) return false;
