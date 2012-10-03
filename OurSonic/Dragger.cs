@@ -1,4 +1,5 @@
 using System;
+using OurSonic.UIManager;
 using jQueryApi;
 namespace OurSonic
 {
@@ -15,31 +16,31 @@ namespace OurSonic
             myOnFling = onFling;
         }
 
-        public void Click(jQueryEvent e)
+        public void Click(Pointer cell)
         {
-            lastPos = new Point(e.ClientX, e.ClientY);
+            lastPos = new Point(cell.X, cell.Y);
         }
 
-        public bool IsDragging(jQueryEvent e)
+        public bool IsDragging(Pointer cell)
         {
             return lastPos.Truthy();
         }
 
-        public void MouseUp(jQueryEvent e)
+        public void MouseUp(Pointer cell)
         {
             lastPos = null;
         }
 
-        public void MouseMove(jQueryEvent e)
+        public void MouseMove(Pointer cell)
         {
             if (lastPos.Falsey())
                 return;
 
-            xsp += ( lastPos.X - e.ClientX ) * 2.7f;
-            ysp += ( lastPos.Y - e.ClientY ) * 2.7f;
+            xsp += (lastPos.X - cell.X) * 2.7f;
+            ysp += (lastPos.Y - cell.Y) * 2.7f;
             xsp =  ( ( xsp > 0 ? 1 : -1 ) * Math.Min(Math.Abs(xsp), 60) );
             ysp =  ( ( ysp > 0 ? 1 : -1 ) * Math.Min(Math.Abs(ysp), 60) );
-            lastPos = new Point(e.ClientX, e.ClientY);
+            lastPos = new Point(cell.X, cell.Y);
         }
 
         public void Tick()

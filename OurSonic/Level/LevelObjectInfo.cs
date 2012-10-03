@@ -235,7 +235,7 @@ namespace OurSonic.Level
 
         public bool twoDArray(int[][] map, int x, int y,bool xflip, bool yflip)
         {
-            var height= map.Length;
+            /*var height= map.Length;
             var width = map[0].Length;
 
             if (yflip) {
@@ -258,7 +258,7 @@ namespace OurSonic.Level
                } else {
                     
                 }
-            }
+            }*/
 
             if (map.Falsey() || x < 0 || y < 0 || x > map.Length)
                 return false;

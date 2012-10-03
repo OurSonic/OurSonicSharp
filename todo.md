@@ -1,0 +1,144 @@
+
+editor
+  layout editor
+  make editor prettier
+  minimize like
+  drawing editors
+debugger
+  better object viewr and shit
+  autoformat
+drawing caching
+water
+transparent color
+mouse xy translate
+better caching solution
+better data sending solution
+drawing depth
+rotate collisions
+object shapes and collisions with shapes
+projectiles
+backgrounds
+garbageless tick
+pushing
+jumping through floors
+shields
+window border and spindsash lag
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+==OLD==
+
+
+Our Sonic
+
+Sonic simulator and level editor 
+
+TODO:
+	Editors
+		Redo in new system
+	1		Prettier, proper window bar
+	1	Piece layout
+	1	Keyboard shit
+		Drag-and-drop upload
+	1	Object frameworks, images, pages
+	1	Minimize menus
+		Drawing editor
+			Draw lines
+			Draw shapes
+			Flood fill
+			Selection (with threshold)
+			Modify palette info
+		Chunk editor
+		Block Editor
+			Collision Map/Angle Editor
+		Tile Editor
+	Script
+	1	Debugging
+	1		List of objects currently on the screen
+	1			Console for each
+	1			Watch for each
+	1			Pause and evaluate
+	1	Update text every so often, not on keydown
+	1	Reset piece locations when piece layout updates
+	1	Javascript autoformat
+			Error checking
+				Syntax
+				And variable lookups
+			Intellisense 
+		Keybindings
+			Control+w
+	1	Remove textbox when deselected
+	Game
+		Water
+		Bosses
+			Boss editor
+		Animation bugs
+			Finish palette logic
+			Launch base zone
+		Drawing
+			Tile replacement
+		Objects
+	1		Transparent color
+	1		Object priority
+	1			When showheightmap all have high priority
+	1		4 direction rotate
+	1		Collision with shapes 
+	1		Think about proper Object API
+				Implement
+	1		Projectiles
+			Proper rebound Logic
+		Backgrounds
+			Tile based slicing
+			Export logic (manually)
+	1	Expand the object window 
+		Animations
+	2		Break images into sections (8^2, 16^2)
+		Lag magnifier
+		Speed
+			Garbageless tick
+		Sonic
+	2		Reaquire the ground properly
+			Pushing
+			Balancing
+	1		Jumping through floors
+	1			only detect A and B
+			Water
+			 ==	Variables
+				Release velocity
+			Shields
+		Proper window
+			borders
+	2		spindash lag
+	Server
+	2	NodeJS
+		Saving levels
+			Forking
+				Merging??
+	2	Proper object database
+			Mongo or like

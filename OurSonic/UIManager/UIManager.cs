@@ -62,9 +62,8 @@ namespace OurSonic.UIManager
             new LiveObjectsArea(this);
         }
 
-        public bool OnClick(jQueryEvent e)
-        {
-            var cell = Help.GetCursorPosition(e);
+        public bool OnClick(Pointer cell)
+        { 
 
             UIArea goodArea = null;
             var cl = ( UIAreas ).OrderBy((f) => -f.Depth).ToArray();
@@ -110,13 +109,12 @@ namespace OurSonic.UIManager
                 }
             }
 
-            sonicManager.UIManager.dragger.Click(e);
+            sonicManager.UIManager.dragger.Click(cell);
             return false;
         }
 
-        public bool OnMouseMove(jQueryEvent e)
-        {
-            var cell = Help.GetCursorPosition(e);
+        public bool OnMouseMove(Pointer cell)
+        { 
 
             var cl = ( UIAreas ).OrderBy((f) => { return -f.Depth; }).ToArray();
 
@@ -131,32 +129,32 @@ namespace OurSonic.UIManager
                 }
             }
 
-            if (dragger.IsDragging(e)) {
-                dragger.MouseMove(e);
+            if (dragger.IsDragging(cell))
+            {
+                dragger.MouseMove(cell);
                 return false;
             }
-            dragger.MouseMove(e);
+            dragger.MouseMove(cell);
 
             return false;
         }
 
-        public void OnMouseUp(jQueryEvent e)
+        public void OnMouseUp(Pointer cell)
         {
-            var cell = Help.GetCursorPosition(e, true);
 
             foreach (var are in UIAreas) {
                 var ec = new Pointer(cell.X - are.X, cell.Y - are.Y, 0, cell.Right);
                 are.OnMouseUp(ec);
             }
 
-            dragger.MouseUp(e);
+            dragger.MouseUp(cell);
         }
 
         public bool OnMouseScroll(jQueryEvent e)
         {
             int delta = e.Me().wheelDelta ? e.Me().wheelDelta / 40 : e.Me().detail ? -e.Me().detail : 0;
 
-            var cell = Help.GetCursorPosition(e, true);
+            var cell = Help.GetCursorPosition(e);
 
             foreach (var are in UIAreas) {
                 if (are.Visible && are.Y <= cell.Y && are.Y + are.Height > cell.Y && are.X <= cell.X && are.X + are.Width > cell.X) {

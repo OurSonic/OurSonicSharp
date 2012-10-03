@@ -307,7 +307,7 @@ namespace OurSonic
             ctx.Restore();
         }
 
-        public static Pointer GetCursorPosition(jQueryEvent ev, bool b = false)
+        public static Pointer GetCursorPosition(jQueryEvent ev)
         {
             if (ev.Me().targetTouches && ev.Me().targetTouches.length > 0) ev = ev.Me().targetTouches[0];
 

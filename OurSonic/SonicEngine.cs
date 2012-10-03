@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonic.UIManager;
 using OurSonicModels.Common;
 using SocketIOWebLibrary;
 using WebLibraries;
@@ -17,7 +18,7 @@ namespace OurSonic
         private bool fullscreenMode;
         private CanvasInformation gameCanvas;
         private string gameCanvasName = "gameLayer";
-        private jQueryEvent lastMouseMove;
+        private Pointer lastMouseMove;
         public SonicManager sonicManager;
         private CanvasInformation uiCanvas;
         private string uiCanvasName = "uiLayer";
@@ -362,8 +363,8 @@ namespace OurSonic
         {
             queryEvent.PreventDefault();
             Document.Body.Style.Cursor = "default";
-            lastMouseMove = queryEvent;
-            if (sonicManager.UIManager.OnMouseMove(queryEvent)) return;
+            lastMouseMove = Help.GetCursorPosition(queryEvent);
+            if (sonicManager.UIManager.OnMouseMove(lastMouseMove)) return;
 
             return;
         }
@@ -371,7 +372,7 @@ namespace OurSonic
         private void canvasOnClick(jQueryEvent queryEvent)
         {
             queryEvent.PreventDefault();
-            if (sonicManager.UIManager.OnClick(queryEvent)) return;
+            if (sonicManager.UIManager.OnClick(Help.GetCursorPosition(queryEvent))) return;
             if (sonicManager.OnClick(queryEvent)) return;
         }
 

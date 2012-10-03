@@ -66,8 +66,9 @@ namespace OurSonic.UIManager
             canv.Save();
 
             if (CachedDrawing.Falsey()) {
-                var cg = Help.DefaultCanvas(Width, Height);
+                var cg = Help.DefaultCanvas(Width+20, Height+20);
                 var cv = cg.Context;
+                cv.Translate(10,10);
 
                 var lingrad = cv.CreateLinearGradient(0, 0, 0, Height);
                 lingrad.AddColorStop(0, "rgba(220,220,220,0.85)");
@@ -80,8 +81,12 @@ namespace OurSonic.UIManager
                 X = 0;
                 Y = 0;
 
+
+              
                 var rad = 30;
                 Help.RoundRect(cv, X, Y, Width, Height, rad, true, true);
+        
+
 
                 cv.BeginPath();
                 cv.MoveTo(X, Y + rad);
@@ -102,7 +107,7 @@ namespace OurSonic.UIManager
                 CachedDrawing = cg;
             }
 
-            canv.DrawImage(CachedDrawing.Canvas, X, Y);
+            canv.DrawImage(CachedDrawing.Canvas, X-10, Y-10);
             if (CachedDrawing.Canvas.Width != Width || CachedDrawing.Canvas.Height != Height)
                 CachedDrawing = null;
 

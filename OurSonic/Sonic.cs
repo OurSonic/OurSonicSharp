@@ -1166,7 +1166,7 @@ namespace OurSonic
         public void Tick()
         {
 
-            if (SonicManager.Instance.InHaltMode)
+            if (true || SonicManager.Instance.InHaltMode)
             {
                 this.mult = 1;
                 return;

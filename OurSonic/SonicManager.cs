@@ -472,6 +472,10 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             if (SonicLevel.PaletteItems[0].Truthy()) {
                 for (int k = 0; k < SonicLevel.PaletteItems[0].Count; k++) {
                     var pal = SonicLevel.PaletteItems[0][k];
+                    if (pal.SkipIndex == 0) continue;
+                    if (pal.TotalLength == 0) continue;
+                    
+
                     for (int j = 0; j <= pal.TotalLength; j += pal.SkipIndex) {
                         if (DrawTickCount % ( pal.TotalLength + pal.SkipIndex ) == j)
                             SonicLevel.palAn[k] = j / pal.SkipIndex;

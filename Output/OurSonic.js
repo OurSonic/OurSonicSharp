@@ -108,24 +108,24 @@ OurSonic.Dragger = function(onFling) {
 	this.$myOnFling = onFling;
 };
 OurSonic.Dragger.prototype = {
-	click: function(e) {
-		this.$lastPos = OurSonic.Point.$ctor1(e.clientX, e.clientY);
+	click: function(cell) {
+		this.$lastPos = OurSonic.Point.$ctor1(cell.x, cell.y);
 	},
-	isDragging: function(e) {
+	isDragging: function(cell) {
 		return this.$lastPos;
 	},
-	mouseUp: function(e) {
+	mouseUp: function(cell) {
 		this.$lastPos = null;
 	},
-	mouseMove: function(e) {
+	mouseMove: function(cell) {
 		if (!this.$lastPos) {
 			return;
 		}
-		this.$xsp += (this.$lastPos.x - e.clientX) * 2.70000004768372;
-		this.$ysp += (this.$lastPos.y - e.clientY) * 2.70000004768372;
+		this.$xsp += (this.$lastPos.x - cell.x) * 2.70000004768372;
+		this.$ysp += (this.$lastPos.y - cell.y) * 2.70000004768372;
 		this.$xsp = ((this.$xsp > 0) ? 1 : -1) * Math.min(Math.abs(this.$xsp), 60);
 		this.$ysp = ((this.$ysp > 0) ? 1 : -1) * Math.min(Math.abs(this.$ysp), 60);
-		this.$lastPos = OurSonic.Point.$ctor1(e.clientX, e.clientY);
+		this.$lastPos = OurSonic.Point.$ctor1(cell.x, cell.y);
 	},
 	tick: function() {
 		if (this.$xsp === 0 && this.$ysp === 0) {
@@ -470,7 +470,7 @@ OurSonic.Help.roundRect = function(ctx, x, y, width, height, radius, fill, strok
 	}
 	ctx.restore();
 };
-OurSonic.Help.getCursorPosition = function(ev, b) {
+OurSonic.Help.getCursorPosition = function(ev) {
 	if (!!(ev.targetTouches && ev.targetTouches.length > 0)) {
 		ev = ev.targetTouches[0];
 	}
@@ -2602,15 +2602,15 @@ OurSonic.SonicEngine.prototype = {
 	$canvasMouseMove: function(queryEvent) {
 		queryEvent.preventDefault();
 		document.body.style.cursor = 'default';
-		this.$lastMouseMove = queryEvent;
-		if (this.sonicManager.uiManager.onMouseMove(queryEvent)) {
+		this.$lastMouseMove = OurSonic.Help.getCursorPosition(queryEvent);
+		if (this.sonicManager.uiManager.onMouseMove(this.$lastMouseMove)) {
 			return;
 		}
 		return;
 	},
 	$canvasOnClick: function(queryEvent) {
 		queryEvent.preventDefault();
-		if (this.sonicManager.uiManager.onClick(queryEvent)) {
+		if (this.sonicManager.uiManager.onClick(OurSonic.Help.getCursorPosition(queryEvent))) {
 			return;
 		}
 		if (this.sonicManager.onClick(queryEvent)) {
@@ -3087,6 +3087,12 @@ OurSonic.SonicManager.prototype = {
 		if (this.sonicLevel.paletteItems[0]) {
 			for (var k = 0; k < this.sonicLevel.paletteItems[0].length; k++) {
 				var pal = this.sonicLevel.paletteItems[0][k];
+				if (pal.skipIndex === 0) {
+					continue;
+				}
+				if (pal.totalLength === 0) {
+					continue;
+				}
 				for (var j = 0; j <= pal.totalLength; j += pal.skipIndex) {
 					if (this.drawTickCount % (pal.totalLength + pal.skipIndex) === j) {
 						this.sonicLevel.palAn[k] = ss.Int32.div(j, pal.skipIndex);
@@ -3953,7 +3959,7 @@ OurSonic.Watcher = function() {
 };
 OurSonic.Watcher.prototype = {
 	tick: function() {
-		if (OurSonic.SonicManager.instance.inHaltMode) {
+		if (true || OurSonic.SonicManager.instance.inHaltMode) {
 			this.mult = 1;
 			return;
 		}
@@ -4441,26 +4447,30 @@ OurSonic.Level.LevelObjectInfo.prototype = {
 		return null;
 	},
 	twoDArray: function(map, x, y, xflip, yflip) {
-		var height = map.length;
-		var width = map[0].length;
-		if (yflip) {
-			if (xflip) {
-				y = height - y;
-				var oldx = x;
-				x = height - y;
-				y = oldx;
-			}
-			else {
-				y = height - y;
-			}
-		}
-		else if (xflip) {
-			var oldx1 = x;
-			x = height - y;
-			y = oldx1;
-		}
-		else {
-		}
+		//var height= map.Length;
+		//var width = map[0].Length;
+		//
+		//if (yflip) {
+		//if (xflip)
+		//{
+		//y = height - y;
+		//
+		//var oldx = x;
+		//x = height - y;
+		//y = oldx;
+		//}
+		//else {
+		//y = height - y;
+		//}
+		//}else {
+		//if (xflip) {
+		//var oldx = x;
+		//x = height - y;
+		//y =  oldx;
+		//} else {
+		//
+		//}
+		//}
 		if (!map || x < 0 || y < 0 || x > map.length) {
 			return false;
 		}
@@ -5666,6 +5676,7 @@ OurSonic.UIManager.Element = function(x, y) {
 	this.y = y;
 	this.editorEngine = new OurSonic.UIManager.EditorEngine(this);
 	this.visible = true;
+	this.editMode = true;
 	//
 	//                        if (this.Construct) {
 	//
@@ -6913,8 +6924,9 @@ OurSonic.UIManager.UIArea.prototype = {
 		}
 		canv.save();
 		if (!this.cachedDrawing) {
-			var cg = OurSonic.Help.defaultCanvas(this.width, this.height);
+			var cg = OurSonic.Help.defaultCanvas(this.width + 20, this.height + 20);
 			var cv = cg.context;
+			cv.translate(10, 10);
 			var lingrad = cv.createLinearGradient(0, 0, 0, this.height);
 			lingrad.addColorStop(0, 'rgba(220,220,220,0.85)');
 			lingrad.addColorStop(1, 'rgba(142,142,142,0.85)');
@@ -6948,7 +6960,7 @@ OurSonic.UIManager.UIArea.prototype = {
 			this.y = xy.y;
 			this.cachedDrawing = cg;
 		}
-		canv.drawImage(this.cachedDrawing.canvas, this.x, this.y);
+		canv.drawImage(this.cachedDrawing.canvas, this.x - 10, this.y - 10);
 		if (this.cachedDrawing.canvas.width !== this.width || this.cachedDrawing.canvas.height !== this.height) {
 			this.cachedDrawing = null;
 		}
@@ -7052,8 +7064,7 @@ OurSonic.UIManager.UIManager.prototype = {
 	set_liveObjectsArea: function(value) {
 		this.$1$LiveObjectsAreaField = value;
 	},
-	onClick: function(e) {
-		var cell = OurSonic.Help.getCursorPosition(e, false);
+	onClick: function(cell) {
 		var goodArea = null;
 		var cl = Enumerable.from(this.uiAreas).orderBy(function(f) {
 			return -f.depth;
@@ -7102,11 +7113,10 @@ OurSonic.UIManager.UIManager.prototype = {
 				$t2.dispose();
 			}
 		}
-		this.sonicManager.uiManager.dragger.click(e);
+		this.sonicManager.uiManager.dragger.click(cell);
 		return false;
 	},
-	onMouseMove: function(e) {
-		var cell = OurSonic.Help.getCursorPosition(e, false);
+	onMouseMove: function(cell) {
 		var cl = Enumerable.from(this.uiAreas).orderBy(function(f) {
 			return -f.depth;
 		}).toArray();
@@ -7117,15 +7127,14 @@ OurSonic.UIManager.UIManager.prototype = {
 				return are.onMouseOver(cell2);
 			}
 		}
-		if (this.dragger.isDragging(e)) {
-			this.dragger.mouseMove(e);
+		if (this.dragger.isDragging(cell)) {
+			this.dragger.mouseMove(cell);
 			return false;
 		}
-		this.dragger.mouseMove(e);
+		this.dragger.mouseMove(cell);
 		return false;
 	},
-	onMouseUp: function(e) {
-		var cell = OurSonic.Help.getCursorPosition(e, true);
+	onMouseUp: function(cell) {
 		var $t1 = this.uiAreas.getEnumerator();
 		try {
 			while ($t1.moveNext()) {
@@ -7137,11 +7146,11 @@ OurSonic.UIManager.UIManager.prototype = {
 		finally {
 			$t1.dispose();
 		}
-		this.dragger.mouseUp(e);
+		this.dragger.mouseUp(cell);
 	},
 	onMouseScroll: function(e) {
 		var delta = ss.Nullable.unbox(Type.cast((!!e.wheelDelta ? (e.wheelDelta / 40) : (!!e.detail ? -e.detail : 0)), ss.Int32));
-		var cell = OurSonic.Help.getCursorPosition(e, true);
+		var cell = OurSonic.Help.getCursorPosition(e);
 		var $t1 = this.uiAreas.getEnumerator();
 		try {
 			while ($t1.moveNext()) {
