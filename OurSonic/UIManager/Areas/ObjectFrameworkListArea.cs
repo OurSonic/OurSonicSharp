@@ -16,6 +16,8 @@ namespace OurSonic.UIManager.Areas
             var size = 40 * 4;
 
             var objectFrameworkListArea = uiManager.ObjectFrameworkListArea = new UIArea(90, 500, 390, 300) {Closable = true};
+            objectFrameworkListArea.Visible = false;
+
             uiManager.AddArea(objectFrameworkListArea);
             objectFrameworkListArea.AddControl(new TextArea(30, 25, "Object Frameworks") {Color = "blue"});
             ScrollBox fList;

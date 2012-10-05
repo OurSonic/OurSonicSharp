@@ -10,6 +10,7 @@ namespace OurSonic.UIManager.Areas
         public LiveObjectsArea(UIManager uiManager)
         {
             var liveObjectsArea = uiManager.LiveObjectsArea = new UIArea<LiveObjectsAreaData>(new LiveObjectsAreaData(), 947, 95, 770, 700) {Closable = true};
+            liveObjectsArea.Visible = false;
             uiManager.AddArea(liveObjectsArea);
             liveObjectsArea.AddControl(new TextArea(30, 25, "Live Objects") {Color = "blue"});
             HScrollBox scl;

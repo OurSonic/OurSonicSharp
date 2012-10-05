@@ -4,6 +4,7 @@ using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonic.UIManager;
+using OurSonicModels;
 using OurSonicModels.Common;
 using SocketIOWebLibrary;
 using WebLibraries;
@@ -114,24 +115,34 @@ namespace OurSonic
             client = SocketIOClient.Connect("50.116.22.241:8998");
 
             client.On<DataObject<string>>("SonicLevel",
-                                          data =>
-                                          {
-                                              sonicManager.Load(data.Data);
+                                          data => {
+                                              Help.DecodeString<SLData>(data.Data,
+                                                                        (level) => {
 
-                                              sonicManager.WindowLocation.X = 0;
-                                              sonicManager.WindowLocation.Y = 0;
-                                              sonicManager.BigWindowLocation.X =
-                                                      (int)(sonicManager.WindowLocation.X - sonicManager.WindowLocation.Width * 0.2);
-                                              sonicManager.BigWindowLocation.Y =
-                                                      (int)(sonicManager.WindowLocation.Y - sonicManager.WindowLocation.Height * 0.2);
+                                                                            sonicManager.Load(level);
 
-                                              sonicManager.BigWindowLocation.Width = (int)(sonicManager.WindowLocation.Width * 1.8);
-                                              sonicManager.BigWindowLocation.Height = (int)(sonicManager.WindowLocation.Height * 1.8);
-                                              sonicManager.ClearCache();
+                                                                            sonicManager.WindowLocation.X = 0;
+                                                                            sonicManager.WindowLocation.Y = 0;
+                                                                            sonicManager.BigWindowLocation.X =
+                                                                                    (int) ( sonicManager.WindowLocation.X - sonicManager.WindowLocation.Width * 0.2 );
+                                                                            sonicManager.BigWindowLocation.Y =
+                                                                                    (int) ( sonicManager.WindowLocation.Y - sonicManager.WindowLocation.Height * 0.2 );
 
-                                              if (sonicManager.CurrentGameState == GameState.Playing)
-                                                  runGame();
-                                              runGame();
+                                                                            sonicManager.BigWindowLocation.Width = (int) ( sonicManager.WindowLocation.Width * 1.8 );
+                                                                            sonicManager.BigWindowLocation.Height = (int) ( sonicManager.WindowLocation.Height * 1.8 );
+                                                                            sonicManager.ClearCache();
+
+                                                                            if (sonicManager.CurrentGameState == GameState.Playing)
+                                                                                runGame();
+                                                                            runGame();
+
+
+                                                                        });
+
+
+                                              
+
+
                                           });
             client.On<DataObject<KeyValuePair<string, string>[]>>("GetObjects.Response", data => { sonicManager.loadObjects(data.Data); }
                     );
@@ -399,7 +410,7 @@ namespace OurSonic
             sonicManager.WindowLocation = Constants.DefaultWindowLocation(sonicManager.CurrentGameState,
                                                                           uiCanvas,
                                                                           sonicManager.Scale);
-            sonicManager.RealScale = !fullscreenMode
+            sonicManager.RealScale  = !fullscreenMode
                                              ? new DoublePoint(1, 1)
                                              : new DoublePoint( (canvasWidth / 320d / sonicManager.Scale.X), ( canvasHeight / 224d / sonicManager.Scale.Y ));
             

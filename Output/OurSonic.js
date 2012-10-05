@@ -432,6 +432,18 @@ OurSonic.Help.defaultCanvas = function(w, h) {
 OurSonic.Help.decodeString = function(lvl) {
 	return (new Compressor()).DecompressText(lvl);
 };
+OurSonic.Help.decodeString$1 = function(T) {
+	return function(lvl, complete) {
+		(new FunctionWorker('FunctionWorker.js')).threadedFunction(function(e) {
+			importScripts('RawDeflate.js');
+			e.data = (new Compressor()).DecompressText(e.data);
+			e.callback(e.data);
+		}, function(e1) {
+			complete(JSON.parse(e1.data));
+		}, function(e2) {
+		}, lvl);
+	};
+};
 OurSonic.Help.fixAngle = function(angle) {
 	var fixedAng = ss.Int32.trunc(Math.floor((256 - angle) * 1.4062)) % 360;
 	var flop = 360 - fixedAng;
@@ -2395,18 +2407,20 @@ OurSonic.SonicEngine = function() {
 	var levelIndex = 0;
 	this.client = io.connect('50.116.22.241:8998');
 	this.client.on('SonicLevel', Function.mkdel(this, function(data) {
-		this.sonicManager.load(data.Data);
-		this.sonicManager.windowLocation.x = 0;
-		this.sonicManager.windowLocation.y = 0;
-		this.sonicManager.bigWindowLocation.x = ss.Int32.trunc(this.sonicManager.windowLocation.x - this.sonicManager.windowLocation.width * 0.2);
-		this.sonicManager.bigWindowLocation.y = ss.Int32.trunc(this.sonicManager.windowLocation.y - this.sonicManager.windowLocation.height * 0.2);
-		this.sonicManager.bigWindowLocation.width = ss.Int32.trunc(this.sonicManager.windowLocation.width * 1.8);
-		this.sonicManager.bigWindowLocation.height = ss.Int32.trunc(this.sonicManager.windowLocation.height * 1.8);
-		this.sonicManager.clearCache();
-		if (this.sonicManager.currentGameState === 0) {
+		OurSonic.Help.decodeString$1(OurSonicModels.SLData).call(null, data.Data, Function.mkdel(this, function(level) {
+			this.sonicManager.load(level);
+			this.sonicManager.windowLocation.x = 0;
+			this.sonicManager.windowLocation.y = 0;
+			this.sonicManager.bigWindowLocation.x = ss.Int32.trunc(this.sonicManager.windowLocation.x - this.sonicManager.windowLocation.width * 0.2);
+			this.sonicManager.bigWindowLocation.y = ss.Int32.trunc(this.sonicManager.windowLocation.y - this.sonicManager.windowLocation.height * 0.2);
+			this.sonicManager.bigWindowLocation.width = ss.Int32.trunc(this.sonicManager.windowLocation.width * 1.8);
+			this.sonicManager.bigWindowLocation.height = ss.Int32.trunc(this.sonicManager.windowLocation.height * 1.8);
+			this.sonicManager.clearCache();
+			if (this.sonicManager.currentGameState === 0) {
+				OurSonic.SonicEngine.runGame();
+			}
 			OurSonic.SonicEngine.runGame();
-		}
-		OurSonic.SonicEngine.runGame();
+		}));
 	}));
 	this.client.on('GetObjects.Response', Function.mkdel(this, function(data1) {
 		this.sonicManager.loadObjects(data1.Data);
@@ -3471,10 +3485,9 @@ OurSonic.SonicManager.prototype = {
 	loadObjects$1: function(objects) {
 		OurSonic.SonicEngine.instance.client.emit('GetObjects', objects);
 	},
-	load: function(lvl) {
+	load: function(sonicLevel) {
 		this.loading = true;
 		this.set_status('Decoding');
-		var sonicLevel = $.parseJSON(OurSonic.Help.decodeString(lvl));
 		this.set_status('Determining Level Information');
 		if (!this.sonicLevel.chunks) {
 			this.sonicLevel.chunks = [];
@@ -4924,19 +4937,30 @@ OurSonic.Tiles.Tile.prototype = {
 		}
 		var palette_ = OurSonic.SonicManager.instance.sonicLevel.palette;
 		var indexed = OurSonic.SonicManager.instance.indexedPalette;
-		for (var i = 0; i < this.colors.length; i++) {
-			for (var jf = 0; jf < this.colors[i].length; jf++) {
+		var mx = this.colors.length;
+		var my = this.colors[0].length;
+		j.context.save();
+		var index0 = (palette + indexed) % palette_.length;
+		var x = oPos.x;
+		var y = oPos.y;
+		for (var i = 0; i < mx; i++) {
+			for (var jf = 0; jf < my; jf++) {
 				var gj = this.colors[i][jf];
 				if (gj === 0) {
 					continue;
 				}
-				var m = palette_[(palette + indexed) % palette_.length][gj];
-				if (!ss.referenceEquals(j.context.fillStyle, '#' + m)) {
-					j.context.fillStyle = '#' + m;
+				var m = palette_[index0][gj];
+				var col = '#' + m;
+				if (!ss.referenceEquals(j.context.fillStyle, col)) {
+					j.context.fillStyle = col;
 				}
-				j.context.fillRect(oPos.x + i * scale.x, oPos.y + jf * scale.y, scale.x, scale.y);
+				j.context.fillRect(x + i * scale.x, y + jf * scale.y, scale.x, scale.y);
 			}
 		}
+		//            j.Context.StrokeStyle = "#7CF1FF";
+		//            j.Context.LineWidth = 4;
+		//            j.Context.StrokeRect(0, 0, cx, cy);
+		j.context.restore();
 		canvas.drawImage(j.canvas, pos.x, pos.y);
 		if (this.showOutline) {
 			canvas.strokeStyle = '#DD0033';
@@ -5062,12 +5086,13 @@ OurSonic.Tiles.TileCacheBlock = function() {
 };
 OurSonic.Tiles.TileCacheBlock.$ctor = function(type) {
 	var $this = {};
+	$this.animatedKey = 0;
 	$this.type = 0;
 	$this.tilePiece = null;
 	$this.block = null;
 	$this.color = null;
-	$this.x = 0;
-	$this.y = 0;
+	$this.xPos = 0;
+	$this.yPos = 0;
 	$this.pieceM = null;
 	$this.type = type;
 	return $this;
@@ -5261,30 +5286,29 @@ OurSonic.Tiles.TileChunk.prototype = {
 					canvas = this.$neverAnimateCache[layer].context;
 					oldPoint = OurSonic.Point.$ctor(position);
 					OurSonic.Point.set(position, 0, 0);
+					//for building no aniamtion cache
+					this.$drawOld(canvas, position, scale, layer, numOfPiecesWide, numOfPiecesLong, blocks, pieceWidth, pieceHeight, isBack, neverAnimates, oldPoint, oldCanvas);
+					return;
 				}
-				else {
-					var $t1 = this.$layerCacheBlocks[layer].getEnumerator();
-					try {
-						while ($t1.moveNext()) {
-							var tileCacheBlock = $t1.get_current();
-							switch (tileCacheBlock.type) {
-								case 0: {
-									OurSonic.Tiles.TileChunk.$drawBlock(canvas, position, tileCacheBlock);
-									break;
-								}
-								case 1: {
-									this.$drawTilePiece(canvas, position, scale, layer, blocks, tileCacheBlock, pieceWidth, pieceHeight, isBack, numOfPiecesWide);
-									break;
-								}
+				var $t1 = this.$layerCacheBlocks[layer].getEnumerator();
+				try {
+					while ($t1.moveNext()) {
+						var tileCacheBlock = $t1.get_current();
+						switch (tileCacheBlock.type) {
+							case 0: {
+								OurSonic.Tiles.TileChunk.$drawBlock(canvas, position, tileCacheBlock);
+								break;
+							}
+							case 1: {
+								this.$drawTilePiece(canvas, position, scale, layer, tileCacheBlock, isBack);
+								break;
 							}
 						}
 					}
-					finally {
-						$t1.dispose();
-					}
-					return;
 				}
-				this.$drawOld(canvas, position, scale, layer, numOfPiecesWide, numOfPiecesLong, blocks, pieceWidth, pieceHeight, isBack, neverAnimates, oldPoint, oldCanvas);
+				finally {
+					$t1.dispose();
+				}
 			}
 			finally {
 				if (ss.isValue($t2)) {
@@ -5294,12 +5318,18 @@ OurSonic.Tiles.TileChunk.prototype = {
 		}
 	},
 	$drawOld: function(canvas, position, scale, layer, numOfPiecesWide, numOfPiecesLong, blocks, pieceWidth, pieceHeight, isBack, neverAnimates, oldPoint, oldCanvas) {
-		for (var pieceX = 0; pieceX < numOfPiecesWide; pieceX++) {
-			for (var pieceY = 0; pieceY < numOfPiecesLong; pieceY++) {
+		var posX = position.x;
+		var posY = position.y;
+		var curKey = 0;
+		//pieceY * numOfPiecesWide + pieceX              VV
+		for (var pieceY = 0; pieceY < numOfPiecesLong; pieceY++) {
+			curKey = pieceY * numOfPiecesWide;
+			for (var pieceX = 0; pieceX < numOfPiecesWide; pieceX++) {
+				curKey += pieceX;
 				var piece = this.tilePieces[pieceX][pieceY];
 				var pm = blocks[piece.block];
 				if (piece) {
-					this.$drawIt(canvas, position, scale, layer, pieceWidth, pieceHeight, piece, pm, isBack, pieceX, pieceY, numOfPiecesWide);
+					this.$drawIt(canvas, scale, layer, piece, pm, isBack, curKey, posX + pieceX * pieceWidth, posY + pieceY * pieceHeight);
 				}
 			}
 		}
@@ -5309,38 +5339,45 @@ OurSonic.Tiles.TileChunk.prototype = {
 			canvas.drawImage(this.$neverAnimateCache[layer].canvas, position.x, position.y);
 		}
 	},
-	$drawTilePiece: function(canvas, position, scale, layer, blocks, tileCacheBlock, pieceWidth, pieceHeight, isBack, numOfPiecesWide) {
-		var pm = blocks[tileCacheBlock.tilePiece.block];
-		this.$drawIt(canvas, position, scale, layer, pieceWidth, pieceHeight, pm, tileCacheBlock.tilePiece, isBack, tileCacheBlock.x, tileCacheBlock.y, numOfPiecesWide);
-		canvas.save();
-		canvas.strokeStyle = 'green';
-		canvas.strokeRect(position.x * scale.x * pieceWidth, position.y * scale.y * pieceHeight, 16 * scale.x, 16 * scale.y);
-		canvas.restore();
+	$drawTilePiece: function(canvas, position, scale, layer, tileCacheBlock, isBack) {
+		this.$drawIt(canvas, scale, layer, tileCacheBlock.tilePiece, tileCacheBlock.pieceM, isBack, tileCacheBlock.animatedKey, position.x + tileCacheBlock.xPos, position.y + tileCacheBlock.yPos);
+		//
+		//                        canvas.Save();
+		//
+		//                        canvas.StrokeStyle = "green";
+		//
+		//                        canvas.StrokeRect(position.X * scale.X * pieceWidth, position.Y * scale.Y * pieceHeight, 16 * scale.X, 16 * scale.Y);
+		//
+		//                        canvas.Restore();
 	},
 	$drawFullChunk: function(canvas, position, scale, layer) {
 		canvas.drawImage(this.$neverAnimateCache[layer].canvas, position.x, position.y);
-		canvas.save();
-		canvas.strokeStyle = 'red';
-		canvas.strokeRect(position.x, position.y, 128 * scale.x, 128 * scale.y);
-		canvas.restore();
+		//
+		//            canvas.Save();
+		//
+		//            canvas.StrokeStyle = "red";
+		//
+		//            canvas.StrokeRect(position.X, position.Y, 128 * scale.X, 128 * scale.Y);
+		//
+		//            canvas.Restore();
 	},
-	$drawIt: function(canvas, position, scale, layer, pieceWidth, pieceHeight, pm, piece, isBack, pieceX, pieceY, numOfPiecesWide) {
-		if ((isBack ? piece.onlyForeground$1 : piece.onlyBackground$1)) {
+	$drawIt: function(canvas, scale, layer, piece, pm, isBack, animatedKey, pointx, pointy) {
+		if ((isBack ? pm.onlyForeground$1 : pm.onlyBackground$1)) {
 			return;
 		}
 		var animatedIndex = 0;
-		var animation = this.animated[pieceY * numOfPiecesWide + pieceX];
+		var animation = this.animated[animatedKey];
 		var hover = false;
-		var shouldAnimate = piece.shouldAnimate();
+		var shouldAnimate = pm.shouldAnimate();
 		if (this.animated && animation) {
 			animatedIndex = animation.lastAnimatedIndex;
 		}
 		else if (!shouldAnimate || ss.Nullable.unbox(this.$neverAnimate)) {
 			hover = true;
 		}
-		this.$myLocalPoint.x = position.x + pieceX * pieceWidth;
-		this.$myLocalPoint.y = position.y + pieceY * pieceHeight;
-		piece.draw(canvas, this.$myLocalPoint, scale, layer, pm.xFlip, pm.yFlip, animatedIndex);
+		this.$myLocalPoint.x = pointx;
+		this.$myLocalPoint.y = pointy;
+		pm.draw(canvas, this.$myLocalPoint, scale, layer, piece.xFlip, piece.yFlip, animatedIndex);
 		if (false && hover) {
 			canvas.save();
 			switch (layer) {
@@ -5363,18 +5400,18 @@ OurSonic.Tiles.TileChunk.prototype = {
 		//canvas.StrokeRect(position.X + pieceX * 16 * scale.X, position.Y + pieceY * 16 * scale.Y, scale.X * 16, scale.Y * 16);
 	},
 	buildCacheBlock: function(scale, layer, bounds) {
-		var cacheBlocks = [];
+		var tilePieces = [];
+		var block = null;
 		if (ss.isValue(this.$neverAnimateCache[layer])) {
-			return cacheBlocks;
+			return [];
 		}
 		var numOfPiecesWide = this.tilePieces.length;
 		var numOfPiecesLong = this.tilePieces[0].length;
 		var pieceWidth = 16 * scale.x;
 		var pieceHeight = 16 * scale.y;
 		if (this.neverAnimates()) {
-			return cacheBlocks;
+			return [];
 		}
-		var currentCacheBlock = null;
 		var blocks = OurSonic.SonicManager.instance.sonicLevel.blocks;
 		var isBack = layer === 0;
 		for (var pieceX = 0; pieceX < numOfPiecesWide; pieceX++) {
@@ -5382,78 +5419,59 @@ OurSonic.Tiles.TileChunk.prototype = {
 				var piece = this.tilePieces[pieceX][pieceY];
 				var pm = blocks[piece.block];
 				if (pm) {
-					currentCacheBlock = this.$buildCacheBlock(scale, layer, pieceWidth, pieceHeight, piece, pm, isBack, pieceX, pieceY, numOfPiecesWide, currentCacheBlock);
-					if (!cacheBlocks.contains(currentCacheBlock)) {
-						cacheBlocks.add(currentCacheBlock);
+					var cacheBlock = this.$buildCacheBlock(scale, layer, pieceWidth, pieceHeight, piece, pm, isBack, pieceX, pieceY, numOfPiecesWide, block);
+					switch (cacheBlock.type) {
+						case 0: {
+							block = cacheBlock;
+							break;
+						}
+						case 1: {
+							tilePieces.add(cacheBlock);
+							break;
+						}
 					}
 				}
 			}
 		}
-		return cacheBlocks;
+		var tileCacheBlocks = tilePieces.clone();
+		if (ss.isValue(block)) {
+			tileCacheBlocks.add(block);
+		}
+		return tileCacheBlocks;
 	},
-	$buildCacheBlock: function(scale, layer, pieceWidth, pieceHeight, pm, piece, isBack, pieceX, pieceY, numOfPiecesWide, oldCacheBlock) {
+	$buildCacheBlock: function(scale, layer, pieceWidth, pieceHeight, piece, pm, isBack, pieceX, pieceY, numOfPiecesWide, oldCacheBlock) {
 		//if (isBack ? (piece.onlyForeground) : (piece.onlyBackground)) return null;
 		var animatedIndex = 0;
 		var animation = this.animated[pieceY * numOfPiecesWide + pieceX];
 		var cacheBlockNeeded = false;
-		var shouldAnimate = piece.shouldAnimate();
+		var shouldAnimate = pm.shouldAnimate();
 		if (this.animated && animation) {
 			animatedIndex = animation.lastAnimatedIndex;
 		}
-		else if (piece.animatedFrames.length === 0 && (!shouldAnimate || ss.Nullable.unbox(this.$neverAnimate))) {
+		else if (pm.animatedFrames.length === 0 && (!shouldAnimate || ss.Nullable.unbox(this.$neverAnimate))) {
 			cacheBlockNeeded = true;
 		}
 		if (cacheBlockNeeded) {
 			var internalPoint = OurSonic.Point.$ctor1(pieceX * pieceWidth, pieceY * pieceHeight);
-			if (ss.isNullOrUndefined(oldCacheBlock) || oldCacheBlock.type === 1) {
+			if (ss.isNullOrUndefined(oldCacheBlock)) {
 				oldCacheBlock = OurSonic.Tiles.TileCacheBlock.$ctor(0);
 				oldCacheBlock.block = OurSonic.Help.defaultCanvas(pieceWidth * 8 * scale.x, pieceHeight * 8 * scale.y);
-				oldCacheBlock.color = String.format('rgba({0},{1},{2},0.3);', ss.Int32.trunc(Math.random() * 255), ss.Int32.trunc(Math.random() * 255), ss.Int32.trunc(Math.random() * 255));
-				piece.draw(oldCacheBlock.block.context, internalPoint, scale, layer, pm.xFlip, pm.yFlip, animatedIndex);
-				//   oldCacheBlock.X = pieceX;
-				//   oldCacheBlock.Y = pieceY;
-				return oldCacheBlock;
+				oldCacheBlock.color = String.format('rgba({0},{1},{2},0.2);', ss.Int32.trunc(Math.random() * 150), ss.Int32.trunc(Math.random() * 255), ss.Int32.trunc(Math.random() * 255));
 			}
-			else {
-				switch (oldCacheBlock.type) {
-					case 0: {
-						oldCacheBlock.block.context.save();
-						piece.draw(oldCacheBlock.block.context, internalPoint, scale, layer, pm.xFlip, pm.yFlip, animatedIndex);
-						oldCacheBlock.block.context.fillStyle = oldCacheBlock.color;
-						oldCacheBlock.block.context.fillRect(internalPoint.x, internalPoint.y, 16 * scale.x, 16 * scale.y);
-						oldCacheBlock.block.context.restore();
-						return oldCacheBlock;
-						break;
-					}
-					case 1: {
-						oldCacheBlock = OurSonic.Tiles.TileCacheBlock.$ctor(0);
-						oldCacheBlock.block = OurSonic.Help.defaultCanvas(pieceWidth * 8 * scale.x, pieceHeight * 8 * scale.y);
-						oldCacheBlock.color = String.format('rgba({0},{0},{0},0.3);', Math.random() * 255);
-						piece.draw(oldCacheBlock.block.context, internalPoint, scale, layer, pm.xFlip, pm.yFlip, animatedIndex);
-						return oldCacheBlock;
-					}
-					default: {
-						return null;
-					}
-				}
-			}
+			oldCacheBlock.block.context.save();
+			pm.draw(oldCacheBlock.block.context, internalPoint, scale, layer, piece.xFlip, piece.yFlip, animatedIndex);
+			//                oldCacheBlock.Block.Context.FillStyle = oldCacheBlock.Color;
+			//                oldCacheBlock.Block.Context.FillRect(internalPoint.X, internalPoint.Y, 16 * scale.X, 16 * scale.Y);
+			oldCacheBlock.block.context.restore();
+			return oldCacheBlock;
 		}
 		else {
-			//
-			//                if (oldCacheBlock.Type == TileCacheBlockType.Block) {
-			//
-			//                
-			//
-			//                //todosomethingwithreadjustingthesizesoitsnotdrawing256*256eachtimefornoreason
-			//
-			//                
-			//
-			//                }
 			var $t1 = OurSonic.Tiles.TileCacheBlock.$ctor(1);
 			$t1.tilePiece = piece;
-			$t1.x = pieceX;
-			$t1.y = pieceY;
+			$t1.xPos = pieceX * pieceWidth;
+			$t1.yPos = pieceY * pieceHeight;
 			$t1.pieceM = pm;
+			$t1.animatedKey = pieceY * numOfPiecesWide + pieceX;
 			return $t1;
 		}
 	},
@@ -5646,6 +5664,9 @@ OurSonic.Tiles.TilePiece.prototype = {
 			}
 			i++;
 		}
+		//            ac.Context.StrokeStyle = "#FF593F";
+		//            ac.Context.LineWidth = 1;
+		//            ac.Context.StrokeRect(0, 0, 2*8 * SonicManager.Instance.Scale.X, 2*8 * SonicManager.Instance.Scale.Y);
 		fd = ac.canvas;
 		this.$setCache(layer, scale, drawOrderIndex, animatedIndex, OurSonic.SonicManager.instance.sonicLevel.palAn, fd);
 		return fd;
@@ -8037,12 +8058,13 @@ OurSonic.UIManager.Areas.LevelInformationArea = function(manager) {
 	var loadLevel = function(name) {
 		OurSonic.UIManager.UIManager.updateTitle('Downloading ' + name);
 		OurSonic.SonicEngine.instance.client.emit('LoadLevel.Request', new (Type.makeGenericType(OurSonicModels.Common.DataObject$1, [String]))(name));
-		OurSonic.SonicEngine.instance.client.on('LoadLevel.Response', function(data) {
-			var lvl = data.Data;
-			OurSonic.UIManager.UIManager.updateTitle('Loading: ' + name);
-			manager.sonicManager.load(lvl);
+		;
+	};
+	OurSonic.SonicEngine.instance.client.on('LoadLevel.Response', function(data) {
+		OurSonic.Help.decodeString$1(OurSonicModels.SLData).call(null, data.Data, function(level) {
+			OurSonic.UIManager.UIManager.updateTitle('Loading: ');
 			var sonicManager = OurSonic.SonicManager.instance;
-			sonicManager.load(data.Data);
+			sonicManager.load(level);
 			sonicManager.windowLocation.x = 0;
 			sonicManager.windowLocation.y = 0;
 			sonicManager.bigWindowLocation.x = ss.Int32.trunc(sonicManager.windowLocation.x - sonicManager.windowLocation.width * 0.2);
@@ -8055,7 +8077,7 @@ OurSonic.UIManager.Areas.LevelInformationArea = function(manager) {
 			}
 			OurSonic.SonicEngine.runGame();
 		});
-	};
+	});
 	OurSonic.SonicEngine.instance.client.on('GetLevels.Response', function(data1) {
 		var $t6 = Enumerable.from(data1.Data).orderBy(function(a) {
 			return a;
@@ -8086,6 +8108,7 @@ OurSonic.UIManager.Areas.LiveObjectsArea = function(uiManager) {
 	$t1.closable = true;
 	uiManager.set_liveObjectsArea($t1);
 	var liveObjectsArea = $t1;
+	liveObjectsArea.visible = false;
 	uiManager.addArea(liveObjectsArea);
 	var $t2 = new OurSonic.UIManager.TextArea(30, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Live Objects'));
 	$t2.color = 'blue';
@@ -9288,6 +9311,7 @@ OurSonic.UIManager.Areas.ObjectFrameworkListArea = function(uiManager) {
 	$t1.closable = true;
 	uiManager.set_objectFrameworkListArea($t1);
 	var objectFrameworkListArea = $t1;
+	objectFrameworkListArea.visible = false;
 	uiManager.addArea(objectFrameworkListArea);
 	var $t2 = new OurSonic.UIManager.TextArea(30, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Object Frameworks'));
 	$t2.color = 'blue';

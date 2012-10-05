@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using OurSonicModels;
 using OurSonicModels.Common;
 namespace OurSonic.UIManager.Areas
 {
@@ -55,36 +56,34 @@ setTimeout(tim, 100);*/
             {
                 UIManager.UpdateTitle("Downloading " + name);
                 SonicEngine.Instance.client.Emit("LoadLevel.Request", new DataObject<string>(name));
-                SonicEngine.Instance.client.On<DataObject<string>>("LoadLevel.Response",
-                                                                   (data) =>
-                                                                   {
-                                                                       var lvl = data.Data;
-                                                                       UIManager.UpdateTitle(
-                                                                               "Loading: " +
-                                                                               name);
-                                                                       manager.sonicManager.
-                                                                               Load(lvl);
-
-                                                                       var sonicManager = SonicManager.Instance;
-
-                                                                       sonicManager.Load(data.Data);
-
-                                                                       sonicManager.WindowLocation.X = 0;
-                                                                       sonicManager.WindowLocation.Y = 0;
-                                                                       sonicManager.BigWindowLocation.X =
-                                                                               (int)(sonicManager.WindowLocation.X - sonicManager.WindowLocation.Width * 0.2);
-                                                                       sonicManager.BigWindowLocation.Y =
-                                                                               (int)(sonicManager.WindowLocation.Y - sonicManager.WindowLocation.Height * 0.2);
-
-                                                                       sonicManager.BigWindowLocation.Width = (int)(sonicManager.WindowLocation.Width * 1.8);
-                                                                       sonicManager.BigWindowLocation.Height = (int)(sonicManager.WindowLocation.Height * 1.8);
-                                                                       sonicManager.ClearCache();
-
-                                                                       if (sonicManager.CurrentGameState == GameState.Playing)
-                                                                           SonicEngine.runGame();
-                                                                       SonicEngine.runGame();
-                                                                   });
+                ;
             });
+
+
+            SonicEngine.Instance.client.On<DataObject<string>>("LoadLevel.Response",
+                                                               (data) => Help.DecodeString<SLData>(data.Data,
+                                                                                                   (level) => {
+                                                                                                       UIManager.UpdateTitle("Loading: ");
+
+                                                                                                       var sonicManager = SonicManager.Instance;
+                                                                                                       sonicManager.Load(level);
+
+                                                                                                       sonicManager.WindowLocation.X = 0;
+                                                                                                       sonicManager.WindowLocation.Y = 0;
+                                                                                                       sonicManager.BigWindowLocation.X = (int) ( sonicManager.WindowLocation.X - sonicManager.WindowLocation.Width * 0.2 );
+                                                                                                       sonicManager.BigWindowLocation.Y = (int) ( sonicManager.WindowLocation.Y - sonicManager.WindowLocation.Height * 0.2 );
+
+                                                                                                       sonicManager.BigWindowLocation.Width = (int) ( sonicManager.WindowLocation.Width * 1.8 );
+                                                                                                       sonicManager.BigWindowLocation.Height = (int) ( sonicManager.WindowLocation.Height * 1.8 );
+                                                                                                       sonicManager.ClearCache();
+
+                                                                                                       if (sonicManager.CurrentGameState == GameState.Playing)
+                                                                                                           SonicEngine.runGame();
+                                                                                                       SonicEngine.runGame();
+
+
+                                                                                                   }));
+
 
             SonicEngine.Instance.client.On<DataObject<string[]>>("GetLevels.Response",
                                                                  data =>

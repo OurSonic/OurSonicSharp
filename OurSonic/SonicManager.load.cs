@@ -82,11 +82,10 @@ namespace OurSonic
             SonicEngine.Instance.client.Emit("GetObjects", objects);
         }
 
-        public void Load(string lvl)
+        public void Load(SLData sonicLevel)
         {
             Loading = true;
             Status = "Decoding";
-            var sonicLevel = jQuery.ParseJsonData<SLData>(Help.DecodeString(lvl));
             Status = "Determining Level Information";
 
             if (SonicLevel.Chunks.Falsey())

@@ -175,7 +175,11 @@ namespace OurSonic.Tiles
                 }
                 i++;
             }
-            fd = ac.Canvas;
+//            ac.Context.StrokeStyle = "#FF593F";
+//            ac.Context.LineWidth = 1;
+//            ac.Context.StrokeRect(0, 0, 2*8 * SonicManager.Instance.Scale.X, 2*8 * SonicManager.Instance.Scale.Y);
+
+            fd = ac.Canvas; 
             SetCache(layer, scale, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.palAn, fd);
             return fd;
         }

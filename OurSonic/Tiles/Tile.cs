@@ -67,20 +67,36 @@ namespace OurSonic.Tiles
             var palette_ = SonicManager.Instance.SonicLevel.Palette;
             int indexed = SonicManager.Instance.IndexedPalette;
 
-            for (int i = 0; i < Colors.Length; i++) {
-                for (int jf = 0; jf < Colors[i].Length; jf++) {
+            var mx = Colors.Length;
+            var my = Colors[0].Length;
+            
+            j.Context.Save();
+            
+            int index0 = (palette + indexed) % palette_.Length;
+            int x = oPos.X;
+            int y = oPos.Y;
+
+            for (int i = 0; i < mx; i++) {
+                for (int jf = 0; jf < my; jf++) {
                     var gj = Colors[i][jf];
                     if (gj == 0) continue;
-                    var m =
-                            palette_[
-                                    ( palette + indexed ) %
-                                    palette_.Length][gj];
-                    if (j.Context.FillStyle != "#" + m)
-                        j.Context.FillStyle = "#" + m;
+                    var m = palette_[index0][gj];
+                    var col = "#" + m;
+                    if (j.Context.FillStyle != col)
+                        j.Context.FillStyle = col;
 
-                    j.Context.FillRect(oPos.X + ( i * scale.X ), oPos.Y + jf * scale.Y, scale.X, scale.Y);
+                    j.Context.FillRect(x + ( i *scale.X ), y + jf *scale.Y, scale.X, scale.Y);
                 }
             }
+
+//            j.Context.StrokeStyle = "#7CF1FF";
+//            j.Context.LineWidth = 4;
+//            j.Context.StrokeRect(0, 0, cx, cy);
+
+
+
+            j.Context.Restore();
+            
             canvas.DrawImage(j.Canvas, pos.X, pos.Y);
 
             if (ShowOutline) {
