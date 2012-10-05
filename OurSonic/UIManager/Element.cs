@@ -51,7 +51,7 @@ namespace OurSonic.UIManager
 
             EditorEngine = new EditorEngine(this);
             Visible = true;
-            EditMode = true;
+
             /*
                         if (this.Construct) {
                             this.Construct();

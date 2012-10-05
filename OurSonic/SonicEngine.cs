@@ -22,11 +22,15 @@ namespace OurSonic
         public SonicManager sonicManager;
         private CanvasInformation uiCanvas;
         private string uiCanvasName = "uiLayer";
+        
+        private int gameGoodWidth;
+        private int uiGoodWidth;
         [IntrinsicProperty]
         public static SonicEngine Instance { get; set; }
 
         public SonicEngine()
         {
+
             Instance = this;
             /*var pl = @"";
             Window.Instance.Me().console.log(new Compressor().CompressText(pl));*/
@@ -35,6 +39,8 @@ namespace OurSonic
                     new CanvasInformation(
                             (CanvasContext2D)gameCanvasItem[0].As<CanvasElement>().GetContext(Rendering.Render2D),
                             gameCanvasItem);
+
+//          new SpeedTester(gameCanvas);return;
             var uiCanvasItem = jQuery.Select(string.Format("#{0}", uiCanvasName));
             uiCanvas =
                     new CanvasInformation(
@@ -396,7 +402,7 @@ namespace OurSonic
             sonicManager.RealScale = !fullscreenMode
                                              ? new DoublePoint(1, 1)
                                              : new DoublePoint( (canvasWidth / 320d / sonicManager.Scale.X), ( canvasHeight / 224d / sonicManager.Scale.Y ));
-
+            
             gameCanvas.DomCanvas.Attribute("width",
                                            (sonicManager.WindowLocation.Width *
                                              (sonicManager.CurrentGameState == GameState.Playing
@@ -407,6 +413,14 @@ namespace OurSonic
                                              (sonicManager.CurrentGameState == GameState.Playing
                                                        ? sonicManager.Scale.Y * sonicManager.RealScale.Y
                                                        : 1)).ToString());
+
+
+
+            uiGoodWidth = canvasWidth;
+            gameGoodWidth = (int)(sonicManager.WindowLocation.Width * (sonicManager.CurrentGameState==GameState.Playing ? sonicManager.Scale.X * sonicManager.RealScale.X : 1));
+
+
+
 
             var screenOffset = sonicManager.CurrentGameState == GameState.Playing
                                        ? new DoublePoint(( ( canvasWidth / 2d -
@@ -422,7 +436,14 @@ namespace OurSonic
 
         public void Clear(CanvasInformation canv)
         {
-            canv.DomCanvas[0].Me().width = (gameCanvas.DomCanvas.GetWidth());
+            int w;
+            if (canv == gameCanvas) {
+                w = gameGoodWidth;
+            }else {
+                w = uiGoodWidth;
+               
+            }
+            canv.DomCanvas[0].Me().width = w;
         }
 
         public void GameDraw()

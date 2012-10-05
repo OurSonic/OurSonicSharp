@@ -50,7 +50,9 @@
     <Compile Include="Level\LevelObjectPieceLayout.cs" />
     <Compile Include="Level\LevelObjectPieceLayoutPiece.cs" />
     <Compile Include="Level\LevelObjectProjectile.cs" />
+    <Compile Include="SpeedTester.cs" />
     <Compile Include="Tiles\Tile.cs" />
+    <Compile Include="Tiles\TileCacheBlock.cs" />
     <Compile Include="Tiles\TileChunk.cs" />
     <Compile Include="Tiles\TileItem.cs" />
     <Compile Include="Tiles\TilePiece.cs" />

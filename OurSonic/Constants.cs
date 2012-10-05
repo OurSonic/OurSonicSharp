@@ -139,5 +139,11 @@ namespace OurSonic
         {
             return new Point(X - x, Y - y);
         }
+
+        public void Set(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
     }
 }

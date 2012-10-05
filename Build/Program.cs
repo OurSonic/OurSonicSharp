@@ -85,10 +85,25 @@ namespace Build
             Console.WriteLine("connected");
 
             webftp.Progress += (e,c) => {
+                 
 
+                                   Console.SetCursorPosition(65, 5);
+                                   Console.Write("|");
+                
+                for (int i = 0; i < c.Percentage / 10; i++)
+                {
+                    Console.Write("=");
+                }
+                for (int i = (int) ( c.Percentage / 10 ); i < 10; i++)
+                {
+                    Console.Write("-");
+                }
+                Console.Write("|");
 
-                Console.WriteLine(c.Percentage);
-            };
+                Console.Write(c.Percentage + "  %  ");
+                Console.WriteLine();
+
+                               };
 
 /*            Ftp serverftp = new Ftp();
             serverftp.Connect("50.116.22.241");

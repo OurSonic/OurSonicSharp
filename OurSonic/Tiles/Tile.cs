@@ -90,6 +90,11 @@ namespace OurSonic.Tiles
             }
         }
 
+        public bool ShouldAnimate()
+        {
+            return IsAnimated && canAnimate;
+        }
+
         private bool CheckGood(CanvasContext2D canvas,
                                Point pos,
                                Point scale,

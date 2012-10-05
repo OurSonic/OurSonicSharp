@@ -8,6 +8,22 @@ using OurSonic.UIManager;
 using jQueryApi;
 namespace OurSonic
 {
+    public class CanvasHandler : IDisposable
+    {
+        private readonly CanvasContext2D myCanvas;
+
+        public CanvasHandler(CanvasContext2D canvas)
+        {
+            myCanvas = canvas;
+            canvas.Save();
+        }
+
+        public void Dispose()
+        {
+            myCanvas.Restore();
+
+        }
+    }
     public static class Help
     {
         public static double[] cos_table = new[] {
@@ -45,6 +61,8 @@ namespace OurSonic
                                                          0.98079, 0.98528, 0.98918, 0.99248, 0.99518, 0.99729, 0.99880, 0.99970
                                                  };
 
+
+
         public static string ToPx(this int number)
         {
             return number + "px";
@@ -72,13 +90,22 @@ namespace OurSonic
         public static ImageElement ScaleSprite(ImageElement image, Point scale, Action<ImageElement> complete)
         {
             var data = GetImageData(image);
-            var colors = new Color[data.Length / 4];
-            for (int f = 0; f < data.Length; f += 4) {
-                colors[f / 4] = ( ColorObjectFromData(data, f) );
+            return LoadSprite(GetBase64Image(ScalePixelData(scale, data)), complete);
+        }
+
+        public static ImageData ScalePixelData(Point scale, ImageData data)
+        {
+            PixelArray pixelArray = data.Data;
+
+
+            var colors = new Color[pixelArray.Length / 4];
+            for (int f = 0; f < pixelArray.Length; f += 4)
+            {
+                colors[f / 4] = (ColorObjectFromData(pixelArray, f));
             }
-            var d = DefaultCanvas(0, 0).Context.CreateImageData(image.Width * scale.X, image.Height * scale.Y);
-            SetDataFromColors(d.Data, colors, scale, image.Width, colors[0]);
-            return LoadSprite(GetBase64Image(d), complete);
+            var d = DefaultCanvas(0, 0).Context.CreateImageData(data.Width * scale.X, data.Height* scale.Y);
+            SetDataFromColors(d.Data, colors, scale, data.Width, colors[0]);
+            return d;
         }
 
         private static void SetDataFromColors(PixelArray data, Color[] colors, Point scale, int width, Color transparent)
@@ -139,7 +166,7 @@ namespace OurSonic
             return new Color(r, g, b, a);
         }
 
-        public static PixelArray GetImageData(ImageElement image)
+        public static ImageData GetImageData(ImageElement image)
         {
             var canvas = (CanvasElement) Document.CreateElement("canvas");
             canvas.Width = image.Width;
@@ -147,7 +174,7 @@ namespace OurSonic
             CanvasContext2D ctx = (CanvasContext2D) canvas.GetContext("2d");
             ctx.DrawImage(image, 0, 0);
             var data = ctx.GetImageData(0, 0, image.Width, image.Height);
-            return data.Data;
+            return data;
         }
 
         public static ImageElement ScaleCsImage(SonicImage image, Point scale, Action<ImageElement> complete)
@@ -331,6 +358,17 @@ namespace OurSonic
 
                                       else return value;
                                   }); //.replaceAll("false", "0").replaceAll("true", "1");
+        }
+
+        public static CanvasInformation SafeResize(CanvasInformation block, int width, int height)
+        {
+            
+            var m = DefaultCanvas(width, height);
+            /*var img=block.Context.GetImageData(0, 0, block.Canvas.Width, block.Canvas.Height);
+            m.Context.PutImageData(img, 0, 0);*/
+            m.Context.DrawImage(block.Canvas, 0, 0);
+            return m;
+
         }
     }
 }

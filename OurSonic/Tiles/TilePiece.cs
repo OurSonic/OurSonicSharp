@@ -128,13 +128,27 @@ namespace OurSonic.Tiles
                          bool yFlip,
                          int animatedIndex)
         {
-            var drawOrderIndex = 0;
-
+            var drawOrderIndex = 0; 
             drawOrderIndex = xFlip ? ( yFlip ? 0 : 1 ) : ( yFlip ? 2 : 3 );
             var fd = GetCache(layer, scale, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.palAn);
             if (fd.Falsey()) fd = buildCache(scale, layer, xFlip, yFlip, animatedIndex, drawOrderIndex);
             DrawIt(canvas, fd, position);
             return true;
+        }
+
+        public bool? shouldAnimate;
+        public bool ShouldAnimate()
+        {
+            if (shouldAnimate == null) {
+                var tiles = SonicManager.Instance.SonicLevel.Tiles;
+                for (int index = 0; index < Tiles.Count; index++) {
+                    var mj = Tiles[index];
+                    if (tiles[mj._Tile].ShouldAnimate()) 
+                    return (shouldAnimate = true).Value;
+                }
+                shouldAnimate = false;
+            }
+            return (shouldAnimate).Value;
         }
 
         private CanvasElement buildCache(Point scale, int layer, bool xFlip, bool yFlip, int animatedIndex, int drawOrderIndex)

@@ -28,6 +28,18 @@ OurSonic.AnimationInstance.prototype = {
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
+// OurSonic.CanvasHandler
+OurSonic.CanvasHandler = function(canvas) {
+	this.$myCanvas = null;
+	this.$myCanvas = canvas;
+	canvas.save();
+};
+OurSonic.CanvasHandler.prototype = {
+	dispose: function() {
+		this.$myCanvas.restore();
+	}
+};
+////////////////////////////////////////////////////////////////////////////////
 // OurSonic.CanvasInformation
 OurSonic.CanvasInformation = function(context, domCanvas) {
 	this.context = null;
@@ -311,13 +323,17 @@ OurSonic.Help.mod = function(j, n) {
 };
 OurSonic.Help.scaleSprite = function(image, scale, complete) {
 	var data = OurSonic.Help.getImageData(image);
-	var colors = new Array(ss.Int32.div(data.length, 4));
-	for (var f = 0; f < data.length; f += 4) {
-		colors[ss.Int32.div(f, 4)] = OurSonic.Help.$colorObjectFromData(data, f);
+	return OurSonic.Help.loadSprite(OurSonic.Help.$getBase64Image(OurSonic.Help.scalePixelData(scale, data)), complete);
+};
+OurSonic.Help.scalePixelData = function(scale, data) {
+	var pixelArray = data.data;
+	var colors = new Array(ss.Int32.div(pixelArray.length, 4));
+	for (var f = 0; f < pixelArray.length; f += 4) {
+		colors[ss.Int32.div(f, 4)] = OurSonic.Help.$colorObjectFromData(pixelArray, f);
 	}
-	var d = OurSonic.Help.defaultCanvas(0, 0).context.createImageData(image.width * scale.x, image.height * scale.y);
-	OurSonic.Help.$setDataFromColors(d.data, colors, scale, image.width, colors[0]);
-	return OurSonic.Help.loadSprite(OurSonic.Help.$getBase64Image(d), complete);
+	var d = OurSonic.Help.defaultCanvas(0, 0).context.createImageData(data.width * scale.x, data.height * scale.y);
+	OurSonic.Help.$setDataFromColors(d.data, colors, scale, data.width, colors[0]);
+	return d;
 };
 OurSonic.Help.$setDataFromColors = function(data, colors, scale, width, transparent) {
 	for (var i = 0; i < colors.length; i++) {
@@ -375,7 +391,7 @@ OurSonic.Help.getImageData = function(image) {
 	var ctx = canvas.getContext('2d');
 	ctx.drawImage(image, 0, 0);
 	var data = ctx.getImageData(0, 0, image.width, image.height);
-	return data.data;
+	return data;
 };
 OurSonic.Help.scaleCsImage = function(image, scale, complete) {
 	var df = image.bytes;
@@ -509,6 +525,13 @@ OurSonic.Help.stringify = function(obj) {
 	});
 	//.replaceAll("false", "0").replaceAll("true", "1");
 };
+OurSonic.Help.safeResize = function(block, width, height) {
+	var m = OurSonic.Help.defaultCanvas(width, height);
+	//var img=block.Context.GetImageData(0, 0, block.Canvas.Width, block.Canvas.Height);
+	//m.Context.PutImageData(img, 0, 0);
+	m.context.drawImage(block.canvas, 0, 0);
+	return m;
+};
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.IntersectingRectangle
 OurSonic.IntersectingRectangle = function(x, y, width, height) {
@@ -566,6 +589,10 @@ OurSonic.Point.negate = function($this, windowLocation) {
 };
 OurSonic.Point.negate$1 = function($this, x, y) {
 	return OurSonic.Point.$ctor1($this.x - x, $this.y - y);
+};
+OurSonic.Point.set = function($this, x, y) {
+	$this.x = x;
+	$this.y = y;
 };
 OurSonic.Point.$ctor1 = function(x, y) {
 	var $this = {};
@@ -2279,11 +2306,14 @@ OurSonic.SonicEngine = function() {
 	this.sonicManager = null;
 	this.$uiCanvas = null;
 	this.$uiCanvasName = 'uiLayer';
+	this.$gameGoodWidth = 0;
+	this.$uiGoodWidth = 0;
 	OurSonic.SonicEngine.instance = this;
 	//var pl = @"";
 	//Window.Instance.Me().console.log(new Compressor().CompressText(pl));
 	var gameCanvasItem = $(String.format('#{0}', this.$gameCanvasName));
 	this.$gameCanvas = new OurSonic.CanvasInformation(gameCanvasItem[0].getContext('2d'), gameCanvasItem);
+	//          new SpeedTester(gameCanvas);return;
 	var uiCanvasItem = $(String.format('#{0}', this.$uiCanvasName));
 	this.$uiCanvas = new OurSonic.CanvasInformation(uiCanvasItem[0].getContext('2d'), uiCanvasItem);
 	this.canvasWidth = 0;
@@ -2630,12 +2660,21 @@ OurSonic.SonicEngine.prototype = {
 		this.sonicManager.realScale = (!this.$fullscreenMode ? OurSonic.DoublePoint.$ctor1(1, 1) : OurSonic.DoublePoint.$ctor1(this.canvasWidth / 320 / this.sonicManager.scale.x, this.canvasHeight / 224 / this.sonicManager.scale.y));
 		this.$gameCanvas.domCanvas.attr('width', (this.sonicManager.windowLocation.width * ((this.sonicManager.currentGameState === 0) ? (this.sonicManager.scale.x * this.sonicManager.realScale.x) : 1)).toString());
 		this.$gameCanvas.domCanvas.attr('height', (this.sonicManager.windowLocation.height * ((this.sonicManager.currentGameState === 0) ? (this.sonicManager.scale.y * this.sonicManager.realScale.y) : 1)).toString());
+		this.$uiGoodWidth = this.canvasWidth;
+		this.$gameGoodWidth = ss.Int32.trunc(this.sonicManager.windowLocation.width * ((this.sonicManager.currentGameState === 0) ? (this.sonicManager.scale.x * this.sonicManager.realScale.x) : 1));
 		var screenOffset = ((this.sonicManager.currentGameState === 0) ? OurSonic.DoublePoint.$ctor1(this.canvasWidth / 2 - this.sonicManager.windowLocation.width * this.sonicManager.scale.x * this.sonicManager.realScale.x / 2, this.canvasHeight / 2 - this.sonicManager.windowLocation.height * this.sonicManager.scale.y * this.sonicManager.realScale.y / 2) : OurSonic.DoublePoint.$ctor1(0, 0));
 		this.$gameCanvas.domCanvas.css('left', OurSonic.Help.toPx(screenOffset.x));
 		this.$gameCanvas.domCanvas.css('top', OurSonic.Help.toPx(screenOffset.y));
 	},
 	clear: function(canv) {
-		canv.domCanvas[0].width = this.$gameCanvas.domCanvas.width();
+		var w;
+		if (ss.referenceEquals(canv, this.$gameCanvas)) {
+			w = this.$gameGoodWidth;
+		}
+		else {
+			w = this.$uiGoodWidth;
+		}
+		canv.domCanvas[0].width = w;
 	},
 	gameDraw: function() {
 		if (!this.sonicManager.inHaltMode) {
@@ -3846,6 +3885,43 @@ OurSonic.SonicManager.$drawLoading = function(canvas) {
 	return;
 };
 ////////////////////////////////////////////////////////////////////////////////
+// OurSonic.SpeedTester
+OurSonic.SpeedTester = function(gameCanvas) {
+	this.$img = null;
+	this.$WIDTH = 1;
+	this.$HEIGHT = 1;
+	this.$SIZE = 512;
+	var m = OurSonic.Help.defaultCanvas(this.$SIZE, this.$SIZE);
+	gameCanvas.canvas.width = window.outerWidth;
+	gameCanvas.canvas.height = window.outerHeight;
+	var con = m.context;
+	this.$img = con.getImageData(0, 0, this.$SIZE, this.$SIZE);
+	window.setInterval(Function.mkdel(this, function() {
+		this.$makeit(gameCanvas, m);
+	}), 16);
+};
+OurSonic.SpeedTester.prototype = {
+	$makeit: function(gameCanvas, m) {
+		var mc = this.$img.data;
+		var length = mc.length;
+		for (var i = 0; i < length; i += 4) {
+			mc[i] = 205;
+			mc[i + 1] = i % 255;
+			mc[i + 2] = 245;
+			mc[i + 3] = 255;
+		}
+		var mj = gameCanvas.context;
+		var fm = OurSonic.Help.scalePixelData(OurSonic.Point.$ctor1(2, 2), this.$img);
+		mj.save();
+		for (var w = 0; w < this.$WIDTH; w++) {
+			for (var h = 0; h < this.$HEIGHT; h++) {
+				mj.putImageData(fm, w * this.$SIZE, h * this.$SIZE);
+			}
+		}
+		mj.restore();
+	}
+};
+////////////////////////////////////////////////////////////////////////////////
 // OurSonic.SpriteCache
 OurSonic.SpriteCache = function() {
 	this.rings = null;
@@ -4868,6 +4944,9 @@ OurSonic.Tiles.Tile.prototype = {
 			canvas.strokeRect(pos.x, pos.y, 8 * scale.x, 8 * scale.y);
 		}
 	},
+	shouldAnimate: function() {
+		return this.isAnimated && this.$canAnimate;
+	},
 	$checkGood: function(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame) {
 		if (!this.isAnimated) {
 			if (!this.$canAnimate) {
@@ -4978,9 +5057,32 @@ OurSonic.Tiles.Tile.prototype = {
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
+// OurSonic.Tiles.TileCacheBlock
+OurSonic.Tiles.TileCacheBlock = function() {
+};
+OurSonic.Tiles.TileCacheBlock.$ctor = function(type) {
+	var $this = {};
+	$this.type = 0;
+	$this.tilePiece = null;
+	$this.block = null;
+	$this.color = null;
+	$this.x = 0;
+	$this.y = 0;
+	$this.pieceM = null;
+	$this.type = type;
+	return $this;
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.Tiles.TileCacheBlockType
+OurSonic.Tiles.TileCacheBlockType = function() {
+};
+OurSonic.Tiles.TileCacheBlockType.prototype = { block: 0, tilePiece: 1 };
+OurSonic.Tiles.TileCacheBlockType.registerEnum('OurSonic.Tiles.TileCacheBlockType', false);
+////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Tiles.TileChunk
 OurSonic.Tiles.TileChunk = function() {
 	this.$myLocalPoint = OurSonic.Point.$ctor1(0, 0);
+	this.$neverAnimate = null;
 	this.isOnlyBackground = null;
 	this.isOnlyForeground = null;
 	this.empty = null;
@@ -4993,9 +5095,12 @@ OurSonic.Tiles.TileChunk = function() {
 	this.$1$HeightBlocks2Field = null;
 	this.$1$AngleMap1Field = null;
 	this.$1$AngleMap2Field = null;
+	this.$layerCacheBlocks = new Array(2);
+	this.$neverAnimateCache = null;
 	this.hLayers = [];
 	this.sprites = [];
 	this.isOnlyBackground = null;
+	this.$neverAnimateCache = new Array(2);
 };
 OurSonic.Tiles.TileChunk.prototype = {
 	get_heightBlocks1: function() {
@@ -5086,41 +5191,271 @@ OurSonic.Tiles.TileChunk.prototype = {
 		}
 		return ss.Nullable.unbox(this.empty);
 	},
+	neverAnimates: function() {
+		var $state = 0, len1, len2, blocks, nothing, i, j, r, pm;
+		$sm1:
+		for (;;) {
+			switch ($state) {
+				case 0: {
+					if (ss.Nullable.eq(this.$neverAnimate, null)) {
+						len1 = this.tilePieces.length;
+						len2 = this.tilePieces[0].length;
+						blocks = OurSonic.SonicManager.instance.sonicLevel.blocks;
+						nothing = true;
+						for (i = 0; i < len1; i++) {
+							for (j = 0; j < len2; j++) {
+								r = this.tilePieces[i][j];
+								pm = blocks[r.block];
+								if (pm) {
+									if (this.animated && this.animated[j * len1 + i] || pm.animatedFrames.length > 0) {
+										nothing = false;
+										$state = 2;
+										continue $sm1;
+									}
+								}
+							}
+						}
+						$state = 2;
+						continue $sm1;
+					}
+					$state = 1;
+					continue $sm1;
+				}
+				case 2: {
+					this.$neverAnimate = nothing;
+					$state = 1;
+					continue $sm1;
+				}
+				case 1: {
+					return ss.Nullable.unbox(this.$neverAnimate);
+				}
+				default: {
+					break $sm1;
+				}
+			}
+		}
+	},
 	draw: function(canvas, position, scale, layer, bounds) {
+		var neverAnimates = this.neverAnimates();
+		if (ss.isNullOrUndefined(this.$layerCacheBlocks[layer])) {
+			this.$layerCacheBlocks[layer] = this.buildCacheBlock(scale, layer, bounds);
+		}
+		{
+			var $t2 = new OurSonic.CanvasHandler(canvas);
+			try {
+				if (ss.isValue(this.$neverAnimateCache[layer])) {
+					this.$drawFullChunk(canvas, position, scale, layer);
+					return;
+				}
+				var numOfPiecesWide = this.tilePieces.length;
+				var numOfPiecesLong = this.tilePieces[0].length;
+				var oldCanvas = null;
+				var oldPoint = null;
+				var pieceWidth = 16 * scale.x;
+				var pieceHeight = 16 * scale.y;
+				var isBack = layer === 0;
+				var blocks = OurSonic.SonicManager.instance.sonicLevel.blocks;
+				if (neverAnimates) {
+					oldCanvas = canvas;
+					this.$neverAnimateCache[layer] = OurSonic.Help.defaultCanvas(numOfPiecesWide * pieceWidth, numOfPiecesLong * pieceHeight);
+					canvas = this.$neverAnimateCache[layer].context;
+					oldPoint = OurSonic.Point.$ctor(position);
+					OurSonic.Point.set(position, 0, 0);
+				}
+				else {
+					var $t1 = this.$layerCacheBlocks[layer].getEnumerator();
+					try {
+						while ($t1.moveNext()) {
+							var tileCacheBlock = $t1.get_current();
+							switch (tileCacheBlock.type) {
+								case 0: {
+									OurSonic.Tiles.TileChunk.$drawBlock(canvas, position, tileCacheBlock);
+									break;
+								}
+								case 1: {
+									this.$drawTilePiece(canvas, position, scale, layer, blocks, tileCacheBlock, pieceWidth, pieceHeight, isBack, numOfPiecesWide);
+									break;
+								}
+							}
+						}
+					}
+					finally {
+						$t1.dispose();
+					}
+					return;
+				}
+				this.$drawOld(canvas, position, scale, layer, numOfPiecesWide, numOfPiecesLong, blocks, pieceWidth, pieceHeight, isBack, neverAnimates, oldPoint, oldCanvas);
+			}
+			finally {
+				if (ss.isValue($t2)) {
+					$t2.dispose();
+				}
+			}
+		}
+	},
+	$drawOld: function(canvas, position, scale, layer, numOfPiecesWide, numOfPiecesLong, blocks, pieceWidth, pieceHeight, isBack, neverAnimates, oldPoint, oldCanvas) {
+		for (var pieceX = 0; pieceX < numOfPiecesWide; pieceX++) {
+			for (var pieceY = 0; pieceY < numOfPiecesLong; pieceY++) {
+				var piece = this.tilePieces[pieceX][pieceY];
+				var pm = blocks[piece.block];
+				if (piece) {
+					this.$drawIt(canvas, position, scale, layer, pieceWidth, pieceHeight, piece, pm, isBack, pieceX, pieceY, numOfPiecesWide);
+				}
+			}
+		}
+		if (neverAnimates) {
+			position = oldPoint;
+			canvas = oldCanvas;
+			canvas.drawImage(this.$neverAnimateCache[layer].canvas, position.x, position.y);
+		}
+	},
+	$drawTilePiece: function(canvas, position, scale, layer, blocks, tileCacheBlock, pieceWidth, pieceHeight, isBack, numOfPiecesWide) {
+		var pm = blocks[tileCacheBlock.tilePiece.block];
+		this.$drawIt(canvas, position, scale, layer, pieceWidth, pieceHeight, pm, tileCacheBlock.tilePiece, isBack, tileCacheBlock.x, tileCacheBlock.y, numOfPiecesWide);
 		canvas.save();
-		var len1 = this.tilePieces.length;
-		var len2 = this.tilePieces[0].length;
-		var lX = 16 * scale.x;
-		var lY = 16 * scale.y;
-		var isBack = layer === 0;
+		canvas.strokeStyle = 'green';
+		canvas.strokeRect(position.x * scale.x * pieceWidth, position.y * scale.y * pieceHeight, 16 * scale.x, 16 * scale.y);
+		canvas.restore();
+	},
+	$drawFullChunk: function(canvas, position, scale, layer) {
+		canvas.drawImage(this.$neverAnimateCache[layer].canvas, position.x, position.y);
+		canvas.save();
+		canvas.strokeStyle = 'red';
+		canvas.strokeRect(position.x, position.y, 128 * scale.x, 128 * scale.y);
+		canvas.restore();
+	},
+	$drawIt: function(canvas, position, scale, layer, pieceWidth, pieceHeight, pm, piece, isBack, pieceX, pieceY, numOfPiecesWide) {
+		if ((isBack ? piece.onlyForeground$1 : piece.onlyBackground$1)) {
+			return;
+		}
+		var animatedIndex = 0;
+		var animation = this.animated[pieceY * numOfPiecesWide + pieceX];
+		var hover = false;
+		var shouldAnimate = piece.shouldAnimate();
+		if (this.animated && animation) {
+			animatedIndex = animation.lastAnimatedIndex;
+		}
+		else if (!shouldAnimate || ss.Nullable.unbox(this.$neverAnimate)) {
+			hover = true;
+		}
+		this.$myLocalPoint.x = position.x + pieceX * pieceWidth;
+		this.$myLocalPoint.y = position.y + pieceY * pieceHeight;
+		piece.draw(canvas, this.$myLocalPoint, scale, layer, pm.xFlip, pm.yFlip, animatedIndex);
+		if (false && hover) {
+			canvas.save();
+			switch (layer) {
+				case 1: {
+					canvas.fillStyle = 'rgba(190,0,0,0.5)';
+					break;
+				}
+				case 0: {
+					canvas.fillStyle = 'rgba(244,0,130,0.5)';
+					break;
+				}
+			}
+			if (!shouldAnimate && !ss.Nullable.unbox(this.$neverAnimate)) {
+				canvas.fillStyle = 'rgba(255,45,255,0.75)';
+			}
+			canvas.fillRect(this.$myLocalPoint.x, this.$myLocalPoint.y, 16 * scale.x, 16 * scale.y);
+			canvas.restore();
+		}
+		//canvas.StrokeStyle = "#FFF";
+		//canvas.StrokeRect(position.X + pieceX * 16 * scale.X, position.Y + pieceY * 16 * scale.Y, scale.X * 16, scale.Y * 16);
+	},
+	buildCacheBlock: function(scale, layer, bounds) {
+		var cacheBlocks = [];
+		if (ss.isValue(this.$neverAnimateCache[layer])) {
+			return cacheBlocks;
+		}
+		var numOfPiecesWide = this.tilePieces.length;
+		var numOfPiecesLong = this.tilePieces[0].length;
+		var pieceWidth = 16 * scale.x;
+		var pieceHeight = 16 * scale.y;
+		if (this.neverAnimates()) {
+			return cacheBlocks;
+		}
+		var currentCacheBlock = null;
 		var blocks = OurSonic.SonicManager.instance.sonicLevel.blocks;
-		for (var i = 0; i < len1; i++) {
-			for (var j = 0; j < len2; j++) {
-				var r = this.tilePieces[i][j];
-				var pm = blocks[r.block];
+		var isBack = layer === 0;
+		for (var pieceX = 0; pieceX < numOfPiecesWide; pieceX++) {
+			for (var pieceY = 0; pieceY < numOfPiecesLong; pieceY++) {
+				var piece = this.tilePieces[pieceX][pieceY];
+				var pm = blocks[piece.block];
 				if (pm) {
-					if (this.$drawIt(canvas, position, scale, layer, lX, lY, r, j, pm, isBack, i, len1)) {
-						continue;
+					currentCacheBlock = this.$buildCacheBlock(scale, layer, pieceWidth, pieceHeight, piece, pm, isBack, pieceX, pieceY, numOfPiecesWide, currentCacheBlock);
+					if (!cacheBlocks.contains(currentCacheBlock)) {
+						cacheBlocks.add(currentCacheBlock);
 					}
 				}
 			}
 		}
-		canvas.restore();
+		return cacheBlocks;
 	},
-	$drawIt: function(canvas, position, scale, layer, lX, lY, r, j, pm, isBack, i, len1) {
-		if ((isBack ? pm.onlyForeground$1 : pm.onlyBackground$1)) {
-			return true;
-		}
+	$buildCacheBlock: function(scale, layer, pieceWidth, pieceHeight, pm, piece, isBack, pieceX, pieceY, numOfPiecesWide, oldCacheBlock) {
+		//if (isBack ? (piece.onlyForeground) : (piece.onlyBackground)) return null;
 		var animatedIndex = 0;
-		if (this.animated && this.animated[j * len1 + i]) {
-			animatedIndex = this.animated[j * len1 + i].lastAnimatedIndex;
+		var animation = this.animated[pieceY * numOfPiecesWide + pieceX];
+		var cacheBlockNeeded = false;
+		var shouldAnimate = piece.shouldAnimate();
+		if (this.animated && animation) {
+			animatedIndex = animation.lastAnimatedIndex;
 		}
-		this.$myLocalPoint.x = position.x + i * lX;
-		this.$myLocalPoint.y = position.y + j * lY;
-		pm.draw(canvas, this.$myLocalPoint, scale, layer, r.xFlip, r.yFlip, animatedIndex);
-		//canvas.StrokeStyle = "#FFF";
-		//canvas.StrokeRect(position.X + i * 16 * scale.X, position.Y + j * 16 * scale.Y, scale.X * 16, scale.Y * 16);
-		return false;
+		else if (piece.animatedFrames.length === 0 && (!shouldAnimate || ss.Nullable.unbox(this.$neverAnimate))) {
+			cacheBlockNeeded = true;
+		}
+		if (cacheBlockNeeded) {
+			var internalPoint = OurSonic.Point.$ctor1(pieceX * pieceWidth, pieceY * pieceHeight);
+			if (ss.isNullOrUndefined(oldCacheBlock) || oldCacheBlock.type === 1) {
+				oldCacheBlock = OurSonic.Tiles.TileCacheBlock.$ctor(0);
+				oldCacheBlock.block = OurSonic.Help.defaultCanvas(pieceWidth * 8 * scale.x, pieceHeight * 8 * scale.y);
+				oldCacheBlock.color = String.format('rgba({0},{1},{2},0.3);', ss.Int32.trunc(Math.random() * 255), ss.Int32.trunc(Math.random() * 255), ss.Int32.trunc(Math.random() * 255));
+				piece.draw(oldCacheBlock.block.context, internalPoint, scale, layer, pm.xFlip, pm.yFlip, animatedIndex);
+				//   oldCacheBlock.X = pieceX;
+				//   oldCacheBlock.Y = pieceY;
+				return oldCacheBlock;
+			}
+			else {
+				switch (oldCacheBlock.type) {
+					case 0: {
+						oldCacheBlock.block.context.save();
+						piece.draw(oldCacheBlock.block.context, internalPoint, scale, layer, pm.xFlip, pm.yFlip, animatedIndex);
+						oldCacheBlock.block.context.fillStyle = oldCacheBlock.color;
+						oldCacheBlock.block.context.fillRect(internalPoint.x, internalPoint.y, 16 * scale.x, 16 * scale.y);
+						oldCacheBlock.block.context.restore();
+						return oldCacheBlock;
+						break;
+					}
+					case 1: {
+						oldCacheBlock = OurSonic.Tiles.TileCacheBlock.$ctor(0);
+						oldCacheBlock.block = OurSonic.Help.defaultCanvas(pieceWidth * 8 * scale.x, pieceHeight * 8 * scale.y);
+						oldCacheBlock.color = String.format('rgba({0},{0},{0},0.3);', Math.random() * 255);
+						piece.draw(oldCacheBlock.block.context, internalPoint, scale, layer, pm.xFlip, pm.yFlip, animatedIndex);
+						return oldCacheBlock;
+					}
+					default: {
+						return null;
+					}
+				}
+			}
+		}
+		else {
+			//
+			//                if (oldCacheBlock.Type == TileCacheBlockType.Block) {
+			//
+			//                
+			//
+			//                //todosomethingwithreadjustingthesizesoitsnotdrawing256*256eachtimefornoreason
+			//
+			//                
+			//
+			//                }
+			var $t1 = OurSonic.Tiles.TileCacheBlock.$ctor(1);
+			$t1.tilePiece = piece;
+			$t1.x = pieceX;
+			$t1.y = pieceY;
+			$t1.pieceM = pm;
+			return $t1;
+		}
 	},
 	animatedTick: function() {
 		var $t1 = Object.getObjectEnumerator(this.animated);
@@ -5142,6 +5477,9 @@ OurSonic.Tiles.TileChunk.prototype = {
 			$t1.dispose();
 		}
 	}
+};
+OurSonic.Tiles.TileChunk.$drawBlock = function(canvas, position, tileCacheBlock) {
+	canvas.drawImage(tileCacheBlock.block.canvas, position.x, position.y);
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Tiles.TileItem
@@ -5172,6 +5510,7 @@ OurSonic.Tiles.TilePiece = function() {
 	this.index = 0;
 	this.solid1 = 0;
 	this.solid2 = 0;
+	this.shouldAnimate$1 = null;
 	this.image = {};
 };
 OurSonic.Tiles.TilePiece.prototype = {
@@ -5271,6 +5610,19 @@ OurSonic.Tiles.TilePiece.prototype = {
 		}
 		this.$drawIt(canvas, fd, position);
 		return true;
+	},
+	shouldAnimate: function() {
+		if (ss.Nullable.eq(this.shouldAnimate$1, null)) {
+			var tiles = OurSonic.SonicManager.instance.sonicLevel.tiles;
+			for (var index = 0; index < this.tiles.length; index++) {
+				var mj = this.tiles[index];
+				if (tiles[mj._Tile].shouldAnimate()) {
+					return ss.Nullable.unbox(this.shouldAnimate$1 = true);
+				}
+			}
+			this.shouldAnimate$1 = false;
+		}
+		return ss.Nullable.unbox(this.shouldAnimate$1);
 	},
 	$buildCache: function(scale, layer, xFlip, yFlip, animatedIndex, drawOrderIndex) {
 		var fd;
@@ -5676,7 +6028,6 @@ OurSonic.UIManager.Element = function(x, y) {
 	this.y = y;
 	this.editorEngine = new OurSonic.UIManager.EditorEngine(this);
 	this.visible = true;
-	this.editMode = true;
 	//
 	//                        if (this.Construct) {
 	//
@@ -9432,6 +9783,7 @@ OurSonic.UIManager.Areas.PieceLayoutMaker.prototype = {
 OurSonic.Animation.registerClass('OurSonic.Animation', Object);
 OurSonic.AnimationFrame.registerClass('OurSonic.AnimationFrame', Object);
 OurSonic.AnimationInstance.registerClass('OurSonic.AnimationInstance', Object);
+OurSonic.CanvasHandler.registerClass('OurSonic.CanvasHandler', Object, ss.IDisposable);
 OurSonic.CanvasInformation.registerClass('OurSonic.CanvasInformation', Object);
 OurSonic.Color.registerClass('OurSonic.Color', Object);
 OurSonic.Constants.registerClass('OurSonic.Constants', Object);
@@ -9456,6 +9808,7 @@ OurSonic.SonicEngine.registerClass('OurSonic.SonicEngine', Object);
 OurSonic.SonicImage.registerClass('OurSonic.SonicImage', Object);
 OurSonic.SonicLevel.registerClass('OurSonic.SonicLevel', Object);
 OurSonic.SonicManager.registerClass('OurSonic.SonicManager', Object);
+OurSonic.SpeedTester.registerClass('OurSonic.SpeedTester', Object);
 OurSonic.SpriteCache.registerClass('OurSonic.SpriteCache', Object);
 OurSonic.SpriteCacheIndexes.registerClass('OurSonic.SpriteCacheIndexes', Object);
 OurSonic.SpriteLoader.registerClass('OurSonic.SpriteLoader', Object);
@@ -9474,6 +9827,7 @@ OurSonic.Level.LevelObjectProjectile.registerClass('OurSonic.Level.LevelObjectPr
 OurSonic.Level.ObjectManager.registerClass('OurSonic.Level.ObjectManager', Object);
 OurSonic.Level.Ring.registerClass('OurSonic.Level.Ring');
 OurSonic.Tiles.Tile.registerClass('OurSonic.Tiles.Tile', Object);
+OurSonic.Tiles.TileCacheBlock.registerClass('OurSonic.Tiles.TileCacheBlock', Object);
 OurSonic.Tiles.TileChunk.registerClass('OurSonic.Tiles.TileChunk', Object);
 OurSonic.Tiles.TileItem.registerClass('OurSonic.Tiles.TileItem', Object);
 OurSonic.Tiles.TilePiece.registerClass('OurSonic.Tiles.TilePiece', Object);
