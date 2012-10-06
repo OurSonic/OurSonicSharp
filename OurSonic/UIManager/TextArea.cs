@@ -50,10 +50,15 @@ namespace OurSonic.UIManager
         public override ForceRedrawing ForceDrawing()
         {
             string txt = Text;
-            if (txt == oldText)
-                return new ForceRedrawing() {Redraw = true, ClearCache = false};
-            oldText = txt;
-            return new ForceRedrawing() {Redraw = true, ClearCache = true};
+            cachedForceRedrawing.Redraw = false;
+            cachedForceRedrawing.ClearCache = false;
+            if (txt == oldText) cachedForceRedrawing.Redraw = true;
+            else {
+                oldText = txt;
+                cachedForceRedrawing.Redraw = true;
+                cachedForceRedrawing.ClearCache = true;
+            }
+            return cachedForceRedrawing;
         }
     }
 }

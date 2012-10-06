@@ -2,11 +2,13 @@ using System;
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
-using jQueryApi;
+using OurSonic.Utility;
 namespace OurSonic.UIManager
 {
     public class Element
     {
+        internal ForceRedrawing cachedForceRedrawing = new ForceRedrawing();
+        private int myDepth;
         [IntrinsicProperty]
         public int X { get; set; }
         [IntrinsicProperty]
@@ -15,8 +17,16 @@ namespace OurSonic.UIManager
         public int Width { get; set; }
         [IntrinsicProperty]
         public int Height { get; set; }
-        [IntrinsicProperty]
-        public int Depth { get; set; }
+        public int Depth
+        {
+            get { return myDepth; }
+            set
+            {
+                myDepth = value;
+                if (( this is UIArea ))
+                    UIManager.Instance.UpdateDepth();
+            }
+        }
         [IntrinsicProperty]
         public bool Visible { get; set; }
         [IntrinsicProperty]
@@ -68,7 +78,7 @@ namespace OurSonic.UIManager
 
         public virtual ForceRedrawing ForceDrawing()
         {
-            return new ForceRedrawing {Redraw = false, ClearCache = false};
+            return cachedForceRedrawing; //redraw=false,cache=false
         }
 
         public virtual bool OnKeyDown(ElementEvent e)

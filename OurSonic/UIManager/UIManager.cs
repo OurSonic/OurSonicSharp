@@ -4,6 +4,7 @@ using System.Html.Media.Graphics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using OurSonic.UIManager.Areas;
+using OurSonic.Utility;
 using jQueryApi;
 namespace OurSonic.UIManager
 {
@@ -38,9 +39,13 @@ namespace OurSonic.UIManager
         public ObjectFrameworkArea ObjectFrameworkArea { get; set; }
         public UIArea ObjectFrameworkListArea { get; set; }
         public UIArea<LiveObjectsAreaData> LiveObjectsArea { get; set; }
+        [IntrinsicProperty]
+        public static UIManager Instance { get; set; }
+        private UIArea[] canvasDepths { get; set; }
 
         public UIManager(SonicManager sonicManager, CanvasContext2D mainCanvas, Point scale)
         {
+            Instance = this;
             mainCanvas.Font = TextFont;
             UIAreas = new List<UIArea>();
 
@@ -63,8 +68,7 @@ namespace OurSonic.UIManager
         }
 
         public bool OnClick(Pointer cell)
-        { 
-
+        {
             UIArea goodArea = null;
             var cl = ( UIAreas ).OrderBy((f) => -f.Depth).ToArray();
             for (var ij = 0; ij < cl.Length; ij++) {
@@ -80,7 +84,7 @@ namespace OurSonic.UIManager
                                 are.X <= cell.X &&
                                 are.X + are.Width > cell.X )) {
                     goodArea = are;
-                    var ec = new Pointer(cell.X - are.X, cell.Y - are.Y,0,cell.Right);
+                    var ec = new Pointer(cell.X - are.X, cell.Y - are.Y, 0, cell.Right);
                     are.OnClick(ec);
                     break;
                 }
@@ -114,8 +118,7 @@ namespace OurSonic.UIManager
         }
 
         public bool OnMouseMove(Pointer cell)
-        { 
-
+        {
             var cl = ( UIAreas ).OrderBy((f) => { return -f.Depth; }).ToArray();
 
             for (var ij = 0; ij < cl.Length; ij++) {
@@ -124,13 +127,12 @@ namespace OurSonic.UIManager
                                                                    are.Y + are.Height > cell.Y &&
                                                                    are.X <= cell.X &&
                                                                    are.X + are.Width > cell.X )) {
-                                                                       var cell2 = new Pointer(cell.X - are.X, cell.Y - are.Y, 0, cell.Right);
+                    var cell2 = new Pointer(cell.X - are.X, cell.Y - are.Y, 0, cell.Right);
                     return are.OnMouseOver(cell2);
                 }
             }
 
-            if (dragger.IsDragging(cell))
-            {
+            if (dragger.IsDragging(cell)) {
                 dragger.MouseMove(cell);
                 return false;
             }
@@ -141,7 +143,6 @@ namespace OurSonic.UIManager
 
         public void OnMouseUp(Pointer cell)
         {
-
             foreach (var are in UIAreas) {
                 var ec = new Pointer(cell.X - are.X, cell.Y - are.Y, 0, cell.Right);
                 are.OnMouseUp(ec);
@@ -158,7 +159,7 @@ namespace OurSonic.UIManager
 
             foreach (var are in UIAreas) {
                 if (are.Visible && are.Y <= cell.Y && are.Y + are.Height > cell.Y && are.X <= cell.X && are.X + are.Width > cell.X) {
-                    var cell2 = new Pointer(cell.X - are.X, cell.Y - are.Y, delta,cell.Right);
+                    var cell2 = new Pointer(cell.X - are.X, cell.Y - are.Y, delta, cell.Right);
                     return are.OnScroll(cell2);
                 }
             }
@@ -168,9 +169,7 @@ namespace OurSonic.UIManager
         public bool OnKeyDown(ElementEvent jQueryEvent)
         {
             foreach (var are in UIAreas) {
-                if (are.OnKeyDown(jQueryEvent)) {
-                    return true;
-                }
+                if (are.OnKeyDown(jQueryEvent)) return true;
             }
             return false;
         }
@@ -179,14 +178,21 @@ namespace OurSonic.UIManager
         {
             uiArea.Construct();
             UIAreas.Add(uiArea);
+
+            UpdateDepth();
+        }
+
+        public void UpdateDepth()
+        {
+            canvasDepths = UIAreas.OrderBy(f => f.Depth).ToArray();
         }
 
         public void Draw(CanvasContext2D canvas)
         {
             dragger.Tick();
             canvas.Save();
-            var cl = UIAreas.OrderBy(f => f.Depth).ToArray();
-            foreach (var are in cl) {
+
+            foreach (var are in canvasDepths) {
                 are.Draw(canvas);
             }
 

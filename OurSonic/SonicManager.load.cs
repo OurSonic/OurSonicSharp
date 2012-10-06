@@ -5,8 +5,8 @@ using System.Serialization;
 using NodeJSLibrary;
 using OurSonic.Level;
 using OurSonic.Tiles;
+using OurSonic.Utility;
 using OurSonicModels;
-using jQueryApi;
 namespace OurSonic
 {
     public partial class SonicManager

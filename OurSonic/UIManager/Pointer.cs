@@ -1,4 +1,5 @@
 using System;
+using OurSonic.Utility;
 namespace OurSonic.UIManager
 {
     [Serializable]

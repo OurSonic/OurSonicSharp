@@ -1,5 +1,6 @@
 using System.Html.Media.Graphics;
 using OurSonic.Level;
+using OurSonic.Utility;
 namespace OurSonic.UIManager.Areas
 {
     public class PieceLayoutEditor : Element
@@ -34,8 +35,7 @@ namespace OurSonic.UIManager.Areas
 
         public override bool OnScroll(Pointer e)
         {
-
-            PieceLayoutMaker.OffsetScale(e.Delta>0);
+            PieceLayoutMaker.OffsetScale(e.Delta > 0);
 
             return base.OnScroll(e);
         }

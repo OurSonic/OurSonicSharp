@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
-using jQueryApi;
+using OurSonic.Utility;
 namespace OurSonic.UIManager
 {
     public class Panel<T> : Panel
@@ -89,9 +89,7 @@ namespace OurSonic.UIManager
 
             var ch = Controls;
             foreach (Element t in ch) {
-                if (t.OnKeyDown(e)) {
-                    return true;
-                }
+                if (t.OnKeyDown(e)) return true;
             }
             return false;
         }

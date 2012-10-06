@@ -1,5 +1,6 @@
 using System.Html.Media.Graphics;
 using OurSonic.Level;
+using OurSonic.Utility;
 namespace OurSonic.UIManager.Areas
 {
     public class ColorEditingArea : Panel
@@ -65,19 +66,15 @@ namespace OurSonic.UIManager.Areas
             var scalex = Width / Editor.AssetFrame.Width;
             var scaley = Height / Editor.AssetFrame.Height;
 
-            var pos = new Point((e.X / scalex), (e.Y / scaley));
+            var pos = new Point(( e.X / scalex ), ( e.Y / scaley ));
             Editor.ShowHurtMap = ShowHurtMap;
             Editor.ShowCollideMap = ShowCollideMap;
 
-            if (Clicking)
-            {
-                if (!Editable)
-                {
+            if (Clicking) {
+                if (!Editable) {
                     if (Click != null)
                         Click(pos);
-                }
-                else
-                {
+                } else {
                     ClickHandled = true;
                     if (ShowHurtMap || ShowCollideMap)
                         Editor.CurrentColor = e.Right ? 0 : 1;

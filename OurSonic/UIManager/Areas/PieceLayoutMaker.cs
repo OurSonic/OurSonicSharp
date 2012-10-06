@@ -1,11 +1,11 @@
 using System.Html.Media.Graphics;
 using OurSonic.Level;
+using OurSonic.Utility;
 namespace OurSonic.UIManager.Areas
 {
     public class PieceLayoutMaker
     {
-
-        private double largeScale=1;
+        private double largeScale = 1;
         public LevelObjectPieceLayout PieceLayout { get; set; }
         public int SelectedPieceIndex { get; set; }
         public bool ShowImages { get; set; }
@@ -49,7 +49,6 @@ namespace OurSonic.UIManager.Areas
                 goodPosition = position;
                 position = lastPosition;
             }
-
 
             for (var i = 0; i < PieceLayout.Pieces.Count; i++) {
                 var j = PieceLayout.Pieces[i];

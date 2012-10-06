@@ -1,5 +1,6 @@
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonic.Utility;
 namespace OurSonic
 {
     public class SonicBackground

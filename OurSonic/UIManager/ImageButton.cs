@@ -1,6 +1,7 @@
 using System;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonic.Utility;
 using OurSonicModels.Common;
 namespace OurSonic.UIManager
 {
@@ -31,7 +32,6 @@ namespace OurSonic.UIManager
         public Action<CanvasContext2D, int, int> Image { get; set; }
         [IntrinsicProperty]
         public Gradient Button1Grad { get; set; }
-        private bool created { get; set; }
         [IntrinsicProperty]
         private Gradient ButtonBorderGrad { get; set; }
         [IntrinsicProperty]
@@ -48,7 +48,6 @@ namespace OurSonic.UIManager
             Font = "";
             Clicking = false;
             Image = null;
-            created = false;
             Button1Grad = null;
             Button2Grad = null;
             ButtonBorderGrad = null;
@@ -60,6 +59,20 @@ namespace OurSonic.UIManager
         public override void Construct()
         {
             base.Construct();
+
+            var canv = Help.DefaultCanvas(1, 1).Context;
+            Button1Grad = canv.CreateLinearGradient(0, 0, 0, 1);
+
+            Button1Grad.AddColorStop(0, "#FFFFFF");
+            Button1Grad.AddColorStop(1, "#A5A5A5");
+
+            Button2Grad = canv.CreateLinearGradient(0, 0, 0, 1);
+            Button2Grad.AddColorStop(0, "#A5A5A5");
+            Button2Grad.AddColorStop(1, "#FFFFFF");
+
+            ButtonBorderGrad = canv.CreateLinearGradient(0, 0, 0, 1);
+            ButtonBorderGrad.AddColorStop(0, "#AFAFAF");
+            ButtonBorderGrad.AddColorStop(1, "#7a7a7a");
         }
 
         public override bool OnClick(Pointer e)
@@ -101,22 +114,6 @@ namespace OurSonic.UIManager
             if (!Visible) return;
 
             canv.Save();
-
-            if (!created) {
-                created = true;
-                Button1Grad = canv.CreateLinearGradient(0, 0, 0, 1);
-
-                Button1Grad.AddColorStop(0, "#FFFFFF");
-                Button1Grad.AddColorStop(1, "#A5A5A5");
-
-                Button2Grad = canv.CreateLinearGradient(0, 0, 0, 1);
-                Button2Grad.AddColorStop(0, "#A5A5A5");
-                Button2Grad.AddColorStop(1, "#FFFFFF");
-
-                ButtonBorderGrad = canv.CreateLinearGradient(0, 0, 0, 1);
-                ButtonBorderGrad.AddColorStop(0, "#AFAFAF");
-                ButtonBorderGrad.AddColorStop(1, "#7a7a7a");
-            }
 
             canv.StrokeStyle = ButtonBorderGrad;
             if (Toggle) {

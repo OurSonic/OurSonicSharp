@@ -1,4 +1,5 @@
 using System.Html.Media.Graphics;
+using OurSonic.Utility;
 namespace OurSonic.UIManager.Areas
 {
     public class PaletteArea : Panel

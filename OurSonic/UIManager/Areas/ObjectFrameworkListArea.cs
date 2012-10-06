@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using OurSonic.Level;
+using OurSonic.Utility;
 using OurSonicModels;
 using OurSonicModels.Common;
 using jQueryApi;
@@ -16,7 +17,7 @@ namespace OurSonic.UIManager.Areas
             var size = 40 * 4;
 
             var objectFrameworkListArea = uiManager.ObjectFrameworkListArea = new UIArea(90, 500, 390, 300) {Closable = true};
-            objectFrameworkListArea.Visible = false;
+            objectFrameworkListArea.Visible = true;
 
             uiManager.AddArea(objectFrameworkListArea);
             objectFrameworkListArea.AddControl(new TextArea(30, 25, "Object Frameworks") {Color = "blue"});
@@ -36,8 +37,7 @@ namespace OurSonic.UIManager.Areas
                                                                                              var obj = data.Data;
 
                                                                                              fList.Controls = new List<Element>();
-                                                                                             foreach (var itm in obj.OrderBy(a => a))
-                                                                                             {
+                                                                                             foreach (var itm in obj.OrderBy(a => a)) {
                                                                                                  Button d;
                                                                                                  string name = itm;
                                                                                                  fList.AddControl(d = new Button(0, 0, 0, 0, itm) {

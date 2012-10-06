@@ -1,5 +1,6 @@
 using System;
 using System.Html.Media.Graphics;
+using OurSonic.Utility;
 namespace OurSonic.UIManager
 {
     public class HtmlBox : Element

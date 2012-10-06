@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
-namespace OurSonic
+namespace OurSonic.Utility
 {
     public static class Extensions
     {

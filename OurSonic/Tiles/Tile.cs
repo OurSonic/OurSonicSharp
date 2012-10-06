@@ -2,6 +2,7 @@
 using System.Html.Media.Graphics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using OurSonic.Utility;
 namespace OurSonic.Tiles
 {
     public class Tile
@@ -69,10 +70,10 @@ namespace OurSonic.Tiles
 
             var mx = Colors.Length;
             var my = Colors[0].Length;
-            
+
             j.Context.Save();
-            
-            int index0 = (palette + indexed) % palette_.Length;
+
+            int index0 = ( palette + indexed ) % palette_.Length;
             int x = oPos.X;
             int y = oPos.Y;
 
@@ -85,7 +86,7 @@ namespace OurSonic.Tiles
                     if (j.Context.FillStyle != col)
                         j.Context.FillStyle = col;
 
-                    j.Context.FillRect(x + ( i *scale.X ), y + jf *scale.Y, scale.X, scale.Y);
+                    j.Context.FillRect(x + ( i * scale.X ), y + jf * scale.Y, scale.X, scale.Y);
                 }
             }
 
@@ -93,10 +94,8 @@ namespace OurSonic.Tiles
 //            j.Context.LineWidth = 4;
 //            j.Context.StrokeRect(0, 0, cx, cy);
 
-
-
             j.Context.Restore();
-            
+
             canvas.DrawImage(j.Canvas, pos.X, pos.Y);
 
             if (ShowOutline) {

@@ -3,7 +3,7 @@
 
 
 
-
+return;
 /*
 * WorkerConsole.js:
 * 

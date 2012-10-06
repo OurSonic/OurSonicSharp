@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonic.Utility;
 using OurSonicModels;
 namespace OurSonic.Level
 {
@@ -137,7 +138,7 @@ namespace OurSonic.Level
                 var asset = ObjectData.Assets[piece.AssetIndex];
                 if (asset.Frames.Count > 0) {
                     var frm = asset.Frames[j.FrameIndex];
-                    Help.MergeRect(_rect, new Rectangle(frm.OffsetX + j.Y, frm.OffsetY + j.Y, frm.Width * scale.Y, frm.Height * scale.Y));
+                    Help.MergeRect(_rect, new Rectangle(frm.OffsetX + j.X, frm.OffsetY + j.Y, frm.Width * scale.X, frm.Height * scale.Y));
                 }
             }
             _rect.X = _rect.X * scale.X;
@@ -217,15 +218,21 @@ namespace OurSonic.Level
             var pcs = Pieces;
             int mX = (int) ( ( sonic.X ) - X );
             int mY = (int) ( ( sonic.Y ) - Y );
+/*//speed?
+            if (mX < -50 || mY < -50) {
+                return null;
+            }
+*/
+
             for (var pieceIndex = 0; pieceIndex < pcs.Count; pieceIndex++) {
                 var j = pcs[pieceIndex];
-                
+
                 var piece = ObjectData.Pieces[j.PieceIndex];
                 var asset = ObjectData.Assets[piece.AssetIndex];
                 if (asset.Frames.Count > 0) {
                     var frm = asset.Frames[j.FrameIndex];
                     var map = isHurtMap ? frm.HurtSonicMap : frm.CollisionMap;
-                    if (twoDArray(map, (mX + frm.OffsetX + j.X), (mY + frm.OffsetY + j.Y), this.Xflip ^ piece.Xflip, this.Yflip ^ piece.Yflip) == true)
+                    if (twoDArray(map, ( mX + frm.OffsetX + j.X ), ( mY + frm.OffsetY + j.Y ), Xflip ^ piece.Xflip, Yflip ^ piece.Yflip) == true)
                         return j;
                 }
             }
@@ -233,7 +240,7 @@ namespace OurSonic.Level
             return null;
         }
 
-        public bool twoDArray(int[][] map, int x, int y,bool xflip, bool yflip)
+        public bool twoDArray(int[][] map, int x, int y, bool xflip, bool yflip)
         {
             /*var height= map.Length;
             var width = map[0].Length;

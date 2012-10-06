@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonic.Utility;
 namespace OurSonic.UIManager
 {
     public class ScrollBox : Element
@@ -51,6 +52,7 @@ namespace OurSonic.UIManager
         public T AddControl<T>(T control) where T : Element
         {
             control.Parent = this;
+            control.Construct();
             Controls.Add(control);
             return control;
         }

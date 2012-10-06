@@ -2,6 +2,7 @@ using System;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonic.Tiles;
+using OurSonic.Utility;
 namespace OurSonic
 {
     public class HeightMask

@@ -2,8 +2,8 @@ using System;
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonic.Utility;
 using OurSonicModels.Common;
-using jQueryApi;
 namespace OurSonic.UIManager
 {
     public class TextBox : Element
@@ -11,6 +11,7 @@ namespace OurSonic.UIManager
         private int blinkTick;
         private bool blinked;
         private CanvasContext2D can;
+        private string oldText;
         [IntrinsicProperty]
         public Action TextChanged { get; set; }
         [IntrinsicProperty]
@@ -29,8 +30,6 @@ namespace OurSonic.UIManager
         public int DrawTicks { get; set; }
         [IntrinsicProperty]
         public int LastClickTick { get; set; }
-        [IntrinsicProperty]
-        public bool Created { get; set; }
         [IntrinsicProperty]
         public bool Blinked { get; set; }
         [IntrinsicProperty]
@@ -58,10 +57,23 @@ namespace OurSonic.UIManager
         public override void Construct()
         {
             base.Construct();
+
+            var canv = Help.DefaultCanvas(1, 1).Context;
+            Button1Grad = canv.CreateLinearGradient(0, 0, 0, 1);
+            Button1Grad.AddColorStop(0, "#FFFFFF");
+            Button1Grad.AddColorStop(1, "#A5A5A5");
+
+            Button2Grad = canv.CreateLinearGradient(0, 0, 0, 1);
+            Button2Grad.AddColorStop(0, "#A5A5A5");
+            Button2Grad.AddColorStop(1, "#FFFFFF");
+
+            ButtonBorderGrad = canv.CreateLinearGradient(0, 0, 0, 1);
+            ButtonBorderGrad.AddColorStop(0, "#AFAFAF");
+            ButtonBorderGrad.AddColorStop(1, "#7a7a7a");
         }
 
         public override bool OnKeyDown(ElementEvent e)
-        { 
+        {
             if (e.AltKey) return false;
             if (Focused) {
                 if (e.CtrlKey) {
@@ -120,7 +132,7 @@ namespace OurSonic.UIManager
                         if (DragPosition == -1) {} else
                             CursorPosition = Math.Min(CursorPosition, DragPosition);
                     } else {
-                        var m = (char)e.KeyCode;
+                        var m = (char) e.KeyCode;
                         var t = String.FromCharCode(m);
                         if (DragPosition == -1)
                             Text = Text.Substring(0, CursorPosition) + t + Text.Substring(CursorPosition, Text.Length);
@@ -143,6 +155,18 @@ namespace OurSonic.UIManager
                 return true;
             }
             return false;
+        }
+
+        public override ForceRedrawing ForceDrawing()
+        {
+            bool redraw = Focused;
+            if (oldText != Text) {
+                oldText = Text;
+                redraw = true;
+            }
+
+            cachedForceRedrawing.Redraw = redraw;
+            return cachedForceRedrawing;
         }
 
         public override bool OnClick(Pointer e)
@@ -236,20 +260,6 @@ namespace OurSonic.UIManager
             }
             DrawTicks++;
             can = canv;
-            if (!Created) {
-                Created = true;
-                Button1Grad = canv.CreateLinearGradient(0, 0, 0, 1);
-                Button1Grad.AddColorStop(0, "#FFFFFF");
-                Button1Grad.AddColorStop(1, "#A5A5A5");
-
-                Button2Grad = canv.CreateLinearGradient(0, 0, 0, 1);
-                Button2Grad.AddColorStop(0, "#A5A5A5");
-                Button2Grad.AddColorStop(1, "#FFFFFF");
-
-                ButtonBorderGrad = canv.CreateLinearGradient(0, 0, 0, 1);
-                ButtonBorderGrad.AddColorStop(0, "#AFAFAF");
-                ButtonBorderGrad.AddColorStop(1, "#7a7a7a");
-            }
 
             canv.StrokeStyle = ButtonBorderGrad;
             canv.FillStyle = Clicking ? Button1Grad : Button2Grad;

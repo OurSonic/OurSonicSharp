@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonic.Utility;
 using OurSonicModels;
 namespace OurSonic.Tiles
 {
@@ -14,6 +15,7 @@ namespace OurSonic.Tiles
         private bool onlyBackgroundSet;
         public bool onlyForeground;
         private bool onlyForegroundSet;
+        public bool? shouldAnimate;
         [IntrinsicProperty]
         private JsDictionary<string, CanvasElement> Image { get; set; }
         [IntrinsicProperty]
@@ -128,7 +130,7 @@ namespace OurSonic.Tiles
                          bool yFlip,
                          int animatedIndex)
         {
-            var drawOrderIndex = 0; 
+            var drawOrderIndex = 0;
             drawOrderIndex = xFlip ? ( yFlip ? 0 : 1 ) : ( yFlip ? 2 : 3 );
             var fd = GetCache(layer, scale, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.palAn);
             if (fd.Falsey()) fd = buildCache(scale, layer, xFlip, yFlip, animatedIndex, drawOrderIndex);
@@ -136,19 +138,18 @@ namespace OurSonic.Tiles
             return true;
         }
 
-        public bool? shouldAnimate;
         public bool ShouldAnimate()
         {
             if (shouldAnimate == null) {
                 var tiles = SonicManager.Instance.SonicLevel.Tiles;
                 for (int index = 0; index < Tiles.Count; index++) {
                     var mj = Tiles[index];
-                    if (tiles[mj._Tile].ShouldAnimate()) 
-                    return (shouldAnimate = true).Value;
+                    if (tiles[mj._Tile].ShouldAnimate())
+                        return ( shouldAnimate = true ).Value;
                 }
                 shouldAnimate = false;
             }
-            return (shouldAnimate).Value;
+            return ( shouldAnimate ).Value;
         }
 
         private CanvasElement buildCache(Point scale, int layer, bool xFlip, bool yFlip, int animatedIndex, int drawOrderIndex)
@@ -179,7 +180,7 @@ namespace OurSonic.Tiles
 //            ac.Context.LineWidth = 1;
 //            ac.Context.StrokeRect(0, 0, 2*8 * SonicManager.Instance.Scale.X, 2*8 * SonicManager.Instance.Scale.Y);
 
-            fd = ac.Canvas; 
+            fd = ac.Canvas;
             SetCache(layer, scale, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.palAn, fd);
             return fd;
         }

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonic.Level;
 using OurSonic.Tiles;
+using OurSonic.Utility;
 using jQueryApi;
 namespace OurSonic
 {
@@ -20,6 +22,7 @@ namespace OurSonic
         public int DrawTickCount;
         private int imageLength;
         private string myStatus;
+        public DoublePoint overrideRealScale;
         private JsDictionary<string, SonicImage> sonicSprites;
         public int tickCount;
         private bool waitingForDrawContinue;
@@ -146,8 +149,9 @@ namespace OurSonic
 
         public bool OnClick(jQueryEvent elementEvent)
         {
-            var e = new Point(elementEvent.ClientX / Scale.X /  WindowLocation.X,
-                              elementEvent.ClientY / Scale.Y /  WindowLocation.Y);
+            //Help.Debugger();
+            var e = new Point(elementEvent.ClientX / Scale.X / WindowLocation.X,
+                              elementEvent.ClientY / Scale.Y / WindowLocation.Y);
 
             if (elementEvent.Button == 0) {
                 int ey;
@@ -176,6 +180,18 @@ namespace OurSonic
                         SonicLevel.Rings.Add(new Ring(true) {X = ex, Y = ey});
                         return true;
                     case ClickState.PlaceObject:
+
+                        ex = e.X;
+                        ey = e.Y;
+                        var pos = new Point(ex, ey);
+                        for (var l = 0; l < SonicLevel.Objects.Count; l++) {
+                            var o = SonicLevel.Objects[l];
+
+                            if (IntersectingRectangle.IntersectsRect(o.GetRect(Scale), pos)) Window.Alert("Object Data: " + Help.Stringify(o));
+                        }
+
+                        return true;
+
                         break;
                 }
             }
@@ -474,7 +490,6 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                     var pal = SonicLevel.PaletteItems[0][k];
                     if (pal.SkipIndex == 0) continue;
                     if (pal.TotalLength == 0) continue;
-                    
 
                     for (int j = 0; j <= pal.TotalLength; j += pal.SkipIndex) {
                         if (DrawTickCount % ( pal.TotalLength + pal.SkipIndex ) == j)

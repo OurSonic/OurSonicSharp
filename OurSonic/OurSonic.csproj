@@ -40,6 +40,8 @@
     <Compile Include="CommonWebLibraries.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Dragger.cs" />
+    <Compile Include="Utility\DoublePoint.cs" />
+    <Compile Include="Utility\IntersectingRectangle.cs" />
     <Compile Include="Level\LevelEvent.cs" />
     <Compile Include="Level\LevelObject.cs" />
     <Compile Include="Level\LevelObjectAsset.cs" />
@@ -56,10 +58,10 @@
     <Compile Include="Tiles\TileChunk.cs" />
     <Compile Include="Tiles\TileItem.cs" />
     <Compile Include="Tiles\TilePiece.cs" />
-    <Compile Include="Extensions.cs" />
+    <Compile Include="Utility\Extensions.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="HeightMask.cs" />
-    <Compile Include="Help.cs" />
+    <Compile Include="Utility\Help.cs" />
     <Compile Include="Level\ObjectManager.cs" />
     <Compile Include="Page.cs" />
     <Compile Include="Level\Ring.cs" />
@@ -98,6 +100,8 @@
     <Compile Include="UIManager\TextBox.cs" />
     <Compile Include="UIManager\UIArea.cs" />
     <Compile Include="UIManager\UIManager.cs" />
+    <Compile Include="Utility\Point.cs" />
+    <Compile Include="Utility\Rectangle.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

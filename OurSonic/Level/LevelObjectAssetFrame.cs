@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonic.Utility;
 namespace OurSonic.Level
 {
     public class LevelObjectAssetFrame
@@ -44,7 +45,7 @@ namespace OurSonic.Level
         public void SetWidth(int w)
         {
             Width = w;
-            CollisionMap =   CollisionMap.Slice(0, w);
+            CollisionMap = CollisionMap.Slice(0, w);
             ClearCache();
         }
 
@@ -52,7 +53,7 @@ namespace OurSonic.Level
         {
             Height = h;
             for (var j = 0; j < Width; j++) {
-                CollisionMap[j] =   CollisionMap[j].Slice(0, h);
+                CollisionMap[j] = CollisionMap[j].Slice(0, h);
             }
             ClearCache();
         }
@@ -108,37 +109,26 @@ namespace OurSonic.Level
             canvas.Save();
             canvas.Translate(pos.X, pos.Y);
 
-            if (xflip)
-            {
-                if (yflip)
-                {
-
+            if (xflip) {
+                if (yflip) {
                     canvas.Translate(0, height);
-                     canvas.Scale(1, -1);
-                     canvas.Translate(width / 2d, height / 2d);
-                     canvas.Rotate(-90 * Math.PI / 180);
-                     canvas.Translate(-width / 2d, -height / 2d);
-
-                }
-                else
-                {
+                    canvas.Scale(1, -1);
                     canvas.Translate(width / 2d, height / 2d);
-                     canvas.Rotate(-90 * Math.PI / 180);
-                     canvas.Translate(-width / 2d, -height / 2d);
-
+                    canvas.Rotate(-90 * Math.PI / 180);
+                    canvas.Translate(-width / 2d, -height / 2d);
+                } else {
+                    canvas.Translate(width / 2d, height / 2d);
+                    canvas.Rotate(-90 * Math.PI / 180);
+                    canvas.Translate(-width / 2d, -height / 2d);
                 }
-            }
-            else
-            {
-                if (yflip)
-                {
+            } else {
+                if (yflip) {
                     canvas.Translate(0, height);
-                     canvas.Scale(1, -1);
-                }
-                else { }
+                    canvas.Scale(1, -1);
+                } else {}
             }
 
-            canvas.Scale((width / Width), (height / Height));
+            canvas.Scale(( width / Width ), ( height / Height ));
 
             for (var x = 0; x < Width; x++) {
                 for (var y = 0; y < Height; y++) {
@@ -257,42 +247,29 @@ namespace OurSonic.Level
                 SetCache(mj, size, xflip, yflip, showOutline, showCollideMap, showHurtMap);
             }
 
-
             _canvas.Save();
             _canvas.Translate(pos.X, pos.Y);
-            
-            if (xflip)
-            {
-                if (yflip)
-                {
 
+            if (xflip) {
+                if (yflip) {
                     _canvas.Translate(0, size.Y);
                     _canvas.Scale(1, -1);
                     _canvas.Translate(fd.Canvas.Width / 2d, fd.Canvas.Height / 2d);
                     _canvas.Rotate(-90 * Math.PI / 180);
                     _canvas.Translate(-fd.Canvas.Width / 2d, -fd.Canvas.Height / 2d);
-
-                }
-                else
-                {
+                } else {
                     _canvas.Translate(fd.Canvas.Width / 2d, fd.Canvas.Height / 2d);
                     _canvas.Rotate(-90 * Math.PI / 180);
                     _canvas.Translate(-fd.Canvas.Width / 2d, -fd.Canvas.Height / 2d);
-
                 }
-            }
-            else
-            {
-                if (yflip)
-                {
+            } else {
+                if (yflip) {
                     _canvas.Translate(0, size.Y);
                     _canvas.Scale(1, -1);
-                }
-                else { }
+                } else {}
             }
             _canvas.DrawImage(fd.Canvas, 0, 0);
             _canvas.Restore();
-        
         }
     }
 }

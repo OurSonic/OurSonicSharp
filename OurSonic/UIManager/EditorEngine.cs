@@ -2,6 +2,7 @@ using System;
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonic.Utility;
 namespace OurSonic.UIManager
 {
     public class EditorEngine

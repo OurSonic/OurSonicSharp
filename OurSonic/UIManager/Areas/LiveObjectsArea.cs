@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Html;
 using OurSonic.Level;
+using OurSonic.Utility;
 using jQueryApi;
 namespace OurSonic.UIManager.Areas
 {
@@ -10,7 +11,7 @@ namespace OurSonic.UIManager.Areas
         public LiveObjectsArea(UIManager uiManager)
         {
             var liveObjectsArea = uiManager.LiveObjectsArea = new UIArea<LiveObjectsAreaData>(new LiveObjectsAreaData(), 947, 95, 770, 700) {Closable = true};
-            liveObjectsArea.Visible = false;
+            liveObjectsArea.Visible = true;
             uiManager.AddArea(liveObjectsArea);
             liveObjectsArea.AddControl(new TextArea(30, 25, "Live Objects") {Color = "blue"});
             HScrollBox scl;

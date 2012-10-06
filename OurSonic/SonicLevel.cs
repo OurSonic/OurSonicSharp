@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using OurSonic.Level;
 using OurSonic.Tiles;
+using OurSonic.Utility;
 namespace OurSonic
 {
     public class SonicLevel

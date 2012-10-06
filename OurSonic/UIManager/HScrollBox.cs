@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonic.Utility;
 namespace OurSonic.UIManager
 {
     public class HScrollBox : Element
@@ -45,13 +46,13 @@ namespace OurSonic.UIManager
             Width = VisibleItems * ( ItemWidth + JWidth );
             Height = ItemHeight + ScrollWidth;
             Scrolling = false;
-            Scrolling = false;
-            Scrolling = false;
         }
 
         public Element AddControl(Element control)
         {
             control.Parent = this;
+            control.Construct();
+
             Controls.Add(control);
             return control;
         }

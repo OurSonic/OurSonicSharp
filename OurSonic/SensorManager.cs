@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonic.Tiles;
+using OurSonic.Utility;
 using OurSonicModels;
 namespace OurSonic
 {
@@ -204,7 +205,7 @@ namespace OurSonic
                             }
                             if ( /*x1 + i > SonicManager.Instance.SonicLevel.LevelWidth || */  curh[( __x + i )][__y] >= (Solidity) 1 ||
                                                                                                SonicManager.Instance.SonicToon.
-                                                                                                       CheckCollisionWithObjects(x1 + i, y1, Letter)) {
+                                                                                                            CheckCollisionWithObjects(x1 + i, y1, Letter)) {
                                 /*    if (!( ( curh[( __x + i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
                                     continue;*/
 

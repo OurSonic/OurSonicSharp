@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Html;
 using CodeMirrorLibrary;
 using OurSonic.Level;
+using OurSonic.Utility;
 using jQueryApi;
 namespace OurSonic.UIManager.Areas
 {
@@ -15,7 +16,7 @@ namespace OurSonic.UIManager.Areas
             var size = 40 * 4;
 
             objectFrameworkArea = new UIArea<ObjectFrameworkData>(new ObjectFrameworkData() {ObjectFramework = new LevelObject("Foo")}, 540, 75, 850, 690) {Closable = true};
-            objectFrameworkArea.Visible = false;
+            objectFrameworkArea.Visible = true;
             manager.AddArea(objectFrameworkArea);
             manager.ObjectFrameworkArea = this;
 
@@ -45,7 +46,7 @@ namespace OurSonic.UIManager.Areas
                                                                                                                         objectFrameworkArea.Data.ObjectFramework.Pieces.Add(
                                                                                                                                 new LevelObjectPiece("Piece " +
                                                                                                                                                      ( objectFrameworkArea.Data.ObjectFramework.
-                                                                                                                                                               Pieces.Count +
+                                                                                                                                                                           Pieces.Count +
                                                                                                                                                        1 )));
                                                                                                                         Populate(objectFrameworkArea.Data.ObjectFramework);
                                                                                                                     }
@@ -63,10 +64,10 @@ namespace OurSonic.UIManager.Areas
                                                                                                                                objectFrameworkArea.Data.ObjectFramework.PieceLayouts.Add(
                                                                                                                                        new LevelObjectPieceLayout("Piece Layout " +
                                                                                                                                                                   ( objectFrameworkArea.Data.
-                                                                                                                                                                            ObjectFramework
-                                                                                                                                                                            .
-                                                                                                                                                                            PieceLayouts
-                                                                                                                                                                            .Count +
+                                                                                                                                                                                        ObjectFramework
+                                                                                                                                                                                       .
+                                                                                                                                                                                        PieceLayouts
+                                                                                                                                                                                       .Count +
                                                                                                                                                                     1 )));
                                                                                                                                Populate(objectFrameworkArea.Data.ObjectFramework);
                                                                                                                            }
@@ -85,7 +86,7 @@ namespace OurSonic.UIManager.Areas
                                                                                                                                      new LevelObjectProjectile(
                                                                                                                                              "Piece Projectile " +
                                                                                                                                              ( objectFrameworkArea.Data.ObjectFramework.Projectiles.
-                                                                                                                                                       Count + 1 )));
+                                                                                                                                                                   Count + 1 )));
                                                                                                                              Populate(objectFrameworkArea.Data.ObjectFramework);
                                                                                                                          }
                                                                                                          });
@@ -110,10 +111,10 @@ namespace OurSonic.UIManager.Areas
                                                                                                                                          objectFrameworkArea.Data.b2.Toggled = false;
                                                                                                                                          objectFrameworkArea.Data.b3.Toggled = false;
                                                                                                                                          objectFrameworkArea.Data.b4.Toggled = false;
-                                                                                                                                         if (objectFrameworkArea.Data.b1.Toggled)
+                                                                                                                                         if (objectFrameworkArea.Data.b1.Toggled) {
                                                                                                                                              addCodeWindow(objectFrameworkArea.Data.ObjectFramework.InitScript,
                                                                                                                                                            () => { objectFrameworkArea.Data.ObjectFramework.InitScript = objectFrameworkArea.Data.Editor.GetValue(); });
-                                                                                                                                         else
+                                                                                                                                         } else
                                                                                                                                              ClearMainArea();
                                                                                                                                      }
                                                                                                                      });
@@ -125,10 +126,10 @@ namespace OurSonic.UIManager.Areas
                                                                                                                                          objectFrameworkArea.Data.b1.Toggled = false;
                                                                                                                                          objectFrameworkArea.Data.b3.Toggled = false;
                                                                                                                                          objectFrameworkArea.Data.b4.Toggled = false;
-                                                                                                                                         if (objectFrameworkArea.Data.b2.Toggled)
+                                                                                                                                         if (objectFrameworkArea.Data.b2.Toggled) {
                                                                                                                                              addCodeWindow(objectFrameworkArea.Data.ObjectFramework.TickScript,
                                                                                                                                                            () => { objectFrameworkArea.Data.ObjectFramework.TickScript = objectFrameworkArea.Data.Editor.GetValue(); });
-                                                                                                                                         else
+                                                                                                                                         } else
                                                                                                                                              ClearMainArea();
                                                                                                                                      }
                                                                                                                      });
@@ -140,10 +141,10 @@ namespace OurSonic.UIManager.Areas
                                                                                                                                              objectFrameworkArea.Data.b1.Toggled = false;
                                                                                                                                              objectFrameworkArea.Data.b2.Toggled = false;
                                                                                                                                              objectFrameworkArea.Data.b4.Toggled = false;
-                                                                                                                                             if (objectFrameworkArea.Data.b3.Toggled)
+                                                                                                                                             if (objectFrameworkArea.Data.b3.Toggled) {
                                                                                                                                                  addCodeWindow(objectFrameworkArea.Data.ObjectFramework.CollideScript,
                                                                                                                                                                () => { objectFrameworkArea.Data.ObjectFramework.CollideScript = objectFrameworkArea.Data.Editor.GetValue(); });
-                                                                                                                                             else
+                                                                                                                                             } else
                                                                                                                                                  ClearMainArea();
                                                                                                                                          }
                                                                                                                          });
@@ -155,10 +156,10 @@ namespace OurSonic.UIManager.Areas
                                                                                                                                                objectFrameworkArea.Data.b1.Toggled = false;
                                                                                                                                                objectFrameworkArea.Data.b2.Toggled = false;
                                                                                                                                                objectFrameworkArea.Data.b3.Toggled = false;
-                                                                                                                                               if (objectFrameworkArea.Data.b4.Toggled)
+                                                                                                                                               if (objectFrameworkArea.Data.b4.Toggled) {
                                                                                                                                                    addCodeWindow(objectFrameworkArea.Data.ObjectFramework.HurtScript,
                                                                                                                                                                  () => { objectFrameworkArea.Data.ObjectFramework.HurtScript = objectFrameworkArea.Data.Editor.GetValue(); });
-                                                                                                                                               else
+                                                                                                                                               } else
                                                                                                                                                    ClearMainArea();
                                                                                                                                            }
                                                                                                                            });
@@ -221,7 +222,6 @@ namespace OurSonic.UIManager.Areas
                                                                                                         sc.Style.Visibility = "visible";
                                                                                                 },
                                                                                        _Hide = () => {
-
                                                                                                    var sc = objectFrameworkArea.Data.Editor.GetScrollerElement();
                                                                                                    objectFrameworkArea.Data.Editor.GetInputField().Blur();
                                                                                                    //            Engine.uiCanvasItem.focus();
@@ -627,9 +627,7 @@ namespace OurSonic.UIManager.Areas
 
                                                                             bd.Text = ( (Func<string>) ( () => { return bd.Data.Name; } ) );
                                                                             bd.Image = (canvas, x, y) =>
-                                                                                
-                                                                                
-                                                                                bd.Data.DrawSimple(canvas, new Point(x, y), bd.Width, bd.Height - 15, false, false);
+                                                                                       bd.Data.DrawSimple(canvas, new Point(x, y), bd.Width, bd.Height - 15, false, false);
 
                                                                             bd.Click = (p) => objectFrameworkArea.Data.MainPanel.Data.LoadFrame(bd.Data);
 

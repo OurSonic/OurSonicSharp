@@ -1,6 +1,6 @@
 using System;
 using OurSonic.UIManager;
-using jQueryApi;
+using OurSonic.Utility;
 namespace OurSonic
 {
     public class Dragger
@@ -36,10 +36,10 @@ namespace OurSonic
             if (lastPos.Falsey())
                 return;
 
-            xsp += (lastPos.X - cell.X) * 2.7f;
-            ysp += (lastPos.Y - cell.Y) * 2.7f;
-            xsp =  ( ( xsp > 0 ? 1 : -1 ) * Math.Min(Math.Abs(xsp), 60) );
-            ysp =  ( ( ysp > 0 ? 1 : -1 ) * Math.Min(Math.Abs(ysp), 60) );
+            xsp += ( lastPos.X - cell.X ) * 2.7f;
+            ysp += ( lastPos.Y - cell.Y ) * 2.7f;
+            xsp = ( ( xsp > 0 ? 1 : -1 ) * Math.Min(Math.Abs(xsp), 60) );
+            ysp = ( ( ysp > 0 ? 1 : -1 ) * Math.Min(Math.Abs(ysp), 60) );
             lastPos = new Point(cell.X, cell.Y);
         }
 

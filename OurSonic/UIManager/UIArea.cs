@@ -1,5 +1,6 @@
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonic.Utility;
 namespace OurSonic.UIManager
 {
     public class UIArea<T> : UIArea
@@ -66,9 +67,9 @@ namespace OurSonic.UIManager
             canv.Save();
 
             if (CachedDrawing.Falsey()) {
-                var cg = Help.DefaultCanvas(Width+20, Height+20);
+                var cg = Help.DefaultCanvas(Width + 20, Height + 20);
                 var cv = cg.Context;
-                cv.Translate(10,10);
+                cv.Translate(10, 10);
 
                 var lingrad = cv.CreateLinearGradient(0, 0, 0, Height);
                 lingrad.AddColorStop(0, "rgba(220,220,220,0.85)");
@@ -81,12 +82,8 @@ namespace OurSonic.UIManager
                 X = 0;
                 Y = 0;
 
-
-              
                 var rad = 30;
                 Help.RoundRect(cv, X, Y, Width, Height, rad, true, true);
-        
-
 
                 cv.BeginPath();
                 cv.MoveTo(X, Y + rad);
@@ -107,11 +104,13 @@ namespace OurSonic.UIManager
                 CachedDrawing = cg;
             }
 
-            canv.DrawImage(CachedDrawing.Canvas, X-10, Y-10);
-            if (CachedDrawing.Canvas.Width != Width || CachedDrawing.Canvas.Height != Height)
+            drawCache(canv);
+
+            if (CachedDrawing.Canvas.Width != Width + 20 || CachedDrawing.Canvas.Height != Height + 20)
                 CachedDrawing = null;
 
-            foreach (Element t in Controls) {
+            for (int index = 0; index < Controls.Count; index++) {
+                Element t = Controls[index];
                 var good = t.ForceDrawing();
                 if (!good.Redraw)
                     t.Draw(canv);
@@ -121,6 +120,11 @@ namespace OurSonic.UIManager
             canv.Restore();
 
             base.Draw(canv);
+        }
+
+        private void drawCache(CanvasContext2D canv)
+        {
+            canv.DrawImage(CachedDrawing.Canvas, X - 10, Y - 10);
         }
     }
 }
