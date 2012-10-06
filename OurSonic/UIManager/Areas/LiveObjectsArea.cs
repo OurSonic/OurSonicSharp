@@ -22,7 +22,8 @@ namespace OurSonic.UIManager.Areas
                                                     ( (ImageButton<LivePopulateModel>) scl.Controls[i] ).Data.@checked = false;
                                                 }
 
-                                                foreach (var lo in liveObjects) {
+                                                for (int index = 0; index < liveObjects.Count; index++) {
+                                                    var lo = liveObjects[index];
                                                     var satisfied = false;
                                                     for (var i = 0; i < scl.Controls.Count; i++) {
                                                         if (lo.Index == ( (ImageButton<LivePopulateModel>) scl.Controls[i] ).Data.@object.Index) {
@@ -121,12 +122,14 @@ namespace OurSonic.UIManager.Areas
         public bool @checked { get; set; }
         public LevelObjectInfo @object { get; set; }
     }
+    [Serializable]
     public class DebugConsoleData
     {
         public Action<LevelObjectInfo> Populate { get; set; }
         public ScrollBox Watch { get; set; }
         public System.Html.Element Element { get; set; }
     }
+    [Serializable]
     public class LiveObjectsAreaData
     {
         public Panel<DebugConsoleData> DebugConsole { get; set; }

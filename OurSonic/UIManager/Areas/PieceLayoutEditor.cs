@@ -1,17 +1,26 @@
 using System.Html.Media.Graphics;
+using System.Runtime.CompilerServices;
 using OurSonic.Level;
 using OurSonic.Utility;
 namespace OurSonic.UIManager.Areas
 {
     public class PieceLayoutEditor : Element
     {
+        [IntrinsicProperty]
         public Point Size { get; set; }
+        [IntrinsicProperty]
         protected bool ShowHurtMap { get; set; }
+        [IntrinsicProperty]
         protected bool ShowCollideMap { get; set; }
+        [IntrinsicProperty]
         protected bool Clicking { get; set; }
+        [IntrinsicProperty]
         public PieceLayoutMaker PieceLayoutMaker { get; set; }
+        [IntrinsicProperty]
         protected LevelObjectPieceLayout PieceLayout { get; set; }
+        [IntrinsicProperty]
         protected Point LastPosition { get; set; }
+        [IntrinsicProperty]
         protected bool ClickHandled { get; set; }
 
         public PieceLayoutEditor(int x, int y, Point size) : base(x, y)

@@ -1,17 +1,25 @@
 using System;
 using System.Html.Media.Graphics;
+using System.Runtime.CompilerServices;
 using OurSonic.Level;
 using OurSonic.Utility;
 namespace OurSonic.UIManager.Areas
 {
     public class Editor
     {
+        [IntrinsicProperty]
         public LevelObjectAssetFrame AssetFrame { get; set; }
+        [IntrinsicProperty]
         public bool ShowOutline { get; set; }
+        [IntrinsicProperty]
         public bool ShowOffset { get; set; }
+        [IntrinsicProperty]
         public bool ShowHurtMap { get; set; }
+        [IntrinsicProperty]
         public int LineWidth { get; set; }
+        [IntrinsicProperty]
         public int CurrentColor { get; set; }
+        [IntrinsicProperty]
         public bool ShowCollideMap { get; set; }
 
         public Editor(LevelObjectAssetFrame assetFrame, bool showOffset)

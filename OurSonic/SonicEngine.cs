@@ -48,6 +48,23 @@ namespace OurSonic
             canvasWidth = 0;
             canvasHeight = 0;
 
+            bindInput();
+
+            fullscreenMode = true;
+
+            Window.AddEventListener("resize", e => resizeCanvas(true));
+            jQuery.Document.Resize(e => resizeCanvas(true));
+
+            sonicManager = new SonicManager(this, gameCanvas, () => resizeCanvas(true));
+            sonicManager.IndexedPalette = 0;
+            Window.SetInterval(sonicManager.Tick, 1000 / 60);
+            Window.SetInterval(GameDraw, 1000 / 60);
+            Window.SetInterval(UIDraw, 1000 / 10);
+            resizeCanvas(true);
+        }
+
+        private void bindInput()
+        {
             uiCanvas.DomCanvas.MouseDown(canvasOnClick);
             uiCanvas.DomCanvas.MouseUp(canvasMouseUp);
             uiCanvas.DomCanvas.MouseMove(canvasMouseMove);
@@ -310,18 +327,6 @@ namespace OurSonic
                                                sonicManager.SonicLevel.CurHeightMap = !sonicManager.SonicLevel.CurHeightMap;
                                            },
                                            () => { });
-
-            fullscreenMode = true;
-
-            Window.AddEventListener("resize", e => resizeCanvas(true));
-            jQuery.Document.Resize(e => resizeCanvas(true));
-
-            sonicManager = new SonicManager(this, gameCanvas, () => resizeCanvas(true));
-            sonicManager.IndexedPalette = 0;
-            Window.SetInterval(sonicManager.Tick, 1000 / 60);
-            Window.SetInterval(GameDraw, 1000 / 60);
-            Window.SetInterval(UIDraw, 1000 / 20);
-            resizeCanvas(true);
         }
 
         public static void runGame()

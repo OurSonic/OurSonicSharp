@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Html;
 using System.Html.Media.Graphics;
@@ -25,6 +26,18 @@ namespace OurSonic.UIManager
         public Dragger dragger { get; set; }
         [IntrinsicProperty]
         public UIManagerData Data { get; set; }
+        [IntrinsicProperty]
+        public UIArea<ColorEditorAreaData> ColorEditorArea { get; set; }
+        [IntrinsicProperty]
+        public ObjectFrameworkArea ObjectFrameworkArea { get; set; }
+        [IntrinsicProperty]
+        public UIArea ObjectFrameworkListArea { get; set; }
+        [IntrinsicProperty]
+        public UIArea<LiveObjectsAreaData> LiveObjectsArea { get; set; }
+        [IntrinsicProperty]
+        public static UIManager Instance { get; set; }
+        [IntrinsicProperty]
+        private UIArea[] canvasDepths { get; set; }
         public static string CurLevelName
         {
             get { return _curLevelName; }
@@ -35,13 +48,6 @@ namespace OurSonic.UIManager
                 _curLevelName = value;
             }
         }
-        public UIArea<ColorEditorAreaData> ColorEditorArea { get; set; }
-        public ObjectFrameworkArea ObjectFrameworkArea { get; set; }
-        public UIArea ObjectFrameworkListArea { get; set; }
-        public UIArea<LiveObjectsAreaData> LiveObjectsArea { get; set; }
-        [IntrinsicProperty]
-        public static UIManager Instance { get; set; }
-        private UIArea[] canvasDepths { get; set; }
 
         public UIManager(SonicManager sonicManager, CanvasContext2D mainCanvas, Point scale)
         {
@@ -91,7 +97,8 @@ namespace OurSonic.UIManager
             }
 
             if (goodArea.Truthy()) {
-                foreach (var are in UIAreas) {
+                for (int index = 0; index < UIAreas.Count; index++) {
+                    var are = UIAreas[index];
                     if (goodArea == are) {
                         are.Depth = 1;
                         are.Focus(cell);
@@ -105,7 +112,8 @@ namespace OurSonic.UIManager
 
                 return true;
             } else {
-                foreach (var are in UIAreas) {
+                for (int index = 0; index < UIAreas.Count; index++) {
+                    var are = UIAreas[index];
                     if (are.Visible) {
                         are.Depth = 0;
                         are.LoseFocus();
@@ -157,7 +165,8 @@ namespace OurSonic.UIManager
 
             var cell = Help.GetCursorPosition(e);
 
-            foreach (var are in UIAreas) {
+            for (int index = 0; index < UIAreas.Count; index++) {
+                var are = UIAreas[index];
                 if (are.Visible && are.Y <= cell.Y && are.Y + are.Height > cell.Y && are.X <= cell.X && are.X + are.Width > cell.X) {
                     var cell2 = new Pointer(cell.X - are.X, cell.Y - are.Y, delta, cell.Right);
                     return are.OnScroll(cell2);
@@ -168,7 +177,8 @@ namespace OurSonic.UIManager
 
         public bool OnKeyDown(ElementEvent jQueryEvent)
         {
-            foreach (var are in UIAreas) {
+            for (int index = 0; index < UIAreas.Count; index++) {
+                var are = UIAreas[index];
                 if (are.OnKeyDown(jQueryEvent)) return true;
             }
             return false;
@@ -192,7 +202,8 @@ namespace OurSonic.UIManager
             dragger.Tick();
             canvas.Save();
 
-            foreach (var are in canvasDepths) {
+            for (int index = 0; index < canvasDepths.Length; index++) {
+                var are = canvasDepths[index];
                 are.Draw(canvas);
             }
 
@@ -210,18 +221,16 @@ namespace OurSonic.UIManager
             Document.Title = title;
         }
     }
+    [Serializable]
     public class UIManagerData
     {
-        [IntrinsicProperty]
         public UIManagerDataIndexes Indexes { get; set; }
-        [IntrinsicProperty]
         public dynamic SolidTileArea { get; set; } //todo:: to SolidTileArea obejct
-        [IntrinsicProperty]
         public dynamic ModifyTilePieceArea { get; set; } //todo:: to ModifyTilePieceArea obejct
     }
+    [Serializable]
     public class UIManagerDataIndexes
     {
-        [IntrinsicProperty]
         public int TPIndex { get; set; }
     }
 }

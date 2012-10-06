@@ -28,9 +28,14 @@ namespace OurSonic.Tiles
         public JsDictionary<int, Animation> Animated { get; set; }
         [IntrinsicProperty]
         public int Index { get; set; }
+
+        [IntrinsicProperty]
         public Solidity[][] HeightBlocks1 { get; set; }
+        [IntrinsicProperty]
         public Solidity[][] HeightBlocks2 { get; set; }
+        [IntrinsicProperty]
         public int[][] AngleMap1 { get; set; }
+        [IntrinsicProperty]
         public int[][] AngleMap2 { get; set; }
 
         public TileChunk( /*TilePiece[][] tilePieces*/)

@@ -5,6 +5,7 @@ namespace OurSonic.UIManager
 {
     public class UIArea<T> : UIArea
     {
+        [IntrinsicProperty]
         public T Data { get; set; }
 
         public UIArea(T data, int x, int y, int width, int height) : base(x, y, width, height)
@@ -92,7 +93,8 @@ namespace OurSonic.UIManager
                 cv.StrokeStyle = "#000000";
                 cv.Stroke();
 
-                foreach (Element t1 in Controls) {
+                for (int index = 0; index < Controls.Count; index++) {
+                    Element t1 = Controls[index];
                     var good = t1.ForceDrawing();
                     if (good.Redraw)
                         t1.Draw(cv);

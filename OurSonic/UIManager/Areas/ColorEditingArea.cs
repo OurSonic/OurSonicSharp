@@ -1,20 +1,32 @@
 using System.Html.Media.Graphics;
+using System.Runtime.CompilerServices;
 using OurSonic.Level;
 using OurSonic.Utility;
 namespace OurSonic.UIManager.Areas
 {
     public class ColorEditingArea : Panel
     {
+        [IntrinsicProperty]
         public LevelObjectAssetFrame Frame { get; set; }
+        [IntrinsicProperty]
         public bool ShowOffset { get; set; }
+        [IntrinsicProperty]
         public bool Editable { get; set; }
+        [IntrinsicProperty]
         public Editor Editor { get; set; }
+        [IntrinsicProperty]
         public bool ShowHurtMap { get; set; }
+        [IntrinsicProperty]
         public bool ShowCollideMap { get; set; }
+        [IntrinsicProperty]
         public PaletteArea PaletteEditor { get; set; }
+        [IntrinsicProperty]
         public Point Scale { get; set; }
+        [IntrinsicProperty]
         protected bool Clicking { get; set; }
+        [IntrinsicProperty]
         protected bool ClickHandled { get; set; }
+        [IntrinsicProperty]
         protected Point LastPosition { get; set; }
 
         public ColorEditingArea(int x, int y, int width, int height)

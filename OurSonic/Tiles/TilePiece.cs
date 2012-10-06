@@ -52,7 +52,8 @@ namespace OurSonic.Tiles
             if (onlyBackgroundSet) return onlyBackground;
 
             var tiles = SonicManager.Instance.SonicLevel.Tiles;
-            foreach (var mj in Tiles) {
+            for (int index = 0; index < Tiles.Count; index++) {
+                var mj = Tiles[index];
                 if (tiles[mj._Tile].Truthy()) {
                     if (mj.Priority) {
                         onlyBackgroundSet = true;
@@ -69,7 +70,8 @@ namespace OurSonic.Tiles
             if (onlyForegroundSet) return onlyForeground;
 
             var tiles = SonicManager.Instance.SonicLevel.Tiles;
-            foreach (var mj in Tiles) {
+            for (int index = 0; index < Tiles.Count; index++) {
+                var mj = Tiles[index];
                 if (tiles[mj._Tile].Truthy()) {
                     if (!mj.Priority) {
                         onlyForegroundSet = true;

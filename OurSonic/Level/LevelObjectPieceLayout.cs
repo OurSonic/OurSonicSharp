@@ -26,7 +26,8 @@ namespace OurSonic.Level
 
         public void Update()
         {
-            foreach (LevelObjectInfo t in SonicManager.Instance.SonicLevel.Objects) {
+            for (int index = 0; index < SonicManager.Instance.SonicLevel.Objects.Count; index++) {
+                LevelObjectInfo t = SonicManager.Instance.SonicLevel.Objects[index];
                 t.Reset();
             }
         }

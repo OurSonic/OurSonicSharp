@@ -1,4 +1,5 @@
 using System.Html.Media.Graphics;
+using System.Runtime.CompilerServices;
 using OurSonic.Level;
 using OurSonic.Utility;
 namespace OurSonic.UIManager.Areas
@@ -6,13 +7,21 @@ namespace OurSonic.UIManager.Areas
     public class PieceLayoutMaker
     {
         private double largeScale = 1;
+        [IntrinsicProperty]
         public LevelObjectPieceLayout PieceLayout { get; set; }
+        [IntrinsicProperty]
         public int SelectedPieceIndex { get; set; }
+        [IntrinsicProperty]
         public bool ShowImages { get; set; }
+        [IntrinsicProperty]
         protected int LineWidth { get; set; }
+        [IntrinsicProperty]
         protected int CurrentColor { get; set; }
+        [IntrinsicProperty]
         protected bool ShowOutline { get; set; }
+        [IntrinsicProperty]
         protected int DraggingIndex { get; set; }
+        [IntrinsicProperty]
         protected Point ZeroPosition { get; set; }
 
         public PieceLayoutMaker(LevelObjectPieceLayout pieceLayout)

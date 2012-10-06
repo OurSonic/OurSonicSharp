@@ -233,7 +233,8 @@ namespace OurSonic
                 }
             }
             UIManager.LiveObjectsArea.Data.Populate(InFocusObjects);
-            foreach (AnimationInstance animationInstance in AnimationInstances) {
+            for (int index = 0; index < AnimationInstances.Count; index++) {
+                AnimationInstance animationInstance = AnimationInstances[index];
                 animationInstance.Tick();
             }
         }
@@ -723,9 +724,12 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
 
         public void ClearCache()
         {
-            foreach (var tile in SonicLevel.Tiles)
+            for (int index = 0; index < SonicLevel.Tiles.Count; index++) {
+                var tile = SonicLevel.Tiles[index];
                 tile.ClearCache();
-            foreach (var tilePiece in SonicLevel.Blocks) {
+            }
+            for (int index = 0; index < SonicLevel.Blocks.Count; index++) {
+                var tilePiece = SonicLevel.Blocks[index];
                 tilePiece.ClearCache();
             }
             Instance.SpriteCache.HeightMaps = new List<CanvasInformation>();

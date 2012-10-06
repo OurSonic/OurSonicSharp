@@ -1,17 +1,25 @@
 using System.Html.Media.Graphics;
+using System.Runtime.CompilerServices;
 using OurSonic.Utility;
 namespace OurSonic.UIManager.Areas
 {
     public class PaletteArea : Panel
     {
+        [IntrinsicProperty]
         private string[] Palette { get; set; }
+        [IntrinsicProperty]
         public Point Scale { get; set; }
+        [IntrinsicProperty]
         protected bool ClickHandled { get; set; }
+        [IntrinsicProperty]
         public bool ShowCurrent { get; set; }
+        [IntrinsicProperty]
         protected bool Wide { get; set; }
+        [IntrinsicProperty]
         public int SelectedIndex { get; set; }
+        [IntrinsicProperty]
         protected bool Clicking { get; set; }
-        public PaletteArea(int x, int y) : base(x, y, 0, 0) {}
+        public PaletteArea(int x, int y) : base(x, y, 0, 0) { }
 
         public override bool OnClick(Pointer e)
         {

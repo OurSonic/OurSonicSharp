@@ -42,7 +42,8 @@ namespace OurSonic.UIManager
         public bool ChildrenAreEditing()
         {
             var ch = Controls;
-            foreach (Element t in ch) {
+            for (int index = 0; index < ch.Count; index++) {
+                Element t = ch[index];
                 if (t.EditorEngine.Dragging.Truthy() || t.EditorEngine.Editing)
                     return true;
                 if (t is Panel && ( (Panel) t ).ChildrenAreEditing())
@@ -55,7 +56,8 @@ namespace OurSonic.UIManager
         {
             var e2 = new Pointer(0, 0);
             var ch = Controls;
-            foreach (Element t in ch) {
+            for (int index = 0; index < ch.Count; index++) {
+                Element t = ch[index];
                 if (t.Visible && t.Y <= e.Y && t.Y + t.Height > e.Y && t.X <= e.X && t.X + t.Width > e.X) {
                     e2.X = e.X - t.X;
                     e2.Y = e.Y - t.Y;
@@ -68,7 +70,8 @@ namespace OurSonic.UIManager
         public override void LoseFocus()
         {
             var ch = Controls;
-            foreach (Element t in ch) {
+            for (int index = 0; index < ch.Count; index++) {
+                Element t = ch[index];
                 t.LoseFocus();
             }
             base.LoseFocus();
@@ -77,7 +80,8 @@ namespace OurSonic.UIManager
         public override void Construct()
         {
             base.Construct();
-            foreach (var element in Controls) {
+            for (int index = 0; index < Controls.Count; index++) {
+                var element = Controls[index];
                 element.Construct();
             }
         }
@@ -88,7 +92,8 @@ namespace OurSonic.UIManager
             if (!Visible) return false;
 
             var ch = Controls;
-            foreach (Element t in ch) {
+            for (int index = 0; index < ch.Count; index++) {
+                Element t = ch[index];
                 if (t.OnKeyDown(e)) return true;
             }
             return false;
@@ -102,7 +107,8 @@ namespace OurSonic.UIManager
             var clicked = false;
 
             var ch = Controls;
-            foreach (Element control in ch) {
+            for (int index = 0; index < ch.Count; index++) {
+                Element control = ch[index];
                 if (control.Visible && control.Y <= e.Y && control.Y + control.Height > e.Y && control.X <= e.X && control.X + control.Width > e.X) {
                     e2.X = e.X - control.X;
                     e2.Y = e.Y - control.Y;
@@ -127,7 +133,8 @@ namespace OurSonic.UIManager
                 dragging = uiArea.Dragging;
 
             if (dragging == null) {
-                foreach (var control in Controls) {
+                for (int index = 0; index < Controls.Count; index++) {
+                    var control = Controls[index];
                     if (control.Visible &&
                         ( ( control.EditorEngine.Editing ) ||
                           ( control.Y <= e.Y && control.Y + control.Height > e.Y && control.X <= e.X && control.X + control.Width > e.X ) )) {
@@ -166,7 +173,8 @@ namespace OurSonic.UIManager
         public override bool OnScroll(Pointer e)
         {
             if (!Visible) return false;
-            foreach (var control in Controls) {
+            for (int index = 0; index < Controls.Count; index++) {
+                var control = Controls[index];
                 if (control.Visible &&
                     ( ( control.EditorEngine.Editing ) ||
                       ( control.Y <= e.Y && control.Y + control.Height > e.Y && control.X <= e.X && control.X + control.Width > e.X ) )) {
@@ -198,7 +206,8 @@ namespace OurSonic.UIManager
                 Help.RoundRect(canv, TotalX, TotalY, Width, Height, rad, true, true);
             }
 
-            foreach (var t in Controls) {
+            for (int index = 0; index < Controls.Count; index++) {
+                var t = Controls[index];
                 t.Draw(canv);
             }
             X = _x;
