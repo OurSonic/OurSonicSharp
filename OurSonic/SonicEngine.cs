@@ -131,7 +131,6 @@ namespace OurSonic
                                                    sonicManager.InHaltMode = !sonicManager.InHaltMode;
                                            },
                                            () => { });
-            int levelIndex = 0;
             client = SocketIOClient.Connect("50.116.22.241:8998");
 
             client.On<DataObject<string>>("SonicLevel",
@@ -342,7 +341,7 @@ namespace OurSonic
                 case GameState.Editing:
                     sonicManager.CurrentGameState = GameState.Playing;
                     sonicManager.WindowLocation = Constants.DefaultWindowLocation(sonicManager.CurrentGameState, Instance.gameCanvas, sonicManager.Scale);
-                    sonicManager.SonicToon = new Sonic();
+                    sonicManager.SonicToon = new Sonic.Sonic();
                     break;
             }
         }

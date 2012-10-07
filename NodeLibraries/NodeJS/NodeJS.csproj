@@ -54,12 +54,6 @@
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Libraries\CoreLib\CoreLib.csproj">
-      <Project>{36D4B098-A21C-4725-ACD3-400922885F38}</Project>
-      <Name>CoreLib</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>

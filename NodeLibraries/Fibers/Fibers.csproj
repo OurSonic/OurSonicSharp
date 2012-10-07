@@ -43,10 +43,6 @@
     <Compile Include="FiberModule.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Libraries\CoreLib\CoreLib.csproj">
-      <Project>{36D4B098-A21C-4725-ACD3-400922885F38}</Project>
-      <Name>CoreLib</Name>
-    </ProjectReference>
     <ProjectReference Include="..\NodeJS\NodeJS.csproj">
       <Project>{79800429-B885-4F5E-9A3B-48E50390214A}</Project>
       <Name>NodeJS</Name>

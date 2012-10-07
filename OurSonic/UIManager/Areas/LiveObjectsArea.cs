@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Html;
-using OurSonic.Level;
+using OurSonic.Level.Objects;
 using OurSonic.Utility;
 using jQueryApi;
 namespace OurSonic.UIManager.Areas

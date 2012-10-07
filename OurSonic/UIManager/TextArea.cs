@@ -30,11 +30,11 @@ namespace OurSonic.UIManager
             if (canv.Font != Font)
                 canv.Font = Font;
 
-            var w = canv.MeasureText(txt).Width;
-            var h = int.Parse(canv.Font.Split("pt")[0]);
+            //var w = canv.MeasureText(txt).Width;
+            //var h = int.Parse(canv.Font.Split("pt")[0]);
 
             //   canv.fillStyle = "rgba(255,255,255,0.78)";
-            var pad = 3;
+            // var pad = 3;
             //     canv.fillRect(this.parent.x + this.x - pad, this.parent.y + this.y - h - pad, w + (pad * 2), h + (pad * 2));
 
             canv.FillStyle = Color;

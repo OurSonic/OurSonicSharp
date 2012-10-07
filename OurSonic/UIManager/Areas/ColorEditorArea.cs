@@ -1,5 +1,5 @@
 using System;
-using OurSonic.Level;
+using OurSonic.Level.Objects;
 using OurSonic.Utility;
 namespace OurSonic.UIManager.Areas
 {

@@ -20,7 +20,7 @@ projectiles
 backgrounds
 garbageless tick
 pushing
-jumping through floors 
+jumping through floors  
 shields
 window border and spindsash lag
 

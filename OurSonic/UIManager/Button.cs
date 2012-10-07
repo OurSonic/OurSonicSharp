@@ -16,7 +16,6 @@ namespace OurSonic.UIManager
     }
     public class Button : Element
     {
-        private string oldText;
         [IntrinsicProperty]
         public string Font { get; set; }
         [IntrinsicProperty]

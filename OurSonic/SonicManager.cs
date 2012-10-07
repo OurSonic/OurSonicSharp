@@ -4,7 +4,9 @@ using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonic.Level;
-using OurSonic.Tiles;
+using OurSonic.Level.Animations;
+using OurSonic.Level.Objects;
+using OurSonic.Level.Tiles;
 using OurSonic.Utility;
 using jQueryApi;
 namespace OurSonic
@@ -34,7 +36,7 @@ namespace OurSonic
         [IntrinsicProperty]
         public UIManager.UIManager UIManager { get; set; }
         [IntrinsicProperty]
-        public Sonic SonicToon { get; set; }
+        public Sonic.Sonic SonicToon { get; set; }
         [IntrinsicProperty]
         public Point Scale { get; set; }
         [IntrinsicProperty]
@@ -162,7 +164,6 @@ namespace OurSonic
                 switch (ClickState) {
                     case ClickState.Dragging:
                         return false;
-                        break;
                     case ClickState.PlaceChunk:
                         ex = e.X / 128;
                         ey = e.Y / 128;
@@ -194,8 +195,6 @@ namespace OurSonic
                         }
 
                         return true;
-
-                        break;
                 }
             }
             return false;
@@ -217,7 +216,6 @@ namespace OurSonic
 
                     break;  
              */
-            return false;
         }
 
         private void tickObjects()
@@ -295,16 +293,14 @@ namespace OurSonic
 
             SpriteCache = SpriteCache ?? new SpriteCache();
             var ci = SpriteCache.Rings;
-            var inj = 0;
             var spriteLocations = new List<string>();
 
             for (int j = 0; j < 4; j++) {
                 spriteLocations.Add(string.Format("assets/Sprites/ring{0}.png", j));
                 imageLength++;
             }
-            int md = 0;
             var ind_ = SpriteCache.Indexes;
-            var sl = SpriteLoader = new SpriteLoader(completed, update);
+            SpriteLoader = new SpriteLoader(completed, update);
             if (ci.Count == 0) {
                 var spriteStep = SpriteLoader.AddStep("Sprites",
                                                       (i, done) => {
@@ -327,7 +323,6 @@ namespace OurSonic
                     SpriteLoader.AddIterationToStep(spriteStep, i);
                 }
             }
-            var numOfAnimations = 0;
             var cci = SpriteCache.SonicSprites;
 
             if (cci.Count == 0) {
@@ -338,7 +333,9 @@ namespace OurSonic
                                                                      Help.ScaleCsImage(sonicSprite.Value, scale, (ec) => { });
                                                          }
 
-                                                         /*var cji = SpriteCache.AnimationSprites = new JsDictionary<string, CanvasInformation>();
+                                                         /*var numOfAnimations = 0;
+
+                                                         var cji = SpriteCache.AnimationSprites = new JsDictionary<string, CanvasInformation>();
 
 foreach (var anni in Animations)
 {
@@ -526,12 +523,6 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
 
                 if (!chunk.IsEmpty() && !chunk.OnlyForeground())
                     chunk.Draw(canvas, localPoint, Scale, 0, bounds);
-
-                if (false && CurrentGameState == GameState.Editing) {
-                    canvas.StrokeStyle = "#DD0033";
-                    canvas.LineWidth = 3;
-                    canvas.StrokeRect(localPoint.X, localPoint.Y, 128 * Scale.X, 128 * Scale.Y);
-                }
             }
         }
 
@@ -550,11 +541,6 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
 
                 if (!chunk.IsEmpty() && !chunk.OnlyBackground())
                     chunk.Draw(canvas, localPoint, Scale, 1, bounds);
-                if (false && CurrentGameState == GameState.Editing) {
-                    canvas.StrokeStyle = "#DD0033";
-                    canvas.LineWidth = 3;
-                    canvas.StrokeRect(localPoint.X, localPoint.Y, 128 * Scale.X, 128 * Scale.Y);
-                }
 
                 if (ShowHeightMap) {
                     var fd = SpriteCache.HeightMapChunks[( SonicLevel.CurHeightMap ? 1 : 2 ) + " " + chunk.Index + " " + Scale.Y + " " + Scale.X];
@@ -571,7 +557,6 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                                 var solid = (int) ( SonicLevel.CurHeightMap ? tp.Solid1 : tp.Solid2 );
 
                                 var hd = SonicLevel.CurHeightMap ? tp.GetLayer1HeightMaps() : tp.GetLayer2HeightMaps();
-
 
                                 var __x = _x;
                                 var __y = _y;
@@ -718,7 +703,6 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
 
         public void ClearCache()
         {
-
             SonicLevel.ClearCache();
             SpriteCache.ClearCache();
         }

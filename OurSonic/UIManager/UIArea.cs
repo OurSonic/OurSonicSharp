@@ -15,7 +15,6 @@ namespace OurSonic.UIManager
     }
     public class UIArea : Panel
     {
-        private bool myClosable;
         [IntrinsicProperty]
         public Point Dragging { get; set; }
         [IntrinsicProperty]

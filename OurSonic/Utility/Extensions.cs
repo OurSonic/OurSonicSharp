@@ -15,12 +15,13 @@ namespace OurSonic.Utility
         public static T Me<T>(this object o)
         {
             return default( T );
-        }   [InlineCode("{o}")]
+        }
+
+        [InlineCode("{o}")]
         [IgnoreGenericArguments]
         public static T[] Array<T>(this List<T> o)
         {
             return new T[0];
         }
-        
     }
 }

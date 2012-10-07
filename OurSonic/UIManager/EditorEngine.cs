@@ -232,7 +232,6 @@ namespace OurSonic.UIManager
 
             StartDragging = new Point(e.X, e.Y);
             return Editing;
-            return false;
         }
 
         public void Draw(CanvasContext2D canv)

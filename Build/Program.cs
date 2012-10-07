@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Limilabs.FTP.Client;
+using Yahoo.Yui.Compressor;
 namespace Build
 {
     public class Program
@@ -135,10 +136,18 @@ namespace Build
 
                 lines.Add(depend.Value.After);
 
-                File.WriteAllLines(to, lines);
+                string text  = lines.Aggregate("", (a, b) => a + b + "\n");
+
+                Yahoo.Yui.Compressor.JavaScriptCompressor jc = new JavaScriptCompressor();
+                jc.ObfuscateJavascript = true;
+                //text=jc.Compress(text);
+                
+                File.WriteAllText(to, text);
                 Console.WriteLine("writing "+to);
 
-                Console.WriteLine("ftp start " + lines.Sum(a=>a.Length).ToString("d"));
+                Console.WriteLine("ftp start " + text.Length.ToString("N0"));
+
+
                 webftp.Upload("/httpdocs/nsonic/" + to.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries).Last(), to);
                 Console.WriteLine("ftp complete " + to);
 

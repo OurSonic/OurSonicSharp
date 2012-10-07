@@ -4,7 +4,9 @@ using System.Linq;
 using System.Serialization;
 using NodeJSLibrary;
 using OurSonic.Level;
-using OurSonic.Tiles;
+using OurSonic.Level.Animations;
+using OurSonic.Level.Objects;
+using OurSonic.Level.Tiles;
 using OurSonic.Utility;
 using OurSonicModels;
 namespace OurSonic
@@ -289,18 +291,19 @@ namespace OurSonic
                 for (int index = 0; index < dj.Tiles.Count; index++) {
                     var mj = dj.Tiles[index];
                     Tile tile = mj.GetTile();
-                    if (tile.Truthy()) { 
-                    var pl = tile.GetAllPaletteIndexes();
-                    for (int k = 0; k < SonicLevel.PaletteItems[0].Count; k++) {
-                        var pal = SonicLevel.PaletteItems[0][k];
-                        foreach (var mjce in pal.Pieces) {
-                            PaletteItemPieces mje1 = mjce;
-                            if (mj.Palette == mje1.PaletteIndex) {
-                                if (pl.Any(j => j == mje1.PaletteOffset / 2 || j == mje1.PaletteOffset / 2 + 1))
-                                    dj.AnimatedFrames[dj.AnimatedFrames.Length] = ( k );
+                    if (tile.Truthy()) {
+                        var pl = tile.GetAllPaletteIndexes();
+                        for (int k = 0; k < SonicLevel.PaletteItems[0].Count; k++) {
+                            var pal = SonicLevel.PaletteItems[0][k];
+                            foreach (var mjce in pal.Pieces) {
+                                PaletteItemPieces mje1 = mjce;
+                                if (mj.Palette == mje1.PaletteIndex) {
+                                    if (pl.Any(j => j == mje1.PaletteOffset / 2 || j == mje1.PaletteOffset / 2 + 1))
+                                        dj.AnimatedFrames[dj.AnimatedFrames.Length] = ( k );
+                                }
                             }
                         }
-                    }}
+                    }
                 }
             }
 

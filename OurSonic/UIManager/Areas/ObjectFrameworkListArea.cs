@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OurSonic.Level;
+using OurSonic.Level.Objects;
 using OurSonic.Utility;
 using OurSonicModels;
 using OurSonicModels.Common;
@@ -13,8 +13,6 @@ namespace OurSonic.UIManager.Areas
         public ObjectFrameworkListArea(UIManager uiManager)
         {
             Action<string> loadObject = null;
-
-            var size = 40 * 4;
 
             var objectFrameworkListArea = uiManager.ObjectFrameworkListArea = new UIArea(90, 500, 390, 300) {Closable = true};
             objectFrameworkListArea.Visible = true;
