@@ -14,8 +14,6 @@ namespace OurSonic
         [IntrinsicProperty]
         public int[][] ChunkMap { get; set; }
         [IntrinsicProperty]
-        public JsDictionary<string, Ring> ActiveRings { get; set; }
-        [IntrinsicProperty]
         public List<Ring> Rings { get; set; }
         [IntrinsicProperty]
         public bool CurHeightMap { get; set; }
@@ -28,7 +26,7 @@ namespace OurSonic
         [IntrinsicProperty]
         public List<Tile> Tiles { get; set; }
         [IntrinsicProperty]
-        public List<TilePiece> Blocks { get; set; }
+        public List<TilePiece> TilePieces { get; set; }
         [IntrinsicProperty]
         public List<LevelObjectInfo> Objects { get; set; }
         [IntrinsicProperty]
@@ -36,7 +34,7 @@ namespace OurSonic
         [IntrinsicProperty]
         public string[][] Palette { get; set; }
         [IntrinsicProperty]
-        public List<int> palAn { get; set; }
+        public List<int> PaletteAnimations { get; set; }
         [IntrinsicProperty]
         public Point[] StartPositions { get; set; }
         [IntrinsicProperty]
@@ -48,7 +46,7 @@ namespace OurSonic
         [IntrinsicProperty]
         public int[] CollisionIndexes2 { get; set; }
         [IntrinsicProperty]
-        public List<HeightMask> HeightMaps { get; set; }
+        public List<HeightMap> HeightMaps { get; set; }
         [IntrinsicProperty]
         public List<TileChunk> AnimatedChunks { get; set; }
         [IntrinsicProperty]
@@ -57,13 +55,47 @@ namespace OurSonic
         public SonicLevel()
         {
             Tiles = new List<Tile>();
-            Blocks = new List<TilePiece>();
+            TilePieces = new List<TilePiece>();
             Chunks = new List<TileChunk>();
             ChunkMap = new int[0][];
             Rings = new List<Ring>();
+            Objects = new List<LevelObjectInfo>();
+            HeightMaps = new List<HeightMap>();
+            PaletteAnimations = new List<int>();
+            Tiles = new List<Tile>();
             CurHeightMap = true;
+            CurPaletteIndex = 0;
+
             LevelWidth = 0;
             LevelHeight = 0;
+        }
+
+        public TileChunk GetChunkAt(int x, int y)
+        {
+            return Chunks[ChunkMap[x][y]];
+        }
+
+        public void ClearCache()
+        {
+            foreach (var tile in Tiles.Array()) {
+                tile.ClearCache();
+            }
+            foreach (var tilePiece in TilePieces.Array()) {
+                tilePiece.ClearCache();
+            }
+            foreach (var chunk in Chunks.Array()) {
+                chunk.ClearCache();
+            }
+        }
+
+        public Tile GetTile(int tile)
+        {
+            return Tiles[tile];
+        }
+
+        public TilePiece GetTilePiece(int block)
+        {
+            return TilePieces[block];
         }
     }
     public class PaletteItem

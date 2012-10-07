@@ -2,17 +2,17 @@
 editor
   layout editor
   make editor prettier
-  minimize like
-  drawing editors
+-  minimize like
+--  drawing editors
 debugger
   better object viewr and shit
   autoformat
-drawing caching
+'/drawing caching
 water
 transparent color
-mouse xy translate
-better caching solution
-better data sending solution
+---mouse xy translate
+-better caching solution
+--better data sending solution
 drawing depth
 rotate collisions
 object shapes and collisions with shapes
@@ -20,7 +20,7 @@ projectiles
 backgrounds
 garbageless tick
 pushing
-jumping through floors
+jumping through floors 
 shields
 window border and spindsash lag
 

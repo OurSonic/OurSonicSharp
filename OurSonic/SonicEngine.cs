@@ -135,27 +135,7 @@ namespace OurSonic
             client = SocketIOClient.Connect("50.116.22.241:8998");
 
             client.On<DataObject<string>>("SonicLevel",
-                                          data => {
-                                              Help.DecodeString<SLData>(data.Data,
-                                                                        (level) => {
-                                                                            sonicManager.Load(level);
-
-                                                                            sonicManager.WindowLocation.X = 0;
-                                                                            sonicManager.WindowLocation.Y = 0;
-                                                                            sonicManager.BigWindowLocation.X =
-                                                                                    (int) ( sonicManager.WindowLocation.X - sonicManager.WindowLocation.Width * 0.2 );
-                                                                            sonicManager.BigWindowLocation.Y =
-                                                                                    (int) ( sonicManager.WindowLocation.Y - sonicManager.WindowLocation.Height * 0.2 );
-
-                                                                            sonicManager.BigWindowLocation.Width = (int) ( sonicManager.WindowLocation.Width * 1.8 );
-                                                                            sonicManager.BigWindowLocation.Height = (int) ( sonicManager.WindowLocation.Height * 1.8 );
-                                                                            sonicManager.ClearCache();
-
-                                                                            if (sonicManager.CurrentGameState == GameState.Playing)
-                                                                                runGame();
-                                                                            runGame();
-                                                                        });
-                                          });
+                                          data => { Help.DecodeString<SLData>(data.Data, RunSonic); });
             client.On<DataObject<KeyValuePair<string, string>[]>>("GetObjects.Response", data => { sonicManager.loadObjects(data.Data); }
                     );
 
@@ -327,6 +307,27 @@ namespace OurSonic
                                                sonicManager.SonicLevel.CurHeightMap = !sonicManager.SonicLevel.CurHeightMap;
                                            },
                                            () => { });
+        }
+
+        public void RunSonic(SLData level)
+        {
+            sonicManager.Load(level);
+
+            sonicManager.WindowLocation.X = 0;
+            sonicManager.WindowLocation.Y = 0;
+            sonicManager.BigWindowLocation.X = (int) ( sonicManager.WindowLocation.X - sonicManager.WindowLocation.Width * 0.2 );
+            sonicManager.BigWindowLocation.Y = (int) ( sonicManager.WindowLocation.Y - sonicManager.WindowLocation.Height * 0.2 );
+
+            sonicManager.BigWindowLocation.Width = (int) ( sonicManager.WindowLocation.Width * 1.8 );
+            sonicManager.BigWindowLocation.Height = (int) ( sonicManager.WindowLocation.Height * 1.8 );
+            sonicManager.ClearCache();
+
+            var dl = Help.GetQueryString();
+            if (dl.ContainsKey("run")) {
+                if (sonicManager.CurrentGameState == GameState.Playing)
+                    runGame();
+                runGame();
+            }
         }
 
         public static void runGame()

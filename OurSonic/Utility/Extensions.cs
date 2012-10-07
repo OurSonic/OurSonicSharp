@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 namespace OurSonic.Utility
 {
@@ -14,6 +15,12 @@ namespace OurSonic.Utility
         public static T Me<T>(this object o)
         {
             return default( T );
+        }   [InlineCode("{o}")]
+        [IgnoreGenericArguments]
+        public static T[] Array<T>(this List<T> o)
+        {
+            return new T[0];
         }
+        
     }
 }

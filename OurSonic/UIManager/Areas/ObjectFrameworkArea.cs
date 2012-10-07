@@ -755,6 +755,7 @@ namespace OurSonic.UIManager.Areas
         }
 
         #region Nested type: ObjectFrameworkAreaPiece
+
         [Serializable]
         public class ObjectFrameworkAreaPiece
         {

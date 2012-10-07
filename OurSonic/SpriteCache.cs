@@ -34,6 +34,12 @@ namespace OurSonic
             HeightMapChunks = new JsDictionary<string, CanvasInformation>();
             Indexes = new SpriteCacheIndexes();
         }
+
+        public void ClearCache()
+        {
+            HeightMaps = new List<CanvasInformation>();
+            HeightMapChunks = new JsDictionary<string, CanvasInformation>();
+        }
     }
     public class SpriteCacheIndexes
     {

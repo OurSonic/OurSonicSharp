@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using OurSonic.Tiles;
 namespace OurSonic
 {
     public class Animation
@@ -39,6 +40,11 @@ namespace OurSonic
         [IntrinsicProperty]
         public int AutomatedTiming { get; set; }
         public Animation() {}
+
+        public Tile[] GetAnimationFile()
+        {
+            return SonicManager.Instance.SonicLevel.AnimatedFiles[AnimationFile];
+        }
     }
     public class AnimationFrame
     {

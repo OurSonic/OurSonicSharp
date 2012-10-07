@@ -19,7 +19,7 @@ namespace OurSonic.UIManager.Areas
         public int SelectedIndex { get; set; }
         [IntrinsicProperty]
         protected bool Clicking { get; set; }
-        public PaletteArea(int x, int y) : base(x, y, 0, 0) { }
+        public PaletteArea(int x, int y) : base(x, y, 0, 0) {}
 
         public override bool OnClick(Pointer e)
         {

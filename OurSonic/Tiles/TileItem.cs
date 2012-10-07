@@ -15,5 +15,10 @@ namespace OurSonic.Tiles
         public int Palette { get; set; }
         [IntrinsicProperty]
         public int Index { get; set; }
+
+        public Tile GetTile()
+        {
+            return SonicManager.Instance.SonicLevel.GetTile(_Tile);
+        }
     }
 }

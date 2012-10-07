@@ -101,7 +101,7 @@ namespace OurSonic
         {
             var _x = x1 / 128;
             var _y = Help.Mod(y1 / 128, SonicManager.Instance.SonicLevel.LevelHeight);
-            var tc = SonicManager.Instance.SonicLevel.Chunks[SonicManager.Instance.SonicLevel.ChunkMap[_x][_y]];
+            var tc = SonicManager.Instance.SonicLevel.GetChunkAt(_x, _y);
             buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
 
             var curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
@@ -128,7 +128,7 @@ namespace OurSonic
                                         __currentM.Angle = 0xFF;
                                         return __currentM;
                                     }
-                                    tc = SonicManager.Instance.SonicLevel.Chunks[SonicManager.Instance.SonicLevel.ChunkMap[_x - 1][_y]];
+                                    tc = SonicManager.Instance.SonicLevel.GetChunkAt(_x - 1, _y);
                                     buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
 
                                     curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
@@ -161,7 +161,7 @@ namespace OurSonic
                                 }
 */
 
-                                tc = SonicManager.Instance.SonicLevel.Chunks[SonicManager.Instance.SonicLevel.ChunkMap[_x + 1][_y]];
+                                tc = SonicManager.Instance.SonicLevel.GetChunkAt(_x + 1, _y);
                                 buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
 
                                 curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
@@ -195,7 +195,7 @@ namespace OurSonic
                                         return this.__currentM;
                                     }
 */
-                                    tc = SonicManager.Instance.SonicLevel.Chunks[SonicManager.Instance.SonicLevel.ChunkMap[_x + 1][_y]];
+                                    tc = SonicManager.Instance.SonicLevel.GetChunkAt(_x + 1, _y);
                                     buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
 
                                     curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
@@ -224,7 +224,7 @@ namespace OurSonic
                                     __currentM.Angle = 0xFF;
                                     return __currentM;
                                 }
-                                tc = SonicManager.Instance.SonicLevel.Chunks[SonicManager.Instance.SonicLevel.ChunkMap[_x - 1][_y]];
+                                tc = SonicManager.Instance.SonicLevel.GetChunkAt(_x - 1, _y);
                                 buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
 
                                 curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
@@ -253,10 +253,7 @@ namespace OurSonic
                         for (i = 0; i < 128 * 2; i++) {
                             while (true) {
                                 if (__y - i < 0) {
-                                    tc =
-                                            SonicManager.Instance.SonicLevel.Chunks[
-                                                    SonicManager.Instance.SonicLevel.ChunkMap[_x][
-                                                            Help.Mod(( _y - 1 ), SonicManager.Instance.SonicLevel.LevelHeight)]];
+                                    tc = SonicManager.Instance.SonicLevel.GetChunkAt(_x, Help.Mod(( _y - 1 ), SonicManager.Instance.SonicLevel.LevelHeight));
                                     buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
                                     curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
                                     cura = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.AngleMap1 : tc.AngleMap2;
@@ -280,10 +277,7 @@ namespace OurSonic
                     for (i = 0; i < length; i++) {
                         while (true) {
                             if (__y + i >= 128) {
-                                tc =
-                                        SonicManager.Instance.SonicLevel.Chunks[
-                                                SonicManager.Instance.SonicLevel.ChunkMap[_x][
-                                                        ( _y + 1 ) % SonicManager.Instance.SonicLevel.LevelHeight]];
+                                tc = SonicManager.Instance.SonicLevel.GetChunkAt(_x, ( _y + 1 ) % SonicManager.Instance.SonicLevel.LevelHeight);
                                 buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
                                 curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
                                 cura = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.AngleMap1 : tc.AngleMap2;
@@ -313,9 +307,7 @@ namespace OurSonic
                             while (true) {
                                 if (__y + i >= 128) {
                                     tc =
-                                            SonicManager.Instance.SonicLevel.Chunks[
-                                                    SonicManager.Instance.SonicLevel.ChunkMap[_x][
-                                                            ( _y + 1 ) % SonicManager.Instance.SonicLevel.LevelHeight]];
+                                            SonicManager.Instance.SonicLevel.GetChunkAt(_x, ( _y + 1 ) % SonicManager.Instance.SonicLevel.LevelHeight);
                                     buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
                                     curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
                                     cura = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.AngleMap1 : tc.AngleMap2;
@@ -340,10 +332,7 @@ namespace OurSonic
                     for (i = 0; i < length; i++) {
                         while (true) {
                             if (__y - i < 0) {
-                                tc =
-                                        SonicManager.Instance.SonicLevel.Chunks[
-                                                SonicManager.Instance.SonicLevel.ChunkMap[_x][
-                                                        Help.Mod(( _y - 1 ), SonicManager.Instance.SonicLevel.LevelHeight)]];
+                                tc = SonicManager.Instance.SonicLevel.GetChunkAt(_x, Help.Mod(( _y - 1 ), SonicManager.Instance.SonicLevel.LevelHeight));
                                 buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
                                 curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
                                 cura = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.AngleMap1 : tc.AngleMap2;
@@ -383,7 +372,8 @@ namespace OurSonic
                 for (var _y = 0; _y < 8; _y++) {
                     for (var _x = 0; _x < 8; _x++) {
                         var tp = chunk.TilePieces[_x][_y];
-                        ab1[_x][_y] = SonicManager.Instance.SonicLevel.Angles[SonicManager.Instance.SonicLevel.CollisionIndexes1[tp.Block]];
+
+                        ab1[_x][_y] = tp.GetLayer1Angles();
 
                         if (!( ab1[_x][_y] == 0 || ab1[_x][_y] == 255 || ab1[_x][_y] == 1 )) {
                             if (tp.XFlip) {
@@ -404,8 +394,7 @@ namespace OurSonic
                         var __x = 0;
                         var __y = 0;
 
-                        HeightMask heightMask =
-                                SonicManager.Instance.SonicLevel.HeightMaps[SonicManager.Instance.SonicLevel.CollisionIndexes1[tp.Block]];
+                        HeightMap heightMask = tp.GetLayer1HeightMaps();
                         int[] heightMaskItems = null;
                         if (heightMask == null) continue;
                         Solidity mj;
@@ -449,7 +438,7 @@ namespace OurSonic
                                         case (Solidity) 1:
                                         case (Solidity) 2:
                                         case (Solidity) 3:
-                                            hb1[( _x * 16 + jx )][( _y * 16 + jy )] = HeightMask.ItemsGood(heightMaskItems, __x, __y) ? tp.Solid1 : 0;
+                                            hb1[( _x * 16 + jx )][( _y * 16 + jy )] = HeightMap.ItemsGood(heightMaskItems, __x, __y) ? tp.Solid1 : 0;
                                             break;
                                     }
                                 }
@@ -473,7 +462,9 @@ namespace OurSonic
                 for (var _y = 0; _y < 8; _y++) {
                     for (var _x = 0; _x < 8; _x++) {
                         var tp = chunk.TilePieces[_x][_y];
-                        ab2[_x][_y] = SonicManager.Instance.SonicLevel.Angles[SonicManager.Instance.SonicLevel.CollisionIndexes2[tp.Block]];
+
+                        ab2[_x][_y] = tp.GetLayer2Angles();
+
                         if (!( ab2[_x][_y] == 0 || ab2[_x][_y] == 255 || ab2[_x][_y] == 1 )) {
                             if (tp.XFlip) {
                                 if (tp.YFlip) {
@@ -492,7 +483,7 @@ namespace OurSonic
 
                         int __x;
                         int __y;
-                        var hd2 = SonicManager.Instance.SonicLevel.HeightMaps[SonicManager.Instance.SonicLevel.CollisionIndexes2[tp.Block]];
+                        var hd2 = tp.GetLayer2HeightMaps();
                         if (hd2 == null) continue;
                         Solidity mj;
 
@@ -538,7 +529,7 @@ namespace OurSonic
                                         case (Solidity) 1:
                                         case (Solidity) 2:
                                         case (Solidity) 3:
-                                            hb2[( _x * 16 + jx )][( _y * 16 + jy )] = HeightMask.ItemsGood(hd2Items, __x, __y) ? tp.Solid2 : 0;
+                                            hb2[( _x * 16 + jx )][( _y * 16 + jy )] = HeightMap.ItemsGood(hd2Items, __x, __y) ? tp.Solid2 : 0;
                                             break;
                                     }
                                 }

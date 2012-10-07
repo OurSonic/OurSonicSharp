@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using System.Serialization;
+using System.Text.RegularExpressions;
 using CommonWebLibraries;
 using OurSonic.UIManager;
 using jQueryApi;
@@ -382,6 +384,19 @@ namespace OurSonic.Utility
             m.Context.PutImageData(img, 0, 0);*/
             m.Context.DrawImage(block.Canvas, 0, 0);
             return m;
+        }
+
+        public static JsDictionary<string, string> GetQueryString()
+        {
+            var result = new JsDictionary<string, string>();
+            string queryString = Window.Location.Search.Substring(1);
+            var re = new Regex("/([^&=]+)=([^&]*)/g");
+            RegexMatch m;
+            while (( m = re.Exec(queryString) ) != null) {
+                result[Window.Instance.Me().decodeURIComponent(m[1])] = Window.Instance.Me().decodeURIComponent(m[2]);
+            }
+
+            return result;
         }
     }
 }

@@ -66,7 +66,7 @@ namespace OurSonic.UIManager
                     e.X -= control.X;
                     e.Y -= control.Y;
                     control.OnClick(e);
-                    return false;
+                    return true;
                 }
             }
 
@@ -78,7 +78,6 @@ namespace OurSonic.UIManager
             }
             Dragging = true;
 
-            return false;
             return base.OnClick(e);
         }
 
@@ -93,7 +92,7 @@ namespace OurSonic.UIManager
                     e.X -= control.X;
                     e.Y -= control.Y;
                     control.OnMouseUp(e);
-                    return false;
+                    return true;
                 }
             }
 
@@ -140,7 +139,7 @@ namespace OurSonic.UIManager
                     e.X -= control.X;
                     e.Y -= control.Y;
                     control.OnScroll(e);
-                    return false;
+                    return true;
                 }
             }
             //if (this.scroll) this.scroll();

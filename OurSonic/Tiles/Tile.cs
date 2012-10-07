@@ -148,7 +148,8 @@ namespace OurSonic.Tiles
                         var frame = acn.Frames[ind];
                         if (frame.Falsey())
                             frame = acn.Frames[0];
-                        var file = SonicManager.Instance.SonicLevel.AnimatedFiles[acn.AnimationFile];
+                        var file=acn.GetAnimationFile();
+                        
                         var va = file[frame.StartingTileIndex + ( Index - anin )];
                         if (va.Truthy()) {
                             if (canvas.FillStyle != "rbga(255,255,255,255)")

@@ -5,7 +5,7 @@ using OurSonic.Tiles;
 using OurSonic.Utility;
 namespace OurSonic
 {
-    public class HeightMask
+    public class HeightMap
     {
         public static string[] colors = new[] {"", "rgba(255,98,235,0.6)", "rgba(24,218,235,0.6)", "rgba(24,98,235,0.6)"};
         [IntrinsicProperty]
@@ -19,7 +19,7 @@ namespace OurSonic
         [IntrinsicProperty]
         protected int Index { get; set; }
 
-        public HeightMask(int[] heightMap, int i)
+        public HeightMap(int[] heightMap, int i)
         {
             Items = heightMap;
             Width = 16;
@@ -28,13 +28,13 @@ namespace OurSonic
             Index = i;
         }
 
-        public static implicit operator HeightMask(int d)
+        public static implicit operator HeightMap(int d)
         {
             var m = d == 0 ? 0 : 16;
-            return new HeightMask(new[] {m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m}, -1); //16 m's
+            return new HeightMap(new[] {m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m}, -1); //16 m's
         }
 
-        public static implicit operator int(HeightMask d)
+        public static implicit operator int(HeightMap d)
         {
             if (d.Integer != -1000) return d.Integer;
 
@@ -180,7 +180,7 @@ namespace OurSonic
 
                             canvas.lineWidth = 1;
                             if (state <= 0 && _H.ItemsGood(this.items, x, y, jy) && solid > 0) {
-                                canvas.fillStyle = HeightMask.colors[solid];
+                                canvas.fillStyle = HeightMap.colors[solid];
                                 canvas.fillRect(_x, _y, scale.x, scale.y);
                             } else {
                                 if (state != -1) {
