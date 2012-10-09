@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Html;
-using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonic.UIManager;
 using OurSonic.Utility;
@@ -33,18 +32,10 @@ namespace OurSonic
             Instance = this;
             /*var pl = @"";
             Window.Instance.Me().console.log(new Compressor().CompressText(pl));*/
-            var gameCanvasItem = jQuery.Select(string.Format("#{0}", gameCanvasName));
-            gameCanvas =
-                    new CanvasInformation(
-                            (CanvasContext2D) gameCanvasItem[0].As<CanvasElement>().GetContext(Rendering.Render2D),
-                            gameCanvasItem);
 
-            //          new SpeedTester(gameCanvas);return;
-            var uiCanvasItem = jQuery.Select(string.Format("#{0}", uiCanvasName));
-            uiCanvas =
-                    new CanvasInformation(
-                            (CanvasContext2D) uiCanvasItem[0].As<CanvasElement>().GetContext(Rendering.Render2D), uiCanvasItem);
-
+            gameCanvas = CanvasInformation.Create((CanvasElement) Document.GetElementById(gameCanvasName), 0, 0);
+            uiCanvas = CanvasInformation.Create((CanvasElement) Document.GetElementById(uiCanvasName), 0, 0);
+            //new SpeedTester(gameCanvas);return;
             canvasWidth = 0;
             canvasHeight = 0;
 
@@ -446,6 +437,11 @@ namespace OurSonic
         {
             if (!sonicManager.InHaltMode)
                 Clear(gameCanvas);
+
+            gameCanvas.Context.Me().webkitImageSmoothingEnabled = false;
+            gameCanvas.Context.Me().mozImageSmoothingEnabled = false;
+            gameCanvas.Context.Me().imageSmoothingEnabled = false;
+
             sonicManager.Draw(gameCanvas.Context);
         }
 
@@ -453,6 +449,8 @@ namespace OurSonic
         {
             if (!sonicManager.InHaltMode)
                 Clear(uiCanvas);
+            uiCanvas.Context.Me().webkitImageSmoothingEnabled = false;
+
             sonicManager.UIManager.Draw(uiCanvas.Context);
         }
     }

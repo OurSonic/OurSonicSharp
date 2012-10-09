@@ -17,7 +17,6 @@ namespace OurSonic.UIManager
         public const string TextFont = "11pt Arial bold ";
         private static string _curLevelName;
         private readonly CanvasContext2D mainCanvas;
-        private readonly Point scale;
         public readonly SonicManager sonicManager;
         private List<string> messages = new List<string>();
         [IntrinsicProperty]
@@ -26,14 +25,6 @@ namespace OurSonic.UIManager
         public Dragger dragger { get; set; }
         [IntrinsicProperty]
         public UIManagerData Data { get; set; }
-        [IntrinsicProperty]
-        public UIArea<ColorEditorAreaData> ColorEditorArea { get; set; }
-        [IntrinsicProperty]
-        public ObjectFrameworkArea ObjectFrameworkArea { get; set; }
-        [IntrinsicProperty]
-        public UIArea ObjectFrameworkListArea { get; set; }
-        [IntrinsicProperty]
-        public UIArea<LiveObjectsAreaData> LiveObjectsArea { get; set; }
         [IntrinsicProperty]
         public static UIManager Instance { get; set; }
         [IntrinsicProperty]
@@ -48,8 +39,9 @@ namespace OurSonic.UIManager
                 _curLevelName = value;
             }
         }
+        public UIManagerAreas UIManagerAreas { get; private set; }
 
-        public UIManager(SonicManager sonicManager, CanvasContext2D mainCanvas, Point scale)
+        public UIManager(SonicManager sonicManager, CanvasContext2D mainCanvas)
         {
             Instance = this;
             mainCanvas.Font = TextFont;
@@ -57,7 +49,6 @@ namespace OurSonic.UIManager
 
             this.sonicManager = sonicManager;
             this.mainCanvas = mainCanvas;
-            this.scale = scale;
             dragger = new Dragger((xsp, ysp) => {
                                       sonicManager.WindowLocation.X += (int) xsp;
                                       sonicManager.WindowLocation.Y += (int) ysp;
@@ -66,11 +57,14 @@ namespace OurSonic.UIManager
                                       sonicManager.BigWindowLocation.Y = sonicManager.WindowLocation.Y;
                                   });
 
+            UIManagerAreas = new UIManagerAreas();
+
             new LevelInformationArea(this);
             new ColorEditorArea(this);
             new ObjectFrameworkArea(this);
             new ObjectFrameworkListArea(this);
-            new LiveObjectsArea(this);
+
+            sonicManager.OnLevelLoad += (level) => { new TileChunkArea(this); };
         }
 
         public bool OnClick(Pointer cell)

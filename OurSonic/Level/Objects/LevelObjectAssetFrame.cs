@@ -179,7 +179,7 @@ namespace OurSonic.Level.Objects
             var fd = GetCache(size, xflip, yflip, showOutline, showCollideMap, showHurtMap);
 
             if (fd.Falsey()) {
-                var mj = Help.DefaultCanvas(size.X, size.Y);
+                var mj = CanvasInformation.Create(size.X, size.Y);
                 var canvas = mj.Context;
 
                 canvas.Save();

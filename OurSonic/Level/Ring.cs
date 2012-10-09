@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonic.Utility;
@@ -25,7 +24,7 @@ namespace OurSonic.Level
             Active = active;
         }
 
-        public void Draw(CanvasContext2D canvas, Point pos, Point scale)
+        public void Draw(CanvasContext2D canvas, Point pos)
         {
             if (Active) {
                 Ysp += 0.09375;
@@ -48,7 +47,7 @@ namespace OurSonic.Level
 
                 if (SonicManager.Instance.DrawTickCount > SonicManager.Instance.SonicToon.sonicLastHitTick + 64 &&
                     IntersectingRectangle.IntersectsRect(SonicManager.Instance.SonicToon.myRec,
-                                                         new Rectangle(X - 8 * scale.X, Y - 8 * scale.Y, 8 * 2 * scale.X, 2 * 8 * scale.Y))) {
+                                                         new Rectangle(X - 8, Y - 8, 8 * 2, 2 * 8))) {
                     TickCount = 0xfffffff;
                     SonicManager.Instance.SonicToon.Rings++;
                     return;
@@ -59,13 +58,13 @@ namespace OurSonic.Level
             if (SonicManager.Instance.CurrentGameState == GameState.Playing)
                 AnimationIndex = ( SonicManager.Instance.DrawTickCount % ( ( Active ? 4 : 8 ) * 4 ) ) / ( Active ? 4 : 8 );
             else AnimationIndex = 0;
-            List<ImageElement> sprites = null;
+            List<CanvasInformation> sprites = null;
             if (SonicManager.Instance.SpriteCache.Rings.Truthy())
                 sprites = SonicManager.Instance.SpriteCache.Rings;
             else throw new Exception("bad ring animation");
-            var sps = sprites[AnimationIndex * 200 + scale.Y * 100 + scale.X];
-            if (sps.Falsey()) throw new Exception("bad ring animation");
-            if (sps.Loaded()) canvas.DrawImage(sps, ( pos.X - 8 ) * scale.X, ( pos.Y - 8 ) * scale.Y);
+            var sps = sprites[AnimationIndex];
+
+            canvas.DrawImage(sps.Canvas, ( pos.X - 8 ), ( pos.Y - 8 ));
         }
     }
 }

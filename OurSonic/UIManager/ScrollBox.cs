@@ -20,7 +20,7 @@ namespace OurSonic.UIManager
         [IntrinsicProperty]
         public string BackColor { get; set; }
         [IntrinsicProperty]
-        public int ScrollOffset { get; set; }
+        public int ScrollIndex { get; set; }
         [IntrinsicProperty]
         public int ScrollPosition { get; set; }
         [IntrinsicProperty]
@@ -60,7 +60,7 @@ namespace OurSonic.UIManager
         public override bool OnClick(Pointer e)
         {
             if (!Visible) return false;
-            for (var ij = ScrollOffset; ij < Controls.Count; ij++) {
+            for (var ij = ScrollIndex; ij < Controls.Count; ij++) {
                 var control = Controls[ij];
                 if (control.Y <= e.Y && control.Y + control.Height > e.Y && control.X + 2 <= e.X && control.X + control.Width + 2 > e.X) {
                     e.X -= control.X;
@@ -72,9 +72,9 @@ namespace OurSonic.UIManager
 
             if (e.X > ItemWidth && e.X < ItemWidth + ScrollWidth) {
                 var height = VisibleItems * ( ItemHeight + JHeight ) - 2;
-                ScrollOffset = ( e.Y / height ) * ( Controls.Count - VisibleItems );
+                ScrollIndex = ( e.Y / height ) * ( Controls.Count - VisibleItems );
 
-                ScrollOffset = Math.Min(Math.Max(ScrollOffset, 0), Controls.Count);
+                ScrollIndex = Math.Min(Math.Max(ScrollIndex, 0), Controls.Count);
             }
             Dragging = true;
             return base.OnClick(e);
@@ -85,7 +85,7 @@ namespace OurSonic.UIManager
             if (!Visible) return false;
             Dragging = false;
 
-            for (var ij = ScrollOffset; ij < Controls.Count; ij++) {
+            for (var ij = ScrollIndex; ij < Controls.Count; ij++) {
                 var control = Controls[ij];
                 if (control.Y <= e.Y && control.Y + control.Height > e.Y && control.X <= e.X + 2 && control.X + control.Width + 2 > e.X) {
                     e.X -= control.X;
@@ -113,9 +113,9 @@ namespace OurSonic.UIManager
             }
             if (Dragging && e.X > ItemWidth && e.X < ItemWidth + ScrollWidth) {
                 var height = VisibleItems * ( ItemHeight + JHeight ) - 2;
-                ScrollOffset = (int) ( ( (double) e.Y / height ) * ( Controls.Count - VisibleItems ) );
+                ScrollIndex = (int) ( ( (double) e.Y / height ) * ( Controls.Count - VisibleItems ) );
 
-                ScrollOffset = Math.Min(Math.Max(ScrollOffset, 0), Controls.Count);
+                ScrollIndex = Math.Min(Math.Max(ScrollIndex, 0), Controls.Count);
             }
             if (MouseOver != null) MouseOver(new Point(e.X, e.Y));
             return base.OnMouseOver(e);
@@ -126,23 +126,21 @@ namespace OurSonic.UIManager
             if (!Visible) return false;
 
             if (e.Delta > 0) {
-                if (ScrollOffset > 0)
-                    ScrollOffset--;
+                if (ScrollIndex > 0)
+                    ScrollIndex--;
             } else {
-                if (ScrollOffset < Controls.Count - VisibleItems)
-                    ScrollOffset++;
+                if (ScrollIndex < Controls.Count - VisibleItems)
+                    ScrollIndex++;
             }
-            for (var ij = 0; ij < Controls.Count; ij++) {
-                var control = Controls[ij];
+            foreach (var control in Controls.Array()) {
                 if (control.Y <= e.Y && control.Y + control.Height > e.Y && control.X <= e.X && control.X + control.Width > e.X) {
                     e.X -= control.X;
                     e.Y -= control.Y;
-                    control.OnScroll(e);
                     return true;
                 }
             }
             //if (this.scroll) this.scroll();
-            return base.OnScroll(e);
+            return true;
         }
 
         public override void Draw(CanvasContext2D canv)
@@ -168,12 +166,12 @@ namespace OurSonic.UIManager
             canv.FillStyle = "FFDDFF";
             canv.LineWidth = 1;
             canv.StrokeStyle = "#FFDDFF";
-            ScrollPosition = height * ScrollOffset / ( Controls.Count - VisibleItems );
+            ScrollPosition = height * ScrollIndex / ( Controls.Count - VisibleItems );
 
             canv.FillRect(TotalX + ItemWidth + 2 + 2 + 2, TotalY + 2 + ( ScrollPosition ), ScrollWidth - 2, 5);
 
             var curY = 3;
-            for (var i = ScrollOffset; i < Math.Min(Controls.Count, ScrollOffset + VisibleItems); i++) {
+            for (var i = ScrollIndex; i < Math.Min(Controls.Count, ScrollIndex + VisibleItems); i++) {
                 Controls[i].Parent = this;
                 Controls[i].X = 2;
                 Controls[i].Y = curY;

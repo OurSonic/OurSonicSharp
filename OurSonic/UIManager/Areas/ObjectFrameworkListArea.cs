@@ -14,8 +14,8 @@ namespace OurSonic.UIManager.Areas
         {
             Action<string> loadObject = null;
 
-            var objectFrameworkListArea = uiManager.ObjectFrameworkListArea = new UIArea(90, 500, 390, 300) {Closable = true};
-            objectFrameworkListArea.Visible = true;
+            var objectFrameworkListArea = uiManager.UIManagerAreas.ObjectFrameworkListArea = new UIArea(90, 500, 390, 300) {Closable = true};
+            objectFrameworkListArea.Visible = false;
 
             uiManager.AddArea(objectFrameworkListArea);
             objectFrameworkListArea.AddControl(new TextArea(30, 25, "Object Frameworks") {Color = "blue"});
@@ -24,8 +24,8 @@ namespace OurSonic.UIManager.Areas
             objectFrameworkListArea.AddControl(new Button(35, 50, 160, 25, "Create Framework") {
                                                                                                        Color = "rgb(50,150,50)",
                                                                                                        Click = (p) => {
-                                                                                                                   uiManager.ObjectFrameworkArea.Populate(new LevelObject("SomeKey"));
-                                                                                                                   uiManager.ObjectFrameworkArea.objectFrameworkArea.Visible = true;
+                                                                                                                   uiManager.UIManagerAreas.ObjectFrameworkArea.Populate(new LevelObject("SomeKey"));
+                                                                                                                   uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Visible = true;
                                                                                                                }
                                                                                                });
             Action getObjects = () => {
@@ -52,9 +52,10 @@ namespace OurSonic.UIManager.Areas
                                                                                                                   var oldTitle = UIManager.CurLevelName;
                                                                                                                   UIManager.UpdateTitle("Saving Object");
 
-                                                                                                                  var k = uiManager.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Key;
-                                                                                                                  var o = uiManager.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.oldKey ?? uiManager.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Key;
-                                                                                                                  var v = Help.Stringify(uiManager.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework);
+                                                                                                                  var k = uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Key;
+                                                                                                                  var o = uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.oldKey ??
+                                                                                                                          uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Key;
+                                                                                                                  var v = Help.Stringify(uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework);
 
                                                                                                                   SonicEngine.Instance.client.Emit("SaveObject", new SaveObjectModel {Key = k, OldKey = o, Data = v});
                                                                                                                   SonicEngine.Instance.client.On<bool>("SaveObject.Response", (data) => { UIManager.UpdateTitle(oldTitle); });
@@ -68,8 +69,8 @@ namespace OurSonic.UIManager.Areas
                              var objects = SonicManager.Instance.cachedObjects;
                              if (objects != null) {
                                  if (objects[name] != null) {
-                                     uiManager.ObjectFrameworkArea.Populate(objects[name]);
-                                     uiManager.ObjectFrameworkArea.objectFrameworkArea.Visible = true;
+                                     uiManager.UIManagerAreas.ObjectFrameworkArea.Populate(objects[name]);
+                                     uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Visible = true;
                                      return;
                                  }
                              }
@@ -83,8 +84,8 @@ namespace OurSonic.UIManager.Areas
                                                                                 (lvl) => {
                                                                                     UIManager.UpdateTitle(oldTitle);
                                                                                     var d = ObjectManager.ExtendObject(jQuery.ParseJsonData<LevelObjectData>(lvl.Data));
-                                                                                    uiManager.ObjectFrameworkArea.Populate(d);
-                                                                                    uiManager.ObjectFrameworkArea.objectFrameworkArea.Visible = true;
+                                                                                    uiManager.UIManagerAreas.ObjectFrameworkArea.Populate(d);
+                                                                                    uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Visible = true;
                                                                                 });
                          };
         }

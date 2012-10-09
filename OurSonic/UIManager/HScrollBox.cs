@@ -138,12 +138,11 @@ namespace OurSonic.UIManager
                 if (control.Y <= e.Y && control.Y + control.Height > e.Y && control.X <= e.X && control.X + control.Width > e.X) {
                     e.X -= control.X;
                     e.Y -= control.Y;
-                    control.OnScroll(e);
                     return true;
                 }
             }
             //if (this.scroll) this.scroll();
-            return base.OnScroll(e);
+            return true;
         }
 
         public override void Draw(CanvasContext2D canv)

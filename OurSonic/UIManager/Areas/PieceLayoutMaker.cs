@@ -61,8 +61,8 @@ namespace OurSonic.UIManager.Areas
 
             for (var i = 0; i < PieceLayout.Pieces.Count; i++) {
                 var j = PieceLayout.Pieces[i];
-                var piece = SonicManager.Instance.UIManager.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Pieces[j.PieceIndex];
-                var asset = SonicManager.Instance.UIManager.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Assets[piece.AssetIndex];
+                var piece = SonicManager.Instance.UIManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Pieces[j.PieceIndex];
+                var asset = SonicManager.Instance.UIManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Assets[piece.AssetIndex];
                 var size = new Point(10, 10);
                 if (asset.Frames.Count > 0) {
                     var frm = asset.Frames[0];
@@ -82,7 +82,7 @@ namespace OurSonic.UIManager.Areas
                     SelectedPieceIndex = i;
                     DraggingIndex = i;
 
-                    var cj = SonicManager.Instance.UIManager.ObjectFrameworkArea.objectFrameworkArea.Data.MainPanel.Data.SelectPieceScroll.Controls;
+                    var cj = SonicManager.Instance.UIManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.MainPanel.Data.SelectPieceScroll.Controls;
 
                     for (var ci = 0; ci < cj.Count; ci++) {
                         if (ci == j.PieceIndex)

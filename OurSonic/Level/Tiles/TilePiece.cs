@@ -74,50 +74,9 @@ namespace OurSonic.Level.Tiles
             return ( onlyForeground = true );
         }
 
-        public void DrawUI(CanvasContext2D canvas, Point position, Point scale, bool xflip, bool yflip)
-        {
-            /*                var drawOrderIndex = 0;
-                            if (xflip) {
-                                if (yflip) {
-                                    drawOrderIndex = 0;
-                                } else {
-                                    drawOrderIndex = 1;
-                                }
-                            } else {
-                                if (yflip) {
-                                    drawOrderIndex = 2;
-
-                                } else {
-                                    drawOrderIndex = 3;
-                                }
-                            }
-                            for (var i = 0; i < this.tiles.length; i++) {
-                                var mj = sonicManager.SonicLevel.Tiles[this.tiles[i].Tile];
-                                if (mj) {
-                                    var df = drawInfo[drawOrder[drawOrderIndex][i]];
-                                    TilePiece.__position.x = position.x + df[0] * 8 * scale.x;
-                                    TilePiece.__position.y = position.y + df[1] * 8 * scale.y;
-                                    mj.drawUI(canvas, TilePiece.__position, scale, (xflip^ mj.XFlip), (yflip^mj.YFlip), mj.Palette);
-
-
-                                }
-                                /* canvas.lineWidth = 2;
-                                canvas.strokeStyle = "#D142AA";
-                                canvas.strokeRect(position.x, position.y, 16 * scale.x, 16 * scale.y);#1#
-                            }
-
-
-                            //canvas.fillStyle = "#FFFFFF";
-                            //canvas.fillText(sonicManager.SonicLevel.TilePieces.indexOf(this), position.x + 8 * scale.x, position.y + 8 * scale.y);
-
-
-                            return true;
-            */
-        }
 
         public bool Draw(CanvasContext2D canvas,
                          Point position,
-                         Point scale,
                          int layer,
                          bool xFlip,
                          bool yFlip,
@@ -125,8 +84,8 @@ namespace OurSonic.Level.Tiles
         {
             var drawOrderIndex = 0;
             drawOrderIndex = xFlip ? ( yFlip ? 0 : 1 ) : ( yFlip ? 2 : 3 );
-            var fd = GetCache(layer, scale, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.PaletteAnimations);
-            if (fd.Falsey()) fd = buildCache(scale, layer, xFlip, yFlip, animatedIndex, drawOrderIndex);
+            var fd = GetCache(layer, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.PaletteAnimations);
+            if (fd.Falsey()) fd = buildCache(layer, xFlip, yFlip, animatedIndex, drawOrderIndex);
             DrawIt(canvas, fd, position);
             return true;
         }
@@ -146,15 +105,15 @@ namespace OurSonic.Level.Tiles
             return ( shouldAnimate ).Value;
         }
 
-        private CanvasElement buildCache(Point scale, int layer, bool xFlip, bool yFlip, int animatedIndex, int drawOrderIndex)
+        private CanvasElement buildCache(int layer, bool xFlip, bool yFlip, int animatedIndex, int drawOrderIndex)
         {
             CanvasElement fd;
-            var ac = Help.DefaultCanvas(8 * SonicManager.Instance.Scale.X * 2, 8 * SonicManager.Instance.Scale.Y * 2);
-            var sX = 8 * scale.X;
-            var sY = 8 * scale.Y;
+            var ac = CanvasInformation.Create(8 * 2, 8 * 2);
+            var sX = 8;
+            var sY = 8;
             var i = 0;
 
-            var localPoint = new Point(0, 0);
+            var localPoint = new Point(0,0);
             foreach (TileItem t in Tiles.Array()) {
                 var mj = t;
                 var tile = t.GetTile();
@@ -165,7 +124,7 @@ namespace OurSonic.Level.Tiles
                         var df = DrawInfo[DrawOrder[drawOrderIndex][i]];
                         localPoint.X = df[0] * sX;
                         localPoint.Y = df[1] * sY;
-                        tile.Draw(ac.Context, localPoint, scale, _xf, _yf, mj.Palette, layer, animatedIndex);
+                        tile.Draw(ac.Context, localPoint, _xf, _yf, mj.Palette, layer, animatedIndex);
                     }
                 }
                 i++;
@@ -175,18 +134,17 @@ namespace OurSonic.Level.Tiles
             //            ac.Context.StrokeRect(0, 0, 2*8 * SonicManager.Instance.Scale.X, 2*8 * SonicManager.Instance.Scale.Y);
 
             fd = ac.Canvas;
-            SetCache(layer, scale, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.PaletteAnimations, fd);
+            SetCache(layer, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.PaletteAnimations, fd);
             return fd;
         }
 
         private void SetCache(int layer,
-                              Point scale,
                               int drawOrder,
                               int animationFrame,
                               List<int> palAn,
                               CanvasElement image)
         {
-            dynamic val = ( ( drawOrder << 8 ) + ( scale.X << 16 ) + ( animationFrame << 20 ) + ( ( layer + 1 ) << 24 ) ); //okay
+            dynamic val = ( ( drawOrder << 8 ) + ( animationFrame << 20 ) + ( ( layer + 1 ) << 24 ) ); //okay
             if (AnimatedFrames.Length > 0) {
                 for (int index = 0; index < AnimatedFrames.Length; index++) {
                     var animatedFrame = AnimatedFrames[index];
@@ -201,9 +159,9 @@ namespace OurSonic.Level.Tiles
             canvas.DrawImage(fd, position.X, position.Y);
         }
 
-        private CanvasElement GetCache(int layer, Point scale, int drawOrder, int animationFrame, List<int> palAn)
+        private CanvasElement GetCache(int layer, int drawOrder, int animationFrame, List<int> palAn)
         {
-            dynamic val = ( ( drawOrder << 8 ) + ( scale.X << 16 ) + ( animationFrame << 20 ) + ( ( layer + 1 ) << 24 ) ); //okay
+            dynamic val = ( ( drawOrder << 8 ) + ( animationFrame << 20 ) + ( ( layer + 1 ) << 24 ) ); //okay
             if (AnimatedFrames.Length > 0) {
                 foreach (var animatedFrame in AnimatedFrames) {
                     val += palAn[animatedFrame] + " ";
@@ -211,6 +169,26 @@ namespace OurSonic.Level.Tiles
             }
 
             return Script.Reinterpret<CanvasElement>(Image.Me()[val]);
+        }
+
+        public int GetLayer1Angles()
+        {
+            return SonicManager.Instance.SonicLevel.Angles[SonicManager.Instance.SonicLevel.CollisionIndexes1[Index]];
+        }
+
+        public int GetLayer2Angles()
+        {
+            return SonicManager.Instance.SonicLevel.Angles[SonicManager.Instance.SonicLevel.CollisionIndexes2[Index]];
+        }
+
+        public HeightMap GetLayer1HeightMaps()
+        {
+            return SonicManager.Instance.SonicLevel.HeightMaps[SonicManager.Instance.SonicLevel.CollisionIndexes1[Index]];
+        }
+
+        public HeightMap GetLayer2HeightMaps()
+        {
+            return SonicManager.Instance.SonicLevel.HeightMaps[SonicManager.Instance.SonicLevel.CollisionIndexes2[Index]];
         }
     }
     public enum RotationMode

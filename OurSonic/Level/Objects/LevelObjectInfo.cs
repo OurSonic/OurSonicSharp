@@ -115,7 +115,7 @@ namespace OurSonic.Level.Objects
             return ObjectData.PieceLayouts[PieceIndex];
         }
 
-        public Rectangle GetRect(Point scale)
+        public Rectangle GetRect( )
         {
             if (ObjectData.PieceLayouts.Count == 0) {
                 _rect.X = (int) X;
@@ -138,11 +138,11 @@ namespace OurSonic.Level.Objects
                 var asset = ObjectData.Assets[piece.AssetIndex];
                 if (asset.Frames.Count > 0) {
                     var frm = asset.Frames[j.FrameIndex];
-                    Help.MergeRect(_rect, new Rectangle(frm.OffsetX + j.X, frm.OffsetY + j.Y, frm.Width * scale.X, frm.Height * scale.Y));
+                    Help.MergeRect(_rect, new Rectangle(frm.OffsetX + j.X, frm.OffsetY + j.Y, frm.Width  , frm.Height ));
                 }
             }
-            _rect.X = _rect.X * scale.X;
-            _rect.Y = _rect.Y * scale.Y;
+            _rect.X = _rect.X ;
+            _rect.Y = _rect.Y ;
             _rect.Width -= _rect.X;
             _rect.Height -= _rect.Y;
 
@@ -151,7 +151,7 @@ namespace OurSonic.Level.Objects
             return _rect;
         }
 
-        public void Draw(CanvasContext2D canvas, int x, int y, Point scale, bool showHeightMap)
+        public void Draw(CanvasContext2D canvas, int x, int y, bool showHeightMap)
         {
             if (Dead || ObjectData.Falsey()) return;
 
@@ -159,14 +159,14 @@ namespace OurSonic.Level.Objects
                 canvas.DrawImage(ObjectManager.broken,
                                  ( x - ObjectManager.broken.Width / 2 ),
                                  ( y - ObjectManager.broken.Height / 2 ),
-                                 ObjectManager.broken.Width * scale.X,
-                                 ObjectManager.broken.Height * scale.Y);
+                                 ObjectManager.broken.Width,
+                                 ObjectManager.broken.Height);
                 return;
             }
 
-            MainPieceLayout().Draw(canvas, x, y, scale, ObjectData, this, showHeightMap);
+            MainPieceLayout().Draw(canvas, x, y, ObjectData, this, showHeightMap);
             if (ConsoleLog != null) {
-                var gr = GetRect(scale);
+                var gr = GetRect();
                 canvas.Save();
                 canvas.FillStyle = "rgba(228,228,12,0.4)";
                 var wd = 1;

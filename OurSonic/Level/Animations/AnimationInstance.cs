@@ -1,11 +1,10 @@
 using System.Html.Media.Graphics;
-using OurSonic.Utility;
 namespace OurSonic.Level.Animations
 {
     public class AnimationInstance
     {
         public void Tick() {}
-        public void Draw(CanvasContext2D canvas, int i, int i1, Point scale) {}
+        public void Draw(CanvasContext2D canvas, int i, int i1) {}
 /*
 
 function AnimationInstance(animation, x, y, tick) {

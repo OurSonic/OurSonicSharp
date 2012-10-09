@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Html;
 using OurSonic.Level.Objects;
-using OurSonic.Utility;
 using jQueryApi;
 namespace OurSonic.UIManager.Areas
 {
@@ -10,7 +9,7 @@ namespace OurSonic.UIManager.Areas
     {
         public LiveObjectsArea(UIManager uiManager)
         {
-            var liveObjectsArea = uiManager.LiveObjectsArea = new UIArea<LiveObjectsAreaData>(new LiveObjectsAreaData(), 947, 95, 770, 700) {Closable = true};
+            var liveObjectsArea = uiManager.UIManagerAreas.LiveObjectsArea = new UIArea<LiveObjectsAreaData>(new LiveObjectsAreaData(), 947, 95, 770, 700) {Closable = true};
             liveObjectsArea.Visible = true;
             uiManager.AddArea(liveObjectsArea);
             liveObjectsArea.AddControl(new TextArea(30, 25, "Live Objects") {Color = "blue"});
@@ -38,7 +37,7 @@ namespace OurSonic.UIManager.Areas
                                                         ImageButton<LivePopulateModel> dm = null;
                                                         ImageButton<LivePopulateModel> imageButton = new ImageButton<LivePopulateModel>(new LivePopulateModel(), 0, 0, 0, 0);
                                                         imageButton.Text = obj.ObjectData.Description + "(" + obj.ObjectData.Key + ")";
-                                                        imageButton.Image = (canv, x, y) => { obj.Draw(canv, x + dm.Width / 2, y + dm.Height / 2, new Point(1, 1), false); };
+                                                        imageButton.OnDraw = (canv, x, y) => { obj.Draw(canv, x + dm.Width / 2, y + dm.Height / 2, false); };
                                                         imageButton.Click = (p) => { liveObjectsArea.Data.DebugConsole.Data.Populate(obj); };
                                                         scl.AddControl(dm = imageButton);
                                                         dm.Data.@checked = true;

@@ -28,7 +28,7 @@ namespace OurSonic.UIManager
         [IntrinsicProperty]
         private Gradient Button2Grad { get; set; }
         [IntrinsicProperty]
-        public Action<CanvasContext2D, int, int> Image { get; set; }
+        public Action<CanvasContext2D, int, int> OnDraw { get; set; }
         [IntrinsicProperty]
         public Gradient Button1Grad { get; set; }
         [IntrinsicProperty]
@@ -46,7 +46,7 @@ namespace OurSonic.UIManager
             Toggled = false;
             Font = "";
             Clicking = false;
-            Image = null;
+            OnDraw = null;
             Button1Grad = null;
             Button2Grad = null;
             ButtonBorderGrad = null;
@@ -59,7 +59,7 @@ namespace OurSonic.UIManager
         {
             base.Construct();
 
-            var canv = Help.DefaultCanvas(1, 1).Context;
+            var canv = CanvasInformation.Create(1, 1).Context;
             Button1Grad = canv.CreateLinearGradient(0, 0, 0, 1);
 
             Button1Grad.AddColorStop(0, "#FFFFFF");
@@ -132,7 +132,7 @@ namespace OurSonic.UIManager
             string txt = Text;
 
             canv.Save();
-            Image(canv, TotalX, TotalY);
+            OnDraw(canv, TotalX, TotalY);
             canv.Restore();
 
             canv.FillText(txt, TotalX + ( ( Width / 2 ) - ( canv.MeasureText(txt).Width / 2 ) ), TotalY + Height - 3);

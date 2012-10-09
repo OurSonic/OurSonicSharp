@@ -33,3 +33,7 @@ onmessage=function (e) {
     self.postMessage({ data: aj.data, state: 'finished' });
 };
 
+
+function hasWebWorker() {
+    return false && typeof Worker !== "undefined";
+}

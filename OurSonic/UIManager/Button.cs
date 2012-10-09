@@ -54,7 +54,7 @@ namespace OurSonic.UIManager
         {
             base.Construct();
 
-            var canv = Help.DefaultCanvas(1, 1).Context;
+            var canv = CanvasInformation.Create(1, 1).Context;
 
             Button1Grad = canv.CreateLinearGradient(0, 0, 0, 1);
 

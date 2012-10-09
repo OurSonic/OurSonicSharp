@@ -7,9 +7,9 @@ namespace OurSonic.Level
     public class SpriteCache
     {
         [IntrinsicProperty]
-        public List<ImageElement> Rings { get; set; }
+        public List<CanvasInformation> Rings { get; set; }
         [IntrinsicProperty]
-        public List<ImageElement> TileChunks { get; set; }
+        public List<CanvasInformation> TileChunks { get; set; }
         [IntrinsicProperty]
         public JsDictionary<string, CanvasInformation> Tilepieces { get; set; }
         [IntrinsicProperty]
@@ -26,8 +26,8 @@ namespace OurSonic.Level
 
         public SpriteCache()
         {
-            Rings = new List<ImageElement>();
-            TileChunks = new List<ImageElement>();
+            Rings = new List<CanvasInformation>();
+            TileChunks = new List<CanvasInformation>();
             Tilepieces = new JsDictionary<string, CanvasInformation>();
             Tiles = new List<ImageElement>();
             SonicSprites = new JsDictionary<string, ImageElement>();

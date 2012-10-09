@@ -91,10 +91,16 @@ namespace OurSonic.Utility
             return ( ( j % n ) + n ) % n;
         }
 
-        public static ImageElement ScaleSprite(ImageElement image, Point scale, Action<ImageElement> complete)
+        public static CanvasInformation ScaleSprite(ImageElement image, Point scale)
         {
-            var data = GetImageData(image);
-            return LoadSprite(GetBase64Image(ScalePixelData(scale, data)), complete);
+            var canv = CanvasInformation.Create(image.Width * scale.X, image.Height * scale.Y);
+
+            canv.Context.Save();
+            canv.Context.Scale(scale.X, scale.Y);
+            canv.Context.DrawImage(image, 0, 0);
+            canv.Context.Restore();
+
+            return canv;
         }
 
         public static ImageData ScalePixelData(Point scale, ImageData data)
@@ -105,7 +111,7 @@ namespace OurSonic.Utility
             for (int f = 0; f < pixelArray.Length; f += 4) {
                 colors[f / 4] = ( ColorObjectFromData(pixelArray, f) );
             }
-            var d = DefaultCanvas(0, 0).Context.CreateImageData(data.Width * scale.X, data.Height * scale.Y);
+            var d = CanvasInformation.Create(1, 1).Context.CreateImageData(data.Width * scale.X, data.Height * scale.Y);
             SetDataFromColors(d.Data, colors, scale, data.Width, colors[0]);
             return d;
         }
@@ -189,7 +195,7 @@ namespace OurSonic.Utility
                 colors[f] = new Color(c[0], c[1], c[2], c[3]);
             }
 
-            var dc = DefaultCanvas(0, 0);
+            var dc = CanvasInformation.Create(1, 1);
             var d = dc.Context.CreateImageData(image.Width * scale.X, image.Height * scale.Y);
             SetDataFromColors(d.Data, colors, scale, image.Width, colors[0]);
             return LoadSprite(GetBase64Image(d), complete);
@@ -218,17 +224,6 @@ namespace OurSonic.Utility
             return sprite1;
         }
 
-        public static CanvasInformation DefaultCanvas(int w, int h)
-        {
-            var canvas = (CanvasElement) Document.CreateElement("canvas");
-
-            canvas.Width = w;
-            canvas.Height = h;
-
-            var ctx = (CanvasContext2D) canvas.GetContext("2d");
-            return new CanvasInformation(ctx, jQuery.FromElement(canvas));
-        }
-
         public static string DecodeString(string lvl)
         {
             return new Compressor().DecompressText(lvl);
@@ -236,17 +231,23 @@ namespace OurSonic.Utility
 
         public static void DecodeString<T>(string lvl, Action<T> complete)
         {
-            new FunctionWorker("lib/FunctionWorker.js").ThreadedFunction<string, string>
-                    ((e) => {
-                         FunctionWorker.ImportScripts("RawDeflate.js");
 
-                         e.Data = new Compressor().DecompressText(e.Data);
+            if (FunctionWorker.HasWebWorker()) {
+                new FunctionWorker("lib/FunctionWorker.js").ThreadedFunction<string, string>
+                        ((e) => {
+                             FunctionWorker.ImportScripts("RawDeflate.js");
 
-                         e.Callback(e.Data);
-                     },
-                     (e) => complete(Json.Parse<T>(e.Data)),
-                     (e) => { },
-                     lvl);
+                             e.Data = new Compressor().DecompressText(e.Data);
+
+                             e.Callback(e.Data);
+                         },
+                         (e) => complete(Json.Parse<T>(e.Data)),
+                         (e) => { },
+                         lvl);
+            } else {
+                complete(Json.Parse<T>(new Compressor().DecompressText(lvl)));
+            }
+            
         }
 
         [InlineCode("debugger")]
@@ -379,7 +380,7 @@ namespace OurSonic.Utility
 
         public static CanvasInformation SafeResize(CanvasInformation block, int width, int height)
         {
-            var m = DefaultCanvas(width, height);
+            var m = CanvasInformation.Create(width, height);
             /*var img=block.Context.GetImageData(0, 0, block.Canvas.Width, block.Canvas.Height);
             m.Context.PutImageData(img, 0, 0);*/
             m.Context.DrawImage(block.Canvas, 0, 0);

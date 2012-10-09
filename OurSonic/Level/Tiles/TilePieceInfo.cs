@@ -1,14 +1,21 @@
+using System.Runtime.CompilerServices;
 using OurSonicModels;
 namespace OurSonic.Level.Tiles
 {
     public class TilePieceInfo
     {
         private TilePiece block;
+        [IntrinsicProperty]
         public int Block { get; set; }
+        [IntrinsicProperty]
         public bool XFlip { get; set; }
+        [IntrinsicProperty]
         public bool YFlip { get; set; }
+        [IntrinsicProperty]
         public Solidity Solid1 { get; set; }
+        [IntrinsicProperty]
         public Solidity Solid2 { get; set; }
+        [IntrinsicProperty]
         public int Index { get; set; }
 
         public TilePiece GetTilePiece()

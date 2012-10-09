@@ -82,8 +82,8 @@ namespace OurSonic.Level.Objects
             for (var i = 0; i < Pieces.Count; i++) {
                 var j = Pieces[i];
                 if (showImages) {
-                    LevelObjectPiece piece = SonicManager.Instance.UIManager.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Pieces[j.PieceIndex];
-                    var asset = SonicManager.Instance.UIManager.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Assets[piece.AssetIndex];
+                    LevelObjectPiece piece = SonicManager.Instance.UIManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Pieces[j.PieceIndex];
+                    var asset = SonicManager.Instance.UIManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Assets[piece.AssetIndex];
                     if (asset.Frames.Count > 0) {
                         LevelObjectAssetFrame frm = asset.Frames[j.FrameIndex];
                         drawRadial = SonicManager.Instance.mainCanvas.Context.CreateRadialGradient(0, 0, 0, 10, 10, 50);
@@ -123,7 +123,7 @@ namespace OurSonic.Level.Objects
             canvas.Restore();
         }
 
-        public void Draw(CanvasContext2D canvas, int x, int y, Point scale, LevelObject framework, LevelObjectInfo instance, bool showHeightMap)
+        public void Draw(CanvasContext2D canvas, int x, int y, LevelObject framework, LevelObjectInfo instance, bool showHeightMap)
         {
             for (var i = 0; i < instance.Pieces.Count; i++) {
                 var j = instance.Pieces[i];
@@ -133,8 +133,8 @@ namespace OurSonic.Level.Objects
                 if (asset.Frames.Count > 0) {
                     var frm = asset.Frames[j.FrameIndex];
                     frm.DrawUI(canvas,
-                               new Point(( x + j.X * scale.X ) - ( frm.OffsetX * scale.X ), ( y + j.Y * scale.Y ) - ( frm.OffsetY * scale.Y )),
-                               new Point(frm.Width * scale.X, frm.Height * scale.Y),
+                               new Point(( x + j.X ) - ( frm.OffsetX ), ( y + j.Y ) - ( frm.OffsetY )),
+                               new Point(frm.Width, frm.Height),
                                false,
                                showHeightMap,
                                showHeightMap,

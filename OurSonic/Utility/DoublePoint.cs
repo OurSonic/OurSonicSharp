@@ -34,6 +34,11 @@ namespace OurSonic.Utility
             return new DoublePoint(X - x, Y - y);
         }
 
+        public static implicit operator DoublePoint(Point p)
+        {
+            return new DoublePoint(p.X, p.Y);
+        }
+
         public string String()
         {
             return string.Format("{{X:{0}, Y:{1}}}", X, Y);

@@ -53,10 +53,10 @@ namespace OurSonic.Sonic
             return SensorResults[mn];
         }
 
-        public void Draw(CanvasContext2D canvas, Point scale, Sonic sonic)
+        public void Draw(CanvasContext2D canvas, Sonic sonic)
         {
             foreach (var sensor in Sensors) {
-                sensor.Value.Draw(canvas, scale, sonic, SensorResults[sensor.Key]);
+                sensor.Value.Draw(canvas, sonic, SensorResults[sensor.Key]);
             }
         }
     }
@@ -399,8 +399,8 @@ namespace OurSonic.Sonic
                         int[] heightMaskItems = null;
                         if (heightMask == null) continue;
                         Solidity mj;
-                        if (heightMask == 0 || heightMask == 1) {
-                            mj = heightMask == 0 ? 0 : tp.Solid1;
+                        if (heightMask .Full!=null) {
+                            mj = !heightMask.Full.Value ? 0 : tp.Solid1;
                             for (__y = 0; __y < 16; __y++) {
                                 for (__x = 0; __x < 16; __x++) {
                                     hb1[( _x * 16 + __x )][( _y * 16 + __y )] = mj;
@@ -431,7 +431,7 @@ namespace OurSonic.Sonic
                                     }
                                 }
 
-                                if (!( heightMask == 0 || heightMask == 1 )) {
+                                if (heightMask.Full==null) {
                                     switch (tp.Solid1) {
                                         case 0:
                                             hb1[( _x * 16 + jx )][( _y * 16 + jy )] = 0;
@@ -490,8 +490,9 @@ namespace OurSonic.Sonic
 
                         int[] hd2Items = null;
 
-                        if (hd2 == 0 || hd2 == 1) {
-                            mj = hd2 == 0 ? 0 : tp.Solid2;
+                        if (hd2.Full != null)
+                        {
+                            mj = hd2.Full==false ? 0 : tp.Solid2;
                             for (__y = 0; __y < 16; __y++) {
                                 for (__x = 0; __x < 16; __x++) {
                                     hb2[( _x * 16 + __x )][( _y * 16 + __y )] = mj;
@@ -522,7 +523,8 @@ namespace OurSonic.Sonic
                                     }
                                 }
 
-                                if (!( hd2 == 0 || hd2 == 1 )) {
+                                if (hd2.Full == null)
+                                {
                                     switch (tp.Solid2) {
                                         case (Solidity) 0:
                                             hb2[( _x * 16 + jx )][( _y * 16 + jy )] = Solidity.NotSolid;
@@ -543,7 +545,7 @@ namespace OurSonic.Sonic
             }
         }
 
-        public void Draw(CanvasContext2D canvas, Point scale, Sonic character, SensorM sensorResult)
+        public void Draw(CanvasContext2D canvas, Sonic character, SensorM sensorResult)
         {
             var x = Help.Floor(character.X) - SonicManager.Instance.WindowLocation.X;
             var y = Help.Floor(character.Y) - SonicManager.Instance.WindowLocation.Y;
@@ -558,20 +560,20 @@ namespace OurSonic.Sonic
             }
             switch (character.Mode) {
                 case RotationMode.Floor:
-                    canvas.MoveTo(( x + X1 ) * scale.X, ( y + Y1 ) * scale.Y);
-                    canvas.LineTo(( x + X2 ) * scale.X, ( y + Y2 ) * scale.Y);
+                    canvas.MoveTo(( x + X1 ), ( y + Y1 ));
+                    canvas.LineTo(( x + X2 ), ( y + Y2 ));
                     break;
                 case RotationMode.LeftWall:
-                    canvas.MoveTo(( x - Y1 ) * scale.X, ( y + X1 ) * scale.Y);
-                    canvas.LineTo(( x - Y2 ) * scale.X, ( y + X2 ) * scale.Y);
+                    canvas.MoveTo(( x - Y1 ), ( y + X1 ));
+                    canvas.LineTo(( x - Y2 ), ( y + X2 ));
                     break;
                 case RotationMode.Ceiling:
-                    canvas.MoveTo(( x - X1 ) * scale.X, ( y - Y1 ) * scale.Y);
-                    canvas.LineTo(( x - X2 ) * scale.X, ( y - Y2 ) * scale.Y);
+                    canvas.MoveTo(( x - X1 ), ( y - Y1 ));
+                    canvas.LineTo(( x - X2 ), ( y - Y2 ));
                     break;
                 case RotationMode.RightWall:
-                    canvas.MoveTo(( x + Y1 ) * scale.X, ( y - X1 ) * scale.Y);
-                    canvas.LineTo(( x + Y2 ) * scale.X, ( y - X2 ) * scale.Y);
+                    canvas.MoveTo(( x + Y1 ), ( y - X1 ));
+                    canvas.LineTo(( x + Y2 ), ( y - X2 ));
                     break;
             }
 

@@ -7,7 +7,7 @@ namespace OurSonic.UIManager.Areas
     {
         public ColorEditorArea(UIManager uiManager)
         {
-            var colorEditorArea = uiManager.ColorEditorArea = new UIArea<ColorEditorAreaData>(new ColorEditorAreaData(), 650, 30, 960, 800) {Closable = true};
+            var colorEditorArea = uiManager.UIManagerAreas.ColorEditorArea = new UIArea<ColorEditorAreaData>(new ColorEditorAreaData(), 650, 30, 960, 800) {Closable = true};
 
             colorEditorArea.Visible = false;
             uiManager.AddArea(colorEditorArea);

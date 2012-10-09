@@ -67,7 +67,7 @@ namespace OurSonic.UIManager
             canv.Save();
 
             if (CachedDrawing.Falsey()) {
-                var cg = Help.DefaultCanvas(Width + 20, Height + 20);
+                var cg = CanvasInformation.Create(Width + 20, Height + 20);
                 var cv = cg.Context;
                 cv.Translate(10, 10);
 

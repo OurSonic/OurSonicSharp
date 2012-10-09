@@ -23,5 +23,20 @@ namespace OurSonic.Utility
         {
             return new T[0];
         }
+
+        public static ExtraData<T, T2> WithData<T, T2>(this T item, T2 data)
+        {
+            return new ExtraData<T, T2>(item, data);
+        }
+
+        public static string Percent(this int num)
+        {
+            return num + "%";
+        }
+
+        public static string Percent(this double num)
+        {
+            return num + "%";
+        }
     }
 }

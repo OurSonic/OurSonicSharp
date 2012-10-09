@@ -16,9 +16,9 @@ namespace OurSonic.UIManager.Areas
             var size = 40 * 4;
 
             objectFrameworkArea = new UIArea<ObjectFrameworkData>(new ObjectFrameworkData() {ObjectFramework = new LevelObject("Foo")}, 540, 75, 850, 690) {Closable = true};
-            objectFrameworkArea.Visible = true;
+            objectFrameworkArea.Visible = false;
             manager.AddArea(objectFrameworkArea);
-            manager.ObjectFrameworkArea = this;
+            manager.UIManagerAreas.ObjectFrameworkArea = this;
 
             objectFrameworkArea.AddControl(new TextArea(30, 25, "Object Framework") {Color = "blue"});
 
@@ -362,10 +362,10 @@ namespace OurSonic.UIManager.Areas
             for (var i = 0; i < objectFrameworkArea.Data.ObjectFramework.Assets.Count; i++) {
                 ImageButton<LevelObjectAsset> bd = new ImageButton<LevelObjectAsset>(null, 0, 0, 0, 0);
                 bd.Text = ( (Func<string>) ( () => { return bd.Data.Name; } ) );
-                bd.Image = (canvas, x, y) => {
-                               if (bd.Data.Frames.Count == 0) return;
-                               bd.Data.Frames[0].DrawSimple(canvas, new Point(x, y), bd.Width, bd.Height - 15, projectile.Xflip, projectile.Yflip);
-                           };
+                bd.OnDraw = (canvas, x, y) => {
+                                if (bd.Data.Frames.Count == 0) return;
+                                bd.Data.Frames[0].DrawSimple(canvas, new Point(x, y), bd.Width, bd.Height - 15, projectile.Xflip, projectile.Yflip);
+                            };
                 bd.Click = (p) => {
                                for (var j = 0; j < jd.Controls.Count; j++) {
                                    if (jd.Controls[j] == bd) {
@@ -419,12 +419,12 @@ namespace OurSonic.UIManager.Areas
             for (var i = 0; i < objectFrameworkArea.Data.ObjectFramework.Pieces.Count; i++) {
                 ImageButton<ObjectFrameworkAreaPiece> bdc = new ImageButton<ObjectFrameworkAreaPiece>(null, 0, 0, 0, 0);
                 bdc.Text = ( (Func<string>) ( () => objectFrameworkArea.Data.ObjectFramework.Pieces[bdc.Data.index].Name ) );
-                bdc.Image = (canvas, x, y) => {
-                                var d = objectFrameworkArea.Data.ObjectFramework.Pieces[bdc.Data.index];
-                                var ast = objectFrameworkArea.Data.ObjectFramework.Assets[d.AssetIndex];
-                                if (ast.Frames.Count == 0) return;
-                                ast.Frames[0].DrawSimple(canvas, new Point(x, y), bdc.Width, bdc.Height - 15, d.Xflip, d.Yflip);
-                            };
+                bdc.OnDraw = (canvas, x, y) => {
+                                 var d = objectFrameworkArea.Data.ObjectFramework.Pieces[bdc.Data.index];
+                                 var ast = objectFrameworkArea.Data.ObjectFramework.Assets[d.AssetIndex];
+                                 if (ast.Frames.Count == 0) return;
+                                 ast.Frames[0].DrawSimple(canvas, new Point(x, y), bdc.Width, bdc.Height - 15, d.Xflip, d.Yflip);
+                             };
                 bdc.Click = (p) => {
                                 ( (ImageButton<LevelObjectPieceLayoutPiece>) objectFrameworkArea.Data.ListOfPieces.Controls[objectFrameworkArea.Data.MainPanel.Data.pe.PieceLayoutMaker.SelectedPieceIndex] ).Data.PieceIndex = bdc.Data.index;
 
@@ -507,12 +507,12 @@ namespace OurSonic.UIManager.Areas
             for (var i = 0; i < pieceLayout.Pieces.Count; i++) {
                 ImageButton<LevelObjectPieceLayoutPiece> bd = new ImageButton<LevelObjectPieceLayoutPiece>(null, 0, 0, 0, 0);
                 bd.Text = (Func<string>) ( () => { return objectFrameworkArea.Data.ObjectFramework.Pieces[bd.Data.PieceIndex].Name; } );
-                bd.Image = (canvas, x, y) => {
-                               var pc = objectFrameworkArea.Data.ObjectFramework.Pieces[bd.Data.PieceIndex];
-                               var ast = objectFrameworkArea.Data.ObjectFramework.Assets[pc.AssetIndex];
-                               if (ast.Frames.Count == 0) return;
-                               ast.Frames[0].DrawSimple(canvas, new Point(x, y), bd.Width, bd.Height - 15, pc.Xflip, pc.Yflip);
-                           };
+                bd.OnDraw = (canvas, x, y) => {
+                                var pc = objectFrameworkArea.Data.ObjectFramework.Pieces[bd.Data.PieceIndex];
+                                var ast = objectFrameworkArea.Data.ObjectFramework.Assets[pc.AssetIndex];
+                                if (ast.Frames.Count == 0) return;
+                                ast.Frames[0].DrawSimple(canvas, new Point(x, y), bd.Width, bd.Height - 15, pc.Xflip, pc.Yflip);
+                            };
                 bd.Click = (p) => {
                                for (var j = 0; j < objectFrameworkArea.Data.ListOfPieces.Controls.Count; j++) {
                                    if (bd == objectFrameworkArea.Data.ListOfPieces.Controls[j]) {
@@ -569,10 +569,10 @@ namespace OurSonic.UIManager.Areas
                 ImageButton<LevelObjectAsset> bd1 = bd;
                 bd.Text = ( (Func<string>) ( () => bd1.Data.Name ) );
 
-                bd.Image = (canvas, x, y) => {
-                               if (bd1.Data.Frames.Count == 0) return;
-                               bd1.Data.Frames[0].DrawSimple(canvas, new Point(x, y), bd1.Width, bd1.Height - 15, piece.Xflip, piece.Yflip);
-                           };
+                bd.OnDraw = (canvas, x, y) => {
+                                if (bd1.Data.Frames.Count == 0) return;
+                                bd1.Data.Frames[0].DrawSimple(canvas, new Point(x, y), bd1.Width, bd1.Height - 15, piece.Xflip, piece.Yflip);
+                            };
                 bd.Click = (p) => {
                                for (var j = 0; j < jd.Controls.Count; j++) {
                                    if (jd.Controls[j] == bd1) {
@@ -631,8 +631,8 @@ namespace OurSonic.UIManager.Areas
                                                                             bd = new ImageButton<LevelObjectAssetFrame>(null, 0, 0, 0, 0);
 
                                                                             bd.Text = ( (Func<string>) ( () => { return bd.Data.Name; } ) );
-                                                                            bd.Image = (canvas, x, y) =>
-                                                                                       bd.Data.DrawSimple(canvas, new Point(x, y), bd.Width, bd.Height - 15, false, false);
+                                                                            bd.OnDraw = (canvas, x, y) =>
+                                                                                        bd.Data.DrawSimple(canvas, new Point(x, y), bd.Width, bd.Height - 15, false, false);
 
                                                                             bd.Click = (p) => objectFrameworkArea.Data.MainPanel.Data.LoadFrame(bd.Data);
 
@@ -745,9 +745,9 @@ namespace OurSonic.UIManager.Areas
                                                                     objectFrameworkArea.Data.MainPanel.Data.FrameArea.AddControl(new Button(230 - 55, 305 + 11 * 2, 310, 25, "Edit Map") {
                                                                                                                                                                                                  Color = "rgb(50,150,50)",
                                                                                                                                                                                                  Click = (p) => {
-                                                                                                                                                                                                             SonicManager.Instance.UIManager.ColorEditorArea.Data.Init(frame);
-                                                                                                                                                                                                             SonicManager.Instance.UIManager.ColorEditorArea.Visible = true;
-                                                                                                                                                                                                             SonicManager.Instance.UIManager.ColorEditorArea.Depth = /*this.Depth + 1*/ 10;
+                                                                                                                                                                                                             SonicManager.Instance.UIManager.UIManagerAreas.ColorEditorArea.Data.Init(frame);
+                                                                                                                                                                                                             SonicManager.Instance.UIManager.UIManagerAreas.ColorEditorArea.Visible = true;
+                                                                                                                                                                                                             SonicManager.Instance.UIManager.UIManagerAreas.ColorEditorArea.Depth = /*this.Depth + 1*/ 10;
                                                                                                                                                                                                              objectFrameworkArea.LoseFocus();
                                                                                                                                                                                                          }
                                                                                                                                                                                          });

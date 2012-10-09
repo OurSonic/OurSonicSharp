@@ -221,9 +221,9 @@ namespace OurSonic
                         b2 = false;
                 }
                 if (b1)
-                    SonicLevel.HeightMaps[i] = 0;
+                    SonicLevel.HeightMaps[i] = new HeightMap(false);
                 else if (b2)
-                    SonicLevel.HeightMaps[i] = 1;
+                    SonicLevel.HeightMaps[i] = new HeightMap(true);
                 else
                     SonicLevel.HeightMaps[i] = new HeightMap(sonicLevel.HeightMaps[i], i);
             }
@@ -269,7 +269,7 @@ namespace OurSonic
             SonicLevel.StartPositions = Script.Reinterpret<Point[]>(sonicLevel.StartPositions.Map(a => new Point(a.X, a.Y)));
 
             SonicLevel.PaletteItems = new List<List<PaletteItem>>();
-            if (sonicLevel.PaletteItems[0].Truthy()) {
+            if (sonicLevel.PaletteItems.Length > 0) {
                 SonicLevel.PaletteItems[0] = new List<PaletteItem>();
 
                 for (int k = 0; k < sonicLevel.PaletteItems[0].Length; k++) {
@@ -284,22 +284,25 @@ namespace OurSonic
                                               };
                 }
             }
-
             for (int kd = 0; kd < SonicLevel.TilePieces.Count; kd++) {
                 var dj = SonicLevel.TilePieces[kd];
                 dj.AnimatedFrames = new int[0];
-                for (int index = 0; index < dj.Tiles.Count; index++) {
-                    var mj = dj.Tiles[index];
-                    Tile tile = mj.GetTile();
-                    if (tile.Truthy()) {
-                        var pl = tile.GetAllPaletteIndexes();
-                        for (int k = 0; k < SonicLevel.PaletteItems[0].Count; k++) {
-                            var pal = SonicLevel.PaletteItems[0][k];
-                            foreach (var mjce in pal.Pieces) {
-                                PaletteItemPieces mje1 = mjce;
-                                if (mj.Palette == mje1.PaletteIndex) {
-                                    if (pl.Any(j => j == mje1.PaletteOffset / 2 || j == mje1.PaletteOffset / 2 + 1))
-                                        dj.AnimatedFrames[dj.AnimatedFrames.Length] = ( k );
+
+                if (sonicLevel.PaletteItems.Length > 0) {
+                    for (int index = 0; index < dj.Tiles.Count; index++) {
+                        var mj = dj.Tiles[index];
+                        Tile tile = mj.GetTile();
+                        if (tile.Truthy()) {
+                            var pl = tile.GetAllPaletteIndexes();
+
+                            for (int k = 0; k < SonicLevel.PaletteItems[0].Count; k++) {
+                                var pal = SonicLevel.PaletteItems[0][k];
+                                foreach (var mjce in pal.Pieces) {
+                                    PaletteItemPieces mje1 = mjce;
+                                    if (mj.Palette == mje1.PaletteIndex) {
+                                        if (pl.Any(j => j == mje1.PaletteOffset / 2 || j == mje1.PaletteOffset / 2 + 1))
+                                            dj.AnimatedFrames[dj.AnimatedFrames.Length] = ( k );
+                                    }
                                 }
                             }
                         }
@@ -308,15 +311,13 @@ namespace OurSonic
             }
 
             var finished = new Action(() => { Loading = false; });
-            PreloadSprites(Scale,
-                           () => {
+            PreloadSprites(() => {
                                finished();
                                ForceResize();
                            },
                            (s) => { Global.Console.Log("ff " + s); });
             ForceResize();
-
-            ;
+            OnLevelLoad(SonicLevel);
 
             /* 
 

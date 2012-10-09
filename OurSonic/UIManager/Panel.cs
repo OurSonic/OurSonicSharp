@@ -15,11 +15,6 @@ namespace OurSonic.UIManager
         {
             Data = data;
         }
-
-        public void Clear()
-        {
-            Controls.Clear();
-        }
     }
     public class Panel : Element
     {
@@ -27,8 +22,6 @@ namespace OurSonic.UIManager
         public List<Element> Controls { get; set; }
         [IntrinsicProperty]
         public bool Outline { get; set; }
-        [IntrinsicProperty]
-        public UIArea Area { get; set; }
 
         public Panel(int x, int y, int width, int height)
                 : base(x, y)
@@ -37,6 +30,11 @@ namespace OurSonic.UIManager
             Width = width;
             Height = height;
             Controls = new List<Element>();
+        }
+
+        public void Clear()
+        {
+            Controls.Clear();
         }
 
         public bool ChildrenAreEditing()
@@ -180,8 +178,7 @@ namespace OurSonic.UIManager
                       ( control.Y <= e.Y && control.Y + control.Height > e.Y && control.X <= e.X && control.X + control.Width > e.X ) )) {
                     e.X -= control.X;
                     e.Y -= control.Y;
-                    control.OnScroll(e);
-                    return false;
+                    return control.OnScroll(e);
                 }
             }
             return base.OnScroll(e);

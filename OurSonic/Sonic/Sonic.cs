@@ -123,7 +123,7 @@ namespace OurSonic.Sonic
                 Mode = RotationMode.Floor;
         }
 
-        public void Tick(SonicLevel sonicLevel, Point scale)
+        public void Tick(SonicLevel sonicLevel)
         {
             if (Debugging) {
                 var debugSpeed = Watcher.Multiply(15);
@@ -283,8 +283,8 @@ namespace OurSonic.Sonic
                 }
                 UpdateMode();
 
-                var cur = SonicManager.Instance.SpriteCache.SonicSprites[SpriteState + scale.X + scale.Y];
-                var __h = cur.Height / scale.Y / 2;
+                var cur = SonicManager.Instance.SpriteCache.SonicSprites[SpriteState];
+                var __h = cur.Height / 2;
 
                 sensorManager.Check(this);
                 var sensorC = sensorManager.GetResult("c");
@@ -412,29 +412,28 @@ namespace OurSonic.Sonic
 
         private Point GetOffsetFromImage()
         {
-            var scale = SonicManager.Instance.Scale;
-            var cur = SonicManager.Instance.SpriteCache.SonicSprites[SpriteState + scale.X + scale.Y];
+            var cur = SonicManager.Instance.SpriteCache.SonicSprites[SpriteState];
             var xOffset = 0;
             var yOffset = 0;
-            if (cur.Height != 40 * scale.X) {
+            if (cur.Height != 40) {
                 int n;
                 switch (Mode) {
                     case RotationMode.Floor:
 
                         n = 0;
-                        yOffset = ( 40 - ( ( cur.Height + n ) / scale.Y ) ) / 2;
+                        yOffset = ( 40 - ( ( cur.Height + n ) ) ) / 2;
                         break;
                     case RotationMode.LeftWall:
                         n = 15;
-                        xOffset = -( 40 - ( ( cur.Height + n ) / scale.X ) ) / 2;
+                        xOffset = -( 40 - ( ( cur.Height + n ) ) ) / 2;
                         break;
                     case RotationMode.Ceiling:
                         n = 8;
-                        yOffset = -( 40 - ( ( cur.Height + n ) / scale.Y ) ) / 2;
+                        yOffset = -( 40 - ( ( cur.Height + n ) ) ) / 2;
                         break;
                     case RotationMode.RightWall:
                         n = 9;
-                        xOffset = ( 40 - ( ( cur.Height + n ) / scale.X ) ) / 2;
+                        xOffset = ( 40 - ( ( cur.Height + n ) ) ) / 2;
                         break;
                 }
             }
@@ -742,25 +741,25 @@ namespace OurSonic.Sonic
             Y = ( ( sonicLevel.LevelHeight * 128 ) + ( Y + Ysp ) ) % ( sonicLevel.LevelHeight * 128 );
         }
 
-        public void Draw(CanvasContext2D canvas, Point scale)
+        public void Draw(CanvasContext2D canvas)
         {
             var fx = ( X );
             var fy = ( Y );
 
             if (Invulnerable()) return;
-            var cur = SonicManager.Instance.SpriteCache.SonicSprites[SpriteState + scale.X + scale.Y];
+            var cur = SonicManager.Instance.SpriteCache.SonicSprites[SpriteState];
             if (cur == null) {}
 
             if (cur.Loaded()) {
                 canvas.Save();
                 var offset = GetOffsetFromImage();
-                canvas.Translate(( fx - SonicManager.Instance.WindowLocation.X + offset.X ) * scale.X,
-                                 ( ( fy - SonicManager.Instance.WindowLocation.Y + offset.Y ) * scale.Y ));
+                canvas.Translate(( fx - SonicManager.Instance.WindowLocation.X + offset.X ),
+                                 ( ( fy - SonicManager.Instance.WindowLocation.Y + offset.Y ) ));
                 if (SonicManager.Instance.ShowHeightMap) {
                     canvas.Save();
                     var mul = 6;
-                    var xj = Xsp * scale.X * mul;
-                    var yj = Ysp * scale.Y * mul;
+                    var xj = Xsp * mul;
+                    var yj = Ysp * mul;
                     canvas.BeginPath();
                     canvas.MoveTo(0, 0);
                     canvas.LineTo(xj, yj);
@@ -789,9 +788,9 @@ namespace OurSonic.Sonic
                     if (SpinDash) {
                         canvas.DrawImage(
                                 SonicManager.Instance.SpriteCache.SonicSprites[
-                                        ( "spinsmoke" + ( SonicManager.Instance.DrawTickCount % 14 ) / 2 ) + scale.X + scale.Y],
-                                ( -cur.Width / 2 ) - 25 * scale.X,
-                                -cur.Height / 2 + ( offset.Y * scale.Y ) - 14,
+                                        ( "spinsmoke" + ( SonicManager.Instance.DrawTickCount % 14 ) / 2 )],
+                                ( -cur.Width / 2 ) - 25,
+                                -cur.Height / 2 + ( offset.Y ) - 14,
                                 cur.Width,
                                 cur.Height);
                     }
@@ -803,9 +802,9 @@ namespace OurSonic.Sonic
                     if (SpinDash) {
                         canvas.DrawImage(
                                 SonicManager.Instance.SpriteCache.SonicSprites[
-                                        ( "spinsmoke" + ( SonicManager.Instance.DrawTickCount % 14 ) / 2 ) + scale.X + scale.Y],
-                                ( -cur.Width / 2 ) - 25 * scale.X,
-                                -cur.Height / 2 + ( offset.Y * scale.Y ) - 14,
+                                        ( "spinsmoke" + ( SonicManager.Instance.DrawTickCount % 14 ) / 2 )],
+                                ( -cur.Width / 2 ) - 25,
+                                -cur.Height / 2 + ( offset.Y ) - 14,
                                 cur.Width,
                                 cur.Height);
                     }
@@ -837,21 +836,21 @@ namespace OurSonic.Sonic
                 */
                 canvas.Restore();
                 if (SonicManager.Instance.ShowHeightMap)
-                    sensorManager.Draw(canvas, scale, this);
+                    sensorManager.Draw(canvas, this);
                 for (var i = 0; i < HaltSmoke.Count; i++) {
                     var lo = HaltSmoke[i];
                     canvas.DrawImage(
                             SonicManager.Instance.SpriteCache.SonicSprites[
-                                    ( "haltsmoke" + ( SonicManager.Instance.DrawTickCount % ( 4 * 6 ) ) / 6 ) + scale.X + scale.Y],
-                            ( ( lo.X - SonicManager.Instance.WindowLocation.X - 25 ) * scale.X ),
-                            ( ( lo.Y + 12 - SonicManager.Instance.WindowLocation.Y + offset.Y ) * scale.Y ));
+                                    ( "haltsmoke" + ( SonicManager.Instance.DrawTickCount % ( 4 * 6 ) ) / 6 )],
+                            ( ( lo.X - SonicManager.Instance.WindowLocation.X - 25 ) ),
+                            ( ( lo.Y + 12 - SonicManager.Instance.WindowLocation.Y + offset.Y ) ));
                     if (( ( SonicManager.Instance.DrawTickCount + 6 ) % ( 4 * 6 ) ) / 6 == 0)
                         HaltSmoke = HaltSmoke.Extract(i, 1);
                 }
             }
         }
 
-        public void DrawUI(CanvasContext2D canvas, Point pos, Point scale)
+        public void DrawUI(CanvasContext2D canvas, Point pos)
         {
             using (new CanvasHandler(canvas)) {
                 if (canvas.Font != "13pt Arial bold")
@@ -863,7 +862,7 @@ namespace OurSonic.Sonic
                 canvas.FillText("Speed: g: " + Gsp.ToFixed(3) + " x:" + Xsp.ToFixed(3) + " y:" + Ysp.ToFixed(3), pos.X + 90, pos.Y + 135);
                 canvas.FillText("Mode: " + Mode.ToString(), pos.X + 90, pos.Y + 165);
                 canvas.FillText("Multiplier: " + Watcher.mult, pos.X + 90, pos.Y + 195);
-                canvas.FillText("RealScale: " + SonicManager.Instance.RealScale.String(), pos.X + 90, pos.Y + 225);
+//                canvas.FillText("RealScale: " + SonicManager.Instance.RealScale.String(), pos.X + 90, pos.Y + 225);
                 if (InAir)
                     canvas.FillText("Air ", pos.X + 220, pos.Y + 45);
                 if (HLock > 0)

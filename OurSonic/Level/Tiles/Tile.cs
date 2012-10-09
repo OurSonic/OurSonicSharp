@@ -42,28 +42,27 @@ namespace OurSonic.Level.Tiles
 
         public void Draw(CanvasContext2D canvas,
                          Point pos,
-                         Point scale,
                          bool xflip,
                          bool yflip,
                          int palette,
                          int layer,
                          int animationFrame)
         {
-            if (CheckGood(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame))
+            if (CheckGood(canvas, pos, xflip, yflip, palette, layer, animationFrame))
                 return;
-            var cx = Colors.Length * scale.X;
-            var cy = Colors.Length * scale.Y;
-            var j = Help.DefaultCanvas(cx, cy);
+            var cx = (int) ( Colors.Length );
+            var cy = (int) ( Colors.Length );
+            var j = CanvasInformation.Create(cx, cy);
 
             if (pos.X < 0 || pos.Y < 0)
                 return;
             var oPos = new Point(0, 0);
             if (xflip) {
-                oPos.X = -Colors.Length * scale.X;
+                oPos.X = -Colors.Length;
                 j.Context.Scale(-1, 1);
             }
             if (yflip) {
-                oPos.Y = -Colors.Length * scale.Y;
+                oPos.Y = -Colors.Length;
                 j.Context.Scale(1, -1);
             }
             var palette_ = SonicManager.Instance.SonicLevel.Palette;
@@ -75,8 +74,8 @@ namespace OurSonic.Level.Tiles
             j.Context.Save();
 
             int index0 = ( palette + indexed ) % palette_.Length;
-            int x = oPos.X;
-            int y = oPos.Y;
+            var x = oPos.X;
+            var y = oPos.Y;
 
             for (int i = 0; i < mx; i++) {
                 for (int jf = 0; jf < my; jf++) {
@@ -87,13 +86,13 @@ namespace OurSonic.Level.Tiles
                     if (j.Context.FillStyle != col)
                         j.Context.FillStyle = col;
 
-                    j.Context.FillRect(x + ( i * scale.X ), y + jf * scale.Y, scale.X, scale.Y);
+                    j.Context.FillRect(x + ( i ), y + jf, 1, 1);
                 }
             }
 
-//            j.Context.StrokeStyle = "#7CF1FF";
-//            j.Context.LineWidth = 4;
-//            j.Context.StrokeRect(0, 0, cx, cy);
+            //            j.Context.StrokeStyle = "#7CF1FF";
+            //            j.Context.LineWidth = 4;
+            //            j.Context.StrokeRect(0, 0, cx, cy);
 
             j.Context.Restore();
 
@@ -102,7 +101,7 @@ namespace OurSonic.Level.Tiles
             if (ShowOutline) {
                 canvas.StrokeStyle = "#DD0033";
                 canvas.LineWidth = 3;
-                canvas.StrokeRect(pos.X, pos.Y, 8 * scale.X, 8 * scale.Y);
+                canvas.StrokeRect(pos.X, pos.Y, 8 * 1, 8 * 1);
             }
         }
 
@@ -113,7 +112,6 @@ namespace OurSonic.Level.Tiles
 
         private bool CheckGood(CanvasContext2D canvas,
                                Point pos,
-                               Point scale,
                                bool xflip,
                                bool yflip,
                                int palette,
@@ -134,7 +132,7 @@ namespace OurSonic.Level.Tiles
                     if (va.Truthy()) {
                         if (canvas.FillStyle != "rbga(255,255,255,255)")
                             canvas.FillStyle = "rbga(255,255,255,255)";
-                        va.Draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
+                        va.Draw(canvas, pos, xflip, yflip, palette, layer, animationFrame);
                         return true;
                     }
                     return false;
@@ -155,7 +153,7 @@ namespace OurSonic.Level.Tiles
                         if (va.Truthy()) {
                             if (canvas.FillStyle != "rbga(255,255,255,255)")
                                 canvas.FillStyle = "rbga(255,255,255,255)";
-                            va.Draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
+                            va.Draw(canvas, pos, xflip, yflip, palette, layer, animationFrame);
                             return true;
                         }
                     }
@@ -212,50 +210,5 @@ namespace OurSonic.Level.Tiles
             CurPaletteIndexes = null;
         }
 
-        /*   
-         
-            this.drawUI = function (canvas, pos, scale, xflip, yflip, palette) {
-
-
-                for (var i = 0; i < this.colors.length; i++) {
-                    for (var j = 0; j < this.colors[i].length; j++) {
-                        var gj = this.colors[i][j];
-                        if (gj == 0) continue;
-
-                        //canvas.drawImage(sonicManager.SonicLevel.Palette[palette][gj], pos.x + ((i)) * scale.x, pos.y + (j) * scale.y, scale.x, scale.y);
-
-                        var m = sonicManager.SonicLevel.Palette[palette][gj];
-                        if (canvas.fillStyle != "#" + m)
-                            canvas.fillStyle = "#" + m;
-
-                        if (xflip) {
-                            if (yflip) {
-                                canvas.fillRect(pos.x + (7 - (i)) * scale.x, pos.y + (7 - j) * scale.y, scale.x, scale.y);
-                            } else {
-                                canvas.fillRect(pos.x + (7 - (i)) * scale.x, pos.y + (j) * scale.y, scale.x, scale.y);
-
-                            }
-                        } else {
-                            if (yflip) {
-                                canvas.fillRect(pos.x + ((i)) * scale.x, pos.y + (7 - j) * scale.y, scale.x, scale.y);
-                            } else {
-                                canvas.fillRect(pos.x + ((i)) * scale.x, pos.y + (j) * scale.y, scale.x, scale.y);
-                            }
-                        }
-
-
-                    }
-                }
-
-                /*  if (showOutline) {
-                canvas.strokeStyle = "#DD0033";
-                canvas.lineWidth = 3;
-                canvas.strokeRect(pos.x, pos.y, 8 * scale.x, 8 * scale.y);
-                }#1#
-
-
-            };
-     
-            };*/
-    }
+     }
 }

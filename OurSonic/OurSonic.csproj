@@ -59,6 +59,11 @@
     <Compile Include="Sonic\SensorManager.cs" />
     <Compile Include="Sonic\Sonic.cs" />
     <Compile Include="Sonic\SonicConstants.cs" />
+    <Compile Include="UIManager\Areas\TileChunkArea.cs" />
+    <Compile Include="UIManager\Image.cs" />
+    <Compile Include="UIManager\Table.cs" />
+    <Compile Include="UIManager\LayoutPanel.cs" />
+    <Compile Include="UIManager\UIManagerAreas.cs" />
     <Compile Include="Utility\CanvasInformation.cs" />
     <Compile Include="Utility\ClickState.cs" />
     <Compile Include="Utility\Color.cs" />
@@ -66,6 +71,7 @@
     <Compile Include="Utility\Constants.cs" />
     <Compile Include="Utility\DoublePoint.cs" />
     <Compile Include="Utility\Dragger.cs" />
+    <Compile Include="Utility\ExtraData.cs" />
     <Compile Include="Utility\GameState.cs" />
     <Compile Include="Utility\IntersectingRectangle.cs" />
     <Compile Include="SpeedTester.cs" />
@@ -102,6 +108,7 @@
     <Compile Include="UIManager\UIManager.cs" />
     <Compile Include="Utility\Point.cs" />
     <Compile Include="Utility\Rectangle.cs" />
+    <Compile Include="Utility\SizeNumber.cs" />
     <Compile Include="Utility\SpriteLoader.cs" />
   </ItemGroup>
   <ItemGroup>

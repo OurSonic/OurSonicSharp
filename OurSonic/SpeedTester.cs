@@ -12,7 +12,7 @@ namespace OurSonic
 
         public SpeedTester(CanvasInformation gameCanvas)
         {
-            var m = Help.DefaultCanvas(SIZE, SIZE);
+            var m = CanvasInformation.Create(SIZE, SIZE);
             gameCanvas.Canvas.Width = Window.OuterWidth;
             gameCanvas.Canvas.Height = Window.OuterHeight;
 
