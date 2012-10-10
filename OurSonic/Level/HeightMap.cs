@@ -59,6 +59,9 @@ namespace OurSonic.Level
 
         public void Draw(CanvasContext2D canvas, Point pos, bool xflip, bool yflip, int solid, int angle)
         {
+            if (this.Items == null) {
+                return;
+            }
             canvas.Save();
 
             var oPos = new Point(pos);

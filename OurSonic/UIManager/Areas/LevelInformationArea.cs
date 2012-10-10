@@ -81,12 +81,17 @@ setTimeout(tim, 100);*/
 
             SonicEngine.Instance.client.On<DataObject<string[]>>("GetLevels.Response",
                                                                  data => {
-                                                                     foreach (var uiArea in data.Data.OrderBy(a => a)) {
-                                                                         string area = uiArea;
-                                                                         ctls.AddControl(new Button(0, 0, 0, 0, uiArea) {
-                                                                                                                                Color = "rgb(50,190,90)",
-                                                                                                                                Click = (p) => { loadLevel(area); }
-                                                                                                                        });
+                                                                     bool load = true;
+                                                                     foreach (var level in data.Data.OrderBy(a => a)) {
+                                                                         if (load) {
+                                                                             loadLevel(level);
+                                                                             load = false;
+                                                                         }
+                                                                         string area = level;
+                                                                         ctls.AddControl(new Button(0, 0, 0, 0, level) {
+                                                                                                                               Color = "rgb(50,190,90)",
+                                                                                                                               Click = (p) => { loadLevel(area); }
+                                                                                                                       });
                                                                      }
                                                                  });
             SonicEngine.Instance.client.Emit("GetLevels.Request", null);
