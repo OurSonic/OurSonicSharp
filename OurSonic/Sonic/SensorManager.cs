@@ -399,7 +399,7 @@ namespace OurSonic.Sonic
                         int[] heightMaskItems = null;
                         if (heightMask == null) continue;
                         Solidity mj;
-                        if (heightMask .Full!=null) {
+                        if (heightMask.Full != null) {
                             mj = !heightMask.Full.Value ? 0 : tp.Solid1;
                             for (__y = 0; __y < 16; __y++) {
                                 for (__x = 0; __x < 16; __x++) {
@@ -431,7 +431,7 @@ namespace OurSonic.Sonic
                                     }
                                 }
 
-                                if (heightMask.Full==null) {
+                                if (heightMask.Full == null) {
                                     switch (tp.Solid1) {
                                         case 0:
                                             hb1[( _x * 16 + jx )][( _y * 16 + jy )] = 0;
@@ -490,9 +490,8 @@ namespace OurSonic.Sonic
 
                         int[] hd2Items = null;
 
-                        if (hd2.Full != null)
-                        {
-                            mj = hd2.Full==false ? 0 : tp.Solid2;
+                        if (hd2.Full != null) {
+                            mj = hd2.Full == false ? 0 : tp.Solid2;
                             for (__y = 0; __y < 16; __y++) {
                                 for (__x = 0; __x < 16; __x++) {
                                     hb2[( _x * 16 + __x )][( _y * 16 + __y )] = mj;
@@ -523,8 +522,7 @@ namespace OurSonic.Sonic
                                     }
                                 }
 
-                                if (hd2.Full == null)
-                                {
+                                if (hd2.Full == null) {
                                     switch (tp.Solid2) {
                                         case (Solidity) 0:
                                             hb2[( _x * 16 + jx )][( _y * 16 + jy )] = Solidity.NotSolid;

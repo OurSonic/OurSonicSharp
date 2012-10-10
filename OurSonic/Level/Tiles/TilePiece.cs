@@ -74,7 +74,6 @@ namespace OurSonic.Level.Tiles
             return ( onlyForeground = true );
         }
 
-
         public bool Draw(CanvasContext2D canvas,
                          Point position,
                          int layer,
@@ -113,7 +112,7 @@ namespace OurSonic.Level.Tiles
             var sY = 8;
             var i = 0;
 
-            var localPoint = new Point(0,0);
+            var localPoint = new Point(0, 0);
             foreach (TileItem t in Tiles.Array()) {
                 var mj = t;
                 var tile = t.GetTile();

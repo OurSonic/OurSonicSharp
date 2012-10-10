@@ -37,9 +37,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDB", "NodeLibraries\Mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redis", "NodeLibraries\Redis\Redis.csproj", "{5214FA01-BBBF-425F-B77D-1F6DA7AEB4ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketIO", "NodeLibraries\SocketIO\SocketIO.csproj", "{BD7C6F4F-3798-4C32-9EE1-306CF197F81E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeJS", "NodeLibraries\NodeJS\NodeJS.csproj", "{79800429-B885-4F5E-9A3B-48E50390214A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketIOLibrary", "NodeLibraries\SocketIO\SocketIOLibrary.csproj", "{BD7C6F4F-3798-4C32-9EE1-306CF197F81E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web Libraries", "Web Libraries", "{30533F63-54AD-409A-A380-1AC0CC71BCF9}"
 EndProject
@@ -48,6 +46,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonWebLibraries", "WebLibraries\CommonWebLibraries\CommonWebLibraries.csproj", "{6DA30112-FDBD-4E48-9F52-7268FCE19D25}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketIOWebLibrary", "WebLibraries\SocketIOWebLibrary\SocketIOWebLibrary.csproj", "{108D8A37-0782-4FFA-9A53-934E07B9B28A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeJS", "NodeLibraries\NodeJS\NodeJS.csproj", "{79800429-B885-4F5E-9A3B-48E50390214A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,10 +83,6 @@ Global
 		{5214FA01-BBBF-425F-B77D-1F6DA7AEB4ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD7C6F4F-3798-4C32-9EE1-306CF197F81E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BD7C6F4F-3798-4C32-9EE1-306CF197F81E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{79800429-B885-4F5E-9A3B-48E50390214A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{79800429-B885-4F5E-9A3B-48E50390214A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{79800429-B885-4F5E-9A3B-48E50390214A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{79800429-B885-4F5E-9A3B-48E50390214A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BBF1829B-3446-4C0D-A75A-9BC713D2A6A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BBF1829B-3446-4C0D-A75A-9BC713D2A6A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBF1829B-3446-4C0D-A75A-9BC713D2A6A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -99,6 +95,10 @@ Global
 		{108D8A37-0782-4FFA-9A53-934E07B9B28A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{108D8A37-0782-4FFA-9A53-934E07B9B28A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{108D8A37-0782-4FFA-9A53-934E07B9B28A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79800429-B885-4F5E-9A3B-48E50390214A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79800429-B885-4F5E-9A3B-48E50390214A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79800429-B885-4F5E-9A3B-48E50390214A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79800429-B885-4F5E-9A3B-48E50390214A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

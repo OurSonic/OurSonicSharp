@@ -1,11 +1,13 @@
-require('./mscorlib.node.debug.js');Enumerable=require('./linq.js');require('./RawDeflate.js');require('./OurSonicModels.js');
-Type.registerNamespace('OurSonicNode');
+require('./mscorlib.debug.js');Enumerable=require('./linq.js');require('./RawDeflate.js');require('./OurSonicModels.js');
+require('mscorlib');
+var fs = require('fs');
+var http = require('http');
+var socketio = require('socket.io');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicNode.Compress
-OurSonicNode.Compress = function() {
+var $OurSonicNode_Compress = function() {
 	var sb = new ss.StringBuilder();
 	var lines = [0];
-	var fs = require('fs');
 	var __dirname = 'C:\\code\\SonicImageParser\\data\\LevelOutput\\';
 	fs.readdir(__dirname, function(ex, ab) {
 		for (var $t1 = 0; $t1 < ab.length; $t1++) {
@@ -21,10 +23,10 @@ OurSonicNode.Compress = function() {
 							fs.unlink(__dirname + this.s1.$ + '\\' + this.s3.$);
 						}
 						var fm = (new Compressor()).CompressText(content);
-						fs.appendFile('abcdef.js', String.format('window.levelData[{0}] = \'{1}\';\r\n\r\n', lines[0]++, fm), 'utf8', function(a, b) {
+						fs.appendFile('abcdef.js', String.format('window.levelData[{0}] = \'{1}\';\r\n\r\n', lines[0]++, fm), 'utf8', function(ecr) {
 						});
 						var imj = (__dirname + this.s1.$ + '\\' + this.s3.$).replaceAll('.js', '.min.js');
-						fs.writeFile(imj, fm, function(a1, b1) {
+						fs.writeFile(imj, fm, function(ecr2) {
 						});
 					}));
 				}
@@ -34,8 +36,7 @@ OurSonicNode.Compress = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicNode.Server
-OurSonicNode.Server = function() {
-	this.$fs = null;
+var $OurSonicNode_Server = function() {
 	this.$levelData = null;
 	this.$objDirectory = '/usr/local/src/sonic/ObjectData/';
 	setInterval(function() {
@@ -43,25 +44,23 @@ OurSonicNode.Server = function() {
 	}, 10000);
 	this.$levelData = {};
 	//load();
-	var http = require('http');
 	var app = http.createServer(function(req, res) {
 		res.end();
 	});
-	var io = require('socket.io').listen(app);
-	this.$fs = require('fs');
+	var io = socketio.listen(app);
 	var fileData = [];
 	var fileNames = [];
 	var levelsDir = '/usr/local/src/sonic/LevelData/';
-	this.$fs.readdir(levelsDir, Function.mkdel(this, function(err, files) {
+	fs.readdir(levelsDir, function(err, files) {
 		for (var i = 0; i < files.length; i++) {
 			var i1 = { $: i };
 			fileNames[i1.$] = files[i].replaceAll('.min.js', '');
 			console.log(fileNames[i1.$] + ' loaded');
-			this.$fs.readFile(levelsDir + files[i], 'utf8', Function.mkdel({ i1: i1 }, function(er, file) {
+			fs.readFile(levelsDir + files[i], 'utf8', Function.mkdel({ i1: i1 }, function(er, file) {
 				fileData[this.i1.$] = file;
 			}));
 		}
-	}));
+	});
 	io.set('log level', 1);
 	app.listen(8998);
 	io.sockets.on('connection', Function.mkdel(this, function(socket) {
@@ -79,18 +78,18 @@ OurSonicNode.Server = function() {
 			socket.emit('LoadLevel.Response', new (Type.makeGenericType(OurSonicModels.Common.DataObject$1, [String]))(fileData[fileNames.indexOf(levelName1.Data)]));
 		});
 		socket.on('GetObject', Function.mkdel(this, function(_object) {
-			this.$fs.exists(this.$objDirectory + _object.Data + '.js', Function.mkdel(this, function(er1, exists) {
-				this.$fs.readFile(this.$objDirectory + _object.Data + '.js', 'utf8', function(err1, result) {
+			fs.exists(this.$objDirectory + _object.Data + '.js', Function.mkdel(this, function(exists) {
+				fs.readFile(this.$objDirectory + _object.Data + '.js', 'utf8', function(err1, result) {
 					socket.emit('GetObject.Response', new (Type.makeGenericType(OurSonicModels.Common.DataObject$1, [String]))(result));
 				});
 			}));
 		}));
 		socket.on('SaveObject', Function.mkdel(this, function(_object1) {
-			this.$fs.exists(this.$objDirectory + _object1.oldKey + '.js', Function.mkdel(this, function(er2, exists1) {
+			fs.exists(this.$objDirectory + _object1.oldKey + '.js', Function.mkdel(this, function(exists1) {
 				if (exists1) {
-					this.$fs.truncateSync(this.$objDirectory + _object1.oldKey + '.js', 0);
+					fs.unlinkSync(this.$objDirectory + _object1.oldKey + '.js');
 				}
-				this.$fs.writeFileSync(this.$objDirectory + _object1.key + '.js', _object1.data);
+				fs.writeFileSync(this.$objDirectory + _object1.key + '.js', _object1.data);
 				socket.emit('SaveObject.Response', { Data: true });
 			}));
 		}));
@@ -101,7 +100,7 @@ OurSonicNode.Server = function() {
 			}).toArray() });
 		}));
 		socket.on('GetAllObjects', Function.mkdel(this, function(_objects1) {
-			socket.emit('GetAllObjects.Response', { Data: Enumerable.from(this.$fs.readdirSync(this.$objDirectory)).where(function(a1) {
+			socket.emit('GetAllObjects.Response', { Data: Enumerable.from(fs.readdirSync(this.$objDirectory)).where(function(a1) {
 				return a1.endsWith('.js');
 			}).select(function(a2) {
 				return a2.replaceAll('.js', '');
@@ -109,7 +108,7 @@ OurSonicNode.Server = function() {
 		}));
 	}));
 };
-OurSonicNode.Server.prototype = {
+$OurSonicNode_Server.prototype = {
 	$_getObjects: function(_objects) {
 		return new ss.IteratorBlockEnumerable(function() {
 			return (function(_objects) {
@@ -131,13 +130,13 @@ OurSonicNode.Server.prototype = {
 									break $sm1;
 								}
 								_object = _objects[$t1];
-								if (!this.$fs.existsSync(this.$objDirectory + _object + '.js')) {
+								if (!fs.existsSync(this.$objDirectory + _object + '.js')) {
 									$result = '';
 									$state = 2;
 									return true;
 								}
 								else {
-									$result = this.$fs.readFileSync(this.$objDirectory + _object + '.js', 'utf8');
+									$result = fs.readFileSync(this.$objDirectory + _object + '.js', 'utf8');
 									$state = 2;
 									return true;
 								}
@@ -161,6 +160,9 @@ OurSonicNode.Server.prototype = {
 		}, this);
 	}
 };
-OurSonicNode.Compress.registerClass('OurSonicNode.Compress', Object);
-OurSonicNode.Server.registerClass('OurSonicNode.Server', Object);
-new OurSonicNode.Server();
+$OurSonicNode_Server.main = function() {
+	new $OurSonicNode_Server();
+};
+Type.registerClass(global, 'OurSonicNode.Compress', $OurSonicNode_Compress, Object);
+Type.registerClass(global, 'OurSonicNode.Server', $OurSonicNode_Server, Object);
+$OurSonicNode_Server.main();

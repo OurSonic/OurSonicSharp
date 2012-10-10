@@ -1,12 +1,14 @@
 using System.Runtime.CompilerServices;
-using NodeJSLibrary;
-namespace SocketIONodeLibrary
+using NodeJS.HttpModule;
+namespace SocketIOLibrary
 {
     [IgnoreNamespace]
     [Imported(IsRealType = true)]
-    public class SocketIOModule : NodeModule
+    [ModuleName("socket.io")]
+    [GlobalMethods]
+    public static class SocketIO
     {
-        public SocketIOClient Listen(HttpServer app)
+        public static SocketIOClient Listen(Server app)
         {
             return null;
         }

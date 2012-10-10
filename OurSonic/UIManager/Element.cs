@@ -17,7 +17,6 @@ namespace OurSonic.UIManager
         public int Width { get; set; }
         [IntrinsicProperty]
         public int Height { get; set; }
-
         public int Depth
         {
             get { return myDepth; }

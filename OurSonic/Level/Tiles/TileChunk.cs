@@ -26,7 +26,7 @@ namespace OurSonic.Level.Tiles
                 bool isBack = layer == 0;
 
                 //for building no aniamtion cache
-                drawOld(canvas, new Point(0,0), layer, pieceWidth, pieceHeight, isBack, false, null, null);
+                drawOld(canvas, new Point(0, 0), layer, pieceWidth, pieceHeight, isBack, false, null, null);
             }
         }
 

@@ -15,7 +15,7 @@ namespace OurSonic.UIManager.Areas
             Action<string> loadObject = null;
 
             var objectFrameworkListArea = uiManager.UIManagerAreas.ObjectFrameworkListArea = new UIArea(90, 500, 390, 300) {Closable = true};
-            objectFrameworkListArea.Visible = false;
+            objectFrameworkListArea.Visible = true;
 
             uiManager.AddArea(objectFrameworkListArea);
             objectFrameworkListArea.AddControl(new TextArea(30, 25, "Object Frameworks") {Color = "blue"});

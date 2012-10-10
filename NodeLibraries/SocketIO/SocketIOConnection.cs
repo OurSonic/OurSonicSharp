@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
-using NodeJSLibrary;
-namespace SocketIONodeLibrary
+using NodeJS.EventsModule;
+namespace SocketIOLibrary
 {
     [IgnoreNamespace]
     [Imported(IsRealType = true)]

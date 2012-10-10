@@ -1,10 +1,10 @@
 using System.Runtime.CompilerServices;
-using NodeJSLibrary;
 namespace Redis
 {
     [Imported(IsRealType = true)]
     [IgnoreNamespace]
-    public class RedisModule : NodeModule
+    [ModuleName("redis")]
+    public class RedisModule
     {
         [ScriptName("debug_mode")] public bool DebugMode;
 

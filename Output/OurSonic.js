@@ -1,15 +1,19 @@
 
-Type.registerNamespace('OurSonic');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Page
-OurSonic.Page = function() {
+var $OurSonic_Page = function() {
 	var stats = new xStats();
 	document.body.appendChild(stats.element);
-	new OurSonic.SonicEngine();
+	new $OurSonic_SonicEngine();
+};
+$OurSonic_Page.main = function() {
+	$(function() {
+		new $OurSonic_Page();
+	});
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.SonicEngine
-OurSonic.SonicEngine = function() {
+var $OurSonic_SonicEngine = function() {
 	this.canvasHeight = 0;
 	this.canvasWidth = 0;
 	this.client = null;
@@ -22,11 +26,11 @@ OurSonic.SonicEngine = function() {
 	this.$uiCanvas = null;
 	this.$uiCanvasName = 'uiLayer';
 	this.$uiGoodWidth = 0;
-	OurSonic.SonicEngine.instance = this;
+	$OurSonic_SonicEngine.instance = this;
 	//var pl = @"";
 	//Window.Instance.Me().console.log(new Compressor().CompressText(pl));
-	this.$gameCanvas = OurSonic.Utility.CanvasInformation.create$1(document.getElementById(this.$gameCanvasName), 0, 0);
-	this.$uiCanvas = OurSonic.Utility.CanvasInformation.create$1(document.getElementById(this.$uiCanvasName), 0, 0);
+	this.$gameCanvas = $OurSonic_Utility_CanvasInformation.create$1(document.getElementById(this.$gameCanvasName), 0, 0);
+	this.$uiCanvas = $OurSonic_Utility_CanvasInformation.create$1(document.getElementById(this.$uiCanvasName), 0, 0);
 	//new SpeedTester(gameCanvas);return;
 	this.canvasWidth = 0;
 	this.canvasHeight = 0;
@@ -38,7 +42,7 @@ OurSonic.SonicEngine = function() {
 	$(document).resize(Function.mkdel(this, function(e1) {
 		this.resizeCanvas(true);
 	}));
-	this.sonicManager = new OurSonic.SonicManager(this, this.$gameCanvas, Function.mkdel(this, function() {
+	this.sonicManager = new $OurSonic_SonicManager(this, this.$gameCanvas, Function.mkdel(this, function() {
 		this.resizeCanvas(true);
 	}));
 	this.sonicManager.indexedPalette = 0;
@@ -47,7 +51,7 @@ OurSonic.SonicEngine = function() {
 	window.setInterval(Function.mkdel(this, this.uiDraw), 100);
 	this.resizeCanvas(true);
 };
-OurSonic.SonicEngine.prototype = {
+$OurSonic_SonicEngine.prototype = {
 	$bindInput: function() {
 		this.$uiCanvas.domCanvas.mousedown(Function.mkdel(this, this.$canvasOnClick));
 		this.$uiCanvas.domCanvas.mouseup(Function.mkdel(this, this.$canvasMouseUp));
@@ -125,7 +129,7 @@ OurSonic.SonicEngine.prototype = {
 		});
 		this.client = io.connect('50.116.22.241:8998');
 		this.client.on('SonicLevel', Function.mkdel(this, function(data) {
-			OurSonic.Utility.Help.decodeString$1(OurSonicModels.SLData).call(null, data.Data, Function.mkdel(this, this.runSonic));
+			$OurSonic_Utility_Help.decodeString$1(OurSonicModels.SLData).call(null, data.Data, Function.mkdel(this, this.runSonic));
 		}));
 		this.client.on('GetObjects.Response', Function.mkdel(this, function(data1) {
 			this.sonicManager.loadObjects(data1.Data);
@@ -149,7 +153,7 @@ OurSonic.SonicEngine.prototype = {
 			if (dontPress) {
 				return;
 			}
-			OurSonic.SonicEngine.runGame();
+			$OurSonic_SonicEngine.runGame();
 		}, function() {
 		});
 		KeyboardJS.bind.key('p', Function.mkdel(this, function() {
@@ -326,12 +330,12 @@ OurSonic.SonicEngine.prototype = {
 		this.sonicManager.bigWindowLocation.width = ss.Int32.trunc(this.sonicManager.windowLocation.width * 1.8);
 		this.sonicManager.bigWindowLocation.height = ss.Int32.trunc(this.sonicManager.windowLocation.height * 1.8);
 		this.sonicManager.clearCache();
-		var dl = OurSonic.Utility.Help.getQueryString();
+		var dl = $OurSonic_Utility_Help.getQueryString();
 		if (Object.keyExists(dl, 'run')) {
 			if (this.sonicManager.currentGameState === 0) {
-				OurSonic.SonicEngine.runGame();
+				$OurSonic_SonicEngine.runGame();
 			}
-			OurSonic.SonicEngine.runGame();
+			$OurSonic_SonicEngine.runGame();
 		}
 	},
 	$handleScroll: function(jQueryEvent) {
@@ -349,7 +353,7 @@ OurSonic.SonicEngine.prototype = {
 	$canvasMouseMove: function(queryEvent) {
 		queryEvent.preventDefault();
 		document.body.style.cursor = 'default';
-		this.$lastMouseMove = OurSonic.Utility.Help.getCursorPosition(queryEvent);
+		this.$lastMouseMove = $OurSonic_Utility_Help.getCursorPosition(queryEvent);
 		if (this.sonicManager.uiManager.onMouseMove(this.$lastMouseMove)) {
 			return;
 		}
@@ -357,7 +361,7 @@ OurSonic.SonicEngine.prototype = {
 	},
 	$canvasOnClick: function(queryEvent) {
 		queryEvent.preventDefault();
-		if (this.sonicManager.uiManager.onClick(OurSonic.Utility.Help.getCursorPosition(queryEvent))) {
+		if (this.sonicManager.uiManager.onClick($OurSonic_Utility_Help.getCursorPosition(queryEvent))) {
 			return;
 		}
 		if (this.sonicManager.onClick(queryEvent)) {
@@ -373,21 +377,21 @@ OurSonic.SonicEngine.prototype = {
 		this.canvasHeight = $(window).height();
 		this.$uiCanvas.domCanvas.attr('width', this.canvasWidth.toString());
 		this.$uiCanvas.domCanvas.attr('height', this.canvasHeight.toString());
-		this.sonicManager.windowLocation = OurSonic.Utility.Constants.defaultWindowLocation(this.sonicManager.currentGameState, this.$uiCanvas, this.sonicManager.scale);
-		this.sonicManager.realScale = (!this.$fullscreenMode ? OurSonic.Utility.DoublePoint.$ctor1(1, 1) : OurSonic.Utility.DoublePoint.$ctor1(this.canvasWidth / 320 / this.sonicManager.scale.x, this.canvasHeight / 224 / this.sonicManager.scale.y));
+		this.sonicManager.windowLocation = $OurSonic_Utility_Constants.defaultWindowLocation(this.sonicManager.currentGameState, this.$uiCanvas, this.sonicManager.scale);
+		this.sonicManager.realScale = (!this.$fullscreenMode ? $OurSonic_Utility_DoublePoint.$ctor1(1, 1) : $OurSonic_Utility_DoublePoint.$ctor1(this.canvasWidth / 320 / this.sonicManager.scale.x, this.canvasHeight / 224 / this.sonicManager.scale.y));
 		if (resetOverride || ss.isNullOrUndefined(this.sonicManager.overrideRealScale)) {
-			this.sonicManager.overrideRealScale = OurSonic.Utility.DoublePoint.$ctor(this.sonicManager.realScale);
+			this.sonicManager.overrideRealScale = $OurSonic_Utility_DoublePoint.$ctor(this.sonicManager.realScale);
 		}
 		else {
-			this.sonicManager.realScale = OurSonic.Utility.DoublePoint.$ctor(this.sonicManager.overrideRealScale);
+			this.sonicManager.realScale = $OurSonic_Utility_DoublePoint.$ctor(this.sonicManager.overrideRealScale);
 		}
 		this.$gameCanvas.domCanvas.attr('width', (this.sonicManager.windowLocation.width * ((this.sonicManager.currentGameState === 0) ? (this.sonicManager.scale.x * this.sonicManager.realScale.x) : 1)).toString());
 		this.$gameCanvas.domCanvas.attr('height', (this.sonicManager.windowLocation.height * ((this.sonicManager.currentGameState === 0) ? (this.sonicManager.scale.y * this.sonicManager.realScale.y) : 1)).toString());
 		this.$uiGoodWidth = this.canvasWidth;
 		this.$gameGoodWidth = ss.Int32.trunc(this.sonicManager.windowLocation.width * ((this.sonicManager.currentGameState === 0) ? (this.sonicManager.scale.x * this.sonicManager.realScale.x) : 1));
-		var screenOffset = ((this.sonicManager.currentGameState === 0) ? OurSonic.Utility.DoublePoint.$ctor1(this.canvasWidth / 2 - this.sonicManager.windowLocation.width * this.sonicManager.scale.x * this.sonicManager.realScale.x / 2, this.canvasHeight / 2 - this.sonicManager.windowLocation.height * this.sonicManager.scale.y * this.sonicManager.realScale.y / 2) : OurSonic.Utility.DoublePoint.$ctor1(0, 0));
-		this.$gameCanvas.domCanvas.css('left', OurSonic.Utility.Help.toPx(screenOffset.x));
-		this.$gameCanvas.domCanvas.css('top', OurSonic.Utility.Help.toPx(screenOffset.y));
+		var screenOffset = ((this.sonicManager.currentGameState === 0) ? $OurSonic_Utility_DoublePoint.$ctor1(this.canvasWidth / 2 - this.sonicManager.windowLocation.width * this.sonicManager.scale.x * this.sonicManager.realScale.x / 2, this.canvasHeight / 2 - this.sonicManager.windowLocation.height * this.sonicManager.scale.y * this.sonicManager.realScale.y / 2) : $OurSonic_Utility_DoublePoint.$ctor1(0, 0));
+		this.$gameCanvas.domCanvas.css('left', $OurSonic_Utility_Help.toPx(screenOffset.x));
+		this.$gameCanvas.domCanvas.css('top', $OurSonic_Utility_Help.toPx(screenOffset.y));
 	},
 	clear: function(canv) {
 		var w;
@@ -416,26 +420,26 @@ OurSonic.SonicEngine.prototype = {
 		this.sonicManager.uiManager.draw(this.$uiCanvas.context);
 	}
 };
-OurSonic.SonicEngine.runGame = function() {
-	var sonicManager = OurSonic.SonicManager.instance;
+$OurSonic_SonicEngine.runGame = function() {
+	var sonicManager = $OurSonic_SonicManager.instance;
 	switch (sonicManager.currentGameState) {
 		case 0: {
 			sonicManager.currentGameState = 1;
-			sonicManager.windowLocation = OurSonic.Utility.Constants.defaultWindowLocation(sonicManager.currentGameState, OurSonic.SonicEngine.instance.$gameCanvas, sonicManager.scale);
+			sonicManager.windowLocation = $OurSonic_Utility_Constants.defaultWindowLocation(sonicManager.currentGameState, $OurSonic_SonicEngine.instance.$gameCanvas, sonicManager.scale);
 			sonicManager.sonicToon = null;
 			break;
 		}
 		case 1: {
 			sonicManager.currentGameState = 0;
-			sonicManager.windowLocation = OurSonic.Utility.Constants.defaultWindowLocation(sonicManager.currentGameState, OurSonic.SonicEngine.instance.$gameCanvas, sonicManager.scale);
-			sonicManager.sonicToon = new OurSonic.Sonic.Sonic();
+			sonicManager.windowLocation = $OurSonic_Utility_Constants.defaultWindowLocation(sonicManager.currentGameState, $OurSonic_SonicEngine.instance.$gameCanvas, sonicManager.scale);
+			sonicManager.sonicToon = new $OurSonic_Sonic_Sonic();
 			break;
 		}
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.SonicManager
-OurSonic.SonicManager = function(engine, gameCanvas, resize) {
+var $OurSonic_SonicManager = function(engine, gameCanvas, resize) {
 	this.mainCanvas = null;
 	this.$myEngine = null;
 	this.objectManager = null;
@@ -473,7 +477,7 @@ OurSonic.SonicManager = function(engine, gameCanvas, resize) {
 	this.typingInEditor = false;
 	this.onLevelLoad = null;
 	this.cachedObjects = null;
-	OurSonic.SonicManager.instance = this;
+	$OurSonic_SonicManager.instance = this;
 	//            SonicToon = new Sonic();
 	this.$myEngine = engine;
 	this.$myEngine.canvasWidth = $(window).width();
@@ -483,27 +487,27 @@ OurSonic.SonicManager = function(engine, gameCanvas, resize) {
 	$.getJSON('Content/sprites/sonic.js', Function.mkdel(this, function(data) {
 		this.$sonicSprites = data;
 	}));
-	this.objectManager = new OurSonic.Level.Objects.ObjectManager(this);
+	this.objectManager = new $OurSonic_Level_Objects_ObjectManager(this);
 	this.objectManager.init();
 	var scl = 2;
-	this.scale = OurSonic.Utility.Point.$ctor1(scl, scl);
-	this.realScale = OurSonic.Utility.DoublePoint.$ctor1(1, 1);
+	this.scale = $OurSonic_Utility_Point.$ctor1(scl, scl);
+	this.realScale = $OurSonic_Utility_DoublePoint.$ctor1(1, 1);
 	this.mainCanvas = gameCanvas;
-	this.windowLocation = OurSonic.Utility.Constants.defaultWindowLocation(1, this.mainCanvas, this.scale);
-	this.bigWindowLocation = OurSonic.Utility.Constants.defaultWindowLocation(1, this.mainCanvas, this.scale);
+	this.windowLocation = $OurSonic_Utility_Constants.defaultWindowLocation(1, this.mainCanvas, this.scale);
+	this.bigWindowLocation = $OurSonic_Utility_Constants.defaultWindowLocation(1, this.mainCanvas, this.scale);
 	this.bigWindowLocation.width = ss.Int32.trunc(this.bigWindowLocation.width * 1.8);
 	this.bigWindowLocation.height = ss.Int32.trunc(this.bigWindowLocation.height * 1.8);
 	this.animations = [];
 	this.animationInstances = [];
 	//jQuery.GetJson("Content/sprites/explosion.js", data => Animations.Add(new Animation("explosion", data)));
 	this.showHeightMap = false;
-	this.goodRing = OurSonic.Level.Ring.$ctor(false);
+	this.goodRing = $OurSonic_Level_Ring.$ctor(false);
 	this.activeRings = [];
 	this.forceResize = resize;
 	this.background = null;
 	this.currentGameState = 1;
-	this.screenOffset = OurSonic.Utility.Point.$ctor1(ss.Int32.div(this.mainCanvas.domCanvas.width(), 2) - ss.Int32.div(this.windowLocation.width, 2), ss.Int32.div(this.mainCanvas.domCanvas.height(), 2) - ss.Int32.div(this.windowLocation.height, 2));
-	this.uiManager = new OurSonic.UIManager.UIManager(this, this.mainCanvas.context);
+	this.screenOffset = $OurSonic_Utility_Point.$ctor1(ss.Int32.div(this.mainCanvas.domCanvas.width(), 2) - ss.Int32.div(this.windowLocation.width, 2), ss.Int32.div(this.mainCanvas.domCanvas.height(), 2) - ss.Int32.div(this.windowLocation.height, 2));
+	this.uiManager = new $OurSonic_UIManager_UIManager(this, this.mainCanvas.context);
 	//UIManager.ObjectFrameworkArea.Populate(new LevelObject("Somekey"));
 	this.clickState = 1;
 	this.tickCount = 0;
@@ -512,17 +516,17 @@ OurSonic.SonicManager = function(engine, gameCanvas, resize) {
 	this.waitingForTickContinue = false;
 	this.$waitingForDrawContinue = false;
 };
-OurSonic.SonicManager.prototype = {
+$OurSonic_SonicManager.prototype = {
 	get_$status: function() {
 		return this.$myStatus;
 	},
 	set_$status: function(value) {
-		OurSonic.UIManager.UIManager.updateTitle(value);
+		$OurSonic_UIManager_UIManager.updateTitle(value);
 		this.$myStatus = value;
 	},
 	onClick: function(elementEvent) {
 		//Help.Debugger();
-		var e = OurSonic.Utility.Point.$ctor1(ss.Int32.trunc(elementEvent.clientX / this.scale.x / this.realScale.x + this.windowLocation.x), ss.Int32.trunc(elementEvent.clientY / this.scale.y / this.realScale.y + this.windowLocation.y));
+		var e = $OurSonic_Utility_Point.$ctor1(ss.Int32.trunc(elementEvent.clientX / this.scale.x / this.realScale.x + this.windowLocation.x), ss.Int32.trunc(elementEvent.clientY / this.scale.y / this.realScale.y + this.windowLocation.y));
 		//then clicking
 		//then chunk editor/tilepiece editor/tile editor/ heightmap editor/ and proper map editor;
 		if (elementEvent.button === 0) {
@@ -553,7 +557,7 @@ OurSonic.SonicManager.prototype = {
 					ex = e.x;
 					ey = e.y;
 					var $t2 = this.sonicLevel.rings;
-					var $t1 = OurSonic.Level.Ring.$ctor(true);
+					var $t1 = $OurSonic_Level_Ring.$ctor(true);
 					$t1.x = ex;
 					$t1.y = ey;
 					$t2.add($t1);
@@ -562,11 +566,11 @@ OurSonic.SonicManager.prototype = {
 				case 3: {
 					ex = e.x;
 					ey = e.y;
-					var pos = OurSonic.Utility.Point.$ctor1(ex, ey);
+					var pos = $OurSonic_Utility_Point.$ctor1(ex, ey);
 					for (var l = 0; l < this.sonicLevel.objects.length; l++) {
 						var o = this.sonicLevel.objects[l];
-						if (OurSonic.Utility.IntersectingRectangle.intersectsRect(o.getRect(), pos)) {
-							window.alert('Object Data: ' + OurSonic.Utility.Help.stringify(o));
+						if ($OurSonic_Utility_IntersectingRectangle.intersectsRect(o.getRect(), pos)) {
+							window.alert('Object Data: ' + $OurSonic_Utility_Help.stringify(o));
 						}
 					}
 					return true;
@@ -606,7 +610,7 @@ OurSonic.SonicManager.prototype = {
 		//                break;
 	},
 	$tickObjects: function() {
-		var localPoint = OurSonic.Utility.Point.$ctor1(0, 0);
+		var localPoint = $OurSonic_Utility_Point.$ctor1(0, 0);
 		this.inFocusObjects = [];
 		var levelObjectInfos = this.sonicLevel.objects;
 		for (var index = 0; index < levelObjectInfos.length; index++) {
@@ -662,7 +666,7 @@ OurSonic.SonicManager.prototype = {
 			completed();
 			return;
 		}
-		this.spriteCache = this.spriteCache || new OurSonic.Level.SpriteCache();
+		this.spriteCache = this.spriteCache || new $OurSonic_Level_SpriteCache();
 		var ci = this.spriteCache.rings;
 		var spriteLocations = [];
 		for (var j = 0; j < 4; j++) {
@@ -670,11 +674,11 @@ OurSonic.SonicManager.prototype = {
 			this.$imageLength++;
 		}
 		var ind_ = this.spriteCache.indexes;
-		this.spriteLoader = new OurSonic.Utility.SpriteLoader(completed, update);
+		this.spriteLoader = new $OurSonic_Utility_SpriteLoader(completed, update);
 		if (ci.length === 0) {
 			var spriteStep = this.spriteLoader.addStep('Sprites', function(i, done) {
-				OurSonic.Utility.Help.loadSprite(spriteLocations[i], function(jd) {
-					ci[i] = OurSonic.Utility.CanvasInformation.create(jd.width, jd.height);
+				$OurSonic_Utility_Help.loadSprite(spriteLocations[i], function(jd) {
+					ci[i] = $OurSonic_Utility_CanvasInformation.create(jd.width, jd.height);
 					ci[i].context.drawImage(jd, 0, 0);
 					done();
 				});
@@ -696,7 +700,7 @@ OurSonic.SonicManager.prototype = {
 				try {
 					while ($t1.moveNext()) {
 						var sonicSprite = $t1.get_current();
-						cci[sonicSprite.key] = OurSonic.Utility.Help.scaleCsImage(sonicSprite.value, OurSonic.Utility.Point.$ctor1(1, 1), function(ec) {
+						cci[sonicSprite.key] = $OurSonic_Utility_Help.scaleCsImage(sonicSprite.value, $OurSonic_Utility_Point.$ctor1(1, 1), function(ec) {
 						});
 					}
 				}
@@ -732,10 +736,10 @@ OurSonic.SonicManager.prototype = {
 			return;
 		}
 		canvas.save();
-		var localPoint = OurSonic.Utility.Point.$ctor1(0, 0);
+		var localPoint = $OurSonic_Utility_Point.$ctor1(0, 0);
 		this.drawTickCount++;
 		if (this.spriteLoader && !this.spriteLoader.tick() || this.loading) {
-			OurSonic.SonicManager.$drawLoading(canvas);
+			$OurSonic_SonicManager.$drawLoading(canvas);
 			canvas.restore();
 			return;
 		}
@@ -743,8 +747,8 @@ OurSonic.SonicManager.prototype = {
 		var w1 = ss.Int32.div(this.windowLocation.width, 128) + 2;
 		var h1 = ss.Int32.div(this.windowLocation.height, 128) + 2;
 		//cleaner with 2 padding on the widthheight
-		var offs = OurSonic.SonicManager.$getOffs(h1, w1);
-		var bounds = new OurSonic.Utility.IntersectingRectangle(-32, -32, this.windowLocation.width + 32, this.windowLocation.height + 32);
+		var offs = $OurSonic_SonicManager.$getOffs(h1, w1);
+		var bounds = new $OurSonic_Utility_IntersectingRectangle(-32, -32, this.windowLocation.width + 32, this.windowLocation.height + 32);
 		this.$updatePalettes();
 		var fxP = ss.Int32.trunc(this.windowLocation.x / 128);
 		var fyP = ss.Int32.trunc(this.windowLocation.y / 128);
@@ -764,7 +768,7 @@ OurSonic.SonicManager.prototype = {
 		}
 		canvas.restore();
 		if (this.currentGameState === 0) {
-			this.sonicToon.drawUI(canvas, OurSonic.Utility.Point.$ctor1(this.screenOffset.x, this.screenOffset.y));
+			this.sonicToon.drawUI(canvas, $OurSonic_Utility_Point.$ctor1(this.screenOffset.x, this.screenOffset.y));
 		}
 	},
 	$updatePositions: function(canvas, localPoint) {
@@ -856,7 +860,7 @@ OurSonic.SonicManager.prototype = {
 			if (_xP < 0 || _xP >= this.sonicLevel.levelWidth) {
 				continue;
 			}
-			_yP = OurSonic.Utility.Help.mod(_yP, this.sonicLevel.levelHeight);
+			_yP = $OurSonic_Utility_Help.mod(_yP, this.sonicLevel.levelHeight);
 			var chunk = this.sonicLevel.getChunkAt(_xP, _yP);
 			if (chunk) {
 				chunk.animatedTick();
@@ -877,7 +881,7 @@ OurSonic.SonicManager.prototype = {
 			if (_xP < 0 || _xP >= this.sonicLevel.levelWidth) {
 				continue;
 			}
-			_yP = OurSonic.Utility.Help.mod(_yP, this.sonicLevel.levelHeight);
+			_yP = $OurSonic_Utility_Help.mod(_yP, this.sonicLevel.levelHeight);
 			var chunk = this.sonicLevel.getChunkAt(_xP, _yP);
 			localPoint.x = _xP * 128 - this.windowLocation.x;
 			localPoint.y = _yPreal * 128 - this.windowLocation.y;
@@ -888,8 +892,8 @@ OurSonic.SonicManager.prototype = {
 				var fd = this.spriteCache.heightMapChunks[(this.sonicLevel.curHeightMap ? 1 : 2) + ' ' + chunk.index];
 				if (!fd) {
 					var md = chunk;
-					var posj1 = OurSonic.Utility.Point.$ctor1(0, 0);
-					var canv = OurSonic.Utility.CanvasInformation.create(128, 128);
+					var posj1 = $OurSonic_Utility_Point.$ctor1(0, 0);
+					var canv = $OurSonic_Utility_CanvasInformation.create(128, 128);
 					var ctx = canv.context;
 					this.$myEngine.clear(canv);
 					for (var _y = 0; _y < 8; _y++) {
@@ -900,7 +904,7 @@ OurSonic.SonicManager.prototype = {
 							var __x = _x;
 							var __y = _y;
 							var vangle = 0;
-							var posm = OurSonic.Utility.Point.$ctor1(posj1.x + __x * 16, posj1.y + __y * 16);
+							var posm = $OurSonic_Utility_Point.$ctor1(posj1.x + __x * 16, posj1.y + __y * 16);
 							if (!hd) {
 								continue;
 							}
@@ -908,7 +912,7 @@ OurSonic.SonicManager.prototype = {
 							}
 							else if (ss.Nullable.eq(hd.get_full(), true)) {
 								if (solid > 0) {
-									ctx.fillStyle = OurSonic.Level.HeightMap.colors[solid];
+									ctx.fillStyle = $OurSonic_Level_HeightMap.colors[solid];
 									ctx.fillRect(posj1.x + __x * 16, posj1.y + __y * 16, 16, 16);
 								}
 							}
@@ -957,14 +961,14 @@ OurSonic.SonicManager.prototype = {
 				case 0: {
 					if (!this.sonicToon.obtainedRing[index]) {
 						if (this.bigWindowLocation.intersects(r)) {
-							OurSonic.Level.Ring.draw(this.goodRing, canvas, OurSonic.Utility.Point.negate$1(r, this.windowLocation.x, this.windowLocation.y));
+							$OurSonic_Level_Ring.draw(this.goodRing, canvas, $OurSonic_Utility_Point.negate$1(r, this.windowLocation.x, this.windowLocation.y));
 						}
 					}
 					break;
 				}
 				case 1: {
 					if (this.bigWindowLocation.intersects(r)) {
-						OurSonic.Level.Ring.draw(this.goodRing, canvas, OurSonic.Utility.Point.negate$1(r, this.windowLocation.x, this.windowLocation.y));
+						$OurSonic_Level_Ring.draw(this.goodRing, canvas, $OurSonic_Utility_Point.negate$1(r, this.windowLocation.x, this.windowLocation.y));
 					}
 					break;
 				}
@@ -998,7 +1002,7 @@ OurSonic.SonicManager.prototype = {
 					var ac = this.activeRings[i];
 					localPoint.x = ac.x - this.windowLocation.x;
 					localPoint.y = ac.y - this.windowLocation.y;
-					OurSonic.Level.Ring.draw(ac, canvas, localPoint);
+					$OurSonic_Level_Ring.draw(ac, canvas, localPoint);
 					if (ac.tickCount > 256) {
 						this.activeRings.remove(ac);
 					}
@@ -1054,17 +1058,17 @@ OurSonic.SonicManager.prototype = {
 				return ss.referenceEquals(p.key, this.o.$);
 			}));
 			if (!d) {
-				this.sonicLevel.objects[l].setObjectData(new OurSonic.Level.Objects.LevelObject(o.$));
+				this.sonicLevel.objects[l].setObjectData(new $OurSonic_Level_Objects_LevelObject(o.$));
 				continue;
 			}
 			var dat;
 			if (d.value.length === 0) {
-				dat = OurSonic.Level.Objects.LevelObjectData.$ctor();
+				dat = $OurSonic_Level_Objects_LevelObjectData.$ctor();
 			}
 			else {
 				dat = JSON.parse(d.value);
 			}
-			var dr = OurSonic.Level.Objects.ObjectManager.extendObject(dat);
+			var dr = $OurSonic_Level_Objects_ObjectManager.extendObject(dat);
 			this.cachedObjects[o.$] = dr;
 			this.sonicLevel.objects[l].setObjectData(dr);
 		}
@@ -1140,15 +1144,15 @@ OurSonic.SonicManager.prototype = {
 		//        });
 	},
 	loadObjects$1: function(objects) {
-		OurSonic.SonicEngine.instance.client.emit('GetObjects', objects);
+		$OurSonic_SonicEngine.instance.client.emit('GetObjects', objects);
 	},
 	load: function(sonicLevel) {
 		this.loading = true;
 		this.set_$status('Decoding');
 		this.set_$status('Determining Level Information');
-		this.sonicLevel = new OurSonic.Level.SonicLevel();
+		this.sonicLevel = new $OurSonic_Level_SonicLevel();
 		for (var n = 0; n < sonicLevel.Rings.length; n++) {
-			this.sonicLevel.rings[n] = OurSonic.Level.Ring.$ctor(true);
+			this.sonicLevel.rings[n] = $OurSonic_Level_Ring.$ctor(true);
 			this.sonicLevel.rings[n].x = sonicLevel.Rings[n].X;
 			this.sonicLevel.rings[n].y = sonicLevel.Rings[n].Y;
 		}
@@ -1157,7 +1161,7 @@ OurSonic.SonicManager.prototype = {
 		this.sonicLevel.chunkMap = sonicLevel.Foreground;
 		this.sonicLevel.bgChunkMap = sonicLevel.Background;
 		for (var l = 0; l < sonicLevel.Objects.length; l++) {
-			this.sonicLevel.objects[l] = new OurSonic.Level.Objects.LevelObjectInfo(sonicLevel.Objects[l]);
+			this.sonicLevel.objects[l] = new $OurSonic_Level_Objects_LevelObjectInfo(sonicLevel.Objects[l]);
 			this.sonicLevel.objects[l].index = l;
 		}
 		var objectKeys = [];
@@ -1186,7 +1190,7 @@ OurSonic.SonicManager.prototype = {
 			for (var n1 = 0; n1 < mj.length; n1++) {
 				mfc[n1 % 8][ss.Int32.div(n1, 8)] = mj[n1];
 			}
-			this.sonicLevel.tiles[j] = new OurSonic.Level.Tiles.Tile(mfc);
+			this.sonicLevel.tiles[j] = new $OurSonic_Level_Tiles_Tile(mfc);
 			this.sonicLevel.tiles[j].index = j;
 		}
 		var acs = this.sonicLevel.animatedChunks = [];
@@ -1211,7 +1215,7 @@ OurSonic.SonicManager.prototype = {
 					for (var n2 = 0; n2 < mjc.length; n2++) {
 						mfc1[n2 % 8][ss.Int32.div(n2, 8)] = mjc[n2];
 					}
-					var tile = new OurSonic.Level.Tiles.Tile(mfc1);
+					var tile = new $OurSonic_Level_Tiles_Tile(mfc1);
 					tile.isAnimated = true;
 					tile.index = j1 * 10000 + jc;
 					this.sonicLevel.animatedFiles[jc][j1] = tile;
@@ -1220,12 +1224,12 @@ OurSonic.SonicManager.prototype = {
 		}
 		for (var j2 = 0; j2 < sonicLevel.Blocks.length; j2++) {
 			var fc1 = sonicLevel.Blocks[j2];
-			var mj1 = new OurSonic.Level.Tiles.TilePiece();
+			var mj1 = new $OurSonic_Level_Tiles_TilePiece();
 			mj1.index = j2;
 			mj1.tiles = [];
 			for (var p1 = 0; p1 < fc1.length; p1++) {
 				var $t2 = mj1.tiles;
-				var $t1 = new OurSonic.Level.Tiles.TileItem();
+				var $t1 = new $OurSonic_Level_Tiles_TileItem();
 				$t1._Tile = fc1[p1].Tile;
 				$t1.index = p1;
 				$t1.palette = fc1[p1].Palette;
@@ -1239,13 +1243,13 @@ OurSonic.SonicManager.prototype = {
 		}
 		this.sonicLevel.angles = sonicLevel.Angles;
 		this.sonicLevel.animations = sonicLevel.Animations.map(function(a) {
-			var $t3 = new OurSonic.Level.Animations.Animation();
+			var $t3 = new $OurSonic_Level_Animations_Animation();
 			$t3.animationFile = a.AnimationFile;
 			$t3.animationTileIndex = a.AnimationTileIndex;
 			$t3.automatedTiming = a.AutomatedTiming;
 			$t3.numberOfTiles = a.NumberOfTiles;
 			$t3.frames = a.Frames.map(function(b) {
-				var $t4 = new OurSonic.Level.Animations.AnimationFrame();
+				var $t4 = new $OurSonic_Level_Animations_AnimationFrame();
 				$t4.ticks = b.Ticks;
 				$t4.startingTileIndex = b.StartingTileIndex;
 				return $t4;
@@ -1266,18 +1270,18 @@ OurSonic.SonicManager.prototype = {
 				}
 			}
 			if (b1) {
-				this.sonicLevel.heightMaps[i1] = new OurSonic.Level.HeightMap(false);
+				this.sonicLevel.heightMaps[i1] = new $OurSonic_Level_HeightMap(false);
 			}
 			else if (b2) {
-				this.sonicLevel.heightMaps[i1] = new OurSonic.Level.HeightMap(true);
+				this.sonicLevel.heightMaps[i1] = new $OurSonic_Level_HeightMap(true);
 			}
 			else {
-				this.sonicLevel.heightMaps[i1] = new OurSonic.Level.HeightMap.$ctor1(sonicLevel.HeightMaps[i1], i1);
+				this.sonicLevel.heightMaps[i1] = new $OurSonic_Level_HeightMap.$ctor1(sonicLevel.HeightMaps[i1], i1);
 			}
 		}
 		for (var j3 = 0; j3 < sonicLevel.Chunks.length; j3++) {
 			var fc2 = sonicLevel.Chunks[j3];
-			var mj2 = new OurSonic.Level.Tiles.TileChunk();
+			var mj2 = new $OurSonic_Level_Tiles_TileChunk();
 			mj2.index = j3;
 			mj2.tilePieces = new Array(8);
 			for (var i2 = 0; i2 < 8; i2++) {
@@ -1286,7 +1290,7 @@ OurSonic.SonicManager.prototype = {
 			for (var p2 = 0; p2 < fc2.length; p2++) {
 				var $t6 = mj2.tilePieces[p2 % 8];
 				var $t7 = ss.Int32.div(p2, 8);
-				var $t5 = new OurSonic.Level.Tiles.TilePieceInfo();
+				var $t5 = new $OurSonic_Level_Tiles_TilePieceInfo();
 				$t5.index = p2;
 				$t5.block = fc2[p2].Block;
 				$t5.solid1 = fc2[p2].Solid1;
@@ -1314,7 +1318,7 @@ OurSonic.SonicManager.prototype = {
 		}
 		this.sonicLevel.palette = sonicLevel.Palette;
 		this.sonicLevel.startPositions = sonicLevel.StartPositions.map(function(a1) {
-			return OurSonic.Utility.Point.$ctor1(a1.X, a1.Y);
+			return $OurSonic_Utility_Point.$ctor1(a1.X, a1.Y);
 		});
 		this.sonicLevel.paletteItems = [];
 		if (sonicLevel.PaletteItems.length > 0) {
@@ -1322,12 +1326,12 @@ OurSonic.SonicManager.prototype = {
 			for (var k = 0; k < sonicLevel.PaletteItems[0].length; k++) {
 				var pal = sonicLevel.PaletteItems[0][k];
 				var $t10 = this.sonicLevel.paletteItems[0];
-				var $t8 = new OurSonic.Level.PaletteItem();
+				var $t8 = new $OurSonic_Level_PaletteItem();
 				$t8.palette = Type.cast(eval(pal.Palette), Array);
 				$t8.skipIndex = pal.SkipIndex;
 				$t8.totalLength = pal.TotalLength;
 				$t8.pieces = pal.Pieces.map(function(a2) {
-					var $t9 = new OurSonic.Level.PaletteItemPieces();
+					var $t9 = new $OurSonic_Level_PaletteItemPieces();
 					$t9.paletteIndex = a2.PaletteIndex;
 					$t9.paletteMultiply = a2.PaletteMultiply;
 					$t9.paletteOffset = a2.PaletteOffset;
@@ -1347,22 +1351,16 @@ OurSonic.SonicManager.prototype = {
 						var pl = tile1.getAllPaletteIndexes();
 						for (var k1 = 0; k1 < this.sonicLevel.paletteItems[0].length; k1++) {
 							var pal1 = this.sonicLevel.paletteItems[0][k1];
-							var $t11 = pal1.pieces.getEnumerator();
-							try {
-								while ($t11.moveNext()) {
-									var mjce = $t11.get_current();
-									var mje1 = { $: mjce };
-									if (mj3.palette === mje1.$.paletteIndex) {
-										if (Enumerable.from(pl).any(Function.mkdel({ mje1: mje1 }, function(j4) {
-											return j4 === ss.Int32.div(this.mje1.$.paletteOffset, 2) || j4 === ss.Int32.div(this.mje1.$.paletteOffset, 2) + 1;
-										}))) {
-											dj.animatedFrames[dj.animatedFrames.length] = k1;
-										}
+							for (var $t11 = 0; $t11 < pal1.pieces.length; $t11++) {
+								var mjce = pal1.pieces[$t11];
+								var mje1 = { $: mjce };
+								if (mj3.palette === mje1.$.paletteIndex) {
+									if (Enumerable.from(pl).any(Function.mkdel({ mje1: mje1 }, function(j4) {
+										return j4 === ss.Int32.div(this.mje1.$.paletteOffset, 2) || j4 === ss.Int32.div(this.mje1.$.paletteOffset, 2) + 1;
+									}))) {
+										dj.animatedFrames[dj.animatedFrames.length] = k1;
 									}
 								}
-							}
-							finally {
-								$t11.dispose();
 							}
 						}
 					}
@@ -1376,7 +1374,6 @@ OurSonic.SonicManager.prototype = {
 			finished();
 			this.forceResize();
 		}), function(s) {
-			console.log('ff ' + s);
 		});
 		this.forceResize();
 		this.onLevelLoad(this.sonicLevel);
@@ -1512,21 +1509,21 @@ OurSonic.SonicManager.prototype = {
 		//        }, sonicManager.uiManager.updateTitle);
 	}
 };
-OurSonic.SonicManager.$getOffs = function(h1, w1) {
+$OurSonic_SonicManager.$getOffs = function(h1, w1) {
 	var hash = (h1 + 1) * (w1 + 1);
-	if (Object.keyExists(OurSonic.SonicManager.$_cachedOffs, hash)) {
-		return OurSonic.SonicManager.$_cachedOffs[hash];
+	if (Object.keyExists($OurSonic_SonicManager.$_cachedOffs, hash)) {
+		return $OurSonic_SonicManager.$_cachedOffs[hash];
 	}
 	var offs = [];
 	var ca = 0;
 	for (var i = -1; i < w1; i++) {
 		for (var j = -1; j < h1; j++) {
-			offs[ca++] = OurSonic.Utility.Point.$ctor1(i, j);
+			offs[ca++] = $OurSonic_Utility_Point.$ctor1(i, j);
 		}
 	}
-	return OurSonic.SonicManager.$_cachedOffs[hash] = offs;
+	return $OurSonic_SonicManager.$_cachedOffs[hash] = offs;
 };
-OurSonic.SonicManager.$drawLoading = function(canvas) {
+$OurSonic_SonicManager.$drawLoading = function(canvas) {
 	canvas.fillStyle = 'white';
 	canvas.fillText('Loading...   ', 95, 95);
 	canvas.restore();
@@ -1534,12 +1531,12 @@ OurSonic.SonicManager.$drawLoading = function(canvas) {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.SpeedTester
-OurSonic.SpeedTester = function(gameCanvas) {
+var $OurSonic_SpeedTester = function(gameCanvas) {
 	this.$HEIGHT = 1;
 	this.$SIZE = 512;
 	this.$WIDTH = 1;
 	this.$img = null;
-	var m = OurSonic.Utility.CanvasInformation.create(this.$SIZE, this.$SIZE);
+	var m = $OurSonic_Utility_CanvasInformation.create(this.$SIZE, this.$SIZE);
 	gameCanvas.canvas.width = window.outerWidth;
 	gameCanvas.canvas.height = window.outerHeight;
 	var con = m.context;
@@ -1548,7 +1545,7 @@ OurSonic.SpeedTester = function(gameCanvas) {
 		this.$makeit(gameCanvas, m);
 	}), 16);
 };
-OurSonic.SpeedTester.prototype = {
+$OurSonic_SpeedTester.prototype = {
 	$makeit: function(gameCanvas, m) {
 		var mc = this.$img.data;
 		var length = mc.length;
@@ -1559,7 +1556,7 @@ OurSonic.SpeedTester.prototype = {
 			mc[i + 3] = 255;
 		}
 		var mj = gameCanvas.context;
-		var fm = OurSonic.Utility.Help.scalePixelData(OurSonic.Utility.Point.$ctor1(2, 2), this.$img);
+		var fm = $OurSonic_Utility_Help.scalePixelData($OurSonic_Utility_Point.$ctor1(2, 2), this.$img);
 		mj.save();
 		for (var w = 0; w < this.$WIDTH; w++) {
 			for (var h = 0; h < this.$HEIGHT; h++) {
@@ -1569,10 +1566,9 @@ OurSonic.SpeedTester.prototype = {
 		mj.restore();
 	}
 };
-Type.registerNamespace('OurSonic.Level');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.HeightMap
-OurSonic.Level.HeightMap = function(full) {
+var $OurSonic_Level_HeightMap = function(full) {
 	this.width = 0;
 	this.height = 0;
 	this.items = null;
@@ -1580,7 +1576,7 @@ OurSonic.Level.HeightMap = function(full) {
 	this.$1$FullField = null;
 	this.set_full(full);
 };
-OurSonic.Level.HeightMap.prototype = {
+$OurSonic_Level_HeightMap.prototype = {
 	get_full: function() {
 		return this.$1$FullField;
 	},
@@ -1615,8 +1611,11 @@ OurSonic.Level.HeightMap.prototype = {
 		this.items[jx] = 16 - jy;
 	},
 	draw: function(canvas, pos, xflip, yflip, solid, angle) {
+		if (ss.isNullOrUndefined(this.items)) {
+			return;
+		}
 		canvas.save();
-		var oPos = OurSonic.Utility.Point.$ctor(pos);
+		var oPos = $OurSonic_Utility_Point.$ctor(pos);
 		if (xflip) {
 			pos.x = -pos.x - 16;
 			canvas.scale(-1, 1);
@@ -1625,32 +1624,32 @@ OurSonic.Level.HeightMap.prototype = {
 			pos.y = -pos.y - 16;
 			canvas.scale(1, -1);
 		}
-		var fd = OurSonic.SonicManager.instance.spriteCache.heightMaps[this.index + (solid << 20)];
+		var fd = $OurSonic_SonicManager.instance.spriteCache.heightMaps[this.index + (solid << 20)];
 		if (this.index !== -1 && fd) {
 			canvas.drawImage(fd.canvas, pos.x, pos.y);
 		}
 		else {
-			var ntcanvas = OurSonic.Utility.CanvasInformation.create(16, 16);
+			var ntcanvas = $OurSonic_Utility_CanvasInformation.create(16, 16);
 			var ncanvas = ntcanvas.context;
 			if (solid > 0) {
 				for (var x = 0; x < 16; x++) {
 					for (var y = 0; y < 16; y++) {
 						var jx = 0;
 						var jy = 0;
-						if (OurSonic.Level.HeightMap.itemsGood(this.items, x, y)) {
+						if ($OurSonic_Level_HeightMap.itemsGood(this.items, x, y)) {
 							jx = x;
 							jy = y;
 							var _x = jx;
 							var _y = jy;
 							ncanvas.lineWidth = 1;
-							ncanvas.fillStyle = OurSonic.Level.HeightMap.colors[solid];
+							ncanvas.fillStyle = $OurSonic_Level_HeightMap.colors[solid];
 							ncanvas.fillRect(_x, _y, 1, 1);
 							if (angle !== 255) {
 								ncanvas.beginPath();
 								ncanvas.lineWidth = 1;
 								ncanvas.strokeStyle = 'rgba(163,241,255,0.8)';
 								ncanvas.moveTo(8, 8);
-								ncanvas.lineTo(8 - OurSonic.Utility.Help.sin(angle) * 8, 8 - OurSonic.Utility.Help.cos(angle) * 8);
+								ncanvas.lineTo(8 - $OurSonic_Utility_Help.sin(angle) * 8, 8 - $OurSonic_Utility_Help.cos(angle) * 8);
 								ncanvas.stroke();
 								//ncanvas.BeginPath();
 								//ncanvas.FillStyle = "rgba(163,241,255,0.8)";
@@ -1667,7 +1666,7 @@ OurSonic.Level.HeightMap.prototype = {
 					}
 				}
 			}
-			OurSonic.SonicManager.instance.spriteCache.heightMaps[this.index + (solid << 20)] = ntcanvas;
+			$OurSonic_SonicManager.instance.spriteCache.heightMaps[this.index + (solid << 20)] = ntcanvas;
 			canvas.drawImage(ntcanvas.canvas, pos.x, pos.y);
 		}
 		canvas.restore();
@@ -1675,7 +1674,7 @@ OurSonic.Level.HeightMap.prototype = {
 		pos.y = oPos.y;
 	}
 };
-OurSonic.Level.HeightMap.$ctor1 = function(heightMap, i) {
+$OurSonic_Level_HeightMap.$ctor1 = function(heightMap, i) {
 	this.width = 0;
 	this.height = 0;
 	this.items = null;
@@ -1686,8 +1685,8 @@ OurSonic.Level.HeightMap.$ctor1 = function(heightMap, i) {
 	this.height = 16;
 	this.index = i;
 };
-OurSonic.Level.HeightMap.$ctor1.prototype = OurSonic.Level.HeightMap.prototype;
-OurSonic.Level.HeightMap.itemsGood = function(items, x, y) {
+$OurSonic_Level_HeightMap.$ctor1.prototype = $OurSonic_Level_HeightMap.prototype;
+$OurSonic_Level_HeightMap.itemsGood = function(items, x, y) {
 	if (items[x] < 0) {
 		return Math.abs(items[x]) >= y;
 	}
@@ -1695,7 +1694,7 @@ OurSonic.Level.HeightMap.itemsGood = function(items, x, y) {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.PaletteItem
-OurSonic.Level.PaletteItem = function() {
+var $OurSonic_Level_PaletteItem = function() {
 	this.palette = null;
 	this.skipIndex = 0;
 	this.totalLength = 0;
@@ -1703,21 +1702,21 @@ OurSonic.Level.PaletteItem = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.PaletteItemPieces
-OurSonic.Level.PaletteItemPieces = function() {
+var $OurSonic_Level_PaletteItemPieces = function() {
 	this.paletteIndex = 0;
 	this.paletteMultiply = 0;
 	this.paletteOffset = 0;
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Ring
-OurSonic.Level.Ring = function() {
+var $OurSonic_Level_Ring = function() {
 };
-OurSonic.Level.Ring.draw = function($this, canvas, pos) {
+$OurSonic_Level_Ring.draw = function($this, canvas, pos) {
 	if ($this.active) {
 		$this.ysp += 0.09375;
 		$this.x += ss.Int32.trunc($this.xsp);
 		$this.y += ss.Int32.trunc($this.ysp);
-		var wl = OurSonic.SonicManager.instance.windowLocation;
+		var wl = $OurSonic_SonicManager.instance.windowLocation;
 		if ($this.x < wl.x || $this.y < wl.y || $this.x > wl.x + wl.width || $this.y > wl.y + wl.height) {
 			$this.tickCount = 268435455;
 			return;
@@ -1730,22 +1729,22 @@ OurSonic.Level.Ring.draw = function($this, canvas, pos) {
 		//       if (SonicManager.Instance.SonicToon.CheckCollisionLine((this.X) - 8, (this.Y) + 8, 26, 0) != -1) {
 		//       this.Xsp *= -0.75;
 		//       }
-		if (OurSonic.SonicManager.instance.drawTickCount > OurSonic.SonicManager.instance.sonicToon.sonicLastHitTick + 64 && OurSonic.Utility.IntersectingRectangle.intersectsRect(OurSonic.SonicManager.instance.sonicToon.myRec, OurSonic.Utility.Rectangle.$ctor1($this.x - 8, $this.y - 8, 16, 16))) {
+		if ($OurSonic_SonicManager.instance.drawTickCount > $OurSonic_SonicManager.instance.sonicToon.sonicLastHitTick + 64 && $OurSonic_Utility_IntersectingRectangle.intersectsRect($OurSonic_SonicManager.instance.sonicToon.myRec, $OurSonic_Utility_Rectangle.$ctor1($this.x - 8, $this.y - 8, 16, 16))) {
 			$this.tickCount = 268435455;
-			OurSonic.SonicManager.instance.sonicToon.rings++;
+			$OurSonic_SonicManager.instance.sonicToon.rings++;
 			return;
 		}
 		$this.tickCount++;
 	}
-	if (OurSonic.SonicManager.instance.currentGameState === 0) {
-		$this.animationIndex = ss.Int32.div(OurSonic.SonicManager.instance.drawTickCount % (($this.active ? 4 : 8) * 4), ($this.active ? 4 : 8));
+	if ($OurSonic_SonicManager.instance.currentGameState === 0) {
+		$this.animationIndex = ss.Int32.div($OurSonic_SonicManager.instance.drawTickCount % (($this.active ? 4 : 8) * 4), ($this.active ? 4 : 8));
 	}
 	else {
 		$this.animationIndex = 0;
 	}
 	var sprites = null;
-	if (OurSonic.SonicManager.instance.spriteCache.rings) {
-		sprites = OurSonic.SonicManager.instance.spriteCache.rings;
+	if ($OurSonic_SonicManager.instance.spriteCache.rings) {
+		sprites = $OurSonic_SonicManager.instance.spriteCache.rings;
 	}
 	else {
 		throw new ss.Exception('bad ring animation');
@@ -1753,8 +1752,8 @@ OurSonic.Level.Ring.draw = function($this, canvas, pos) {
 	var sps = sprites[$this.animationIndex];
 	canvas.drawImage(sps.canvas, pos.x - 8, pos.y - 8);
 };
-OurSonic.Level.Ring.$ctor = function(active) {
-	var $this = OurSonic.Utility.Point.$ctor1(0, 0);
+$OurSonic_Level_Ring.$ctor = function(active) {
+	var $this = $OurSonic_Utility_Point.$ctor1(0, 0);
 	$this.active = false;
 	$this.animationIndex = 0;
 	$this.tickCount = 0;
@@ -1765,21 +1764,21 @@ OurSonic.Level.Ring.$ctor = function(active) {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.SonicBackground
-OurSonic.Level.SonicBackground = function() {
+var $OurSonic_Level_SonicBackground = function() {
 	this.width = 0;
 	this.height = 0;
 };
-OurSonic.Level.SonicBackground.prototype = {
+$OurSonic_Level_SonicBackground.prototype = {
 	draw: function(canvas, point, wOffset) {
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.SonicImage
-OurSonic.Level.SonicImage = function() {
+var $OurSonic_Level_SonicImage = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.SonicLevel
-OurSonic.Level.SonicLevel = function() {
+var $OurSonic_Level_SonicLevel = function() {
 	this.animations = null;
 	this.animatedFiles = null;
 	this.chunkMap = null;
@@ -1816,7 +1815,7 @@ OurSonic.Level.SonicLevel = function() {
 	this.levelWidth = 0;
 	this.levelHeight = 0;
 };
-OurSonic.Level.SonicLevel.prototype = {
+$OurSonic_Level_SonicLevel.prototype = {
 	getChunkAt: function(x, y) {
 		return this.chunks[this.chunkMap[x][y]];
 	},
@@ -1843,7 +1842,7 @@ OurSonic.Level.SonicLevel.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.SpriteCache
-OurSonic.Level.SpriteCache = function() {
+var $OurSonic_Level_SpriteCache = function() {
 	this.rings = null;
 	this.tileChunks = null;
 	this.tilepieces = null;
@@ -1860,9 +1859,9 @@ OurSonic.Level.SpriteCache = function() {
 	this.sonicSprites = {};
 	this.heightMaps = [];
 	this.heightMapChunks = {};
-	this.indexes = new OurSonic.Level.SpriteCacheIndexes();
+	this.indexes = new $OurSonic_Level_SpriteCacheIndexes();
 };
-OurSonic.Level.SpriteCache.prototype = {
+$OurSonic_Level_SpriteCache.prototype = {
 	get_animationSprites: function() {
 		return this.$1$AnimationSpritesField;
 	},
@@ -1876,7 +1875,7 @@ OurSonic.Level.SpriteCache.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.SpriteCacheIndexes
-OurSonic.Level.SpriteCacheIndexes = function() {
+var $OurSonic_Level_SpriteCacheIndexes = function() {
 	this.sprites = 0;
 	this.tps = 0;
 	this.tcs = 0;
@@ -1887,10 +1886,9 @@ OurSonic.Level.SpriteCacheIndexes = function() {
 	this.px = 0;
 	this.aes = 0;
 };
-Type.registerNamespace('OurSonic.Level.Animations');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Animations.Animation
-OurSonic.Level.Animations.Animation = function() {
+var $OurSonic_Level_Animations_Animation = function() {
 	this.animationFile = 0;
 	this.numberOfTiles = 0;
 	this.lastAnimatedIndex = 0;
@@ -1899,36 +1897,34 @@ OurSonic.Level.Animations.Animation = function() {
 	this.frames = null;
 	this.automatedTiming = 0;
 };
-OurSonic.Level.Animations.Animation.prototype = {
+$OurSonic_Level_Animations_Animation.prototype = {
 	getAnimationFile: function() {
-		return OurSonic.SonicManager.instance.sonicLevel.animatedFiles[this.animationFile];
+		return $OurSonic_SonicManager.instance.sonicLevel.animatedFiles[this.animationFile];
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Animations.AnimationFrame
-OurSonic.Level.Animations.AnimationFrame = function() {
+var $OurSonic_Level_Animations_AnimationFrame = function() {
 	this.ticks = 0;
 	this.startingTileIndex = 0;
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Animations.AnimationInstance
-OurSonic.Level.Animations.AnimationInstance = function() {
+var $OurSonic_Level_Animations_AnimationInstance = function() {
 };
-OurSonic.Level.Animations.AnimationInstance.prototype = {
+$OurSonic_Level_Animations_AnimationInstance.prototype = {
 	tick: function() {
 	},
 	draw: function(canvas, i, i1) {
 	}
 };
-Type.registerNamespace('OurSonic.Level.Events');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Events.LevelEvent
-OurSonic.Level.Events.LevelEvent = function() {
+var $OurSonic_Level_Events_LevelEvent = function() {
 };
-Type.registerNamespace('OurSonic.Level.Objects');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Objects.LevelObject
-OurSonic.Level.Objects.LevelObject = function(key) {
+var $OurSonic_Level_Objects_LevelObject = function(key) {
 	this.$cacheCompiled = {};
 	this.$cacheLast = {};
 	this.oldKey = null;
@@ -1949,7 +1945,7 @@ OurSonic.Level.Objects.LevelObject = function(key) {
 	this.projectiles = [];
 	this.assets = [];
 };
-OurSonic.Level.Objects.LevelObject.prototype = {
+$OurSonic_Level_Objects_LevelObject.prototype = {
 	init: function(object, level, sonic) {
 		object.reset();
 		this.$evalMe('initScript').apply(object, [object, level, sonic]);
@@ -1961,10 +1957,10 @@ OurSonic.Level.Objects.LevelObject.prototype = {
 		return this.$evalMe('hurtScript').apply(object, [object, level, sonic, sensor, piece]);
 	},
 	tick: function(object, level, sonic) {
-		if (object.lastDrawTick !== OurSonic.SonicManager.instance.tickCount - 1) {
+		if (object.lastDrawTick !== $OurSonic_SonicManager.instance.tickCount - 1) {
 			this.init(object, level, sonic);
 		}
-		object.lastDrawTick = OurSonic.SonicManager.instance.tickCount;
+		object.lastDrawTick = $OurSonic_SonicManager.instance.tickCount;
 		this.$evalMe('tickScript').apply(object, [object, level, sonic]);
 		if (object.state) {
 			object.xsp = object.state.xsp;
@@ -1993,7 +1989,7 @@ OurSonic.Level.Objects.LevelObject.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Objects.LevelObjectAsset
-OurSonic.Level.Objects.LevelObjectAsset = function(name) {
+var $OurSonic_Level_Objects_LevelObjectAsset = function(name) {
 	this.frames = null;
 	this.name = null;
 	this.frames = [];
@@ -2001,7 +1997,7 @@ OurSonic.Level.Objects.LevelObjectAsset = function(name) {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Objects.LevelObjectAssetFrame
-OurSonic.Level.Objects.LevelObjectAssetFrame = function(name) {
+var $OurSonic_Level_Objects_LevelObjectAssetFrame = function(name) {
 	this.offsetX = 0;
 	this.width = 0;
 	this.height = 0;
@@ -2021,7 +2017,7 @@ OurSonic.Level.Objects.LevelObjectAssetFrame = function(name) {
 		this.hurtSonicMap[i] = new Array(100);
 	}
 };
-OurSonic.Level.Objects.LevelObjectAssetFrame.prototype = {
+$OurSonic_Level_Objects_LevelObjectAssetFrame.prototype = {
 	setWidth: function(w) {
 		this.width = w;
 		this.collisionMap = this.collisionMap.slice(0, w);
@@ -2088,7 +2084,7 @@ OurSonic.Level.Objects.LevelObjectAssetFrame.prototype = {
 	drawUI: function(_canvas, pos, size, showOutline, showCollideMap, showHurtMap, showOffset, xflip, yflip) {
 		var fd = this.getCache(size, xflip, yflip, showOutline, showCollideMap, showHurtMap);
 		if (!fd) {
-			var mj = OurSonic.Utility.CanvasInformation.create(size.x, size.y);
+			var mj = $OurSonic_Utility_CanvasInformation.create(size.x, size.y);
 			var canvas = mj.context;
 			canvas.save();
 			canvas.strokeStyle = '#000000';
@@ -2178,12 +2174,12 @@ OurSonic.Level.Objects.LevelObjectAssetFrame.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Objects.LevelObjectData
-OurSonic.Level.Objects.LevelObjectData = function() {
+var $OurSonic_Level_Objects_LevelObjectData = function() {
 };
-OurSonic.Level.Objects.LevelObjectData.createInstance = function() {
-	return OurSonic.Level.Objects.LevelObjectData.$ctor();
+$OurSonic_Level_Objects_LevelObjectData.createInstance = function() {
+	return $OurSonic_Level_Objects_LevelObjectData.$ctor();
 };
-OurSonic.Level.Objects.LevelObjectData.$ctor = function() {
+$OurSonic_Level_Objects_LevelObjectData.$ctor = function() {
 	var $this = {};
 	$this.key = null;
 	$this.description = null;
@@ -2209,8 +2205,8 @@ OurSonic.Level.Objects.LevelObjectData.$ctor = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Objects.LevelObjectInfo
-OurSonic.Level.Objects.LevelObjectInfo = function(o) {
-	this.$_rect = OurSonic.Utility.Rectangle.$ctor1(0, 0, 0, 0);
+var $OurSonic_Level_Objects_LevelObjectInfo = function(o) {
+	this.$_rect = $OurSonic_Utility_Rectangle.$ctor1(0, 0, 0, 0);
 	this.lastDrawTick = 0;
 	this.o = null;
 	this.x = 0;
@@ -2241,7 +2237,7 @@ OurSonic.Level.Objects.LevelObjectInfo = function(o) {
 	this.upperNibble = this.subdata >> 4;
 	this.lowerNibble = this.subdata & 15;
 };
-OurSonic.Level.Objects.LevelObjectInfo.prototype = {
+$OurSonic_Level_Objects_LevelObjectInfo.prototype = {
 	log: function(txt, level) {
 		if (!this.debug) {
 			this.debug = [];
@@ -2290,8 +2286,8 @@ OurSonic.Level.Objects.LevelObjectInfo.prototype = {
 		if (this.objectData.pieceLayouts.length === 0) {
 			this.$_rect.x = ss.Int32.trunc(this.x);
 			this.$_rect.y = ss.Int32.trunc(this.y);
-			this.$_rect.width = OurSonic.Level.Objects.ObjectManager.broken.width;
-			this.$_rect.height = OurSonic.Level.Objects.ObjectManager.broken.height;
+			this.$_rect.width = $OurSonic_Level_Objects_ObjectManager.broken.width;
+			this.$_rect.height = $OurSonic_Level_Objects_ObjectManager.broken.height;
 			return this.$_rect;
 		}
 		var pcs = this.pieces;
@@ -2305,7 +2301,7 @@ OurSonic.Level.Objects.LevelObjectInfo.prototype = {
 			var asset = this.objectData.assets[piece.assetIndex];
 			if (asset.frames.length > 0) {
 				var frm = asset.frames[j.frameIndex];
-				OurSonic.Utility.Help.mergeRect(this.$_rect, OurSonic.Utility.Rectangle.$ctor1(frm.offsetX + j.x, frm.offsetY + j.y, frm.width, frm.height));
+				$OurSonic_Utility_Help.mergeRect(this.$_rect, $OurSonic_Utility_Rectangle.$ctor1(frm.offsetX + j.x, frm.offsetY + j.y, frm.width, frm.height));
 			}
 		}
 		this.$_rect.x = this.$_rect.x;
@@ -2321,7 +2317,7 @@ OurSonic.Level.Objects.LevelObjectInfo.prototype = {
 			return;
 		}
 		if (this.objectData.pieceLayouts.length === 0) {
-			canvas.drawImage(OurSonic.Level.Objects.ObjectManager.broken, x - ss.Int32.div(OurSonic.Level.Objects.ObjectManager.broken.width, 2), y - ss.Int32.div(OurSonic.Level.Objects.ObjectManager.broken.height, 2), OurSonic.Level.Objects.ObjectManager.broken.width, OurSonic.Level.Objects.ObjectManager.broken.height);
+			canvas.drawImage($OurSonic_Level_Objects_ObjectManager.broken, x - ss.Int32.div($OurSonic_Level_Objects_ObjectManager.broken.width, 2), y - ss.Int32.div($OurSonic_Level_Objects_ObjectManager.broken.height, 2), $OurSonic_Level_Objects_ObjectManager.broken.width, $OurSonic_Level_Objects_ObjectManager.broken.height);
 			return;
 		}
 		this.mainPieceLayout().draw(canvas, x, y, this.objectData, this, showHeightMap);
@@ -2422,7 +2418,7 @@ OurSonic.Level.Objects.LevelObjectInfo.prototype = {
 	},
 	collide: function(sonic, sensor, piece) {
 		try {
-			return this.objectData.onCollide(this, OurSonic.SonicManager.instance.sonicLevel, sonic, sensor, piece);
+			return this.objectData.onCollide(this, $OurSonic_SonicManager.instance.sonicLevel, sonic, sensor, piece);
 		}
 		catch ($t1) {
 			var EJ = ss.Exception.wrap($t1);
@@ -2432,7 +2428,7 @@ OurSonic.Level.Objects.LevelObjectInfo.prototype = {
 	},
 	hurtSonic: function(sonic, sensor, piece) {
 		try {
-			return this.objectData.onHurtSonic(this, OurSonic.SonicManager.instance.sonicLevel, sonic, sensor, piece);
+			return this.objectData.onHurtSonic(this, $OurSonic_SonicManager.instance.sonicLevel, sonic, sensor, piece);
 		}
 		catch ($t1) {
 			var EJ = ss.Exception.wrap($t1);
@@ -2443,9 +2439,9 @@ OurSonic.Level.Objects.LevelObjectInfo.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Objects.LevelObjectPiece
-OurSonic.Level.Objects.LevelObjectPiece = function() {
+var $OurSonic_Level_Objects_LevelObjectPiece = function() {
 };
-OurSonic.Level.Objects.LevelObjectPiece.$ctor = function(name) {
+$OurSonic_Level_Objects_LevelObjectPiece.$ctor = function(name) {
 	var $this = {};
 	$this.assetIndex = 0;
 	$this.frameIndex = 0;
@@ -2462,7 +2458,7 @@ OurSonic.Level.Objects.LevelObjectPiece.$ctor = function(name) {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Objects.LevelObjectPieceLayout
-OurSonic.Level.Objects.LevelObjectPieceLayout = function(name) {
+var $OurSonic_Level_Objects_LevelObjectPieceLayout = function(name) {
 	this.width = 0;
 	this.height = 0;
 	this.pieces = null;
@@ -2472,10 +2468,10 @@ OurSonic.Level.Objects.LevelObjectPieceLayout = function(name) {
 	this.height = 280;
 	this.pieces = [];
 };
-OurSonic.Level.Objects.LevelObjectPieceLayout.prototype = {
+$OurSonic_Level_Objects_LevelObjectPieceLayout.prototype = {
 	update: function() {
-		for (var index = 0; index < OurSonic.SonicManager.instance.sonicLevel.objects.length; index++) {
-			var t = OurSonic.SonicManager.instance.sonicLevel.objects[index];
+		for (var index = 0; index < $OurSonic_SonicManager.instance.sonicLevel.objects.length; index++) {
+			var t = $OurSonic_SonicManager.instance.sonicLevel.objects[index];
 			t.reset();
 		}
 	},
@@ -2512,11 +2508,11 @@ OurSonic.Level.Objects.LevelObjectPieceLayout.prototype = {
 		for (var i1 = 0; i1 < this.pieces.length; i1++) {
 			var j1 = this.pieces[i1];
 			if (showImages) {
-				var piece = OurSonic.SonicManager.instance.uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework.pieces[j1.pieceIndex];
-				var asset = OurSonic.SonicManager.instance.uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework.assets[piece.assetIndex];
+				var piece = $OurSonic_SonicManager.instance.uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework.pieces[j1.pieceIndex];
+				var asset = $OurSonic_SonicManager.instance.uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework.assets[piece.assetIndex];
 				if (asset.frames.length > 0) {
 					var frm = asset.frames[j1.frameIndex];
-					drawRadial = OurSonic.SonicManager.instance.mainCanvas.context.createRadialGradient(0, 0, 0, 10, 10, 50);
+					drawRadial = $OurSonic_SonicManager.instance.mainCanvas.context.createRadialGradient(0, 0, 0, 10, 10, 50);
 					drawRadial.addColorStop(0, 'white');
 					if (selectedPieceIndex === i1) {
 						drawRadial.addColorStop(1, 'yellow');
@@ -2527,11 +2523,11 @@ OurSonic.Level.Objects.LevelObjectPieceLayout.prototype = {
 					canvas.fillStyle = drawRadial;
 					//var borderSize = 3;
 					//   canvas.fillRect(pos.x + j.x - frm.offsetX - borderSize, pos.y + j.y - frm.offsetY - borderSize, frm.width + borderSize * 2, frm.height + borderSize*2);
-					frm.drawUI(canvas, OurSonic.Utility.Point.$ctor1(pos.x + j1.x - frm.offsetX, pos.y + j1.y - frm.offsetY), OurSonic.Utility.Point.$ctor1(frm.width, frm.height), false, true, true, false, piece.xflip, piece.yflip);
+					frm.drawUI(canvas, $OurSonic_Utility_Point.$ctor1(pos.x + j1.x - frm.offsetX, pos.y + j1.y - frm.offsetY), $OurSonic_Utility_Point.$ctor1(frm.width, frm.height), false, true, true, false, piece.xflip, piece.yflip);
 				}
 			}
 			else {
-				drawRadial = OurSonic.SonicManager.instance.mainCanvas.context.createRadialGradient(0, 0, 0, 10, 10, 50);
+				drawRadial = $OurSonic_SonicManager.instance.mainCanvas.context.createRadialGradient(0, 0, 0, 10, 10, 50);
 				drawRadial.addColorStop(0, 'white');
 				if (selectedPieceIndex === i1) {
 					drawRadial.addColorStop(1, 'yellow');
@@ -2558,16 +2554,16 @@ OurSonic.Level.Objects.LevelObjectPieceLayout.prototype = {
 			var asset = framework.assets[piece.assetIndex];
 			if (asset.frames.length > 0) {
 				var frm = asset.frames[j.frameIndex];
-				frm.drawUI(canvas, OurSonic.Utility.Point.$ctor1(x + j.x - frm.offsetX, y + j.y - frm.offsetY), OurSonic.Utility.Point.$ctor1(frm.width, frm.height), false, showHeightMap, showHeightMap, false, instance.xflip ^ piece.xflip, instance.yflip ^ piece.yflip);
+				frm.drawUI(canvas, $OurSonic_Utility_Point.$ctor1(x + j.x - frm.offsetX, y + j.y - frm.offsetY), $OurSonic_Utility_Point.$ctor1(frm.width, frm.height), false, showHeightMap, showHeightMap, false, instance.xflip ^ piece.xflip, instance.yflip ^ piece.yflip);
 			}
 		}
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Objects.LevelObjectPieceLayoutPiece
-OurSonic.Level.Objects.LevelObjectPieceLayoutPiece = function() {
+var $OurSonic_Level_Objects_LevelObjectPieceLayoutPiece = function() {
 };
-OurSonic.Level.Objects.LevelObjectPieceLayoutPiece.$ctor = function(pieceIndex) {
+$OurSonic_Level_Objects_LevelObjectPieceLayoutPiece.$ctor = function(pieceIndex) {
 	var $this = {};
 	$this.pieceIndex = 0;
 	$this.assetIndex = 0;
@@ -2581,9 +2577,9 @@ OurSonic.Level.Objects.LevelObjectPieceLayoutPiece.$ctor = function(pieceIndex) 
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Objects.LevelObjectProjectile
-OurSonic.Level.Objects.LevelObjectProjectile = function() {
+var $OurSonic_Level_Objects_LevelObjectProjectile = function() {
 };
-OurSonic.Level.Objects.LevelObjectProjectile.$ctor = function(name) {
+$OurSonic_Level_Objects_LevelObjectProjectile.$ctor = function(name) {
 	var $this = {};
 	$this.x = 0;
 	$this.y = 0;
@@ -2599,16 +2595,16 @@ OurSonic.Level.Objects.LevelObjectProjectile.$ctor = function(name) {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Objects.ObjectManager
-OurSonic.Level.Objects.ObjectManager = function(sonicManager) {
+var $OurSonic_Level_Objects_ObjectManager = function(sonicManager) {
 	this.$sonicManager = null;
 	this.$sonicManager = sonicManager;
 };
-OurSonic.Level.Objects.ObjectManager.prototype = {
+$OurSonic_Level_Objects_ObjectManager.prototype = {
 	init: function() {
 	}
 };
-OurSonic.Level.Objects.ObjectManager.extendObject = function(d) {
-	var $t1 = new OurSonic.Level.Objects.LevelObject(d.key);
+$OurSonic_Level_Objects_ObjectManager.extendObject = function(d) {
+	var $t1 = new $OurSonic_Level_Objects_LevelObject(d.key);
 	$t1.collideScript = d.collideScript;
 	$t1.hurtScript = d.hurtScript;
 	$t1.initScript = d.initScript;
@@ -2618,14 +2614,14 @@ OurSonic.Level.Objects.ObjectManager.extendObject = function(d) {
 	obj.assets = [];
 	for (var i = 0; i < d.assets.length; i++) {
 		var asset = d.assets[i];
-		var $t2 = new OurSonic.Level.Objects.LevelObjectAsset('');
+		var $t2 = new $OurSonic_Level_Objects_LevelObjectAsset('');
 		$t2.name = asset.name;
 		var levelObjectAsset = $t2;
 		levelObjectAsset.frames = [];
 		for (var index = 0; index < asset.frames.length; index++) {
 			var fr = asset.frames[index];
 			var $t4 = levelObjectAsset.frames;
-			var $t3 = new OurSonic.Level.Objects.LevelObjectAssetFrame('');
+			var $t3 = new $OurSonic_Level_Objects_LevelObjectAssetFrame('');
 			$t3.offsetX = fr.offsetX;
 			$t3.width = fr.width;
 			$t3.height = fr.height;
@@ -2647,7 +2643,7 @@ OurSonic.Level.Objects.ObjectManager.extendObject = function(d) {
 	for (var index2 = 0; index2 < d.pieceLayouts.length; index2++) {
 		var pl = d.pieceLayouts[index2];
 		var $t6 = obj.pieceLayouts;
-		var $t5 = new OurSonic.Level.Objects.LevelObjectPieceLayout(pl.name);
+		var $t5 = new $OurSonic_Level_Objects_LevelObjectPieceLayout(pl.name);
 		$t5.height = pl.height;
 		$t5.width = pl.width;
 		$t6[index2] = $t5;
@@ -2659,7 +2655,7 @@ OurSonic.Level.Objects.ObjectManager.extendObject = function(d) {
 	obj.projectiles = [];
 	for (var index3 = 0; index3 < d.projectiles.length; index3++) {
 		var proj = d.projectiles[index3];
-		var $t7 = OurSonic.Level.Objects.LevelObjectProjectile.$ctor(proj.name);
+		var $t7 = $OurSonic_Level_Objects_LevelObjectProjectile.$ctor(proj.name);
 		$t7.x = proj.x;
 		$t7.y = proj.y;
 		$t7.xsp = proj.xsp;
@@ -2673,16 +2669,15 @@ OurSonic.Level.Objects.ObjectManager.extendObject = function(d) {
 	}
 	return obj;
 };
-Type.registerNamespace('OurSonic.Level.Tiles');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Tiles.RotationMode
-OurSonic.Level.Tiles.RotationMode = function() {
+var $OurSonic_Level_Tiles_RotationMode = function() {
 };
-OurSonic.Level.Tiles.RotationMode.prototype = { floor: 134, rightWall: 224, ceiling: 314, leftWall: 44 };
-OurSonic.Level.Tiles.RotationMode.registerEnum('OurSonic.Level.Tiles.RotationMode', false);
+$OurSonic_Level_Tiles_RotationMode.prototype = { floor: 134, rightWall: 224, ceiling: 314, leftWall: 44 };
+Type.registerEnum(global, 'OurSonic.Level.Tiles.RotationMode', $OurSonic_Level_Tiles_RotationMode, false);
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Tiles.Tile
-OurSonic.Level.Tiles.Tile = function(colors) {
+var $OurSonic_Level_Tiles_Tile = function(colors) {
 	this.$canAnimate = true;
 	this.$willAnimate = null;
 	this._Tile = 0;
@@ -2700,18 +2695,18 @@ OurSonic.Level.Tiles.Tile = function(colors) {
 	this.sprites = [];
 	this.curPaletteIndexes = null;
 };
-OurSonic.Level.Tiles.Tile.prototype = {
+$OurSonic_Level_Tiles_Tile.prototype = {
 	draw: function(canvas, pos, xflip, yflip, palette, layer, animationFrame) {
 		if (this.$checkGood(canvas, pos, xflip, yflip, palette, layer, animationFrame)) {
 			return;
 		}
 		var cx = this.colors.length;
 		var cy = this.colors.length;
-		var j = OurSonic.Utility.CanvasInformation.create(cx, cy);
+		var j = $OurSonic_Utility_CanvasInformation.create(cx, cy);
 		if (pos.x < 0 || pos.y < 0) {
 			return;
 		}
-		var oPos = OurSonic.Utility.Point.$ctor1(0, 0);
+		var oPos = $OurSonic_Utility_Point.$ctor1(0, 0);
 		if (xflip) {
 			oPos.x = -this.colors.length;
 			j.context.scale(-1, 1);
@@ -2720,8 +2715,8 @@ OurSonic.Level.Tiles.Tile.prototype = {
 			oPos.y = -this.colors.length;
 			j.context.scale(1, -1);
 		}
-		var palette_ = OurSonic.SonicManager.instance.sonicLevel.palette;
-		var indexed = OurSonic.SonicManager.instance.indexedPalette;
+		var palette_ = $OurSonic_SonicManager.instance.sonicLevel.palette;
+		var indexed = $OurSonic_SonicManager.instance.indexedPalette;
 		var mx = this.colors.length;
 		var my = this.colors[0].length;
 		j.context.save();
@@ -2769,7 +2764,7 @@ OurSonic.Level.Tiles.Tile.prototype = {
 				if (!frame) {
 					frame = an.frames[0];
 				}
-				var file = OurSonic.SonicManager.instance.sonicLevel.animatedFiles[an.animationFile];
+				var file = $OurSonic_SonicManager.instance.sonicLevel.animatedFiles[an.animationFile];
 				var va = file[frame.startingTileIndex + (this.index - anin)];
 				if (va) {
 					if (canvas.fillStyle !== 'rbga(255,255,255,255)') {
@@ -2780,8 +2775,8 @@ OurSonic.Level.Tiles.Tile.prototype = {
 				}
 				return false;
 			}
-			for (var i = 0; i < OurSonic.SonicManager.instance.sonicLevel.animations.length; i++) {
-				var acn = OurSonic.SonicManager.instance.sonicLevel.animations[i];
+			for (var i = 0; i < $OurSonic_SonicManager.instance.sonicLevel.animations.length; i++) {
+				var acn = $OurSonic_SonicManager.instance.sonicLevel.animations[i];
 				var anin1 = acn.animationTileIndex;
 				var num = acn.numberOfTiles;
 				if (this.index >= anin1 && this.index < anin1 + num) {
@@ -2867,9 +2862,9 @@ OurSonic.Level.Tiles.Tile.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Tiles.TileCacheBlock
-OurSonic.Level.Tiles.TileCacheBlock = function() {
+var $OurSonic_Level_Tiles_TileCacheBlock = function() {
 };
-OurSonic.Level.Tiles.TileCacheBlock.$ctor = function(type) {
+$OurSonic_Level_Tiles_TileCacheBlock.$ctor = function(type) {
 	var $this = {};
 	$this.animatedKey = 0;
 	$this.type = 0;
@@ -2883,15 +2878,15 @@ OurSonic.Level.Tiles.TileCacheBlock.$ctor = function(type) {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Tiles.TileCacheBlockType
-OurSonic.Level.Tiles.TileCacheBlockType = function() {
+var $OurSonic_Level_Tiles_TileCacheBlockType = function() {
 };
-OurSonic.Level.Tiles.TileCacheBlockType.prototype = { block: 0, tilePiece: 1 };
-OurSonic.Level.Tiles.TileCacheBlockType.registerEnum('OurSonic.Level.Tiles.TileCacheBlockType', false);
+$OurSonic_Level_Tiles_TileCacheBlockType.prototype = { block: 0, tilePiece: 1 };
+Type.registerEnum(global, 'OurSonic.Level.Tiles.TileCacheBlockType', $OurSonic_Level_Tiles_TileCacheBlockType, false);
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Tiles.TileChunk
-OurSonic.Level.Tiles.TileChunk = function() {
+var $OurSonic_Level_Tiles_TileChunk = function() {
 	this.$layerCacheBlocks = null;
-	this.$myLocalPoint = OurSonic.Utility.Point.$ctor1(0, 0);
+	this.$myLocalPoint = $OurSonic_Utility_Point.$ctor1(0, 0);
 	this.$myNeverAnimate = null;
 	this.$neverAnimateCache = null;
 	this.isOnlyBackground = null;
@@ -2910,9 +2905,9 @@ OurSonic.Level.Tiles.TileChunk = function() {
 	this.$neverAnimateCache = new Array(2);
 	this.$layerCacheBlocks = new Array(2);
 };
-OurSonic.Level.Tiles.TileChunk.prototype = {
+$OurSonic_Level_Tiles_TileChunk.prototype = {
 	drawUI: function(canvas, position, scale, layer) {
-		var $t1 = new OurSonic.Utility.CanvasHandler(canvas);
+		var $t1 = new $OurSonic_Utility_CanvasHandler(canvas);
 		try {
 			canvas.translate(position.x, position.y);
 			canvas.scale(scale.x, scale.y);
@@ -2920,7 +2915,7 @@ OurSonic.Level.Tiles.TileChunk.prototype = {
 			var pieceHeight = 16;
 			var isBack = layer === 0;
 			//for building no aniamtion cache
-			this.$drawOld(canvas, OurSonic.Utility.Point.$ctor1(0, 0), layer, pieceWidth, pieceHeight, isBack, false, null, null);
+			this.$drawOld(canvas, $OurSonic_Utility_Point.$ctor1(0, 0), layer, pieceWidth, pieceHeight, isBack, false, null, null);
 		}
 		finally {
 			if (ss.isValue($t1)) {
@@ -3033,7 +3028,7 @@ OurSonic.Level.Tiles.TileChunk.prototype = {
 			this.$layerCacheBlocks[layer] = this.buildCacheBlock(layer, bounds);
 		}
 		{
-			var $t2 = new OurSonic.Utility.CanvasHandler(canvas);
+			var $t3 = new $OurSonic_Utility_CanvasHandler(canvas);
 			try {
 				if (ss.isValue(this.$neverAnimateCache[layer])) {
 					this.$drawFullChunk(canvas, position, layer);
@@ -3046,37 +3041,32 @@ OurSonic.Level.Tiles.TileChunk.prototype = {
 				var isBack = layer === 0;
 				if (neverAnimates) {
 					oldCanvas = canvas;
-					this.$neverAnimateCache[layer] = OurSonic.Utility.CanvasInformation.create(OurSonic.Level.Tiles.TileChunk.$numOfPiecesWide * pieceWidth, OurSonic.Level.Tiles.TileChunk.$numOfPiecesLong * pieceHeight);
+					this.$neverAnimateCache[layer] = $OurSonic_Utility_CanvasInformation.create($OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide * pieceWidth, $OurSonic_Level_Tiles_TileChunk.$numOfPiecesLong * pieceHeight);
 					canvas = this.$neverAnimateCache[layer].context;
-					oldPoint = OurSonic.Utility.Point.$ctor(position);
-					OurSonic.Utility.Point.set(position, 0, 0);
+					oldPoint = $OurSonic_Utility_Point.$ctor(position);
+					$OurSonic_Utility_Point.set(position, 0, 0);
 					//for building no aniamtion cache
 					this.$drawOld(canvas, position, layer, pieceWidth, pieceHeight, isBack, neverAnimates, oldPoint, oldCanvas);
 					return;
 				}
-				var $t1 = this.$layerCacheBlocks[layer].getEnumerator();
-				try {
-					while ($t1.moveNext()) {
-						var tileCacheBlock = $t1.get_current();
-						switch (tileCacheBlock.type) {
-							case 0: {
-								OurSonic.Level.Tiles.TileChunk.$drawBlock(canvas, position, tileCacheBlock);
-								break;
-							}
-							case 1: {
-								this.$drawTilePiece(canvas, position, layer, tileCacheBlock, isBack);
-								break;
-							}
+				var $t1 = this.$layerCacheBlocks[layer];
+				for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+					var tileCacheBlock = $t1[$t2];
+					switch (tileCacheBlock.type) {
+						case 0: {
+							$OurSonic_Level_Tiles_TileChunk.$drawBlock(canvas, position, tileCacheBlock);
+							break;
+						}
+						case 1: {
+							this.$drawTilePiece(canvas, position, layer, tileCacheBlock, isBack);
+							break;
 						}
 					}
 				}
-				finally {
-					$t1.dispose();
-				}
 			}
 			finally {
-				if (ss.isValue($t2)) {
-					$t2.dispose();
+				if (ss.isValue($t3)) {
+					$t3.dispose();
 				}
 			}
 		}
@@ -3086,9 +3076,9 @@ OurSonic.Level.Tiles.TileChunk.prototype = {
 		var posY = position.y;
 		var curKey = 0;
 		//pieceY * numOfPiecesWide + pieceX              VV
-		for (var pieceY = 0; pieceY < OurSonic.Level.Tiles.TileChunk.$numOfPiecesLong; pieceY++) {
-			curKey = pieceY * OurSonic.Level.Tiles.TileChunk.$numOfPiecesWide;
-			for (var pieceX = 0; pieceX < OurSonic.Level.Tiles.TileChunk.$numOfPiecesWide; pieceX++) {
+		for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$numOfPiecesLong; pieceY++) {
+			curKey = pieceY * $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide;
+			for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide; pieceX++) {
 				curKey += pieceX;
 				this.$drawIt(canvas, layer, this.tilePieces[pieceX][pieceY], isBack, curKey, posX + pieceX * pieceWidth, posY + pieceY * pieceHeight);
 			}
@@ -3149,8 +3139,8 @@ OurSonic.Level.Tiles.TileChunk.prototype = {
 			return [];
 		}
 		var isBack = layer === 0;
-		for (var pieceX = 0; pieceX < OurSonic.Level.Tiles.TileChunk.$numOfPiecesWide; pieceX++) {
-			for (var pieceY = 0; pieceY < OurSonic.Level.Tiles.TileChunk.$numOfPiecesLong; pieceY++) {
+		for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide; pieceX++) {
+			for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$numOfPiecesLong; pieceY++) {
 				var cacheBlock = this.$buildCacheBlock(layer, pieceWidth, pieceHeight, this.tilePieces[pieceX][pieceY], isBack, pieceX, pieceY, block);
 				switch (cacheBlock.type) {
 					case 0: {
@@ -3174,7 +3164,7 @@ OurSonic.Level.Tiles.TileChunk.prototype = {
 		//if (isBack ? (piece.onlyForeground) : (piece.onlyBackground)) return null;
 		var piece = pieceInfo.getTilePiece();
 		var animatedIndex = 0;
-		var animation = this.animated[pieceY * OurSonic.Level.Tiles.TileChunk.$numOfPiecesWide + pieceX];
+		var animation = this.animated[pieceY * $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide + pieceX];
 		var cacheBlockNeeded = false;
 		var shouldAnimate = piece.shouldAnimate();
 		if (this.animated && animation) {
@@ -3184,10 +3174,10 @@ OurSonic.Level.Tiles.TileChunk.prototype = {
 			cacheBlockNeeded = true;
 		}
 		if (cacheBlockNeeded) {
-			var internalPoint = OurSonic.Utility.Point.$ctor1(pieceX * pieceWidth, pieceY * pieceHeight);
+			var internalPoint = $OurSonic_Utility_Point.$ctor1(pieceX * pieceWidth, pieceY * pieceHeight);
 			if (ss.isNullOrUndefined(oldCacheBlock)) {
-				oldCacheBlock = OurSonic.Level.Tiles.TileCacheBlock.$ctor(0);
-				oldCacheBlock.block = OurSonic.Utility.CanvasInformation.create(pieceWidth * 8, pieceHeight * 8);
+				oldCacheBlock = $OurSonic_Level_Tiles_TileCacheBlock.$ctor(0);
+				oldCacheBlock.block = $OurSonic_Utility_CanvasInformation.create(pieceWidth * 8, pieceHeight * 8);
 				oldCacheBlock.color = String.format('rgba({0},{1},{2},0.2);', ss.Int32.trunc(Math.random() * 150), ss.Int32.trunc(Math.random() * 255), ss.Int32.trunc(Math.random() * 255));
 			}
 			oldCacheBlock.block.context.save();
@@ -3198,11 +3188,11 @@ OurSonic.Level.Tiles.TileChunk.prototype = {
 			return oldCacheBlock;
 		}
 		else {
-			var $t1 = OurSonic.Level.Tiles.TileCacheBlock.$ctor(1);
+			var $t1 = $OurSonic_Level_Tiles_TileCacheBlock.$ctor(1);
 			$t1.tilePieceInfo = pieceInfo;
 			$t1.xPos = pieceX * pieceWidth;
 			$t1.yPos = pieceY * pieceHeight;
-			$t1.animatedKey = pieceY * OurSonic.Level.Tiles.TileChunk.$numOfPiecesWide + pieceX;
+			$t1.animatedKey = pieceY * $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide + pieceX;
 			return $t1;
 		}
 	},
@@ -3216,8 +3206,8 @@ OurSonic.Level.Tiles.TileChunk.prototype = {
 					anni.lastAnimatedFrame = 0;
 					anni.lastAnimatedIndex = 0;
 				}
-				if (anni.frames[anni.lastAnimatedIndex].ticks === 0 || ss.Nullable.ge(ss.Nullable.sub(OurSonic.SonicManager.instance.drawTickCount, anni.lastAnimatedFrame), ((anni.automatedTiming > 0) ? anni.automatedTiming : anni.frames[anni.lastAnimatedIndex].ticks))) {
-					anni.lastAnimatedFrame = OurSonic.SonicManager.instance.drawTickCount;
+				if (anni.frames[anni.lastAnimatedIndex].ticks === 0 || ss.Nullable.ge(ss.Nullable.sub($OurSonic_SonicManager.instance.drawTickCount, anni.lastAnimatedFrame), ((anni.automatedTiming > 0) ? anni.automatedTiming : anni.frames[anni.lastAnimatedIndex].ticks))) {
+					anni.lastAnimatedFrame = $OurSonic_SonicManager.instance.drawTickCount;
 					anni.lastAnimatedIndex = (anni.lastAnimatedIndex + 1) % anni.frames.length;
 				}
 			}
@@ -3227,12 +3217,12 @@ OurSonic.Level.Tiles.TileChunk.prototype = {
 		}
 	}
 };
-OurSonic.Level.Tiles.TileChunk.$drawBlock = function(canvas, position, tileCacheBlock) {
+$OurSonic_Level_Tiles_TileChunk.$drawBlock = function(canvas, position, tileCacheBlock) {
 	canvas.drawImage(tileCacheBlock.block.canvas, position.x, position.y);
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Tiles.TileItem
-OurSonic.Level.Tiles.TileItem = function() {
+var $OurSonic_Level_Tiles_TileItem = function() {
 	this._Tile = 0;
 	this.priority = false;
 	this.xFlip = false;
@@ -3240,14 +3230,14 @@ OurSonic.Level.Tiles.TileItem = function() {
 	this.palette = 0;
 	this.index = 0;
 };
-OurSonic.Level.Tiles.TileItem.prototype = {
+$OurSonic_Level_Tiles_TileItem.prototype = {
 	getTile: function() {
-		return OurSonic.SonicManager.instance.sonicLevel.getTile(this._Tile);
+		return $OurSonic_SonicManager.instance.sonicLevel.getTile(this._Tile);
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Tiles.TilePiece
-OurSonic.Level.Tiles.TilePiece = function() {
+var $OurSonic_Level_Tiles_TilePiece = function() {
 	this.$onlyBackground = false;
 	this.$onlyBackgroundSet = false;
 	this.$onlyForeground = false;
@@ -3259,7 +3249,7 @@ OurSonic.Level.Tiles.TilePiece = function() {
 	this.index = 0;
 	this.image = {};
 };
-OurSonic.Level.Tiles.TilePiece.prototype = {
+$OurSonic_Level_Tiles_TilePiece.prototype = {
 	init: function() {
 		this.onlyBackground();
 		this.onlyForeground();
@@ -3302,7 +3292,7 @@ OurSonic.Level.Tiles.TilePiece.prototype = {
 	draw: function(canvas, position, layer, xFlip, yFlip, animatedIndex) {
 		var drawOrderIndex = 0;
 		drawOrderIndex = (xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3));
-		var fd = this.$getCache(layer, drawOrderIndex, animatedIndex, OurSonic.SonicManager.instance.sonicLevel.paletteAnimations);
+		var fd = this.$getCache(layer, drawOrderIndex, animatedIndex, $OurSonic_SonicManager.instance.sonicLevel.paletteAnimations);
 		if (!fd) {
 			fd = this.$buildCache(layer, xFlip, yFlip, animatedIndex, drawOrderIndex);
 		}
@@ -3325,11 +3315,11 @@ OurSonic.Level.Tiles.TilePiece.prototype = {
 	},
 	$buildCache: function(layer, xFlip, yFlip, animatedIndex, drawOrderIndex) {
 		var fd;
-		var ac = OurSonic.Utility.CanvasInformation.create(16, 16);
+		var ac = $OurSonic_Utility_CanvasInformation.create(16, 16);
 		var sX = 8;
 		var sY = 8;
 		var i = 0;
-		var localPoint = OurSonic.Utility.Point.$ctor1(0, 0);
+		var localPoint = $OurSonic_Utility_Point.$ctor1(0, 0);
 		for (var $t1 = 0; $t1 < this.tiles.length; $t1++) {
 			var t = this.tiles[$t1];
 			var mj = t;
@@ -3338,7 +3328,7 @@ OurSonic.Level.Tiles.TilePiece.prototype = {
 				if (mj.priority === (layer === 1)) {
 					var _xf = xFlip ^ mj.xFlip;
 					var _yf = yFlip ^ mj.yFlip;
-					var df = OurSonic.Level.Tiles.TilePiece.$drawInfo[OurSonic.Level.Tiles.TilePiece.$drawOrder[drawOrderIndex][i]];
+					var df = $OurSonic_Level_Tiles_TilePiece.$drawInfo[$OurSonic_Level_Tiles_TilePiece.$drawOrder[drawOrderIndex][i]];
 					localPoint.x = df[0] * sX;
 					localPoint.y = df[1] * sY;
 					tile.draw(ac.context, localPoint, _xf, _yf, mj.palette, layer, animatedIndex);
@@ -3350,7 +3340,7 @@ OurSonic.Level.Tiles.TilePiece.prototype = {
 		//            ac.Context.LineWidth = 1;
 		//            ac.Context.StrokeRect(0, 0, 2*8 * SonicManager.Instance.Scale.X, 2*8 * SonicManager.Instance.Scale.Y);
 		fd = ac.canvas;
-		this.$setCache(layer, drawOrderIndex, animatedIndex, OurSonic.SonicManager.instance.sonicLevel.paletteAnimations, fd);
+		this.$setCache(layer, drawOrderIndex, animatedIndex, $OurSonic_SonicManager.instance.sonicLevel.paletteAnimations, fd);
 		return fd;
 	},
 	$setCache: function(layer, drawOrder, animationFrame, palAn, image) {
@@ -3379,21 +3369,21 @@ OurSonic.Level.Tiles.TilePiece.prototype = {
 		return this.image[val];
 	},
 	getLayer1Angles: function() {
-		return OurSonic.SonicManager.instance.sonicLevel.angles[OurSonic.SonicManager.instance.sonicLevel.collisionIndexes1[this.index]];
+		return $OurSonic_SonicManager.instance.sonicLevel.angles[$OurSonic_SonicManager.instance.sonicLevel.collisionIndexes1[this.index]];
 	},
 	getLayer2Angles: function() {
-		return OurSonic.SonicManager.instance.sonicLevel.angles[OurSonic.SonicManager.instance.sonicLevel.collisionIndexes2[this.index]];
+		return $OurSonic_SonicManager.instance.sonicLevel.angles[$OurSonic_SonicManager.instance.sonicLevel.collisionIndexes2[this.index]];
 	},
 	getLayer1HeightMaps: function() {
-		return OurSonic.SonicManager.instance.sonicLevel.heightMaps[OurSonic.SonicManager.instance.sonicLevel.collisionIndexes1[this.index]];
+		return $OurSonic_SonicManager.instance.sonicLevel.heightMaps[$OurSonic_SonicManager.instance.sonicLevel.collisionIndexes1[this.index]];
 	},
 	getLayer2HeightMaps: function() {
-		return OurSonic.SonicManager.instance.sonicLevel.heightMaps[OurSonic.SonicManager.instance.sonicLevel.collisionIndexes2[this.index]];
+		return $OurSonic_SonicManager.instance.sonicLevel.heightMaps[$OurSonic_SonicManager.instance.sonicLevel.collisionIndexes2[this.index]];
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Level.Tiles.TilePieceInfo
-OurSonic.Level.Tiles.TilePieceInfo = function() {
+var $OurSonic_Level_Tiles_TilePieceInfo = function() {
 	this.$block = null;
 	this.block = 0;
 	this.xFlip = false;
@@ -3402,10 +3392,10 @@ OurSonic.Level.Tiles.TilePieceInfo = function() {
 	this.solid2 = 0;
 	this.index = 0;
 };
-OurSonic.Level.Tiles.TilePieceInfo.prototype = {
+$OurSonic_Level_Tiles_TilePieceInfo.prototype = {
 	getTilePiece: function() {
 		if (ss.isNullOrUndefined(this.$block)) {
-			this.$block = OurSonic.SonicManager.instance.sonicLevel.getTilePiece(this.block);
+			this.$block = $OurSonic_SonicManager.instance.sonicLevel.getTilePiece(this.block);
 		}
 		return this.$block;
 	},
@@ -3414,22 +3404,21 @@ OurSonic.Level.Tiles.TilePieceInfo.prototype = {
 		this.$block = null;
 	},
 	getLayer1Angles: function() {
-		return OurSonic.SonicManager.instance.sonicLevel.angles[OurSonic.SonicManager.instance.sonicLevel.collisionIndexes1[this.block]];
+		return $OurSonic_SonicManager.instance.sonicLevel.angles[$OurSonic_SonicManager.instance.sonicLevel.collisionIndexes1[this.block]];
 	},
 	getLayer2Angles: function() {
-		return OurSonic.SonicManager.instance.sonicLevel.angles[OurSonic.SonicManager.instance.sonicLevel.collisionIndexes2[this.block]];
+		return $OurSonic_SonicManager.instance.sonicLevel.angles[$OurSonic_SonicManager.instance.sonicLevel.collisionIndexes2[this.block]];
 	},
 	getLayer1HeightMaps: function() {
-		return OurSonic.SonicManager.instance.sonicLevel.heightMaps[OurSonic.SonicManager.instance.sonicLevel.collisionIndexes1[this.block]];
+		return $OurSonic_SonicManager.instance.sonicLevel.heightMaps[$OurSonic_SonicManager.instance.sonicLevel.collisionIndexes1[this.block]];
 	},
 	getLayer2HeightMaps: function() {
-		return OurSonic.SonicManager.instance.sonicLevel.heightMaps[OurSonic.SonicManager.instance.sonicLevel.collisionIndexes2[this.block]];
+		return $OurSonic_SonicManager.instance.sonicLevel.heightMaps[$OurSonic_SonicManager.instance.sonicLevel.collisionIndexes2[this.block]];
 	}
 };
-Type.registerNamespace('OurSonic.Sonic');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Sonic.Sensor
-OurSonic.Sonic.Sensor = function(x1, x2, y1, y2, manager, color, ignoreSolid, letter) {
+var $OurSonic_Sonic_Sensor = function(x1, x2, y1, y2, manager, color, ignoreSolid, letter) {
 	this.$__currentM = { value: 0, angle: 0 };
 	this.value = 0;
 	this.angle = 0;
@@ -3451,21 +3440,21 @@ OurSonic.Sonic.Sensor = function(x1, x2, y1, y2, manager, color, ignoreSolid, le
 	this.ignoreSolid = ignoreSolid;
 	this.letter = letter;
 };
-OurSonic.Sonic.Sensor.prototype = {
+$OurSonic_Sonic_Sensor.prototype = {
 	$checkCollisionLineWrap: function(x1, x2, y1, y2, ignoreSolid) {
 		var _x = ss.Int32.div(x1, 128);
-		var _y = OurSonic.Utility.Help.mod(ss.Int32.div(y1, 128), OurSonic.SonicManager.instance.sonicLevel.levelHeight);
-		var tc = OurSonic.SonicManager.instance.sonicLevel.getChunkAt(_x, _y);
-		this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
-		var curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
-		var cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
+		var _y = $OurSonic_Utility_Help.mod(ss.Int32.div(y1, 128), $OurSonic_SonicManager.instance.sonicLevel.levelHeight);
+		var tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x, _y);
+		this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+		var curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
+		var cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 		var __x = x1 - _x * 128;
 		var __y = y1 - _y * 128;
 		var i = 0;
 		var length = 0;
 		if (y1 === y2) {
-			if (Math.max(x1, x2) > OurSonic.SonicManager.instance.sonicLevel.levelWidth * 128) {
-				this.$__currentM.value = OurSonic.SonicManager.instance.sonicLevel.levelWidth * 128 - 20;
+			if (Math.max(x1, x2) > $OurSonic_SonicManager.instance.sonicLevel.levelWidth * 128) {
+				this.$__currentM.value = $OurSonic_SonicManager.instance.sonicLevel.levelWidth * 128 - 20;
 				this.$__currentM.angle = 255;
 				return this.$__currentM;
 			}
@@ -3480,17 +3469,17 @@ OurSonic.Sonic.Sensor.prototype = {
 									this.$__currentM.angle = 255;
 									return this.$__currentM;
 								}
-								tc = OurSonic.SonicManager.instance.sonicLevel.getChunkAt(_x - 1, _y);
-								this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
-								curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
-								cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
+								tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x - 1, _y);
+								this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+								curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
+								cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 								__x += 128;
 							}
 							else {
 								break;
 							}
 						}
-						if (curh[__x - i][__y] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1 - i, y1, this.letter)) {
+						if (curh[__x - i][__y] >= 1 || $OurSonic_SonicManager.instance.sonicToon.checkCollisionWithObjects(x1 - i, y1, this.letter)) {
 							//            if (!( ( curh[( __x - i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
 							//            continue;
 							this.$__currentM.value = x1 - i;
@@ -3514,17 +3503,17 @@ OurSonic.Sonic.Sensor.prototype = {
 							//                                return this.__currentM;
 							//
 							//                                }
-							tc = OurSonic.SonicManager.instance.sonicLevel.getChunkAt(_x + 1, _y);
-							this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
-							curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
-							cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
+							tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x + 1, _y);
+							this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+							curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
+							cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 							__x -= 128;
 						}
 						else {
 							break;
 						}
 					}
-					if (curh[__x + i][__y] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1 + i, y1, this.letter)) {
+					if (curh[__x + i][__y] >= 1 || $OurSonic_SonicManager.instance.sonicToon.checkCollisionWithObjects(x1 + i, y1, this.letter)) {
 						//if (!( ( curh[( __x + i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
 						//continue;
 						this.$__currentM.value = x1 + i;
@@ -3551,17 +3540,17 @@ OurSonic.Sonic.Sensor.prototype = {
 								//                                    return this.__currentM;
 								//
 								//                                    }
-								tc = OurSonic.SonicManager.instance.sonicLevel.getChunkAt(_x + 1, _y);
-								this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
-								curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
-								cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
+								tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x + 1, _y);
+								this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+								curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
+								cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 								__x -= 128;
 							}
 							else {
 								break;
 							}
 						}
-						if (curh[__x + i][__y] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1 + i, y1, this.letter)) {
+						if (curh[__x + i][__y] >= 1 || $OurSonic_SonicManager.instance.sonicToon.checkCollisionWithObjects(x1 + i, y1, this.letter)) {
 							//    if (!( ( curh[( __x + i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
 							//    continue;
 							this.$__currentM.value = x1 + i;
@@ -3578,17 +3567,17 @@ OurSonic.Sonic.Sensor.prototype = {
 								this.$__currentM.angle = 255;
 								return this.$__currentM;
 							}
-							tc = OurSonic.SonicManager.instance.sonicLevel.getChunkAt(_x - 1, _y);
-							this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
-							curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
-							cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
+							tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x - 1, _y);
+							this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+							curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
+							cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 							__x += 128;
 						}
 						else {
 							break;
 						}
 					}
-					if (curh[__x - i][__y] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1 - i, y1, this.letter)) {
+					if (curh[__x - i][__y] >= 1 || $OurSonic_SonicManager.instance.sonicToon.checkCollisionWithObjects(x1 - i, y1, this.letter)) {
 						//          if (!( ( curh[( __x - i )][__y] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
 						//          continue;
 						this.$__currentM.value = x1 - i;
@@ -3606,17 +3595,17 @@ OurSonic.Sonic.Sensor.prototype = {
 					for (i = 0; i < 256; i++) {
 						while (true) {
 							if (__y - i < 0) {
-								tc = OurSonic.SonicManager.instance.sonicLevel.getChunkAt(_x, OurSonic.Utility.Help.mod(_y - 1, OurSonic.SonicManager.instance.sonicLevel.levelHeight));
-								this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
-								curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
-								cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
+								tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x, $OurSonic_Utility_Help.mod(_y - 1, $OurSonic_SonicManager.instance.sonicLevel.levelHeight));
+								this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+								curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
+								cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 								__y += 128;
 							}
 							else {
 								break;
 							}
 						}
-						if (curh[__x][__y - i] > 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1, y1 - i, this.letter)) {
+						if (curh[__x][__y - i] > 1 || $OurSonic_SonicManager.instance.sonicToon.checkCollisionWithObjects(x1, y1 - i, this.letter)) {
 							//
 							//                                if (!( ( curh[__x][__y - i] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) )) {
 							//
@@ -3634,18 +3623,18 @@ OurSonic.Sonic.Sensor.prototype = {
 				for (i = 0; i < length; i++) {
 					while (true) {
 						if (__y + i >= 128) {
-							tc = OurSonic.SonicManager.instance.sonicLevel.getChunkAt(_x, (_y + 1) % OurSonic.SonicManager.instance.sonicLevel.levelHeight);
-							this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
-							curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
-							cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
+							tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x, (_y + 1) % $OurSonic_SonicManager.instance.sonicLevel.levelHeight);
+							this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+							curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
+							cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 							__y -= 128;
 						}
 						else {
 							break;
 						}
 					}
-					if (curh[__x][__y + i] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1, y1 + i, this.letter)) {
-						if (curh[__x][__y + i] === 1 && OurSonic.SonicManager.instance.sonicToon.inAir && OurSonic.SonicManager.instance.sonicToon.ysp < 0) {
+					if (curh[__x][__y + i] >= 1 || $OurSonic_SonicManager.instance.sonicToon.checkCollisionWithObjects(x1, y1 + i, this.letter)) {
+						if (curh[__x][__y + i] === 1 && $OurSonic_SonicManager.instance.sonicToon.inAir && $OurSonic_SonicManager.instance.sonicToon.ysp < 0) {
 							continue;
 						}
 						//
@@ -3670,17 +3659,17 @@ OurSonic.Sonic.Sensor.prototype = {
 					for (i = 0; i < 256; i++) {
 						while (true) {
 							if (__y + i >= 128) {
-								tc = OurSonic.SonicManager.instance.sonicLevel.getChunkAt(_x, (_y + 1) % OurSonic.SonicManager.instance.sonicLevel.levelHeight);
-								this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
-								curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
-								cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
+								tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x, (_y + 1) % $OurSonic_SonicManager.instance.sonicLevel.levelHeight);
+								this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+								curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
+								cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 								__y -= 128;
 							}
 							else {
 								break;
 							}
 						}
-						if (curh[__x][__y + i] >= 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1, y1 + i, this.letter)) {
+						if (curh[__x][__y + i] >= 1 || $OurSonic_SonicManager.instance.sonicToon.checkCollisionWithObjects(x1, y1 + i, this.letter)) {
 							//
 							//                                if (!( ( curh[__x][__y + i] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
 							//
@@ -3700,17 +3689,17 @@ OurSonic.Sonic.Sensor.prototype = {
 				for (i = 0; i < length; i++) {
 					while (true) {
 						if (__y - i < 0) {
-							tc = OurSonic.SonicManager.instance.sonicLevel.getChunkAt(_x, OurSonic.Utility.Help.mod(_y - 1, OurSonic.SonicManager.instance.sonicLevel.levelHeight));
-							this.$buildChunk(tc, OurSonic.SonicManager.instance.sonicLevel.curHeightMap);
-							curh = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
-							cura = (OurSonic.SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
+							tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x, $OurSonic_Utility_Help.mod(_y - 1, $OurSonic_SonicManager.instance.sonicLevel.levelHeight));
+							this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+							curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
+							cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 							__y += 128;
 						}
 						else {
 							break;
 						}
 					}
-					if (curh[__x][__y - i] > 1 || OurSonic.SonicManager.instance.sonicToon.checkCollisionWithObjects(x1, y1 + i, this.letter)) {
+					if (curh[__x][__y - i] > 1 || $OurSonic_SonicManager.instance.sonicToon.checkCollisionWithObjects(x1, y1 + i, this.letter)) {
 						//                            if (!( ( curh[__x][__y - i] < (Solidity) 3 || ( Letter == "a" || Letter == "b" ) ) ))
 						//                            {
 						//                            Help.Debugger();
@@ -3809,7 +3798,7 @@ OurSonic.Sonic.Sensor.prototype = {
 									case 1:
 									case 2:
 									case 3: {
-										hb1[_x * 16 + jx][_y * 16 + jy] = (OurSonic.Level.HeightMap.itemsGood(heightMaskItems, __x, __y) ? tp.solid1 : 0);
+										hb1[_x * 16 + jx][_y * 16 + jy] = ($OurSonic_Level_HeightMap.itemsGood(heightMaskItems, __x, __y) ? tp.solid1 : 0);
 										break;
 									}
 								}
@@ -3902,7 +3891,7 @@ OurSonic.Sonic.Sensor.prototype = {
 									case 1:
 									case 2:
 									case 3: {
-										hb2[_x1 * 16 + jx1][_y1 * 16 + jy1] = (OurSonic.Level.HeightMap.itemsGood(hd2Items, __x1, __y1) ? tp1.solid2 : 0);
+										hb2[_x1 * 16 + jx1][_y1 * 16 + jy1] = ($OurSonic_Level_HeightMap.itemsGood(hd2Items, __x1, __y1) ? tp1.solid2 : 0);
 										break;
 									}
 								}
@@ -3915,8 +3904,8 @@ OurSonic.Sonic.Sensor.prototype = {
 		}
 	},
 	draw: function(canvas, character, sensorResult) {
-		var x = OurSonic.Utility.Help.floor(character.x) - OurSonic.SonicManager.instance.windowLocation.x;
-		var y = OurSonic.Utility.Help.floor(character.y) - OurSonic.SonicManager.instance.windowLocation.y;
+		var x = $OurSonic_Utility_Help.floor(character.x) - $OurSonic_SonicManager.instance.windowLocation.x;
+		var y = $OurSonic_Utility_Help.floor(character.y) - $OurSonic_SonicManager.instance.windowLocation.y;
 		canvas.beginPath();
 		if (sensorResult && sensorResult.chosen) {
 			canvas.strokeStyle = '#FFF76D';
@@ -3954,8 +3943,8 @@ OurSonic.Sonic.Sensor.prototype = {
 	check: function(character) {
 		var _y2 = (character.inAir ? this.y2 : this.y2);
 		var m = null;
-		var x = OurSonic.Utility.Help.floor(character.x);
-		var y = OurSonic.Utility.Help.floor(character.y);
+		var x = $OurSonic_Utility_Help.floor(character.x);
+		var y = $OurSonic_Utility_Help.floor(character.y);
 		switch (character.mode) {
 			case 134: {
 				m = this.$checkCollisionLineWrap(x + this.x1, x + this.x2, y + this.y1, y + _y2, this.ignoreSolid);
@@ -3996,27 +3985,27 @@ OurSonic.Sonic.Sensor.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Sonic.SensorM
-OurSonic.Sonic.SensorM = function() {
+var $OurSonic_Sonic_SensorM = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Sonic.SensorManager
-OurSonic.Sonic.SensorManager = function() {
+var $OurSonic_Sonic_SensorManager = function() {
 	this.sensors = null;
 	this.sensorResults = null;
 	this.sensors = {};
 	this.sensorResults = {};
 };
-OurSonic.Sonic.SensorManager.prototype = {
+$OurSonic_Sonic_SensorManager.prototype = {
 	addSensor: function(letter, sensor) {
 		this.sensors[letter] = sensor;
 		this.sensorResults[letter] = null;
 		return sensor;
 	},
 	createVerticalSensor: function(letter, x, y1, y2, color, ignoreSolid) {
-		return this.addSensor(letter, new OurSonic.Sonic.Sensor(x, x, y1, y2, this, color, ignoreSolid, letter));
+		return this.addSensor(letter, new $OurSonic_Sonic_Sensor(x, x, y1, y2, this, color, ignoreSolid, letter));
 	},
 	createHorizontalSensor: function(letter, y, x1, x2, color, ignoreSolid) {
-		return this.addSensor(letter, new OurSonic.Sonic.Sensor(x1, x2, y, y, this, color, ignoreSolid, letter));
+		return this.addSensor(letter, new $OurSonic_Sonic_Sensor(x1, x2, y, y, this, color, ignoreSolid, letter));
 	},
 	check: function(character) {
 		var none = false;
@@ -4051,7 +4040,7 @@ OurSonic.Sonic.SensorManager.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Sonic.Sonic
-OurSonic.Sonic.Sonic = function() {
+var $OurSonic_Sonic_Sonic = function() {
 	this.myRec = null;
 	this.obtainedRing = {};
 	this.$oldSign = 0;
@@ -4091,13 +4080,13 @@ OurSonic.Sonic.Sonic = function() {
 	this.spriteState = null;
 	this.haltSmoke = null;
 	this.wasJumping = false;
-	this.watcher = new OurSonic.Sonic.Watcher();
-	this.$physicsVariables = OurSonic.Sonic.SonicConstants.sonic();
-	var sonicManager = OurSonic.SonicManager.instance;
+	this.watcher = new $OurSonic_Sonic_Watcher();
+	this.$physicsVariables = $OurSonic_Sonic_SonicConstants.sonic();
+	var sonicManager = $OurSonic_SonicManager.instance;
 	this.$sonicLevel = sonicManager.sonicLevel;
 	this.x = this.$sonicLevel.startPositions[0].x;
 	this.y = this.$sonicLevel.startPositions[0].y;
-	this.$sensorManager = new OurSonic.Sonic.SensorManager();
+	this.$sensorManager = new $OurSonic_Sonic_SensorManager();
 	this.haltSmoke = [];
 	this.rings = 7;
 	this.$sensorManager.createVerticalSensor('a', -9, 0, 36, '#F202F2', false);
@@ -4108,7 +4097,7 @@ OurSonic.Sonic.Sonic = function() {
 	this.$sensorManager.createHorizontalSensor('m2', 4, 0, 13, '#22Ffc1', false);
 	this.spriteState = 'normal';
 };
-OurSonic.Sonic.Sonic.prototype = {
+$OurSonic_Sonic_Sonic.prototype = {
 	updateMode: function() {
 		if (this.angle <= 34 || this.angle >= 222) {
 			this.mode = 134;
@@ -4124,7 +4113,7 @@ OurSonic.Sonic.Sonic.prototype = {
 		}
 		//        x = _H.floor(x);
 		//        y = _H.floor(y);
-		this.myRec = OurSonic.Utility.Rectangle.$ctor1(ss.Int32.trunc(this.x - 5), ss.Int32.trunc(this.y - 20), 10, 40);
+		this.myRec = $OurSonic_Utility_Rectangle.$ctor1(ss.Int32.trunc(this.x - 5), ss.Int32.trunc(this.y - 20), 10, 40);
 		if (this.inAir) {
 			this.mode = 134;
 		}
@@ -4144,7 +4133,7 @@ OurSonic.Sonic.Sonic.prototype = {
 			if (this.holdingUp) {
 				this.y -= debugSpeed;
 			}
-			var offset = OurSonic.Utility.Point.$ctor1(0, 0);
+			var offset = $OurSonic_Utility_Point.$ctor1(0, 0);
 			// getOffsetFromImage();
 			this.x = (sonicLevel.levelWidth * 128 + this.x) % (sonicLevel.levelWidth * 128) + offset.x;
 			this.y = (sonicLevel.levelHeight * 128 + this.y) % (sonicLevel.levelHeight * 128) + offset.y;
@@ -4287,7 +4276,7 @@ OurSonic.Sonic.Sonic.prototype = {
 				}
 			}
 			this.updateMode();
-			var cur = OurSonic.SonicManager.instance.spriteCache.sonicSprites[this.spriteState];
+			var cur = $OurSonic_SonicManager.instance.spriteCache.sonicSprites[this.spriteState];
 			var __h = ss.Int32.div(cur.height, 2);
 			this.$sensorManager.check(this);
 			var sensorC = this.$sensorManager.getResult('c');
@@ -4390,7 +4379,7 @@ OurSonic.Sonic.Sonic.prototype = {
 		return null;
 	},
 	invulnerable: function() {
-		var mc = OurSonic.SonicManager.instance.drawTickCount - this.sonicLastHitTick;
+		var mc = $OurSonic_SonicManager.instance.drawTickCount - this.sonicLastHitTick;
 		if (mc < 120) {
 			if (mc % 8 < 4) {
 				return true;
@@ -4399,7 +4388,7 @@ OurSonic.Sonic.Sonic.prototype = {
 		return false;
 	},
 	$getHalfImageSize: function() {
-		return OurSonic.Utility.Point.$ctor1(20, 20);
+		return $OurSonic_Utility_Point.$ctor1(20, 20);
 		//
 		//                        var scale = SonicManager.Instance.Scale;
 		//
@@ -4446,7 +4435,7 @@ OurSonic.Sonic.Sonic.prototype = {
 		//                        return new Point(xSize, ySize);
 	},
 	$getOffsetFromImage: function() {
-		var cur = OurSonic.SonicManager.instance.spriteCache.sonicSprites[this.spriteState];
+		var cur = $OurSonic_SonicManager.instance.spriteCache.sonicSprites[this.spriteState];
 		var xOffset = 0;
 		var yOffset = 0;
 		if (cur.height !== 40) {
@@ -4474,7 +4463,7 @@ OurSonic.Sonic.Sonic.prototype = {
 				}
 			}
 		}
-		return OurSonic.Utility.Point.$ctor1(xOffset, yOffset);
+		return $OurSonic_Utility_Point.$ctor1(xOffset, yOffset);
 	},
 	$updateSprite: function() {
 		var absgsp = Math.abs(this.gsp);
@@ -4545,7 +4534,7 @@ OurSonic.Sonic.Sonic.prototype = {
 			else if (this.$runningTick++ % 7 === 0) {
 				this.spriteState = 'breaking' + (j + 1) % 4;
 				if (j === 0) {
-					this.haltSmoke.add(OurSonic.Utility.Point.$ctor1(ss.Int32.trunc(this.x), ss.Int32.trunc(this.y)));
+					this.haltSmoke.add($OurSonic_Utility_Point.$ctor1(ss.Int32.trunc(this.x), ss.Int32.trunc(this.y)));
 				}
 			}
 		}
@@ -4617,10 +4606,10 @@ OurSonic.Sonic.Sonic.prototype = {
 				//friction
 				this.gsp -= Math.min(Math.abs(this.gsp), this.watcher.multiply(physics.frc)) * ((this.gsp > 0) ? 1 : -1);
 			}
-			this.$oldSign = OurSonic.Utility.Help.sign(this.gsp);
+			this.$oldSign = $OurSonic_Utility_Help.sign(this.gsp);
 			//slope
-			this.gsp += this.watcher.multiply(physics.slp) * -OurSonic.Utility.Help.sin(this.angle);
-			if (this.$oldSign !== OurSonic.Utility.Help.sign(this.gsp) && this.$oldSign !== 0) {
+			this.gsp += this.watcher.multiply(physics.slp) * -$OurSonic_Utility_Help.sin(this.angle);
+			if (this.$oldSign !== $OurSonic_Utility_Help.sign(this.gsp) && this.$oldSign !== 0) {
 				this.hLock = 30;
 			}
 			if (this.holdingRight && !this.holdingLeft && !this.justHit) {
@@ -4673,7 +4662,7 @@ OurSonic.Sonic.Sonic.prototype = {
 			}
 		}
 		else if (this.spinDash) {
-			this.gsp = (8 + ss.Int32.div(OurSonic.Utility.Help.floor(this.spinDashSpeed), 2)) * (this.facing ? 1 : -1);
+			this.gsp = (8 + ss.Int32.div($OurSonic_Utility_Help.floor(this.spinDashSpeed), 2)) * (this.facing ? 1 : -1);
 			this.spinDash = false;
 			this.rolling = true;
 			this.currentlyBall = true;
@@ -4683,22 +4672,22 @@ OurSonic.Sonic.Sonic.prototype = {
 			if (this.holdingLeft && !this.justHit) {
 				if (this.gsp > 0) {
 					if (this.rolling) {
-						this.gsp = OurSonic.Utility.Help.max(0, this.gsp - this.watcher.multiply(physics.rdec));
+						this.gsp = $OurSonic_Utility_Help.max(0, this.gsp - this.watcher.multiply(physics.rdec));
 					}
 				}
 			}
 			if (this.holdingRight && !this.justHit) {
 				if (this.gsp < 0) {
 					if (this.rolling) {
-						this.gsp = OurSonic.Utility.Help.min(0, this.gsp + this.watcher.multiply(physics.rdec));
+						this.gsp = $OurSonic_Utility_Help.min(0, this.gsp + this.watcher.multiply(physics.rdec));
 					}
 				}
 			}
 			//friction
 			this.gsp -= Math.min(Math.abs(this.gsp), this.watcher.multiply(physics.rfrc)) * ((this.gsp > 0) ? 1 : -1);
-			this.$oldSign = OurSonic.Utility.Help.sign(this.gsp);
+			this.$oldSign = $OurSonic_Utility_Help.sign(this.gsp);
 			//slope
-			var ang = OurSonic.Utility.Help.sin(this.angle);
+			var ang = $OurSonic_Utility_Help.sin(this.angle);
 			if (ang > 0 === this.gsp > 0) {
 				this.gsp += this.watcher.multiply(-physics.slpRollingUp) * ang;
 			}
@@ -4711,7 +4700,7 @@ OurSonic.Sonic.Sonic.prototype = {
 			if (this.gsp < -max * 2.5) {
 				this.gsp = -max * 2.5;
 			}
-			if (this.$oldSign !== OurSonic.Utility.Help.sign(this.gsp) && this.$oldSign !== 0) {
+			if (this.$oldSign !== $OurSonic_Utility_Help.sign(this.gsp) && this.$oldSign !== 0) {
 				this.hLock = 30;
 			}
 			if (Math.abs(this.gsp) < 0.53125) {
@@ -4782,8 +4771,8 @@ OurSonic.Sonic.Sonic.prototype = {
 			else {
 				this.inAir = true;
 				this.currentlyBall = true;
-				this.xsp = physics.jmp * OurSonic.Utility.Help.sin(this.angle) + this.gsp * OurSonic.Utility.Help.cos(this.angle);
-				this.ysp = physics.jmp * OurSonic.Utility.Help.cos(this.angle);
+				this.xsp = physics.jmp * $OurSonic_Utility_Help.sin(this.angle) + this.gsp * $OurSonic_Utility_Help.cos(this.angle);
+				this.ysp = physics.jmp * $OurSonic_Utility_Help.cos(this.angle);
 				if (Math.abs(this.xsp) < 0.17) {
 					this.xsp = 0;
 				}
@@ -4793,8 +4782,8 @@ OurSonic.Sonic.Sonic.prototype = {
 			if (this.spinDash) {
 				this.gsp = 0;
 			}
-			this.xsp = this.gsp * OurSonic.Utility.Help.cos(this.angle);
-			this.ysp = this.gsp * -OurSonic.Utility.Help.sin(this.angle);
+			this.xsp = this.gsp * $OurSonic_Utility_Help.cos(this.angle);
+			this.ysp = this.gsp * -$OurSonic_Utility_Help.sin(this.angle);
 			if (Math.abs(this.gsp) < 2.5 && this.mode !== 134) {
 				if (this.mode === 224) {
 					this.x += 0;
@@ -4830,14 +4819,14 @@ OurSonic.Sonic.Sonic.prototype = {
 		if (this.invulnerable()) {
 			return;
 		}
-		var cur = OurSonic.SonicManager.instance.spriteCache.sonicSprites[this.spriteState];
+		var cur = $OurSonic_SonicManager.instance.spriteCache.sonicSprites[this.spriteState];
 		if (ss.isNullOrUndefined(cur)) {
 		}
-		if (OurSonic.Utility.Help.loaded(cur)) {
+		if ($OurSonic_Utility_Help.loaded(cur)) {
 			canvas.save();
 			var offset = this.$getOffsetFromImage();
-			canvas.translate(fx - OurSonic.SonicManager.instance.windowLocation.x + offset.x, fy - OurSonic.SonicManager.instance.windowLocation.y + offset.y);
-			if (OurSonic.SonicManager.instance.showHeightMap) {
+			canvas.translate(fx - $OurSonic_SonicManager.instance.windowLocation.x + offset.x, fy - $OurSonic_SonicManager.instance.windowLocation.y + offset.y);
+			if ($OurSonic_SonicManager.instance.showHeightMap) {
 				canvas.save();
 				var mul = 6;
 				var xj = this.xsp * mul;
@@ -4863,20 +4852,20 @@ OurSonic.Sonic.Sonic.prototype = {
 				//canvas.translate(cur.width, 0);
 				canvas.scale(-1, 1);
 				if (!this.currentlyBall && !this.spinDash) {
-					canvas.rotate(-OurSonic.Utility.Help.fixAngle(this.angle));
+					canvas.rotate(-$OurSonic_Utility_Help.fixAngle(this.angle));
 				}
 				canvas.drawImage(cur, ss.Int32.div(-cur.width, 2), ss.Int32.div(-cur.height, 2));
 				if (this.spinDash) {
-					canvas.drawImage(OurSonic.SonicManager.instance.spriteCache.sonicSprites['spinsmoke' + ss.Int32.div(OurSonic.SonicManager.instance.drawTickCount % 14, 2)], ss.Int32.div(-cur.width, 2) - 25, ss.Int32.div(-cur.height, 2) + offset.y - 14, cur.width, cur.height);
+					canvas.drawImage($OurSonic_SonicManager.instance.spriteCache.sonicSprites['spinsmoke' + ss.Int32.div($OurSonic_SonicManager.instance.drawTickCount % 14, 2)], ss.Int32.div(-cur.width, 2) - 25, ss.Int32.div(-cur.height, 2) + offset.y - 14, cur.width, cur.height);
 				}
 			}
 			else {
 				if (!this.currentlyBall && !this.spinDash) {
-					canvas.rotate(OurSonic.Utility.Help.fixAngle(this.angle));
+					canvas.rotate($OurSonic_Utility_Help.fixAngle(this.angle));
 				}
 				canvas.drawImage(cur, ss.Int32.div(-cur.width, 2), ss.Int32.div(-cur.height, 2));
 				if (this.spinDash) {
-					canvas.drawImage(OurSonic.SonicManager.instance.spriteCache.sonicSprites['spinsmoke' + ss.Int32.div(OurSonic.SonicManager.instance.drawTickCount % 14, 2)], ss.Int32.div(-cur.width, 2) - 25, ss.Int32.div(-cur.height, 2) + offset.y - 14, cur.width, cur.height);
+					canvas.drawImage($OurSonic_SonicManager.instance.spriteCache.sonicSprites['spinsmoke' + ss.Int32.div($OurSonic_SonicManager.instance.drawTickCount % 14, 2)], ss.Int32.div(-cur.width, 2) - 25, ss.Int32.div(-cur.height, 2) + offset.y - 14, cur.width, cur.height);
 				}
 			}
 			//
@@ -4920,20 +4909,20 @@ OurSonic.Sonic.Sonic.prototype = {
 			//
 			//                canvas.strokeRect(-cur.width / 2, -cur.height / 2, cur.width, cur.height);
 			canvas.restore();
-			if (OurSonic.SonicManager.instance.showHeightMap) {
+			if ($OurSonic_SonicManager.instance.showHeightMap) {
 				this.$sensorManager.draw(canvas, this);
 			}
 			for (var i = 0; i < this.haltSmoke.length; i++) {
 				var lo = this.haltSmoke[i];
-				canvas.drawImage(OurSonic.SonicManager.instance.spriteCache.sonicSprites['haltsmoke' + ss.Int32.div(OurSonic.SonicManager.instance.drawTickCount % 24, 6)], lo.x - OurSonic.SonicManager.instance.windowLocation.x - 25, lo.y + 12 - OurSonic.SonicManager.instance.windowLocation.y + offset.y);
-				if (ss.Int32.div((OurSonic.SonicManager.instance.drawTickCount + 6) % 24, 6) === 0) {
+				canvas.drawImage($OurSonic_SonicManager.instance.spriteCache.sonicSprites['haltsmoke' + ss.Int32.div($OurSonic_SonicManager.instance.drawTickCount % 24, 6)], lo.x - $OurSonic_SonicManager.instance.windowLocation.x - 25, lo.y + 12 - $OurSonic_SonicManager.instance.windowLocation.y + offset.y);
+				if (ss.Int32.div(($OurSonic_SonicManager.instance.drawTickCount + 6) % 24, 6) === 0) {
 					this.haltSmoke = this.haltSmoke.extract(i, 1);
 				}
 			}
 		}
 	},
 	drawUI: function(canvas, pos) {
-		var $t1 = new OurSonic.Utility.CanvasHandler(canvas);
+		var $t1 = new $OurSonic_Utility_CanvasHandler(canvas);
 		try {
 			if (canvas.font !== '13pt Arial bold') {
 				canvas.font = '13pt Arial bold';
@@ -4960,20 +4949,20 @@ OurSonic.Sonic.Sonic.prototype = {
 		}
 	},
 	hit: function(x, y) {
-		if (OurSonic.SonicManager.instance.drawTickCount - this.sonicLastHitTick < 120) {
+		if ($OurSonic_SonicManager.instance.drawTickCount - this.sonicLastHitTick < 120) {
 			return;
 		}
 		this.justHit = true;
 		this.ysp = -4;
 		this.xsp = 2 * ((this.x - x < 0) ? -1 : 1);
-		this.sonicLastHitTick = OurSonic.SonicManager.instance.drawTickCount;
+		this.sonicLastHitTick = $OurSonic_SonicManager.instance.drawTickCount;
 		var t = 0;
 		var angle = 101.25;
 		var n = false;
 		var speed = 4;
 		while (t < this.rings) {
-			var ring = OurSonic.Level.Ring.$ctor(true);
-			OurSonic.SonicManager.instance.activeRings.add(ring);
+			var ring = $OurSonic_Level_Ring.$ctor(true);
+			$OurSonic_SonicManager.instance.activeRings.add(ring);
 			ring.x = ss.Int32.trunc(this.x);
 			ring.y = ss.Int32.trunc(this.y) - 10;
 			ring.ysp = -Math.sin(angle) * speed;
@@ -5029,8 +5018,8 @@ OurSonic.Sonic.Sonic.prototype = {
 		this.jumping = false;
 	},
 	checkCollisionWithObjects: function(x, y, letter) {
-		var me = OurSonic.Utility.Point.$ctor1(x, y);
-		var levelObjectInfos = OurSonic.SonicManager.instance.inFocusObjects;
+		var me = $OurSonic_Utility_Point.$ctor1(x, y);
+		var levelObjectInfos = $OurSonic_SonicManager.instance.inFocusObjects;
 		for (var index = 0; index < levelObjectInfos.length; index++) {
 			var ob = levelObjectInfos[index];
 			var dj = ob.collides(me);
@@ -5046,8 +5035,8 @@ OurSonic.Sonic.Sonic.prototype = {
 	},
 	checkCollisionWithRings: function() {
 		var me = this.myRec;
-		var rectangle = OurSonic.Utility.Rectangle.$ctor1(0, 0, 16, 16);
-		var rings = OurSonic.SonicManager.instance.sonicLevel.rings;
+		var rectangle = $OurSonic_Utility_Rectangle.$ctor1(0, 0, 16, 16);
+		var rings = $OurSonic_SonicManager.instance.sonicLevel.rings;
 		for (var index = 0; index < rings.length; index++) {
 			var ring = rings[index];
 			var pos = ring;
@@ -5056,7 +5045,7 @@ OurSonic.Sonic.Sonic.prototype = {
 			}
 			rectangle.x = pos.x - 8;
 			rectangle.y = pos.y - 8;
-			if (OurSonic.Utility.IntersectingRectangle.intersectRect(me, rectangle)) {
+			if ($OurSonic_Utility_IntersectingRectangle.intersectRect(me, rectangle)) {
 				this.rings++;
 				this.obtainedRing[index] = true;
 			}
@@ -5068,7 +5057,7 @@ OurSonic.Sonic.Sonic.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Sonic.SonicConstants
-OurSonic.Sonic.SonicConstants = function() {
+var $OurSonic_Sonic_SonicConstants = function() {
 	this.acc = 0;
 	this.air = 0;
 	this.dec = 0;
@@ -5082,8 +5071,8 @@ OurSonic.Sonic.SonicConstants = function() {
 	this.slpRollingUp = 0;
 	this.topSpeed = 0;
 };
-OurSonic.Sonic.SonicConstants.sonic = function() {
-	var $t1 = new OurSonic.Sonic.SonicConstants();
+$OurSonic_Sonic_SonicConstants.sonic = function() {
+	var $t1 = new $OurSonic_Sonic_SonicConstants();
 	$t1.acc = 0.046875;
 	$t1.dec = 0.5;
 	$t1.slp = 0.125;
@@ -5101,13 +5090,13 @@ OurSonic.Sonic.SonicConstants.sonic = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Sonic.Watcher
-OurSonic.Sonic.Watcher = function() {
+var $OurSonic_Sonic_Watcher = function() {
 	this.$lastTick = 0;
 	this.mult = 1;
 };
-OurSonic.Sonic.Watcher.prototype = {
+$OurSonic_Sonic_Watcher.prototype = {
 	tick: function() {
-		if (true || OurSonic.SonicManager.instance.inHaltMode) {
+		if (true || $OurSonic_SonicManager.instance.inHaltMode) {
 			this.mult = 1;
 			return;
 		}
@@ -5126,10 +5115,9 @@ OurSonic.Sonic.Watcher.prototype = {
 		return this.mult * v;
 	}
 };
-Type.registerNamespace('OurSonic.UIManager');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Button
-OurSonic.UIManager.Button = function(x, y, width, height, text) {
+var $OurSonic_UIManager_Button = function(x, y, width, height, text) {
 	this.font = null;
 	this.toggle = false;
 	this.toggled = false;
@@ -5139,11 +5127,11 @@ OurSonic.UIManager.Button = function(x, y, width, height, text) {
 	this.buttonBorderGrad = null;
 	this.text = null;
 	this.color = null;
-	OurSonic.UIManager.Element.call(this, x, y);
+	$OurSonic_UIManager_Element.call(this, x, y);
 	this.text = text;
 	this.toggle = false;
 	this.toggled = false;
-	this.font = OurSonic.UIManager.UIManager.buttonFont;
+	this.font = $OurSonic_UIManager_UIManager.buttonFont;
 	this.clicking = false;
 	this.button1Grad = null;
 	this.button2Grad = null;
@@ -5151,10 +5139,10 @@ OurSonic.UIManager.Button = function(x, y, width, height, text) {
 	this.width = width;
 	this.height = height;
 };
-OurSonic.UIManager.Button.prototype = {
+$OurSonic_UIManager_Button.prototype = {
 	construct: function() {
-		OurSonic.UIManager.Element.prototype.construct.call(this);
-		var canv = OurSonic.Utility.CanvasInformation.create(1, 1).context;
+		$OurSonic_UIManager_Element.prototype.construct.call(this);
+		var canv = $OurSonic_Utility_CanvasInformation.create(1, 1).context;
 		this.button1Grad = canv.createLinearGradient(0, 0, 0, 1);
 		this.button1Grad.addColorStop(0, '#FFFFFF');
 		this.button1Grad.addColorStop(1, '#A5A5A5');
@@ -5173,7 +5161,7 @@ OurSonic.UIManager.Button.prototype = {
 		if (this.toggle) {
 			this.toggled = !this.toggled;
 		}
-		return OurSonic.UIManager.Element.prototype.onClick.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onClick.call(this, e);
 	},
 	onMouseUp: function(e) {
 		if (!this.visible) {
@@ -5181,23 +5169,23 @@ OurSonic.UIManager.Button.prototype = {
 		}
 		if (this.clicking) {
 			if (ss.isValue(this.click)) {
-				this.click(OurSonic.Utility.Point.$ctor1(e.x, e.y));
+				this.click($OurSonic_Utility_Point.$ctor1(e.x, e.y));
 			}
 		}
 		this.clicking = false;
 		if (ss.isValue(this.mouseUp)) {
-			this.mouseUp(OurSonic.Utility.Point.$ctor1(e.x, e.y));
+			this.mouseUp($OurSonic_Utility_Point.$ctor1(e.x, e.y));
 		}
-		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseUp.call(this, e);
 	},
 	onMouseOver: function(e) {
 		if (!this.visible) {
 			return false;
 		}
 		if (ss.isValue(this.mouseOver)) {
-			this.mouseOver(OurSonic.Utility.Point.$ctor1(e.x, e.y));
+			this.mouseOver($OurSonic_Utility_Point.$ctor1(e.x, e.y));
 		}
-		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseOver.call(this, e);
 	},
 	draw: function(canv) {
 		if (!this.visible) {
@@ -5212,7 +5200,7 @@ OurSonic.UIManager.Button.prototype = {
 			canv.fillStyle = (this.clicking ? this.button1Grad : this.button2Grad);
 		}
 		canv.lineWidth = 2;
-		OurSonic.Utility.Help.roundRect(canv, this.get_totalX(), this.get_totalY(), this.width, this.height, 2, true, true);
+		$OurSonic_Utility_Help.roundRect(canv, this.get_totalX(), this.get_totalY(), this.width, this.height, 2, true, true);
 		if (!ss.referenceEquals(canv.font, this.font)) {
 			canv.font = this.font;
 		}
@@ -5224,23 +5212,23 @@ OurSonic.UIManager.Button.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Button
-OurSonic.UIManager.Button$1 = function(T) {
+var $OurSonic_UIManager_Button$1 = function(T) {
 	var $type = function(data, x, y, width, height, text) {
 		this.data = T.getDefaultValue();
-		OurSonic.UIManager.Button.call(this, x, y, width, height, text);
+		$OurSonic_UIManager_Button.call(this, x, y, width, height, text);
 		this.data = data;
 	};
-	$type.registerGenericClassInstance($type, OurSonic.UIManager.Button$1, [T], function() {
-		return OurSonic.UIManager.Button;
+	Type.registerGenericClassInstance($type, $OurSonic_UIManager_Button$1, [T], function() {
+		return $OurSonic_UIManager_Button;
 	}, function() {
 		return [];
 	});
 	return $type;
 };
-OurSonic.UIManager.Button$1.registerGenericClass('OurSonic.UIManager.Button$1', 1);
+Type.registerGenericClass(global, 'OurSonic.UIManager.Button$1', $OurSonic_UIManager_Button$1, 1);
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.EditorEngine
-OurSonic.UIManager.EditorEngine = function(el) {
+var $OurSonic_UIManager_EditorEngine = function(el) {
 	this.$points = null;
 	this.editing = false;
 	this.element = null;
@@ -5248,7 +5236,7 @@ OurSonic.UIManager.EditorEngine = function(el) {
 	this.startDragging = null;
 	this.dragg = null;
 	this.element = el;
-	this.$points = [OurSonic.UIManager.EditorEnginePoint.$ctor(0, 0, 10, 'nw-resize', Function.mkdel(this, function(dv) {
+	this.$points = [$OurSonic_UIManager_EditorEnginePoint.$ctor(0, 0, 10, 'nw-resize', Function.mkdel(this, function(dv) {
 		var x = dv.x;
 		var y = dv.y;
 		this.element.width += x;
@@ -5256,7 +5244,7 @@ OurSonic.UIManager.EditorEngine = function(el) {
 		this.element.x -= x;
 		this.element.y -= y;
 		this.element.clearCache();
-	})), OurSonic.UIManager.EditorEnginePoint.$ctor(100, 0, 10, 'ne-resize', Function.mkdel(this, function(dv1) {
+	})), $OurSonic_UIManager_EditorEnginePoint.$ctor(100, 0, 10, 'ne-resize', Function.mkdel(this, function(dv1) {
 		var x1 = dv1.x;
 		var y1 = dv1.y;
 		this.element.width -= x1;
@@ -5264,14 +5252,14 @@ OurSonic.UIManager.EditorEngine = function(el) {
 		this.element.y -= y1;
 		this.element.clearCache();
 		dv1.x = 0;
-	})), OurSonic.UIManager.EditorEnginePoint.$ctor(100, 100, 10, 'se-resize', Function.mkdel(this, function(dv2) {
+	})), $OurSonic_UIManager_EditorEnginePoint.$ctor(100, 100, 10, 'se-resize', Function.mkdel(this, function(dv2) {
 		var x2 = dv2.x;
 		var y2 = dv2.y;
 		this.element.width -= x2;
 		this.element.height -= y2;
 		this.element.clearCache();
 		dv2.x = dv2.y = 0;
-	})), OurSonic.UIManager.EditorEnginePoint.$ctor(0, 100, 10, 'sw-resize', Function.mkdel(this, function(dv3) {
+	})), $OurSonic_UIManager_EditorEnginePoint.$ctor(0, 100, 10, 'sw-resize', Function.mkdel(this, function(dv3) {
 		var x3 = dv3.x;
 		var y3 = dv3.y;
 		this.element.width += x3;
@@ -5279,25 +5267,25 @@ OurSonic.UIManager.EditorEngine = function(el) {
 		this.element.x -= x3;
 		this.element.clearCache();
 		dv3.y = 0;
-	})), OurSonic.UIManager.EditorEnginePoint.$ctor(50, 0, 5, 'n-resize', Function.mkdel(this, function(dv4) {
+	})), $OurSonic_UIManager_EditorEnginePoint.$ctor(50, 0, 5, 'n-resize', Function.mkdel(this, function(dv4) {
 		var x4 = dv4.x;
 		var y4 = dv4.y;
 		this.element.height += y4;
 		this.element.y -= x4;
 		this.element.clearCache();
-	})), OurSonic.UIManager.EditorEnginePoint.$ctor(100, 50, 5, 'e-resize', Function.mkdel(this, function(dv5) {
+	})), $OurSonic_UIManager_EditorEnginePoint.$ctor(100, 50, 5, 'e-resize', Function.mkdel(this, function(dv5) {
 		var x5 = dv5.x;
 		var y5 = dv5.y;
 		this.element.width -= y5;
 		this.element.clearCache();
 		dv5.x = dv5.y = 0;
-	})), OurSonic.UIManager.EditorEnginePoint.$ctor(50, 100, 5, 'n-resize', Function.mkdel(this, function(dv6) {
+	})), $OurSonic_UIManager_EditorEnginePoint.$ctor(50, 100, 5, 'n-resize', Function.mkdel(this, function(dv6) {
 		var x6 = dv6.x;
 		var y6 = dv6.y;
 		this.element.height -= y6;
 		this.element.clearCache();
 		dv6.x = dv6.y = 0;
-	})), OurSonic.UIManager.EditorEnginePoint.$ctor(0, 50, 5, 'e-resize', Function.mkdel(this, function(dv7) {
+	})), $OurSonic_UIManager_EditorEnginePoint.$ctor(0, 50, 5, 'e-resize', Function.mkdel(this, function(dv7) {
 		var x7 = dv7.x;
 		var y7 = dv7.y;
 		this.element.width += x7;
@@ -5305,7 +5293,7 @@ OurSonic.UIManager.EditorEngine = function(el) {
 		this.element.clearCache();
 	}))];
 };
-OurSonic.UIManager.EditorEngine.prototype = {
+$OurSonic_UIManager_EditorEngine.prototype = {
 	click: function(e) {
 		var x = 0;
 		var y = 0;
@@ -5319,17 +5307,17 @@ OurSonic.UIManager.EditorEngine.prototype = {
 		for (var i1 = 0; i1 < this.$points.length; i1++) {
 			var j1 = this.$points[i1];
 			var sz = j1.size * 5;
-			var rect = OurSonic.Utility.Rectangle.$ctor1(x + ss.Int32.div(w * j1.x, 100) - ss.Int32.div(sz, 2), y + ss.Int32.div(h * j1.y, 100) - ss.Int32.div(sz, 2), sz, sz);
+			var rect = $OurSonic_Utility_Rectangle.$ctor1(x + ss.Int32.div(w * j1.x, 100) - ss.Int32.div(sz, 2), y + ss.Int32.div(h * j1.y, 100) - ss.Int32.div(sz, 2), sz, sz);
 			if (e.x > rect.x && e.x < rect.x + rect.width && e.y > rect.y && e.y < rect.y + rect.height) {
 				document.body.style.cursor = j1.cursor;
-				this.startDragging = OurSonic.Utility.Point.$ctor1(e.x, e.y);
+				this.startDragging = $OurSonic_Utility_Point.$ctor1(e.x, e.y);
 				this.editing = true;
 				j1.editing = true;
 				return true;
 			}
 		}
 		if (e.x > x && e.x < x + w && e.y > y && e.y < y + h) {
-			this.dragg = OurSonic.Utility.Point.$ctor1(e.x, e.y);
+			this.dragg = $OurSonic_Utility_Point.$ctor1(e.x, e.y);
 			document.body.style.cursor = 'move';
 			this.dragging = true;
 			return false;
@@ -5382,23 +5370,23 @@ OurSonic.UIManager.EditorEngine.prototype = {
 			var sz = j.size * 5;
 			if (j.editing) {
 				document.body.style.cursor = j.cursor;
-				var dv = OurSonic.Utility.Point.$ctor1(this.startDragging.x - e.x, this.startDragging.y - e.y);
+				var dv = $OurSonic_Utility_Point.$ctor1(this.startDragging.x - e.x, this.startDragging.y - e.y);
 				j.click(dv);
-				this.startDragging = OurSonic.Utility.Point.$ctor1(e.x + dv.x, e.y + dv.y);
+				this.startDragging = $OurSonic_Utility_Point.$ctor1(e.x + dv.x, e.y + dv.y);
 				return true;
 			}
-			var rect = OurSonic.Utility.Rectangle.$ctor1(x + ss.Int32.div(w * j.x, 100) - ss.Int32.div(sz, 2), y + ss.Int32.div(h * j.y, 100) - ss.Int32.div(sz, 2), sz, sz);
+			var rect = $OurSonic_Utility_Rectangle.$ctor1(x + ss.Int32.div(w * j.x, 100) - ss.Int32.div(sz, 2), y + ss.Int32.div(h * j.y, 100) - ss.Int32.div(sz, 2), sz, sz);
 			if (e.x > rect.x && e.x < rect.x + rect.width && e.y > rect.y && e.y < rect.y + rect.height) {
 				document.body.style.cursor = j.cursor;
 				if (j.editing) {
-					var dv1 = OurSonic.Utility.Point.$ctor1(this.startDragging.x - e.x, this.startDragging.y - e.y);
+					var dv1 = $OurSonic_Utility_Point.$ctor1(this.startDragging.x - e.x, this.startDragging.y - e.y);
 					j.click(dv1);
-					this.startDragging = OurSonic.Utility.Point.$ctor1(e.x + dv1.x, e.y + dv1.y);
+					this.startDragging = $OurSonic_Utility_Point.$ctor1(e.x + dv1.x, e.y + dv1.y);
 				}
 				return true;
 			}
 		}
-		this.startDragging = OurSonic.Utility.Point.$ctor1(e.x, e.y);
+		this.startDragging = $OurSonic_Utility_Point.$ctor1(e.x, e.y);
 		return this.editing;
 	},
 	draw: function(canv) {
@@ -5424,9 +5412,9 @@ OurSonic.UIManager.EditorEngine.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.EditorEnginePoint
-OurSonic.UIManager.EditorEnginePoint = function() {
+var $OurSonic_UIManager_EditorEnginePoint = function() {
 };
-OurSonic.UIManager.EditorEnginePoint.$ctor = function(x, y, size, cursor, click) {
+$OurSonic_UIManager_EditorEnginePoint.$ctor = function(x, y, size, cursor, click) {
 	var $this = {};
 	$this.x = 0;
 	$this.y = 0;
@@ -5443,8 +5431,8 @@ OurSonic.UIManager.EditorEnginePoint.$ctor = function(x, y, size, cursor, click)
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Element
-OurSonic.UIManager.Element = function(x, y) {
-	this.$cachedForceRedrawing = OurSonic.UIManager.Element$ForceRedrawing.$ctor();
+var $OurSonic_UIManager_Element = function(x, y) {
+	this.$cachedForceRedrawing = $OurSonic_UIManager_Element$ForceRedrawing.$ctor();
 	this.$myDepth = 0;
 	this.x = 0;
 	this.y = 0;
@@ -5461,7 +5449,7 @@ OurSonic.UIManager.Element = function(x, y) {
 	this.focused = false;
 	this.x = x;
 	this.y = y;
-	this.editorEngine = new OurSonic.UIManager.EditorEngine(this);
+	this.editorEngine = new $OurSonic_UIManager_EditorEngine(this);
 	this.visible = true;
 	//
 	//                        if (this.Construct) {
@@ -5470,14 +5458,14 @@ OurSonic.UIManager.Element = function(x, y) {
 	//
 	//                        }
 };
-OurSonic.UIManager.Element.prototype = {
+$OurSonic_UIManager_Element.prototype = {
 	get_depth: function() {
 		return this.$myDepth;
 	},
 	set_depth: function(value) {
 		this.$myDepth = value;
-		if (Type.isInstanceOfType(this, OurSonic.UIManager.UIArea)) {
-			OurSonic.UIManager.UIManager.instance.updateDepth();
+		if (Type.isInstanceOfType(this, $OurSonic_UIManager_UIArea)) {
+			$OurSonic_UIManager_UIManager.instance.updateDepth();
 		}
 	},
 	get_totalX: function() {
@@ -5542,12 +5530,12 @@ OurSonic.UIManager.Element.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Element.ForceRedrawing
-OurSonic.UIManager.Element$ForceRedrawing = function() {
+var $OurSonic_UIManager_Element$ForceRedrawing = function() {
 };
-OurSonic.UIManager.Element$ForceRedrawing.createInstance = function() {
-	return OurSonic.UIManager.Element$ForceRedrawing.$ctor();
+$OurSonic_UIManager_Element$ForceRedrawing.createInstance = function() {
+	return $OurSonic_UIManager_Element$ForceRedrawing.$ctor();
 };
-OurSonic.UIManager.Element$ForceRedrawing.$ctor = function() {
+$OurSonic_UIManager_Element$ForceRedrawing.$ctor = function() {
 	var $this = {};
 	$this.redraw = false;
 	$this.clearCache = false;
@@ -5555,7 +5543,7 @@ OurSonic.UIManager.Element$ForceRedrawing.$ctor = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.HScrollBox
-OurSonic.UIManager.HScrollBox = function(x, y, itemHeight, visibleItems, itemWidth) {
+var $OurSonic_UIManager_HScrollBox = function(x, y, itemHeight, visibleItems, itemWidth) {
 	this.itemWidth = 0;
 	this.scrollWidth = 0;
 	this.jWidth = 0;
@@ -5567,7 +5555,7 @@ OurSonic.UIManager.HScrollBox = function(x, y, itemHeight, visibleItems, itemWid
 	this.dragging = false;
 	this.controls = null;
 	this.scrolling = false;
-	OurSonic.UIManager.Element.call(this, x, y);
+	$OurSonic_UIManager_Element.call(this, x, y);
 	this.itemWidth = itemWidth;
 	this.scrollWidth = 14;
 	this.jWidth = 5;
@@ -5575,7 +5563,7 @@ OurSonic.UIManager.HScrollBox = function(x, y, itemHeight, visibleItems, itemWid
 	this.itemHeight = itemHeight;
 	this.controls = [];
 };
-OurSonic.UIManager.HScrollBox.prototype = {
+$OurSonic_UIManager_HScrollBox.prototype = {
 	construct: function() {
 		this.width = this.visibleItems * (this.itemWidth + this.jWidth);
 		this.height = this.itemHeight + this.scrollWidth;
@@ -5606,7 +5594,7 @@ OurSonic.UIManager.HScrollBox.prototype = {
 			this.scrollOffset = Math.min(Math.max(this.scrollOffset, 0), this.controls.length);
 		}
 		this.dragging = true;
-		return OurSonic.UIManager.Element.prototype.onClick.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onClick.call(this, e);
 	},
 	onMouseUp: function(e) {
 		if (!this.visible) {
@@ -5623,9 +5611,9 @@ OurSonic.UIManager.HScrollBox.prototype = {
 			}
 		}
 		if (ss.isValue(this.mouseUp)) {
-			this.mouseUp(OurSonic.Utility.Point.$ctor1(e.x, e.y));
+			this.mouseUp($OurSonic_Utility_Point.$ctor1(e.x, e.y));
 		}
-		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseUp.call(this, e);
 	},
 	onMouseOver: function(e) {
 		if (!this.visible) {
@@ -5646,9 +5634,9 @@ OurSonic.UIManager.HScrollBox.prototype = {
 			this.scrollOffset = Math.min(Math.max(this.scrollOffset, 0), this.controls.length);
 		}
 		if (ss.isValue(this.mouseOver)) {
-			this.mouseOver(OurSonic.Utility.Point.$ctor1(e.x, e.y));
+			this.mouseOver($OurSonic_Utility_Point.$ctor1(e.x, e.y));
 		}
-		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseOver.call(this, e);
 	},
 	onScroll: function(e) {
 		if (!this.visible) {
@@ -5683,7 +5671,7 @@ OurSonic.UIManager.HScrollBox.prototype = {
 		canv.fillStyle = this.backColor;
 		canv.lineWidth = 1;
 		canv.strokeStyle = '#333';
-		OurSonic.Utility.Help.roundRect(canv, this.get_totalX(), this.get_totalY(), this.visibleItems * (this.itemWidth + this.jWidth) + 2, this.itemHeight + this.scrollWidth + 6, 3, true, true);
+		$OurSonic_Utility_Help.roundRect(canv, this.get_totalX(), this.get_totalY(), this.visibleItems * (this.itemWidth + this.jWidth) + 2, this.itemHeight + this.scrollWidth + 6, 3, true, true);
 		canv.fillStyle = 'grey';
 		canv.lineWidth = 1;
 		canv.strokeStyle = '#444';
@@ -5704,19 +5692,19 @@ OurSonic.UIManager.HScrollBox.prototype = {
 			this.controls[i].draw(canv);
 		}
 		canv.restore();
-		OurSonic.UIManager.Element.prototype.draw.call(this, canv);
+		$OurSonic_UIManager_Element.prototype.draw.call(this, canv);
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.HtmlBox
-OurSonic.UIManager.HtmlBox = function(x, y) {
+var $OurSonic_UIManager_HtmlBox = function(x, y) {
 	this.$2$InitField = null;
 	this.$2$UpdatePositionField = null;
 	this.$2$_FocusField = null;
 	this.$2$_HideField = null;
-	OurSonic.UIManager.Element.call(this, x, y);
+	$OurSonic_UIManager_Element.call(this, x, y);
 };
-OurSonic.UIManager.HtmlBox.prototype = {
+$OurSonic_UIManager_HtmlBox.prototype = {
 	get_init: function() {
 		return this.$2$InitField;
 	},
@@ -5743,51 +5731,51 @@ OurSonic.UIManager.HtmlBox.prototype = {
 	},
 	construct: function() {
 		this.get_init()();
-		OurSonic.UIManager.Element.prototype.construct.call(this);
+		$OurSonic_UIManager_Element.prototype.construct.call(this);
 	},
 	focus: function(e) {
 		this.get__Focus()();
-		OurSonic.UIManager.Element.prototype.focus.call(this, e);
+		$OurSonic_UIManager_Element.prototype.focus.call(this, e);
 	},
 	loseFocus: function() {
 		this.get__Hide()();
-		OurSonic.UIManager.Element.prototype.loseFocus.call(this);
+		$OurSonic_UIManager_Element.prototype.loseFocus.call(this);
 	},
 	onClick: function(e) {
 		return false;
 	},
 	onMouseUp: function(e) {
 		if (ss.isValue(this.mouseUp)) {
-			this.mouseUp(OurSonic.Utility.Point.$ctor1(e.x, e.y));
+			this.mouseUp($OurSonic_Utility_Point.$ctor1(e.x, e.y));
 		}
-		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseUp.call(this, e);
 	},
 	onMouseOver: function(e) {
 		if (ss.isValue(this.mouseOver)) {
-			this.mouseOver(OurSonic.Utility.Point.$ctor1(e.x, e.y));
+			this.mouseOver($OurSonic_Utility_Point.$ctor1(e.x, e.y));
 		}
-		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseOver.call(this, e);
 	},
 	draw: function(canv) {
 		if (!this.visible) {
 			return;
 		}
 		this.get_updatePosition()(this.get_totalX(), this.get_totalY());
-		OurSonic.UIManager.Element.prototype.draw.call(this, canv);
+		$OurSonic_UIManager_Element.prototype.draw.call(this, canv);
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Image
-OurSonic.UIManager.Image = function(x, y, width, height) {
+var $OurSonic_UIManager_Image = function(x, y, width, height) {
 	this.onDraw = null;
-	OurSonic.UIManager.Element.call(this, x, y);
+	$OurSonic_UIManager_Element.call(this, x, y);
 	this.onDraw = null;
 	this.width = width;
 	this.height = height;
 };
-OurSonic.UIManager.Image.prototype = {
+$OurSonic_UIManager_Image.prototype = {
 	construct: function() {
-		OurSonic.UIManager.Element.prototype.construct.call(this);
+		$OurSonic_UIManager_Element.prototype.construct.call(this);
 	},
 	onClick: function(e) {
 		if (!this.visible) {
@@ -5797,19 +5785,19 @@ OurSonic.UIManager.Image.prototype = {
 		if (ss.isValue(this.click)) {
 			this.click(e);
 		}
-		return OurSonic.UIManager.Element.prototype.onClick.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onClick.call(this, e);
 	},
 	onMouseUp: function(e) {
 		if (!this.visible) {
 			return false;
 		}
-		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseUp.call(this, e);
 	},
 	onMouseOver: function(e) {
 		if (!this.visible) {
 			return false;
 		}
-		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseOver.call(this, e);
 	},
 	draw: function(canv) {
 		if (!this.visible) {
@@ -5817,7 +5805,7 @@ OurSonic.UIManager.Image.prototype = {
 		}
 		canv.save();
 		canv.lineWidth = 2;
-		OurSonic.Utility.Help.roundRect(canv, this.get_totalX(), this.get_totalY(), this.width, this.height, 2, true, true);
+		$OurSonic_Utility_Help.roundRect(canv, this.get_totalX(), this.get_totalY(), this.width, this.height, 2, true, true);
 		canv.fillStyle = '#000000';
 		this.onDraw(canv, this.get_totalX(), this.get_totalY());
 		canv.restore();
@@ -5825,23 +5813,23 @@ OurSonic.UIManager.Image.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Image
-OurSonic.UIManager.Image$1 = function(T) {
+var $OurSonic_UIManager_Image$1 = function(T) {
 	var $type = function(data, x, y, width, height) {
 		this.data = T.getDefaultValue();
-		OurSonic.UIManager.Image.call(this, x, y, width, height);
+		$OurSonic_UIManager_Image.call(this, x, y, width, height);
 		this.data = data;
 	};
-	$type.registerGenericClassInstance($type, OurSonic.UIManager.Image$1, [T], function() {
-		return OurSonic.UIManager.Image;
+	Type.registerGenericClassInstance($type, $OurSonic_UIManager_Image$1, [T], function() {
+		return $OurSonic_UIManager_Image;
 	}, function() {
 		return [];
 	});
 	return $type;
 };
-OurSonic.UIManager.Image$1.registerGenericClass('OurSonic.UIManager.Image$1', 1);
+Type.registerGenericClass(global, 'OurSonic.UIManager.Image$1', $OurSonic_UIManager_Image$1, 1);
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.ImageButton
-OurSonic.UIManager.ImageButton = function(x, y, width, height) {
+var $OurSonic_UIManager_ImageButton = function(x, y, width, height) {
 	this.font = null;
 	this.toggle = false;
 	this.toggled = false;
@@ -5852,7 +5840,7 @@ OurSonic.UIManager.ImageButton = function(x, y, width, height) {
 	this.buttonBorderGrad = null;
 	this.text = null;
 	this.color = null;
-	OurSonic.UIManager.Element.call(this, x, y);
+	$OurSonic_UIManager_Element.call(this, x, y);
 	this.text = Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('');
 	this.toggle = false;
 	this.toggled = false;
@@ -5865,10 +5853,10 @@ OurSonic.UIManager.ImageButton = function(x, y, width, height) {
 	this.width = width;
 	this.height = height;
 };
-OurSonic.UIManager.ImageButton.prototype = {
+$OurSonic_UIManager_ImageButton.prototype = {
 	construct: function() {
-		OurSonic.UIManager.Element.prototype.construct.call(this);
-		var canv = OurSonic.Utility.CanvasInformation.create(1, 1).context;
+		$OurSonic_UIManager_Element.prototype.construct.call(this);
+		var canv = $OurSonic_Utility_CanvasInformation.create(1, 1).context;
 		this.button1Grad = canv.createLinearGradient(0, 0, 0, 1);
 		this.button1Grad.addColorStop(0, '#FFFFFF');
 		this.button1Grad.addColorStop(1, '#A5A5A5');
@@ -5887,7 +5875,7 @@ OurSonic.UIManager.ImageButton.prototype = {
 		if (this.toggle) {
 			this.toggled = !this.toggled;
 		}
-		return OurSonic.UIManager.Element.prototype.onClick.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onClick.call(this, e);
 	},
 	onMouseUp: function(e) {
 		if (!this.visible) {
@@ -5895,23 +5883,23 @@ OurSonic.UIManager.ImageButton.prototype = {
 		}
 		if (this.clicking) {
 			if (ss.isValue(this.click)) {
-				this.click(OurSonic.Utility.Point.$ctor1(e.x, e.y));
+				this.click($OurSonic_Utility_Point.$ctor1(e.x, e.y));
 			}
 		}
 		this.clicking = false;
 		if (ss.isValue(this.mouseUp)) {
-			this.mouseUp(OurSonic.Utility.Point.$ctor1(e.x, e.y));
+			this.mouseUp($OurSonic_Utility_Point.$ctor1(e.x, e.y));
 		}
-		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseUp.call(this, e);
 	},
 	onMouseOver: function(e) {
 		if (!this.visible) {
 			return false;
 		}
 		if (ss.isValue(this.mouseOver)) {
-			this.mouseOver(OurSonic.Utility.Point.$ctor1(e.x, e.y));
+			this.mouseOver($OurSonic_Utility_Point.$ctor1(e.x, e.y));
 		}
-		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseOver.call(this, e);
 	},
 	draw: function(canv) {
 		if (!this.visible) {
@@ -5926,7 +5914,7 @@ OurSonic.UIManager.ImageButton.prototype = {
 			canv.fillStyle = (this.clicking ? this.button1Grad : this.button2Grad);
 		}
 		canv.lineWidth = 2;
-		OurSonic.Utility.Help.roundRect(canv, this.get_totalX(), this.get_totalY(), this.width, this.height, 2, true, true);
+		$OurSonic_Utility_Help.roundRect(canv, this.get_totalX(), this.get_totalY(), this.width, this.height, 2, true, true);
 		if (!ss.referenceEquals(canv.font, this.font)) {
 			canv.font = this.font;
 		}
@@ -5941,32 +5929,32 @@ OurSonic.UIManager.ImageButton.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.ImageButton
-OurSonic.UIManager.ImageButton$1 = function(T) {
+var $OurSonic_UIManager_ImageButton$1 = function(T) {
 	var $type = function(data, x, y, width, height) {
 		this.data = T.getDefaultValue();
-		OurSonic.UIManager.ImageButton.call(this, x, y, width, height);
+		$OurSonic_UIManager_ImageButton.call(this, x, y, width, height);
 		this.data = data;
 	};
-	$type.registerGenericClassInstance($type, OurSonic.UIManager.ImageButton$1, [T], function() {
-		return OurSonic.UIManager.ImageButton;
+	Type.registerGenericClassInstance($type, $OurSonic_UIManager_ImageButton$1, [T], function() {
+		return $OurSonic_UIManager_ImageButton;
 	}, function() {
 		return [];
 	});
 	return $type;
 };
-OurSonic.UIManager.ImageButton$1.registerGenericClass('OurSonic.UIManager.ImageButton$1', 1);
+Type.registerGenericClass(global, 'OurSonic.UIManager.ImageButton$1', $OurSonic_UIManager_ImageButton$1, 1);
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Panel
-OurSonic.UIManager.Panel = function(x, y, width, height) {
+var $OurSonic_UIManager_Panel = function(x, y, width, height) {
 	this.controls = null;
 	this.outline = false;
-	OurSonic.UIManager.Element.call(this, x, y);
+	$OurSonic_UIManager_Element.call(this, x, y);
 	this.outline = true;
 	this.width = width;
 	this.height = height;
 	this.controls = [];
 };
-OurSonic.UIManager.Panel.prototype = {
+$OurSonic_UIManager_Panel.prototype = {
 	clear: function() {
 		this.controls.clear();
 	},
@@ -5977,14 +5965,14 @@ OurSonic.UIManager.Panel.prototype = {
 			if (t.editorEngine.dragging || t.editorEngine.editing) {
 				return true;
 			}
-			if (Type.isInstanceOfType(t, OurSonic.UIManager.Panel) && Type.cast(t, OurSonic.UIManager.Panel).childrenAreEditing()) {
+			if (Type.isInstanceOfType(t, $OurSonic_UIManager_Panel) && Type.cast(t, $OurSonic_UIManager_Panel).childrenAreEditing()) {
 				return true;
 			}
 		}
 		return false;
 	},
 	focus: function(e) {
-		var e2 = OurSonic.UIManager.Pointer.$ctor(0, 0, 0, false);
+		var e2 = $OurSonic_UIManager_Pointer.$ctor(0, 0, 0, false);
 		var ch = this.controls;
 		for (var index = 0; index < ch.length; index++) {
 			var t = ch[index];
@@ -5994,7 +5982,7 @@ OurSonic.UIManager.Panel.prototype = {
 				t.focus(e2);
 			}
 		}
-		OurSonic.UIManager.Element.prototype.focus.call(this, e);
+		$OurSonic_UIManager_Element.prototype.focus.call(this, e);
 	},
 	loseFocus: function() {
 		var ch = this.controls;
@@ -6002,17 +5990,17 @@ OurSonic.UIManager.Panel.prototype = {
 			var t = ch[index];
 			t.loseFocus();
 		}
-		OurSonic.UIManager.Element.prototype.loseFocus.call(this);
+		$OurSonic_UIManager_Element.prototype.loseFocus.call(this);
 	},
 	construct: function() {
-		OurSonic.UIManager.Element.prototype.construct.call(this);
+		$OurSonic_UIManager_Element.prototype.construct.call(this);
 		for (var index = 0; index < this.controls.length; index++) {
 			var element = this.controls[index];
 			element.construct();
 		}
 	},
 	onKeyDown: function(e) {
-		OurSonic.UIManager.Element.prototype.onKeyDown.call(this, e);
+		$OurSonic_UIManager_Element.prototype.onKeyDown.call(this, e);
 		if (!this.visible) {
 			return false;
 		}
@@ -6026,7 +6014,7 @@ OurSonic.UIManager.Panel.prototype = {
 		return false;
 	},
 	onClick: function(e) {
-		var e2 = OurSonic.UIManager.Pointer.$ctor(0, 0, 0, false);
+		var e2 = $OurSonic_UIManager_Pointer.$ctor(0, 0, 0, false);
 		if (!this.visible) {
 			return false;
 		}
@@ -6045,8 +6033,8 @@ OurSonic.UIManager.Panel.prototype = {
 				control.loseFocus();
 			}
 		}
-		if (!clicked && !this.isEditMode() && Type.isInstanceOfType(this, OurSonic.UIManager.UIArea)) {
-			Type.cast(this, OurSonic.UIManager.UIArea).dragging = OurSonic.Utility.Point.$ctor1(e.x, e.y);
+		if (!clicked && !this.isEditMode() && Type.isInstanceOfType(this, $OurSonic_UIManager_UIArea)) {
+			Type.cast(this, $OurSonic_UIManager_UIArea).dragging = $OurSonic_Utility_Point.$ctor1(e.x, e.y);
 		}
 		return clicked;
 	},
@@ -6055,7 +6043,7 @@ OurSonic.UIManager.Panel.prototype = {
 			return false;
 		}
 		var dragging = null;
-		var uiArea = Type.safeCast(this, OurSonic.UIManager.UIArea);
+		var uiArea = Type.safeCast(this, $OurSonic_UIManager_UIArea);
 		if (ss.isValue(uiArea)) {
 			dragging = uiArea.dragging;
 		}
@@ -6074,7 +6062,7 @@ OurSonic.UIManager.Panel.prototype = {
 		this.x += e.x - dragging.x;
 		this.y += e.y - dragging.y;
 		//this.onMove(); 
-		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseOver.call(this, e);
 	},
 	onMouseUp: function(e) {
 		if (!this.visible) {
@@ -6082,13 +6070,13 @@ OurSonic.UIManager.Panel.prototype = {
 		}
 		for (var ij = 0; ij < this.controls.length; ij++) {
 			var control = this.controls[ij];
-			control.onMouseUp(OurSonic.UIManager.Pointer.$ctor(e.x - control.x, e.y - control.y, 0, false));
+			control.onMouseUp($OurSonic_UIManager_Pointer.$ctor(e.x - control.x, e.y - control.y, 0, false));
 		}
-		var uiArea = Type.safeCast(this, OurSonic.UIManager.UIArea);
+		var uiArea = Type.safeCast(this, $OurSonic_UIManager_UIArea);
 		if (ss.isValue(uiArea)) {
 			uiArea.dragging = null;
 		}
-		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseUp.call(this, e);
 	},
 	onScroll: function(e) {
 		if (!this.visible) {
@@ -6102,7 +6090,7 @@ OurSonic.UIManager.Panel.prototype = {
 				return control.onScroll(e);
 			}
 		}
-		return OurSonic.UIManager.Element.prototype.onScroll.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onScroll.call(this, e);
 	},
 	draw: function(canv) {
 		if (!this.visible) {
@@ -6118,7 +6106,7 @@ OurSonic.UIManager.Panel.prototype = {
 			canv.fillStyle = lingrad;
 			canv.strokeStyle = '#333';
 			var rad = 5;
-			OurSonic.Utility.Help.roundRect(canv, this.get_totalX(), this.get_totalY(), this.width, this.height, rad, true, true);
+			$OurSonic_Utility_Help.roundRect(canv, this.get_totalX(), this.get_totalY(), this.width, this.height, rad, true, true);
 		}
 		for (var index = 0; index < this.controls.length; index++) {
 			var t = this.controls[index];
@@ -6127,7 +6115,7 @@ OurSonic.UIManager.Panel.prototype = {
 		this.x = _x;
 		this.y = _y;
 		canv.restore();
-		OurSonic.UIManager.Element.prototype.draw.call(this, canv);
+		$OurSonic_UIManager_Element.prototype.draw.call(this, canv);
 	},
 	addControl: function(T) {
 		return function(element) {
@@ -6140,26 +6128,26 @@ OurSonic.UIManager.Panel.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Panel
-OurSonic.UIManager.Panel$1 = function(T) {
+var $OurSonic_UIManager_Panel$1 = function(T) {
 	var $type = function(data, x, y, width, height) {
 		this.data = T.getDefaultValue();
-		OurSonic.UIManager.Panel.call(this, x, y, width, height);
+		$OurSonic_UIManager_Panel.call(this, x, y, width, height);
 		this.data = data;
 	};
-	$type.registerGenericClassInstance($type, OurSonic.UIManager.Panel$1, [T], function() {
-		return OurSonic.UIManager.Panel;
+	Type.registerGenericClassInstance($type, $OurSonic_UIManager_Panel$1, [T], function() {
+		return $OurSonic_UIManager_Panel;
 	}, function() {
 		return [];
 	});
 	return $type;
 };
-OurSonic.UIManager.Panel$1.registerGenericClass('OurSonic.UIManager.Panel$1', 1);
+Type.registerGenericClass(global, 'OurSonic.UIManager.Panel$1', $OurSonic_UIManager_Panel$1, 1);
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Pointer
-OurSonic.UIManager.Pointer = function() {
+var $OurSonic_UIManager_Pointer = function() {
 };
-OurSonic.UIManager.Pointer.$ctor = function(x, y, delta, right) {
-	var $this = OurSonic.Utility.Point.$ctor1(x, y);
+$OurSonic_UIManager_Pointer.$ctor = function(x, y, delta, right) {
+	var $this = $OurSonic_Utility_Point.$ctor1(x, y);
 	$this.delta = 0;
 	$this.right = false;
 	$this.delta = delta;
@@ -6168,17 +6156,17 @@ OurSonic.UIManager.Pointer.$ctor = function(x, y, delta, right) {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.PropertyButton
-OurSonic.UIManager.PropertyButton = function(x, y) {
-	OurSonic.UIManager.Element.call(this, x, y);
+var $OurSonic_UIManager_PropertyButton = function(x, y) {
+	$OurSonic_UIManager_Element.call(this, x, y);
 };
-OurSonic.UIManager.PropertyButton.prototype = {
+$OurSonic_UIManager_PropertyButton.prototype = {
 	construct: function() {
-		OurSonic.UIManager.Element.prototype.construct.call(this);
+		$OurSonic_UIManager_Element.prototype.construct.call(this);
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.ScrollBox
-OurSonic.UIManager.ScrollBox = function(x, y, itemHeight, visibleItems, itemWidth) {
+var $OurSonic_UIManager_ScrollBox = function(x, y, itemHeight, visibleItems, itemWidth) {
 	this.itemWidth = 0;
 	this.scrollWidth = 0;
 	this.jHeight = 0;
@@ -6190,7 +6178,7 @@ OurSonic.UIManager.ScrollBox = function(x, y, itemHeight, visibleItems, itemWidt
 	this.dragging = false;
 	this.controls = null;
 	this.scrolling = false;
-	OurSonic.UIManager.Element.call(this, x, y);
+	$OurSonic_UIManager_Element.call(this, x, y);
 	this.itemWidth = itemWidth;
 	this.scrollWidth = 14;
 	this.visibleItems = visibleItems;
@@ -6199,7 +6187,7 @@ OurSonic.UIManager.ScrollBox = function(x, y, itemHeight, visibleItems, itemWidt
 	this.jHeight = 5;
 	this.controls = [];
 };
-OurSonic.UIManager.ScrollBox.prototype = {
+$OurSonic_UIManager_ScrollBox.prototype = {
 	construct: function() {
 		this.height = this.visibleItems * (this.itemHeight + this.jHeight);
 		this.width = this.itemWidth + this.scrollWidth;
@@ -6232,7 +6220,7 @@ OurSonic.UIManager.ScrollBox.prototype = {
 			this.scrollIndex = Math.min(Math.max(this.scrollIndex, 0), this.controls.length);
 		}
 		this.dragging = true;
-		return OurSonic.UIManager.Element.prototype.onClick.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onClick.call(this, e);
 	},
 	onMouseUp: function(e) {
 		if (!this.visible) {
@@ -6249,9 +6237,9 @@ OurSonic.UIManager.ScrollBox.prototype = {
 			}
 		}
 		if (ss.isValue(this.mouseUp)) {
-			this.mouseUp(OurSonic.Utility.Point.$ctor1(e.x, e.y));
+			this.mouseUp($OurSonic_Utility_Point.$ctor1(e.x, e.y));
 		}
-		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseUp.call(this, e);
 	},
 	onMouseOver: function(e) {
 		if (!this.visible) {
@@ -6272,9 +6260,9 @@ OurSonic.UIManager.ScrollBox.prototype = {
 			this.scrollIndex = Math.min(Math.max(this.scrollIndex, 0), this.controls.length);
 		}
 		if (ss.isValue(this.mouseOver)) {
-			this.mouseOver(OurSonic.Utility.Point.$ctor1(e.x, e.y));
+			this.mouseOver($OurSonic_Utility_Point.$ctor1(e.x, e.y));
 		}
-		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseOver.call(this, e);
 	},
 	onScroll: function(e) {
 		if (!this.visible) {
@@ -6309,7 +6297,7 @@ OurSonic.UIManager.ScrollBox.prototype = {
 		canv.fillStyle = this.backColor;
 		canv.lineWidth = 1;
 		canv.strokeStyle = '#333';
-		OurSonic.Utility.Help.roundRect(canv, this.get_totalX(), this.get_totalY(), this.itemWidth + this.scrollWidth + 6, this.visibleItems * (this.itemHeight + this.jHeight), 3, true, true);
+		$OurSonic_Utility_Help.roundRect(canv, this.get_totalX(), this.get_totalY(), this.itemWidth + this.scrollWidth + 6, this.visibleItems * (this.itemHeight + this.jHeight), 3, true, true);
 		canv.fillStyle = 'grey';
 		canv.lineWidth = 1;
 		canv.strokeStyle = '#444';
@@ -6330,7 +6318,7 @@ OurSonic.UIManager.ScrollBox.prototype = {
 			this.controls[i].draw(canv);
 		}
 		canv.restore();
-		OurSonic.UIManager.Element.prototype.draw.call(this, canv);
+		$OurSonic_UIManager_Element.prototype.draw.call(this, canv);
 	},
 	clearControls: function() {
 		this.controls = [];
@@ -6338,14 +6326,14 @@ OurSonic.UIManager.ScrollBox.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Table
-OurSonic.UIManager.Table = function(x, y, width, height) {
+var $OurSonic_UIManager_Table = function(x, y, width, height) {
 	this.rows = null;
-	OurSonic.UIManager.Element.call(this, x, y);
+	$OurSonic_UIManager_Element.call(this, x, y);
 	this.width = width;
 	this.height = height;
 	this.rows = [];
 };
-OurSonic.UIManager.Table.prototype = {
+$OurSonic_UIManager_Table.prototype = {
 	childrenAreEditing: function() {
 		var ch = this.rows;
 		for (var index = 0; index < ch.length; index++) {
@@ -6363,50 +6351,38 @@ OurSonic.UIManager.Table.prototype = {
 		var spots = [];
 		var totalWidth = { $: this.width };
 		var totalHeight = { $: this.height };
-		var lastRowRect = OurSonic.Utility.Rectangle.$ctor1(0, 0, 0, 0);
+		var lastRowRect = $OurSonic_Utility_Rectangle.$ctor1(0, 0, 0, 0);
 		var mainRow = this.rows[0];
-		var $t1 = this.rows.getEnumerator();
-		try {
-			while ($t1.moveNext()) {
-				var row = $t1.get_current();
-				var lastRowRectData = OurSonic.Utility.Extensions.withData(OurSonic.Utility.Rectangle, OurSonic.UIManager.TableRow).call(null, this.$calculateRowSize(row, lastRowRect.y + lastRowRect.height, totalWidth, totalHeight), row);
-				lastRowRect = Type.makeGenericType(OurSonic.Utility.ExtraData$2, [OurSonic.Utility.Rectangle, OurSonic.UIManager.TableRow]).op_Implicit(lastRowRectData);
-				var lastCellRect = OurSonic.Utility.Rectangle.$ctor1(0, lastRowRect.y, 0, 0);
-				var $t2 = row.cells.getEnumerator();
-				try {
-					while ($t2.moveNext()) {
-						var cell = $t2.get_current();
-						var lastCellRectData = OurSonic.Utility.Extensions.withData(OurSonic.Utility.Rectangle, OurSonic.UIManager.TableCell).call(null, this.$calculateCellSize(cell, lastCellRect.x + lastCellRect.width, lastCellRect.y, totalWidth, totalHeight), cell);
-						spots.add(lastCellRectData);
-						lastCellRect = Type.makeGenericType(OurSonic.Utility.ExtraData$2, [OurSonic.Utility.Rectangle, OurSonic.UIManager.TableCell]).op_Implicit(lastCellRectData);
-					}
-				}
-				finally {
-					$t2.dispose();
-				}
+		for (var $t1 = 0; $t1 < this.rows.length; $t1++) {
+			var row = this.rows[$t1];
+			var lastRowRectData = $OurSonic_Utility_Extensions.withData($OurSonic_Utility_Rectangle, $OurSonic_UIManager_TableRow).call(null, this.$calculateRowSize(row, lastRowRect.y + lastRowRect.height, totalWidth, totalHeight), row);
+			lastRowRect = Type.makeGenericType($OurSonic_Utility_ExtraData$2, [$OurSonic_Utility_Rectangle, $OurSonic_UIManager_TableRow]).op_Implicit(lastRowRectData);
+			var lastCellRect = $OurSonic_Utility_Rectangle.$ctor1(0, lastRowRect.y, 0, 0);
+			for (var $t2 = 0; $t2 < row.cells.length; $t2++) {
+				var cell = row.cells[$t2];
+				var lastCellRectData = $OurSonic_Utility_Extensions.withData($OurSonic_Utility_Rectangle, $OurSonic_UIManager_TableCell).call(null, this.$calculateCellSize(cell, lastCellRect.x + lastCellRect.width, lastCellRect.y, totalWidth, totalHeight), cell);
+				spots.add(lastCellRectData);
+				lastCellRect = Type.makeGenericType($OurSonic_Utility_ExtraData$2, [$OurSonic_Utility_Rectangle, $OurSonic_UIManager_TableCell]).op_Implicit(lastCellRectData);
 			}
-		}
-		finally {
-			$t1.dispose();
 		}
 		return spots;
 	},
 	$calculateRowSize: function(row, y, totalWidth, totalHeight) {
 		var height;
-		if (ss.isNullOrUndefined(OurSonic.Utility.SizeNumber.op_Implicit$1(row.get_rowHeight()))) {
+		if (ss.isNullOrUndefined($OurSonic_Utility_SizeNumber.op_Implicit$1(row.get_rowHeight()))) {
 			height = totalHeight.$ / row.get_table().rows.length;
 		}
-		else if (OurSonic.Utility.SizeNumber.op_Implicit$1(row.get_rowHeight()).endsWith('%')) {
-			height = totalHeight.$ * OurSonic.Utility.SizeNumber.op_Implicit(row.get_rowHeight()) / 100;
+		else if ($OurSonic_Utility_SizeNumber.op_Implicit$1(row.get_rowHeight()).endsWith('%')) {
+			height = totalHeight.$ * $OurSonic_Utility_SizeNumber.op_Implicit(row.get_rowHeight()) / 100;
 		}
 		else {
-			if (OurSonic.Utility.SizeNumber.op_Implicit(row.get_rowHeight()) + y > totalHeight.$) {
-				var resetHeight = ss.Int32.trunc(y + OurSonic.Utility.SizeNumber.op_Implicit(row.get_rowHeight()));
+			if ($OurSonic_Utility_SizeNumber.op_Implicit(row.get_rowHeight()) + y > totalHeight.$) {
+				var resetHeight = ss.Int32.trunc(y + $OurSonic_Utility_SizeNumber.op_Implicit(row.get_rowHeight()));
 				totalHeight.$ = resetHeight;
 			}
-			height = OurSonic.Utility.SizeNumber.op_Implicit(row.get_rowHeight());
+			height = $OurSonic_Utility_SizeNumber.op_Implicit(row.get_rowHeight());
 		}
-		return OurSonic.Utility.Rectangle.$ctor1(0, y, totalWidth.$, ss.Int32.trunc(height));
+		return $OurSonic_Utility_Rectangle.$ctor1(0, y, totalWidth.$, ss.Int32.trunc(height));
 	},
 	$calculateCellSize: function(cell, x, y, totalWidth, totalHeight) {
 		var width;
@@ -6419,88 +6395,76 @@ OurSonic.UIManager.Table.prototype = {
 		else {
 			lastCellAtThisIndex = cell.get_row().get_table().rows[rowIndex - 1].cells[cell.get_row().cells.indexOf(cell)];
 		}
-		if (ss.isNullOrUndefined(OurSonic.Utility.SizeNumber.op_Implicit$1(cell.cellWidth))) {
-			width = (ss.isNullOrUndefined(lastCellAtThisIndex) ? (totalWidth.$ / cell.get_row().cells.length) : OurSonic.Utility.SizeNumber.op_Implicit(lastCellAtThisIndex.cellWidth));
+		if (ss.isNullOrUndefined($OurSonic_Utility_SizeNumber.op_Implicit$1(cell.cellWidth))) {
+			width = (ss.isNullOrUndefined(lastCellAtThisIndex) ? (totalWidth.$ / cell.get_row().cells.length) : $OurSonic_Utility_SizeNumber.op_Implicit(lastCellAtThisIndex.cellWidth));
 		}
-		else if (OurSonic.Utility.SizeNumber.op_Implicit$1(cell.cellWidth).endsWith('%')) {
-			width = totalWidth.$ * OurSonic.Utility.SizeNumber.op_Implicit(cell.cellWidth) / 100;
+		else if ($OurSonic_Utility_SizeNumber.op_Implicit$1(cell.cellWidth).endsWith('%')) {
+			width = totalWidth.$ * $OurSonic_Utility_SizeNumber.op_Implicit(cell.cellWidth) / 100;
 		}
 		else {
-			if (OurSonic.Utility.SizeNumber.op_Implicit(cell.cellWidth) + x > totalWidth.$) {
-				totalWidth.$ = ss.Int32.trunc(x + OurSonic.Utility.SizeNumber.op_Implicit(cell.cellWidth));
+			if ($OurSonic_Utility_SizeNumber.op_Implicit(cell.cellWidth) + x > totalWidth.$) {
+				totalWidth.$ = ss.Int32.trunc(x + $OurSonic_Utility_SizeNumber.op_Implicit(cell.cellWidth));
 			}
-			width = OurSonic.Utility.SizeNumber.op_Implicit(cell.cellWidth);
+			width = $OurSonic_Utility_SizeNumber.op_Implicit(cell.cellWidth);
 		}
-		if (ss.isNullOrUndefined(OurSonic.Utility.SizeNumber.op_Implicit$1(cell.cellHeight))) {
+		if (ss.isNullOrUndefined($OurSonic_Utility_SizeNumber.op_Implicit$1(cell.cellHeight))) {
 			height = totalHeight.$;
 		}
-		else if (OurSonic.Utility.SizeNumber.op_Implicit$1(cell.cellHeight).endsWith('%')) {
-			height = totalHeight.$ * OurSonic.Utility.SizeNumber.op_Implicit(cell.cellHeight) / 100;
+		else if ($OurSonic_Utility_SizeNumber.op_Implicit$1(cell.cellHeight).endsWith('%')) {
+			height = totalHeight.$ * $OurSonic_Utility_SizeNumber.op_Implicit(cell.cellHeight) / 100;
 		}
 		else {
-			if (OurSonic.Utility.SizeNumber.op_Implicit(cell.cellHeight) + y > totalHeight.$) {
-				totalHeight.$ = ss.Int32.trunc(y + OurSonic.Utility.SizeNumber.op_Implicit(cell.cellHeight));
+			if ($OurSonic_Utility_SizeNumber.op_Implicit(cell.cellHeight) + y > totalHeight.$) {
+				totalHeight.$ = ss.Int32.trunc(y + $OurSonic_Utility_SizeNumber.op_Implicit(cell.cellHeight));
 			}
-			height = OurSonic.Utility.SizeNumber.op_Implicit(cell.cellHeight);
+			height = $OurSonic_Utility_SizeNumber.op_Implicit(cell.cellHeight);
 		}
 		if (cell.fullSize) {
-			var $t1 = cell.controls.getEnumerator();
-			try {
-				while ($t1.moveNext()) {
-					var cnt = $t1.get_current();
-					cnt.x = 0;
-					cnt.y = 0;
-					cnt.width = ss.Int32.trunc(width);
-					cnt.height = ss.Int32.trunc(height);
-				}
-			}
-			finally {
-				$t1.dispose();
+			for (var $t1 = 0; $t1 < cell.controls.length; $t1++) {
+				var cnt = cell.controls[$t1];
+				cnt.x = 0;
+				cnt.y = 0;
+				cnt.width = ss.Int32.trunc(width);
+				cnt.height = ss.Int32.trunc(height);
 			}
 		}
-		return OurSonic.Utility.Rectangle.$ctor1(x, y, ss.Int32.trunc(width), ss.Int32.trunc(height));
+		return $OurSonic_Utility_Rectangle.$ctor1(x, y, ss.Int32.trunc(width), ss.Int32.trunc(height));
 	},
 	focus: function(e) {
-		OurSonic.UIManager.Element.prototype.focus.call(this, e);
+		$OurSonic_UIManager_Element.prototype.focus.call(this, e);
 	},
 	loseFocus: function() {
-		OurSonic.UIManager.Element.prototype.loseFocus.call(this);
+		$OurSonic_UIManager_Element.prototype.loseFocus.call(this);
 	},
 	construct: function() {
-		OurSonic.UIManager.Element.prototype.construct.call(this);
+		$OurSonic_UIManager_Element.prototype.construct.call(this);
 	},
 	onKeyDown: function(e) {
-		return OurSonic.UIManager.Element.prototype.onKeyDown.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onKeyDown.call(this, e);
 	},
 	onClick: function(e) {
-		return OurSonic.UIManager.Element.prototype.onClick.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onClick.call(this, e);
 	},
 	onMouseOver: function(e) {
-		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseOver.call(this, e);
 	},
 	onMouseUp: function(e) {
-		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseUp.call(this, e);
 	},
 	onScroll: function(e) {
-		return OurSonic.UIManager.Element.prototype.onScroll.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onScroll.call(this, e);
 	},
 	draw: function(canv) {
 		var fm = this.$buildSizeMap();
-		var $t1 = fm.getEnumerator();
-		try {
-			while ($t1.moveNext()) {
-				var extraData = $t1.get_current();
-				extraData.data.x = extraData.item.x;
-				extraData.data.y = extraData.item.y;
-				extraData.data.cellWidth = OurSonic.Utility.SizeNumber.op_Implicit$2(extraData.item.width);
-				extraData.data.cellHeight = OurSonic.Utility.SizeNumber.op_Implicit$2(extraData.item.height);
-				extraData.data.draw(canv);
-			}
+		for (var $t1 = 0; $t1 < fm.length; $t1++) {
+			var extraData = fm[$t1];
+			extraData.data.x = extraData.item.x;
+			extraData.data.y = extraData.item.y;
+			extraData.data.cellWidth = $OurSonic_Utility_SizeNumber.op_Implicit$2(extraData.item.width);
+			extraData.data.cellHeight = $OurSonic_Utility_SizeNumber.op_Implicit$2(extraData.item.height);
+			extraData.data.draw(canv);
 		}
-		finally {
-			$t1.dispose();
-		}
-		OurSonic.UIManager.Element.prototype.draw.call(this, canv);
+		$OurSonic_UIManager_Element.prototype.draw.call(this, canv);
 	},
 	addRow: function(element) {
 		element.parent = this;
@@ -6511,87 +6475,87 @@ OurSonic.UIManager.Table.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Table
-OurSonic.UIManager.Table$1 = function(T) {
+var $OurSonic_UIManager_Table$1 = function(T) {
 	var $type = function(data, x, y, width, height) {
 		this.data = T.getDefaultValue();
-		OurSonic.UIManager.Table.call(this, x, y, width, height);
+		$OurSonic_UIManager_Table.call(this, x, y, width, height);
 		this.data = data;
 	};
-	$type.registerGenericClassInstance($type, OurSonic.UIManager.Table$1, [T], function() {
-		return OurSonic.UIManager.Table;
+	Type.registerGenericClassInstance($type, $OurSonic_UIManager_Table$1, [T], function() {
+		return $OurSonic_UIManager_Table;
 	}, function() {
 		return [];
 	});
 	return $type;
 };
-OurSonic.UIManager.Table$1.registerGenericClass('OurSonic.UIManager.Table$1', 1);
+Type.registerGenericClass(global, 'OurSonic.UIManager.Table$1', $OurSonic_UIManager_Table$1, 1);
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.TableCell
-OurSonic.UIManager.TableCell = function() {
+var $OurSonic_UIManager_TableCell = function() {
 	this.cellHeight = null;
 	this.cellWidth = null;
 	this.fullSize = false;
 	this.rowSpan = 0;
 	this.colSpan = 0;
-	OurSonic.UIManager.Panel.call(this, 0, 0, 0, 0);
+	$OurSonic_UIManager_Panel.call(this, 0, 0, 0, 0);
 };
-OurSonic.UIManager.TableCell.prototype = {
+$OurSonic_UIManager_TableCell.prototype = {
 	get_row: function() {
-		return Type.cast(this.parent, OurSonic.UIManager.TableRow);
+		return Type.cast(this.parent, $OurSonic_UIManager_TableRow);
 	},
 	focus: function(e) {
-		OurSonic.UIManager.Panel.prototype.focus.call(this, e);
+		$OurSonic_UIManager_Panel.prototype.focus.call(this, e);
 	},
 	loseFocus: function() {
-		OurSonic.UIManager.Panel.prototype.loseFocus.call(this);
+		$OurSonic_UIManager_Panel.prototype.loseFocus.call(this);
 	},
 	construct: function() {
-		OurSonic.UIManager.Panel.prototype.construct.call(this);
+		$OurSonic_UIManager_Panel.prototype.construct.call(this);
 	},
 	onKeyDown: function(e) {
-		return OurSonic.UIManager.Panel.prototype.onKeyDown.call(this, e);
+		return $OurSonic_UIManager_Panel.prototype.onKeyDown.call(this, e);
 	},
 	onClick: function(e) {
-		return OurSonic.UIManager.Panel.prototype.onClick.call(this, e);
+		return $OurSonic_UIManager_Panel.prototype.onClick.call(this, e);
 	},
 	onMouseOver: function(e) {
-		return OurSonic.UIManager.Panel.prototype.onMouseOver.call(this, e);
+		return $OurSonic_UIManager_Panel.prototype.onMouseOver.call(this, e);
 	},
 	onMouseUp: function(e) {
-		return OurSonic.UIManager.Panel.prototype.onMouseUp.call(this, e);
+		return $OurSonic_UIManager_Panel.prototype.onMouseUp.call(this, e);
 	},
 	onScroll: function(e) {
-		return OurSonic.UIManager.Panel.prototype.onScroll.call(this, e);
+		return $OurSonic_UIManager_Panel.prototype.onScroll.call(this, e);
 	},
 	draw: function(canv) {
-		this.width = ss.Int32.trunc(OurSonic.Utility.SizeNumber.op_Implicit(this.cellWidth));
-		this.height = ss.Int32.trunc(OurSonic.Utility.SizeNumber.op_Implicit(this.cellHeight));
-		OurSonic.UIManager.Panel.prototype.draw.call(this, canv);
+		this.width = ss.Int32.trunc($OurSonic_Utility_SizeNumber.op_Implicit(this.cellWidth));
+		this.height = ss.Int32.trunc($OurSonic_Utility_SizeNumber.op_Implicit(this.cellHeight));
+		$OurSonic_UIManager_Panel.prototype.draw.call(this, canv);
 	}
 };
-OurSonic.UIManager.TableCell.$ctor1 = function(width, height) {
+$OurSonic_UIManager_TableCell.$ctor1 = function(width, height) {
 	this.cellHeight = null;
 	this.cellWidth = null;
 	this.fullSize = false;
 	this.rowSpan = 0;
 	this.colSpan = 0;
-	OurSonic.UIManager.Panel.call(this, 0, 0, 0, 0);
+	$OurSonic_UIManager_Panel.call(this, 0, 0, 0, 0);
 	this.cellWidth = width;
 	this.cellHeight = height;
 	this.outline = true;
 	this.fullSize = true;
 };
-OurSonic.UIManager.TableCell.$ctor1.prototype = OurSonic.UIManager.TableCell.prototype;
+$OurSonic_UIManager_TableCell.$ctor1.prototype = $OurSonic_UIManager_TableCell.prototype;
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.TableRow
-OurSonic.UIManager.TableRow = function(height) {
+var $OurSonic_UIManager_TableRow = function(height) {
 	this.cells = null;
 	this.$2$RowHeightField = null;
-	OurSonic.UIManager.Element.call(this, 0, 0);
+	$OurSonic_UIManager_Element.call(this, 0, 0);
 	this.set_rowHeight(height);
 	this.cells = [];
 };
-OurSonic.UIManager.TableRow.prototype = {
+$OurSonic_UIManager_TableRow.prototype = {
 	get_rowHeight: function() {
 		return this.$2$RowHeightField;
 	},
@@ -6599,7 +6563,7 @@ OurSonic.UIManager.TableRow.prototype = {
 		this.$2$RowHeightField = value;
 	},
 	get_table: function() {
-		return Type.cast(this.parent, OurSonic.UIManager.Table);
+		return Type.cast(this.parent, $OurSonic_UIManager_Table);
 	},
 	childrenAreEditing: function() {
 		var ch = this.cells;
@@ -6615,31 +6579,31 @@ OurSonic.UIManager.TableRow.prototype = {
 		return false;
 	},
 	focus: function(e) {
-		OurSonic.UIManager.Element.prototype.focus.call(this, e);
+		$OurSonic_UIManager_Element.prototype.focus.call(this, e);
 	},
 	loseFocus: function() {
-		OurSonic.UIManager.Element.prototype.loseFocus.call(this);
+		$OurSonic_UIManager_Element.prototype.loseFocus.call(this);
 	},
 	construct: function() {
-		OurSonic.UIManager.Element.prototype.construct.call(this);
+		$OurSonic_UIManager_Element.prototype.construct.call(this);
 	},
 	onKeyDown: function(e) {
-		return OurSonic.UIManager.Element.prototype.onKeyDown.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onKeyDown.call(this, e);
 	},
 	onClick: function(e) {
-		return OurSonic.UIManager.Element.prototype.onClick.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onClick.call(this, e);
 	},
 	onMouseOver: function(e) {
-		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseOver.call(this, e);
 	},
 	onMouseUp: function(e) {
-		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseUp.call(this, e);
 	},
 	onScroll: function(e) {
-		return OurSonic.UIManager.Element.prototype.onScroll.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onScroll.call(this, e);
 	},
 	draw: function(canv) {
-		OurSonic.UIManager.Element.prototype.draw.call(this, canv);
+		$OurSonic_UIManager_Element.prototype.draw.call(this, canv);
 	},
 	addCell: function(element) {
 		element.parent = this;
@@ -6650,18 +6614,18 @@ OurSonic.UIManager.TableRow.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.TextArea
-OurSonic.UIManager.TextArea = function(x, y, text) {
+var $OurSonic_UIManager_TextArea = function(x, y, text) {
 	this.$oldText = null;
 	this.text = null;
 	this.font = null;
 	this.color = null;
-	OurSonic.UIManager.Element.call(this, x, y);
+	$OurSonic_UIManager_Element.call(this, x, y);
 	this.text = text;
-	this.font = OurSonic.UIManager.UIManager.textFont;
+	this.font = $OurSonic_UIManager_UIManager.textFont;
 	this.color = 'black';
 	this.$oldText = '';
 };
-OurSonic.UIManager.TextArea.prototype = {
+$OurSonic_UIManager_TextArea.prototype = {
 	draw: function(canv) {
 		if (!this.visible) {
 			return;
@@ -6679,7 +6643,7 @@ OurSonic.UIManager.TextArea.prototype = {
 		canv.fillText(txt, this.get_totalX(), this.get_totalY());
 	},
 	construct: function() {
-		OurSonic.UIManager.Element.prototype.construct.call(this);
+		$OurSonic_UIManager_Element.prototype.construct.call(this);
 	},
 	forceDrawing: function() {
 		var txt = Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit(this.text);
@@ -6698,7 +6662,7 @@ OurSonic.UIManager.TextArea.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.TextBox
-OurSonic.UIManager.TextBox = function(x, y, width, height, text) {
+var $OurSonic_UIManager_TextBox = function(x, y, width, height, text) {
 	this.$blinkTick = 0;
 	this.$blinked = false;
 	this.$can = null;
@@ -6718,17 +6682,17 @@ OurSonic.UIManager.TextBox = function(x, y, width, height, text) {
 	this.button2Grad = null;
 	this.buttonBorderGrad = null;
 	this.can = false;
-	OurSonic.UIManager.Element.call(this, x, y);
+	$OurSonic_UIManager_Element.call(this, x, y);
 	this.text = Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit(text);
 	this.width = width;
 	this.height = height;
-	this.font = OurSonic.UIManager.UIManager.textFont;
+	this.font = $OurSonic_UIManager_UIManager.textFont;
 	this.dragPosition = -1;
 };
-OurSonic.UIManager.TextBox.prototype = {
+$OurSonic_UIManager_TextBox.prototype = {
 	construct: function() {
-		OurSonic.UIManager.Element.prototype.construct.call(this);
-		var canv = OurSonic.Utility.CanvasInformation.create(1, 1).context;
+		$OurSonic_UIManager_Element.prototype.construct.call(this);
+		var canv = $OurSonic_Utility_CanvasInformation.create(1, 1).context;
 		this.button1Grad = canv.createLinearGradient(0, 0, 0, 1);
 		this.button1Grad.addColorStop(0, '#FFFFFF');
 		this.button1Grad.addColorStop(1, '#A5A5A5');
@@ -6875,7 +6839,7 @@ OurSonic.UIManager.TextBox.prototype = {
 		}
 		this.lastClickTick = this.drawTicks;
 		this.$can.restore();
-		return OurSonic.UIManager.Element.prototype.onClick.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onClick.call(this, e);
 	},
 	$selectWord: function() {
 		var j = this.text.split(' ');
@@ -6901,9 +6865,9 @@ OurSonic.UIManager.TextBox.prototype = {
 		}
 		this.clicking = false;
 		if (ss.isValue(this.mouseUp)) {
-			this.mouseUp(OurSonic.Utility.Point.$ctor1(e.x, e.y));
+			this.mouseUp($OurSonic_Utility_Point.$ctor1(e.x, e.y));
 		}
-		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseUp.call(this, e);
 	},
 	onMouseOver: function(e) {
 		if (!this.visible) {
@@ -6929,9 +6893,9 @@ OurSonic.UIManager.TextBox.prototype = {
 			this.cursorPosition = this.text.length;
 		}
 		if (ss.isValue(this.mouseOver)) {
-			this.mouseOver(OurSonic.Utility.Point.$ctor1(e.x, e.y));
+			this.mouseOver($OurSonic_Utility_Point.$ctor1(e.x, e.y));
 		}
-		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseOver.call(this, e);
 	},
 	draw: function(canv) {
 		if (!this.visible) {
@@ -6947,7 +6911,7 @@ OurSonic.UIManager.TextBox.prototype = {
 		canv.strokeStyle = this.buttonBorderGrad;
 		canv.fillStyle = (this.clicking ? this.button1Grad : this.button2Grad);
 		canv.lineWidth = 2;
-		OurSonic.Utility.Help.roundRect(canv, this.get_totalX(), this.get_totalY(), this.width, this.height, 2, true, true);
+		$OurSonic_Utility_Help.roundRect(canv, this.get_totalX(), this.get_totalY(), this.width, this.height, 2, true, true);
 		if (!ss.referenceEquals(canv.font, this.font)) {
 			canv.font = this.font;
 		}
@@ -6979,43 +6943,43 @@ OurSonic.UIManager.TextBox.prototype = {
 			canv.stroke();
 		}
 		canv.restore();
-		OurSonic.UIManager.Element.prototype.draw.call(this, canv);
+		$OurSonic_UIManager_Element.prototype.draw.call(this, canv);
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.UIArea
-OurSonic.UIManager.UIArea = function(x, y, width, height) {
+var $OurSonic_UIManager_UIArea = function(x, y, width, height) {
 	this.dragging = null;
 	this.closable = false;
-	OurSonic.UIManager.Panel.call(this, x, y, width, height);
+	$OurSonic_UIManager_Panel.call(this, x, y, width, height);
 	this.closable = true;
 	this.outline = false;
 };
-OurSonic.UIManager.UIArea.prototype = {
+$OurSonic_UIManager_UIArea.prototype = {
 	addControl: function(T) {
 		return function(element) {
-			var fm = OurSonic.UIManager.Panel.prototype.addControl(T).call(this, element);
+			var fm = $OurSonic_UIManager_Panel.prototype.addControl(T).call(this, element);
 			fm.construct();
 			return fm;
 		};
 	},
 	construct: function() {
 		if (this.closable) {
-			var $t1 = new OurSonic.UIManager.Button(this.width - 30, 4, 26, 23, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('X'));
-			$t1.font = OurSonic.UIManager.UIManager.buttonFont;
+			var $t1 = new $OurSonic_UIManager_Button(this.width - 30, 4, 26, 23, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('X'));
+			$t1.font = $OurSonic_UIManager_UIManager.buttonFont;
 			$t1.color = 'Green';
 			$t1.click = Function.mkdel(this, function(p) {
 				this.loseFocus();
 				this.visible = false;
 			});
-			this.addControl(OurSonic.UIManager.Button).call(this, $t1);
+			this.addControl($OurSonic_UIManager_Button).call(this, $t1);
 		}
-		OurSonic.UIManager.Panel.prototype.construct.call(this);
+		$OurSonic_UIManager_Panel.prototype.construct.call(this);
 	},
 	onClick: function(e) {
-		var base = OurSonic.UIManager.Panel.prototype.onClick.call(this, e);
+		var base = $OurSonic_UIManager_Panel.prototype.onClick.call(this, e);
 		if (!base && !this.isEditMode()) {
-			this.dragging = OurSonic.Utility.Point.$ctor1(e.x, e.y);
+			this.dragging = $OurSonic_Utility_Point.$ctor1(e.x, e.y);
 		}
 		return base;
 	},
@@ -7025,7 +6989,7 @@ OurSonic.UIManager.UIArea.prototype = {
 		}
 		canv.save();
 		if (!this.cachedDrawing) {
-			var cg = OurSonic.Utility.CanvasInformation.create(this.width + 20, this.height + 20);
+			var cg = $OurSonic_Utility_CanvasInformation.create(this.width + 20, this.height + 20);
 			var cv = cg.context;
 			cv.translate(10, 10);
 			var lingrad = cv.createLinearGradient(0, 0, 0, this.height);
@@ -7033,11 +6997,11 @@ OurSonic.UIManager.UIArea.prototype = {
 			lingrad.addColorStop(1, 'rgba(142,142,142,0.85)');
 			cv.fillStyle = lingrad;
 			cv.strokeStyle = '#333';
-			var xy = OurSonic.Utility.Point.$ctor1(this.x, this.y);
+			var xy = $OurSonic_Utility_Point.$ctor1(this.x, this.y);
 			this.x = 0;
 			this.y = 0;
 			var rad = 30;
-			OurSonic.Utility.Help.roundRect(cv, this.x, this.y, this.width, this.height, rad, true, true);
+			$OurSonic_Utility_Help.roundRect(cv, this.x, this.y, this.width, this.height, rad, true, true);
 			cv.beginPath();
 			cv.moveTo(this.x, this.y + rad);
 			cv.lineTo(this.x + this.width, this.y + rad);
@@ -7070,7 +7034,7 @@ OurSonic.UIManager.UIArea.prototype = {
 			}
 		}
 		canv.restore();
-		OurSonic.UIManager.Panel.prototype.draw.call(this, canv);
+		$OurSonic_UIManager_Panel.prototype.draw.call(this, canv);
 	},
 	$drawCache: function(canv) {
 		canv.drawImage(this.cachedDrawing.canvas, this.x - 10, this.y - 10);
@@ -7078,23 +7042,23 @@ OurSonic.UIManager.UIArea.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.UIArea
-OurSonic.UIManager.UIArea$1 = function(T) {
+var $OurSonic_UIManager_UIArea$1 = function(T) {
 	var $type = function(data, x, y, width, height) {
 		this.data = T.getDefaultValue();
-		OurSonic.UIManager.UIArea.call(this, x, y, width, height);
+		$OurSonic_UIManager_UIArea.call(this, x, y, width, height);
 		this.data = data;
 	};
-	$type.registerGenericClassInstance($type, OurSonic.UIManager.UIArea$1, [T], function() {
-		return OurSonic.UIManager.UIArea;
+	Type.registerGenericClassInstance($type, $OurSonic_UIManager_UIArea$1, [T], function() {
+		return $OurSonic_UIManager_UIArea;
 	}, function() {
 		return [];
 	});
 	return $type;
 };
-OurSonic.UIManager.UIArea$1.registerGenericClass('OurSonic.UIManager.UIArea$1', 1);
+Type.registerGenericClass(global, 'OurSonic.UIManager.UIArea$1', $OurSonic_UIManager_UIArea$1, 1);
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.UIManager
-OurSonic.UIManager.UIManager = function(sonicManager, mainCanvas) {
+var $OurSonic_UIManager_UIManager = function(sonicManager, mainCanvas) {
 	this.$mainCanvas = null;
 	this.sonicManager = null;
 	this.$messages = [];
@@ -7103,27 +7067,27 @@ OurSonic.UIManager.UIManager = function(sonicManager, mainCanvas) {
 	this.data = null;
 	this.canvasDepths = null;
 	this.$1$UIManagerAreasField = null;
-	OurSonic.UIManager.UIManager.instance = this;
-	mainCanvas.font = OurSonic.UIManager.UIManager.textFont;
+	$OurSonic_UIManager_UIManager.instance = this;
+	mainCanvas.font = $OurSonic_UIManager_UIManager.textFont;
 	this.uiAreas = [];
 	this.sonicManager = sonicManager;
 	this.$mainCanvas = mainCanvas;
-	this.dragger = new OurSonic.Utility.Dragger(function(xsp, ysp) {
+	this.dragger = new $OurSonic_Utility_Dragger(function(xsp, ysp) {
 		sonicManager.windowLocation.x += ss.Int32.trunc(xsp);
 		sonicManager.windowLocation.y += ss.Int32.trunc(ysp);
 		sonicManager.bigWindowLocation.x = sonicManager.windowLocation.x;
 		sonicManager.bigWindowLocation.y = sonicManager.windowLocation.y;
 	});
-	this.set_uiManagerAreas(new OurSonic.UIManager.UIManagerAreas());
-	new OurSonic.UIManager.Areas.LevelInformationArea(this);
-	new OurSonic.UIManager.Areas.ColorEditorArea(this);
-	new OurSonic.UIManager.Areas.ObjectFrameworkArea(this);
-	new OurSonic.UIManager.Areas.ObjectFrameworkListArea(this);
+	this.set_uiManagerAreas(new $OurSonic_UIManager_UIManagerAreas());
+	new $OurSonic_UIManager_Areas_LevelInformationArea(this);
+	new $OurSonic_UIManager_Areas_ColorEditorArea(this);
+	new $OurSonic_UIManager_Areas_ObjectFrameworkArea(this);
+	new $OurSonic_UIManager_Areas_ObjectFrameworkListArea(this);
 	sonicManager.onLevelLoad = Function.combine(sonicManager.onLevelLoad, Function.mkdel(this, function(level) {
-		new OurSonic.UIManager.Areas.TileChunkArea(this);
+		new $OurSonic_UIManager_Areas_TileChunkArea(this);
 	}));
 };
-OurSonic.UIManager.UIManager.prototype = {
+$OurSonic_UIManager_UIManager.prototype = {
 	get_uiManagerAreas: function() {
 		return this.$1$UIManagerAreasField;
 	},
@@ -7139,7 +7103,7 @@ OurSonic.UIManager.UIManager.prototype = {
 			var are = cl[ij];
 			if (are.visible && (are.isEditMode() ? (are.y - are.editorEngine.maxSize() <= cell.y && are.y + are.editorEngine.maxSize() + are.height > cell.y && are.x - are.editorEngine.maxSize() <= cell.x && are.x + are.editorEngine.maxSize() + are.width > cell.x) : (are.y <= cell.y && are.y + are.height > cell.y && are.x <= cell.x && are.x + are.width > cell.x))) {
 				goodArea = are;
-				var ec = OurSonic.UIManager.Pointer.$ctor(cell.x - are.x, cell.y - are.y, 0, cell.right);
+				var ec = $OurSonic_UIManager_Pointer.$ctor(cell.x - are.x, cell.y - are.y, 0, cell.right);
 				are.onClick(ec);
 				break;
 			}
@@ -7177,7 +7141,7 @@ OurSonic.UIManager.UIManager.prototype = {
 		for (var ij = 0; ij < cl.length; ij++) {
 			var are = cl[ij];
 			if (are.dragging || are.isEditMode() || are.visible && are.y <= cell.y && are.y + are.height > cell.y && are.x <= cell.x && are.x + are.width > cell.x) {
-				var cell2 = OurSonic.UIManager.Pointer.$ctor(cell.x - are.x, cell.y - are.y, 0, cell.right);
+				var cell2 = $OurSonic_UIManager_Pointer.$ctor(cell.x - are.x, cell.y - are.y, 0, cell.right);
 				return are.onMouseOver(cell2);
 			}
 		}
@@ -7189,26 +7153,20 @@ OurSonic.UIManager.UIManager.prototype = {
 		return false;
 	},
 	onMouseUp: function(cell) {
-		var $t1 = this.uiAreas.getEnumerator();
-		try {
-			while ($t1.moveNext()) {
-				var are = $t1.get_current();
-				var ec = OurSonic.UIManager.Pointer.$ctor(cell.x - are.x, cell.y - are.y, 0, cell.right);
-				are.onMouseUp(ec);
-			}
-		}
-		finally {
-			$t1.dispose();
+		for (var $t1 = 0; $t1 < this.uiAreas.length; $t1++) {
+			var are = this.uiAreas[$t1];
+			var ec = $OurSonic_UIManager_Pointer.$ctor(cell.x - are.x, cell.y - are.y, 0, cell.right);
+			are.onMouseUp(ec);
 		}
 		this.dragger.mouseUp(cell);
 	},
 	onMouseScroll: function(e) {
 		var delta = ss.Nullable.unbox(Type.cast((!!e.wheelDelta ? (e.wheelDelta / 40) : (!!e.detail ? -e.detail : 0)), ss.Int32));
-		var cell = OurSonic.Utility.Help.getCursorPosition(e);
+		var cell = $OurSonic_Utility_Help.getCursorPosition(e);
 		for (var index = 0; index < this.uiAreas.length; index++) {
 			var are = this.uiAreas[index];
 			if (are.visible && are.y <= cell.y && are.y + are.height > cell.y && are.x <= cell.x && are.x + are.width > cell.x) {
-				var cell2 = OurSonic.UIManager.Pointer.$ctor(cell.x - are.x, cell.y - are.y, delta, cell.right);
+				var cell2 = $OurSonic_UIManager_Pointer.$ctor(cell.x - are.x, cell.y - are.y, delta, cell.right);
 				return are.onScroll(cell2);
 			}
 		}
@@ -7248,19 +7206,19 @@ OurSonic.UIManager.UIManager.prototype = {
 		canvas.restore();
 	}
 };
-OurSonic.UIManager.UIManager.get_curLevelName = function() {
-	return OurSonic.UIManager.UIManager.$_curLevelName;
+$OurSonic_UIManager_UIManager.get_curLevelName = function() {
+	return $OurSonic_UIManager_UIManager.$_curLevelName;
 };
-OurSonic.UIManager.UIManager.set_curLevelName = function(value) {
-	OurSonic.UIManager.UIManager.updateTitle('- Our Sonic - ' + value);
-	OurSonic.UIManager.UIManager.$_curLevelName = value;
+$OurSonic_UIManager_UIManager.set_curLevelName = function(value) {
+	$OurSonic_UIManager_UIManager.updateTitle('- Our Sonic - ' + value);
+	$OurSonic_UIManager_UIManager.$_curLevelName = value;
 };
-OurSonic.UIManager.UIManager.updateTitle = function(title) {
+$OurSonic_UIManager_UIManager.updateTitle = function(title) {
 	document.title = title;
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.UIManagerAreas
-OurSonic.UIManager.UIManagerAreas = function() {
+var $OurSonic_UIManager_UIManagerAreas = function() {
 	this.tileChunkArea = null;
 	this.tilePieceArea = null;
 	this.colorEditorArea = null;
@@ -7270,12 +7228,12 @@ OurSonic.UIManager.UIManagerAreas = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.UIManagerData
-OurSonic.UIManager.UIManagerData = function() {
+var $OurSonic_UIManager_UIManagerData = function() {
 };
-OurSonic.UIManager.UIManagerData.createInstance = function() {
-	return OurSonic.UIManager.UIManagerData.$ctor();
+$OurSonic_UIManager_UIManagerData.createInstance = function() {
+	return $OurSonic_UIManager_UIManagerData.$ctor();
 };
-OurSonic.UIManager.UIManagerData.$ctor = function() {
+$OurSonic_UIManager_UIManagerData.$ctor = function() {
 	var $this = {};
 	$this.indexes = null;
 	$this.solidTileArea = null;
@@ -7284,20 +7242,19 @@ OurSonic.UIManager.UIManagerData.$ctor = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.UIManagerDataIndexes
-OurSonic.UIManager.UIManagerDataIndexes = function() {
+var $OurSonic_UIManager_UIManagerDataIndexes = function() {
 };
-OurSonic.UIManager.UIManagerDataIndexes.createInstance = function() {
-	return OurSonic.UIManager.UIManagerDataIndexes.$ctor();
+$OurSonic_UIManager_UIManagerDataIndexes.createInstance = function() {
+	return $OurSonic_UIManager_UIManagerDataIndexes.$ctor();
 };
-OurSonic.UIManager.UIManagerDataIndexes.$ctor = function() {
+$OurSonic_UIManager_UIManagerDataIndexes.$ctor = function() {
 	var $this = {};
 	$this.tpIndex = 0;
 	return $this;
 };
-Type.registerNamespace('OurSonic.UIManager.Areas');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.ColorEditingArea
-OurSonic.UIManager.Areas.ColorEditingArea = function(x, y, width, height) {
+var $OurSonic_UIManager_Areas_ColorEditingArea = function(x, y, width, height) {
 	this.frame = null;
 	this.showOffset = false;
 	this.editable = false;
@@ -7309,13 +7266,13 @@ OurSonic.UIManager.Areas.ColorEditingArea = function(x, y, width, height) {
 	this.clicking = false;
 	this.clickHandled = false;
 	this.lastPosition = null;
-	OurSonic.UIManager.Panel.call(this, x, y, width, height);
+	$OurSonic_UIManager_Panel.call(this, x, y, width, height);
 	this.editable = true;
 };
-OurSonic.UIManager.Areas.ColorEditingArea.prototype = {
+$OurSonic_UIManager_Areas_ColorEditingArea.prototype = {
 	init: function(frame) {
 		this.frame = frame;
-		this.editor = new OurSonic.UIManager.Areas.Editor(frame, this.showOffset);
+		this.editor = new $OurSonic_UIManager_Areas_Editor(frame, this.showOffset);
 	},
 	onClick: function(e) {
 		if (!this.visible) {
@@ -7330,7 +7287,7 @@ OurSonic.UIManager.Areas.ColorEditingArea.prototype = {
 		var scaley = ss.Int32.div(this.height, this.editor.assetFrame.height);
 		this.editor.showHurtMap = this.showHurtMap;
 		this.editor.showCollideMap = this.showCollideMap;
-		var pos = OurSonic.Utility.Point.$ctor1(ss.Int32.div(e.x, scalex), ss.Int32.div(e.y, scaley));
+		var pos = $OurSonic_Utility_Point.$ctor1(ss.Int32.div(e.x, scalex), ss.Int32.div(e.y, scaley));
 		if (!this.editable) {
 			if (ss.isValue(this.click)) {
 				this.click(pos);
@@ -7346,7 +7303,7 @@ OurSonic.UIManager.Areas.ColorEditingArea.prototype = {
 			}
 			this.editor.drawPixel(pos);
 		}
-		return OurSonic.UIManager.Panel.prototype.onClick.call(this, e);
+		return $OurSonic_UIManager_Panel.prototype.onClick.call(this, e);
 	},
 	onMouseOver: function(e) {
 		if (ss.isNullOrUndefined(this.editor)) {
@@ -7354,7 +7311,7 @@ OurSonic.UIManager.Areas.ColorEditingArea.prototype = {
 		}
 		var scalex = ss.Int32.div(this.width, this.editor.assetFrame.width);
 		var scaley = ss.Int32.div(this.height, this.editor.assetFrame.height);
-		var pos = OurSonic.Utility.Point.$ctor1(ss.Int32.div(e.x, scalex), ss.Int32.div(e.y, scaley));
+		var pos = $OurSonic_Utility_Point.$ctor1(ss.Int32.div(e.x, scalex), ss.Int32.div(e.y, scaley));
 		this.editor.showHurtMap = this.showHurtMap;
 		this.editor.showCollideMap = this.showCollideMap;
 		if (this.clicking) {
@@ -7372,7 +7329,7 @@ OurSonic.UIManager.Areas.ColorEditingArea.prototype = {
 				this.lastPosition = pos;
 			}
 		}
-		return OurSonic.UIManager.Panel.prototype.onMouseOver.call(this, e);
+		return $OurSonic_UIManager_Panel.prototype.onMouseOver.call(this, e);
 	},
 	onMouseUp: function(e) {
 		if (!this.visible) {
@@ -7381,42 +7338,42 @@ OurSonic.UIManager.Areas.ColorEditingArea.prototype = {
 		this.lastPosition = null;
 		this.clickHandled = false;
 		this.clicking = false;
-		return OurSonic.UIManager.Panel.prototype.onMouseUp.call(this, e);
+		return $OurSonic_UIManager_Panel.prototype.onMouseUp.call(this, e);
 	},
 	draw: function(canv) {
-		OurSonic.UIManager.Panel.prototype.draw.call(this, canv);
+		$OurSonic_UIManager_Panel.prototype.draw.call(this, canv);
 		if (!this.visible) {
 			return;
 		}
 		if (ss.isNullOrUndefined(this.editor)) {
 			return;
 		}
-		var pos = OurSonic.Utility.Point.$ctor1(this.get_totalX(), this.get_totalY());
-		this.editor.draw(canv, pos, OurSonic.Utility.Point.$ctor1(this.width, this.height), this.showCollideMap, this.showHurtMap);
+		var pos = $OurSonic_Utility_Point.$ctor1(this.get_totalX(), this.get_totalY());
+		this.editor.draw(canv, pos, $OurSonic_Utility_Point.$ctor1(this.width, this.height), this.showCollideMap, this.showHurtMap);
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.ColorEditorArea
-OurSonic.UIManager.Areas.ColorEditorArea = function(uiManager) {
+var $OurSonic_UIManager_Areas_ColorEditorArea = function(uiManager) {
 	var $t2 = uiManager.get_uiManagerAreas();
-	var $t1 = new (Type.makeGenericType(OurSonic.UIManager.UIArea$1, [OurSonic.UIManager.Areas.ColorEditorAreaData]))(OurSonic.UIManager.Areas.ColorEditorAreaData.$ctor(), 650, 30, 960, 800);
+	var $t1 = new (Type.makeGenericType($OurSonic_UIManager_UIArea$1, [$OurSonic_UIManager_Areas_ColorEditorAreaData]))($OurSonic_UIManager_Areas_ColorEditorAreaData.$ctor(), 650, 30, 960, 800);
 	$t1.closable = true;
 	var colorEditorArea = $t2.colorEditorArea = $t1;
 	colorEditorArea.visible = false;
 	uiManager.addArea(colorEditorArea);
 	var $t4 = colorEditorArea.data;
-	var $t3 = new OurSonic.UIManager.Areas.ColorEditingArea(30, 45, 680, 680);
+	var $t3 = new $OurSonic_UIManager_Areas_ColorEditingArea(30, 45, 680, 680);
 	$t3.showOffset = false;
 	$t4.colorEditor = $t3;
-	colorEditorArea.addControl(OurSonic.UIManager.Areas.ColorEditingArea).call(colorEditorArea, colorEditorArea.data.colorEditor);
-	var $t5 = new OurSonic.UIManager.Button(770, 70, 150, 22, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Show Outline'));
+	colorEditorArea.addControl($OurSonic_UIManager_Areas_ColorEditingArea).call(colorEditorArea, colorEditorArea.data.colorEditor);
+	var $t5 = new $OurSonic_UIManager_Button(770, 70, 150, 22, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Show Outline'));
 	$t5.color = 'rgb(50,150,50)';
 	$t5.click = function(p) {
 		colorEditorArea.data.colorEditor.editor.showOutline = !colorEditorArea.data.colorEditor.editor.showOutline;
 	};
-	colorEditorArea.addControl(OurSonic.UIManager.Button).call(colorEditorArea, $t5);
+	colorEditorArea.addControl($OurSonic_UIManager_Button).call(colorEditorArea, $t5);
 	var bt = null;
-	var $t6 = new OurSonic.UIManager.Button(770, 190, 150, 22, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Modify Hurt Map'));
+	var $t6 = new $OurSonic_UIManager_Button(770, 190, 150, 22, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Modify Hurt Map'));
 	$t6.color = 'rgb(50,150,50)';
 	$t6.click = function(p1) {
 		if (colorEditorArea.data.colorEditor.showHurtMap === false && colorEditorArea.data.colorEditor.showCollideMap === false) {
@@ -7435,44 +7392,44 @@ OurSonic.UIManager.Areas.ColorEditorArea = function(uiManager) {
 			bt.text = Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Modify Hurt Map');
 		}
 	};
-	colorEditorArea.addControl(OurSonic.UIManager.Button).call(colorEditorArea, bt = $t6);
-	var $t7 = new OurSonic.UIManager.TextArea(750, 150, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(function() {
+	colorEditorArea.addControl($OurSonic_UIManager_Button).call(colorEditorArea, bt = $t6);
+	var $t7 = new $OurSonic_UIManager_TextArea(750, 150, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(function() {
 		return 'Line Width:' + colorEditorArea.data.colorEditor.editor.lineWidth;
 	}));
 	$t7.color = 'Black';
-	colorEditorArea.addControl(OurSonic.UIManager.TextArea).call(colorEditorArea, $t7);
-	var $t8 = new OurSonic.UIManager.Button(900, 120, 14, 20, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('^'));
+	colorEditorArea.addControl($OurSonic_UIManager_TextArea).call(colorEditorArea, $t7);
+	var $t8 = new $OurSonic_UIManager_Button(900, 120, 14, 20, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('^'));
 	$t8.color = 'rgb(50,150,50)';
 	$t8.click = function(p2) {
 		colorEditorArea.data.colorEditor.editor.lineWidth = Math.max(colorEditorArea.data.colorEditor.editor.lineWidth + 1, 1);
 	};
-	colorEditorArea.addControl(OurSonic.UIManager.Button).call(colorEditorArea, $t8);
-	var $t9 = new OurSonic.UIManager.Button(900, 145, 14, 20, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('v'));
+	colorEditorArea.addControl($OurSonic_UIManager_Button).call(colorEditorArea, $t8);
+	var $t9 = new $OurSonic_UIManager_Button(900, 145, 14, 20, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('v'));
 	$t9.color = 'rgb(50,150,50)';
 	$t9.click = function(p3) {
 		colorEditorArea.data.colorEditor.editor.lineWidth = Math.min(colorEditorArea.data.colorEditor.editor.lineWidth - 1, 10);
 	};
-	colorEditorArea.addControl(OurSonic.UIManager.Button).call(colorEditorArea, $t9);
+	colorEditorArea.addControl($OurSonic_UIManager_Button).call(colorEditorArea, $t9);
 	var $t11 = colorEditorArea.data;
-	var $t10 = new OurSonic.UIManager.Areas.PaletteArea(770, 250);
-	$t10.scale = OurSonic.Utility.Point.$ctor1(45, 45);
+	var $t10 = new $OurSonic_UIManager_Areas_PaletteArea(770, 250);
+	$t10.scale = $OurSonic_Utility_Point.$ctor1(45, 45);
 	$t10.showCurrent = true;
-	colorEditorArea.addControl(OurSonic.UIManager.Areas.PaletteArea).call(colorEditorArea, $t11.paletteArea = $t10);
+	colorEditorArea.addControl($OurSonic_UIManager_Areas_PaletteArea).call(colorEditorArea, $t11.paletteArea = $t10);
 	colorEditorArea.data.colorEditor.paletteEditor = colorEditorArea.data.paletteArea;
 	colorEditorArea.data.init = function(frame) {
-		colorEditorArea.data.colorEditor.scale = OurSonic.Utility.Point.$ctor1(ss.Int32.div(700, frame.width), ss.Int32.div(700, frame.height));
+		colorEditorArea.data.colorEditor.scale = $OurSonic_Utility_Point.$ctor1(ss.Int32.div(700, frame.width), ss.Int32.div(700, frame.height));
 		colorEditorArea.data.colorEditor.init(frame);
 		colorEditorArea.data.paletteArea.init(frame.palette, false);
 	};
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.ColorEditorAreaData
-OurSonic.UIManager.Areas.ColorEditorAreaData = function() {
+var $OurSonic_UIManager_Areas_ColorEditorAreaData = function() {
 };
-OurSonic.UIManager.Areas.ColorEditorAreaData.createInstance = function() {
-	return OurSonic.UIManager.Areas.ColorEditorAreaData.$ctor();
+$OurSonic_UIManager_Areas_ColorEditorAreaData.createInstance = function() {
+	return $OurSonic_UIManager_Areas_ColorEditorAreaData.$ctor();
 };
-OurSonic.UIManager.Areas.ColorEditorAreaData.$ctor = function() {
+$OurSonic_UIManager_Areas_ColorEditorAreaData.$ctor = function() {
 	var $this = {};
 	$this.colorEditor = null;
 	$this.paletteArea = null;
@@ -7481,12 +7438,12 @@ OurSonic.UIManager.Areas.ColorEditorAreaData.$ctor = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.DebugConsoleData
-OurSonic.UIManager.Areas.DebugConsoleData = function() {
+var $OurSonic_UIManager_Areas_DebugConsoleData = function() {
 };
-OurSonic.UIManager.Areas.DebugConsoleData.createInstance = function() {
-	return OurSonic.UIManager.Areas.DebugConsoleData.$ctor();
+$OurSonic_UIManager_Areas_DebugConsoleData.createInstance = function() {
+	return $OurSonic_UIManager_Areas_DebugConsoleData.$ctor();
 };
-OurSonic.UIManager.Areas.DebugConsoleData.$ctor = function() {
+$OurSonic_UIManager_Areas_DebugConsoleData.$ctor = function() {
 	var $this = {};
 	$this.populate = null;
 	$this.watch = null;
@@ -7495,7 +7452,7 @@ OurSonic.UIManager.Areas.DebugConsoleData.$ctor = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.Editor
-OurSonic.UIManager.Areas.Editor = function(assetFrame, showOffset) {
+var $OurSonic_UIManager_Areas_Editor = function(assetFrame, showOffset) {
 	this.assetFrame = null;
 	this.showOutline = false;
 	this.showOffset = false;
@@ -7509,7 +7466,7 @@ OurSonic.UIManager.Areas.Editor = function(assetFrame, showOffset) {
 	this.currentColor = 0;
 	this.showOutline = true;
 };
-OurSonic.UIManager.Areas.Editor.prototype = {
+$OurSonic_UIManager_Areas_Editor.prototype = {
 	draw: function(canvas, pos, size, showCollideMap, showHurtMap) {
 		this.assetFrame.drawUI(canvas, pos, size, this.showOutline, showCollideMap, showHurtMap, this.showOffset, false, false);
 	},
@@ -7529,7 +7486,7 @@ OurSonic.UIManager.Areas.Editor.prototype = {
 		this.assetFrame.clearCache();
 	},
 	drawLine: function(locationa, location2) {
-		var location1 = OurSonic.Utility.Point.$ctor(locationa);
+		var location1 = $OurSonic_Utility_Point.$ctor(locationa);
 		var dx = Math.abs(location2.x - location1.x);
 		var dy = Math.abs(location2.y - location1.y);
 		var sx = 1;
@@ -7560,12 +7517,12 @@ OurSonic.UIManager.Areas.Editor.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.FrameAreaData
-OurSonic.UIManager.Areas.FrameAreaData = function() {
+var $OurSonic_UIManager_Areas_FrameAreaData = function() {
 };
-OurSonic.UIManager.Areas.FrameAreaData.createInstance = function() {
-	return OurSonic.UIManager.Areas.FrameAreaData.$ctor();
+$OurSonic_UIManager_Areas_FrameAreaData.createInstance = function() {
+	return $OurSonic_UIManager_Areas_FrameAreaData.$ctor();
 };
-OurSonic.UIManager.Areas.FrameAreaData.$ctor = function() {
+$OurSonic_UIManager_Areas_FrameAreaData.$ctor = function() {
 	var $this = {};
 	$this.palatteArea = null;
 	$this.colorEditor = null;
@@ -7573,25 +7530,25 @@ OurSonic.UIManager.Areas.FrameAreaData.$ctor = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.LevelInformationArea
-OurSonic.UIManager.Areas.LevelInformationArea = function(manager) {
-	var levelInformation = new OurSonic.UIManager.UIArea(70, 70, 460, 420);
+var $OurSonic_UIManager_Areas_LevelInformationArea = function(manager) {
+	var levelInformation = new $OurSonic_UIManager_UIArea(70, 70, 460, 420);
 	manager.addArea(levelInformation);
-	var $t1 = new OurSonic.UIManager.TextArea(30, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Level Selector'));
-	$t1.font = OurSonic.UIManager.UIManager.textFont;
+	var $t1 = new $OurSonic_UIManager_TextArea(30, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Level Selector'));
+	$t1.font = $OurSonic_UIManager_UIManager.textFont;
 	$t1.color = 'blue';
-	levelInformation.addControl(OurSonic.UIManager.TextArea).call(levelInformation, $t1);
-	var $t2 = new OurSonic.UIManager.TextArea(30, 52, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(function() {
-		return OurSonic.UIManager.UIManager.get_curLevelName();
+	levelInformation.addControl($OurSonic_UIManager_TextArea).call(levelInformation, $t1);
+	var $t2 = new $OurSonic_UIManager_TextArea(30, 52, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(function() {
+		return $OurSonic_UIManager_UIManager.get_curLevelName();
 	}));
-	$t2.font = OurSonic.UIManager.UIManager.textFont;
+	$t2.font = $OurSonic_UIManager_UIManager.textFont;
 	$t2.color = 'black';
-	levelInformation.addControl(OurSonic.UIManager.TextArea).call(levelInformation, $t2);
-	var $t3 = new OurSonic.UIManager.Button(320, 70, 100, 22, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Save Level'));
-	$t3.font = OurSonic.UIManager.UIManager.buttonFont;
+	levelInformation.addControl($OurSonic_UIManager_TextArea).call(levelInformation, $t2);
+	var $t3 = new $OurSonic_UIManager_Button(320, 70, 100, 22, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Save Level'));
+	$t3.font = $OurSonic_UIManager_UIManager.buttonFont;
 	$t3.color = 'rgb(50,150,50)';
-	levelInformation.addControl(OurSonic.UIManager.Button).call(levelInformation, $t3);
-	var $t4 = new OurSonic.UIManager.Button(320, 105, 135, 22, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Load Empty Level'));
-	$t4.font = OurSonic.UIManager.UIManager.buttonFont;
+	levelInformation.addControl($OurSonic_UIManager_Button).call(levelInformation, $t3);
+	var $t4 = new $OurSonic_UIManager_Button(320, 105, 135, 22, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Load Empty Level'));
+	$t4.font = $OurSonic_UIManager_UIManager.buttonFont;
 	$t4.color = 'rgb(50,150,50)';
 	$t4.click = function(p) {
 		//  levelManagerArea.visible = true;
@@ -7620,19 +7577,19 @@ OurSonic.UIManager.Areas.LevelInformationArea = function(manager) {
 		//  };
 		//  setTimeout(tim, 100);
 	};
-	levelInformation.addControl(OurSonic.UIManager.Button).call(levelInformation, $t4);
-	var $t5 = new OurSonic.UIManager.ScrollBox(30, 70, 25, 11, 250);
+	levelInformation.addControl($OurSonic_UIManager_Button).call(levelInformation, $t4);
+	var $t5 = new $OurSonic_UIManager_ScrollBox(30, 70, 25, 11, 250);
 	$t5.backColor = 'rgb(50, 60, 127)';
-	var ctls = levelInformation.addControl(OurSonic.UIManager.ScrollBox).call(levelInformation, $t5);
+	var ctls = levelInformation.addControl($OurSonic_UIManager_ScrollBox).call(levelInformation, $t5);
 	var loadLevel = function(name) {
-		OurSonic.UIManager.UIManager.updateTitle('Downloading ' + name);
-		OurSonic.SonicEngine.instance.client.emit('LoadLevel.Request', new (Type.makeGenericType(OurSonicModels.Common.DataObject$1, [String]))(name));
+		$OurSonic_UIManager_UIManager.updateTitle('Downloading ' + name);
+		$OurSonic_SonicEngine.instance.client.emit('LoadLevel.Request', new (Type.makeGenericType(OurSonicModels.Common.DataObject$1, [String]))(name));
 		;
 	};
-	OurSonic.SonicEngine.instance.client.on('LoadLevel.Response', function(data) {
-		OurSonic.Utility.Help.decodeString$1(OurSonicModels.SLData).call(null, data.Data, function(level) {
-			OurSonic.UIManager.UIManager.updateTitle('Loading: ');
-			var sonicManager = OurSonic.SonicManager.instance;
+	$OurSonic_SonicEngine.instance.client.on('LoadLevel.Response', function(data) {
+		$OurSonic_Utility_Help.decodeString$1(OurSonicModels.SLData).call(null, data.Data, function(level) {
+			$OurSonic_UIManager_UIManager.updateTitle('Loading: ');
+			var sonicManager = $OurSonic_SonicManager.instance;
 			sonicManager.load(level);
 			sonicManager.windowLocation.x = 0;
 			sonicManager.windowLocation.y = 0;
@@ -7642,60 +7599,65 @@ OurSonic.UIManager.Areas.LevelInformationArea = function(manager) {
 			sonicManager.bigWindowLocation.height = ss.Int32.trunc(sonicManager.windowLocation.height * 1.8);
 			sonicManager.clearCache();
 			if (sonicManager.currentGameState === 0) {
-				OurSonic.SonicEngine.runGame();
+				$OurSonic_SonicEngine.runGame();
 			}
-			OurSonic.SonicEngine.runGame();
+			$OurSonic_SonicEngine.runGame();
 		});
 	});
-	OurSonic.SonicEngine.instance.client.on('GetLevels.Response', function(data1) {
+	$OurSonic_SonicEngine.instance.client.on('GetLevels.Response', function(data1) {
+		var load = true;
 		var $t6 = Enumerable.from(data1.Data).orderBy(function(a) {
 			return a;
 		}).getEnumerator();
 		try {
 			while ($t6.moveNext()) {
-				var uiArea = $t6.get_current();
-				var area = { $: uiArea };
-				var $t7 = new OurSonic.UIManager.Button(0, 0, 0, 0, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(uiArea));
+				var level1 = $t6.get_current();
+				if (load) {
+					loadLevel(level1);
+					load = false;
+				}
+				var area = { $: level1 };
+				var $t7 = new $OurSonic_UIManager_Button(0, 0, 0, 0, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(level1));
 				$t7.color = 'rgb(50,190,90)';
 				$t7.click = Function.mkdel({ area: area }, function(p1) {
 					loadLevel(this.area.$);
 				});
-				ctls.addControl(OurSonic.UIManager.Button).call(ctls, $t7);
+				ctls.addControl($OurSonic_UIManager_Button).call(ctls, $t7);
 			}
 		}
 		finally {
 			$t6.dispose();
 		}
 	});
-	OurSonic.SonicEngine.instance.client.emit('GetLevels.Request', null);
-	OurSonic.UIManager.UIManager.set_curLevelName('Level Not Loaded');
+	$OurSonic_SonicEngine.instance.client.emit('GetLevels.Request', null);
+	$OurSonic_UIManager_UIManager.set_curLevelName('Level Not Loaded');
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.LiveObjectsArea
-OurSonic.UIManager.Areas.LiveObjectsArea = function(uiManager) {
+var $OurSonic_UIManager_Areas_LiveObjectsArea = function(uiManager) {
 	var $t2 = uiManager.get_uiManagerAreas();
-	var $t1 = new (Type.makeGenericType(OurSonic.UIManager.UIArea$1, [OurSonic.UIManager.Areas.LiveObjectsAreaData]))(OurSonic.UIManager.Areas.LiveObjectsAreaData.$ctor(), 947, 95, 770, 700);
+	var $t1 = new (Type.makeGenericType($OurSonic_UIManager_UIArea$1, [$OurSonic_UIManager_Areas_LiveObjectsAreaData]))($OurSonic_UIManager_Areas_LiveObjectsAreaData.$ctor(), 947, 95, 770, 700);
 	$t1.closable = true;
 	var liveObjectsArea = $t2.liveObjectsArea = $t1;
 	liveObjectsArea.visible = true;
 	uiManager.addArea(liveObjectsArea);
-	var $t3 = new OurSonic.UIManager.TextArea(30, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Live Objects'));
+	var $t3 = new $OurSonic_UIManager_TextArea(30, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Live Objects'));
 	$t3.color = 'blue';
-	liveObjectsArea.addControl(OurSonic.UIManager.TextArea).call(liveObjectsArea, $t3);
+	liveObjectsArea.addControl($OurSonic_UIManager_TextArea).call(liveObjectsArea, $t3);
 	var scl;
-	var $t4 = new OurSonic.UIManager.HScrollBox(20, 60, 85, 8, 85);
+	var $t4 = new $OurSonic_UIManager_HScrollBox(20, 60, 85, 8, 85);
 	$t4.backColor = 'rgb(50,150,50)';
-	liveObjectsArea.addControl(OurSonic.UIManager.HScrollBox).call(liveObjectsArea, scl = $t4);
+	liveObjectsArea.addControl($OurSonic_UIManager_HScrollBox).call(liveObjectsArea, scl = $t4);
 	liveObjectsArea.data.populate = function(liveObjects) {
 		for (var i = 0; i < scl.controls.length; i++) {
-			Type.cast(scl.controls[i], Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.UIManager.Areas.LivePopulateModel])).data.checked = false;
+			Type.cast(scl.controls[i], Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_UIManager_Areas_LivePopulateModel])).data.checked = false;
 		}
 		for (var index = 0; index < liveObjects.length; index++) {
 			var lo = liveObjects[index];
 			var satisfied = false;
 			for (var i1 = 0; i1 < scl.controls.length; i1++) {
-				if (lo.index === Type.cast(scl.controls[i1], Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.UIManager.Areas.LivePopulateModel])).data.object.index) {
-					Type.cast(scl.controls[i1], Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.UIManager.Areas.LivePopulateModel])).data.checked = true;
+				if (lo.index === Type.cast(scl.controls[i1], Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_UIManager_Areas_LivePopulateModel])).data.object.index) {
+					Type.cast(scl.controls[i1], Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_UIManager_Areas_LivePopulateModel])).data.checked = true;
 					satisfied = true;
 					break;
 				}
@@ -7703,7 +7665,7 @@ OurSonic.UIManager.Areas.LiveObjectsArea = function(uiManager) {
 			if (!satisfied) {
 				var obj = { $: lo };
 				var dm = { $: null };
-				var imageButton = new (Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.UIManager.Areas.LivePopulateModel]))(OurSonic.UIManager.Areas.LivePopulateModel.$ctor(), 0, 0, 0, 0);
+				var imageButton = new (Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_UIManager_Areas_LivePopulateModel]))($OurSonic_UIManager_Areas_LivePopulateModel.$ctor(), 0, 0, 0, 0);
 				imageButton.text = Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(obj.$.objectData.description + '(' + obj.$.objectData.key + ')');
 				imageButton.onDraw = Function.mkdel({ obj: obj, dm: dm }, function(canv, x, y) {
 					this.obj.$.draw(canv, x + ss.Int32.div(this.dm.$.width, 2), y + ss.Int32.div(this.dm.$.height, 2), false);
@@ -7717,19 +7679,19 @@ OurSonic.UIManager.Areas.LiveObjectsArea = function(uiManager) {
 			}
 		}
 		for (var i2 = scl.controls.length - 1; i2 >= 0; i2--) {
-			if (!Type.cast(scl.controls[i2], Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.UIManager.Areas.LivePopulateModel])).data.checked) {
+			if (!Type.cast(scl.controls[i2], Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_UIManager_Areas_LivePopulateModel])).data.checked) {
 				scl.controls.removeAt(i2);
 			}
 		}
 	};
-	liveObjectsArea.addControl(Type.makeGenericType(OurSonic.UIManager.Panel$1, [OurSonic.UIManager.Areas.DebugConsoleData])).call(liveObjectsArea, liveObjectsArea.data.debugConsole = new (Type.makeGenericType(OurSonic.UIManager.Panel$1, [OurSonic.UIManager.Areas.DebugConsoleData]))(OurSonic.UIManager.Areas.DebugConsoleData.$ctor(), 20, 200, 730, 450));
+	liveObjectsArea.addControl(Type.makeGenericType($OurSonic_UIManager_Panel$1, [$OurSonic_UIManager_Areas_DebugConsoleData])).call(liveObjectsArea, liveObjectsArea.data.debugConsole = new (Type.makeGenericType($OurSonic_UIManager_Panel$1, [$OurSonic_UIManager_Areas_DebugConsoleData]))($OurSonic_UIManager_Areas_DebugConsoleData.$ctor(), 20, 200, 730, 450));
 	liveObjectsArea.data.debugConsole.data.populate = function(obj1) {
 		liveObjectsArea.data.debugConsole.clear();
 		var $t7 = liveObjectsArea.data.debugConsole;
 		var $t6 = liveObjectsArea.data.debugConsole.data;
-		var $t5 = new OurSonic.UIManager.ScrollBox(10, 15, 30, 12, 210);
+		var $t5 = new $OurSonic_UIManager_ScrollBox(10, 15, 30, 12, 210);
 		$t5.backColor = 'rgb(50,150,50)';
-		$t7.addControl(OurSonic.UIManager.ScrollBox).call($t7, $t6.watch = $t5);
+		$t7.addControl($OurSonic_UIManager_ScrollBox).call($t7, $t6.watch = $t5);
 		var o = obj1;
 		var $t8 = Object.getObjectEnumerator(o);
 		try {
@@ -7738,26 +7700,26 @@ OurSonic.UIManager.Areas.LiveObjectsArea = function(uiManager) {
 				if (true) {
 					var pr1 = { $: pr };
 					var $t10 = liveObjectsArea.data.debugConsole.data.watch;
-					var $t9 = new OurSonic.UIManager.Button(0, 0, 0, 0, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(Function.mkdel({ pr1: pr1 }, function() {
+					var $t9 = new $OurSonic_UIManager_Button(0, 0, 0, 0, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(Function.mkdel({ pr1: pr1 }, function() {
 						return this.pr1.$.key + ': ' + this.pr1.$.value;
 					})));
 					$t9.color = 'rgb(50,190,90)';
-					$t10.addControl(OurSonic.UIManager.Button).call($t10, $t9);
+					$t10.addControl($OurSonic_UIManager_Button).call($t10, $t9);
 				}
 			}
 		}
 		finally {
 			$t8.dispose();
 		}
-		for (var l = 0; l < OurSonic.SonicManager.instance.sonicLevel.objects.length; l++) {
-			OurSonic.SonicManager.instance.sonicLevel.objects[l].consoleLog = null;
+		for (var l = 0; l < $OurSonic_SonicManager.instance.sonicLevel.objects.length; l++) {
+			$OurSonic_SonicManager.instance.sonicLevel.objects[l].consoleLog = null;
 		}
 		obj1.consoleLog = function(txt) {
 			liveObjectsArea.data.debugConsole.data.element.innerHTML = txt.join('\n');
 			liveObjectsArea.data.debugConsole.data.element.scrollTop = liveObjectsArea.data.debugConsole.data.element.scrollHeight;
 		};
 		var $t12 = liveObjectsArea.data.debugConsole;
-		var $t11 = new OurSonic.UIManager.HtmlBox(270, 15);
+		var $t11 = new $OurSonic_UIManager_HtmlBox(270, 15);
 		$t11.width = 445;
 		$t11.height = 430;
 		$t11.set_init(function() {
@@ -7794,17 +7756,17 @@ OurSonic.UIManager.Areas.LiveObjectsArea = function(uiManager) {
 				sc1.style.visibility = 'hidden';
 			}
 		});
-		$t12.addControl(OurSonic.UIManager.HtmlBox).call($t12, $t11);
+		$t12.addControl($OurSonic_UIManager_HtmlBox).call($t12, $t11);
 	};
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.LiveObjectsAreaData
-OurSonic.UIManager.Areas.LiveObjectsAreaData = function() {
+var $OurSonic_UIManager_Areas_LiveObjectsAreaData = function() {
 };
-OurSonic.UIManager.Areas.LiveObjectsAreaData.createInstance = function() {
-	return OurSonic.UIManager.Areas.LiveObjectsAreaData.$ctor();
+$OurSonic_UIManager_Areas_LiveObjectsAreaData.createInstance = function() {
+	return $OurSonic_UIManager_Areas_LiveObjectsAreaData.$ctor();
 };
-OurSonic.UIManager.Areas.LiveObjectsAreaData.$ctor = function() {
+$OurSonic_UIManager_Areas_LiveObjectsAreaData.$ctor = function() {
 	var $this = {};
 	$this.debugConsole = null;
 	$this.populate = null;
@@ -7812,12 +7774,12 @@ OurSonic.UIManager.Areas.LiveObjectsAreaData.$ctor = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.LivePopulateModel
-OurSonic.UIManager.Areas.LivePopulateModel = function() {
+var $OurSonic_UIManager_Areas_LivePopulateModel = function() {
 };
-OurSonic.UIManager.Areas.LivePopulateModel.createInstance = function() {
-	return OurSonic.UIManager.Areas.LivePopulateModel.$ctor();
+$OurSonic_UIManager_Areas_LivePopulateModel.createInstance = function() {
+	return $OurSonic_UIManager_Areas_LivePopulateModel.$ctor();
 };
-OurSonic.UIManager.Areas.LivePopulateModel.$ctor = function() {
+$OurSonic_UIManager_Areas_LivePopulateModel.$ctor = function() {
 	var $this = {};
 	$this.checked = false;
 	$this.object = null;
@@ -7825,12 +7787,12 @@ OurSonic.UIManager.Areas.LivePopulateModel.$ctor = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.MainPanelData
-OurSonic.UIManager.Areas.MainPanelData = function() {
+var $OurSonic_UIManager_Areas_MainPanelData = function() {
 };
-OurSonic.UIManager.Areas.MainPanelData.createInstance = function() {
-	return OurSonic.UIManager.Areas.MainPanelData.$ctor();
+$OurSonic_UIManager_Areas_MainPanelData.createInstance = function() {
+	return $OurSonic_UIManager_Areas_MainPanelData.$ctor();
 };
-OurSonic.UIManager.Areas.MainPanelData.$ctor = function() {
+$OurSonic_UIManager_Areas_MainPanelData.$ctor = function() {
 	var $this = {};
 	$this.assetPopulate = null;
 	$this.frameArea = null;
@@ -7843,12 +7805,12 @@ OurSonic.UIManager.Areas.MainPanelData.$ctor = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.ObjectFrameworkArea
-OurSonic.UIManager.Areas.ObjectFrameworkArea = function(manager) {
+var $OurSonic_UIManager_Areas_ObjectFrameworkArea = function(manager) {
 	this.objectFrameworkArea = null;
 	var size = 160;
-	var $t2 = Type.makeGenericType(OurSonic.UIManager.UIArea$1, [OurSonic.UIManager.Areas.ObjectFrameworkData]);
-	var $t1 = OurSonic.UIManager.Areas.ObjectFrameworkData.$ctor();
-	$t1.objectFramework = new OurSonic.Level.Objects.LevelObject('Foo');
+	var $t2 = Type.makeGenericType($OurSonic_UIManager_UIArea$1, [$OurSonic_UIManager_Areas_ObjectFrameworkData]);
+	var $t1 = $OurSonic_UIManager_Areas_ObjectFrameworkData.$ctor();
+	$t1.objectFramework = new $OurSonic_Level_Objects_LevelObject('Foo');
 	var $t3 = new $t2($t1, 540, 75, 850, 690);
 	$t3.closable = true;
 	this.objectFrameworkArea = $t3;
@@ -7856,106 +7818,106 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea = function(manager) {
 	manager.addArea(this.objectFrameworkArea);
 	manager.get_uiManagerAreas().objectFrameworkArea = this;
 	var $t5 = this.objectFrameworkArea;
-	var $t4 = new OurSonic.UIManager.TextArea(30, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Object Framework'));
+	var $t4 = new $OurSonic_UIManager_TextArea(30, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Object Framework'));
 	$t4.color = 'blue';
-	$t5.addControl(OurSonic.UIManager.TextArea).call($t5, $t4);
+	$t5.addControl($OurSonic_UIManager_TextArea).call($t5, $t4);
 	var $t7 = this.objectFrameworkArea;
-	var $t6 = new OurSonic.UIManager.TextArea(16, 60, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Assets'));
+	var $t6 = new $OurSonic_UIManager_TextArea(16, 60, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Assets'));
 	$t6.color = 'black';
-	$t7.addControl(OurSonic.UIManager.TextArea).call($t7, $t6);
+	$t7.addControl($OurSonic_UIManager_TextArea).call($t7, $t6);
 	var $t9 = this.objectFrameworkArea;
-	var $t8 = new OurSonic.UIManager.Button(160, 38, 140, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Add Asset'));
+	var $t8 = new $OurSonic_UIManager_Button(160, 38, 140, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Add Asset'));
 	$t8.color = 'rgb(50,150,50)';
 	$t8.click = Function.mkdel(this, function(p) {
-		this.objectFrameworkArea.data.objectFramework.assets.add(new OurSonic.Level.Objects.LevelObjectAsset('Asset ' + (this.objectFrameworkArea.data.objectFramework.assets.length + 1)));
+		this.objectFrameworkArea.data.objectFramework.assets.add(new $OurSonic_Level_Objects_LevelObjectAsset('Asset ' + (this.objectFrameworkArea.data.objectFramework.assets.length + 1)));
 		this.populate(this.objectFrameworkArea.data.objectFramework);
 	});
-	$t9.addControl(OurSonic.UIManager.Button).call($t9, $t8);
+	$t9.addControl($OurSonic_UIManager_Button).call($t9, $t8);
 	var $t12 = this.objectFrameworkArea;
 	var $t11 = this.objectFrameworkArea.data;
-	var $t10 = new OurSonic.UIManager.ScrollBox(30, 70, 25, 4, 250);
+	var $t10 = new $OurSonic_UIManager_ScrollBox(30, 70, 25, 4, 250);
 	$t10.backColor = 'rgb(50, 60, 127)';
-	$t12.addControl(OurSonic.UIManager.ScrollBox).call($t12, $t11.assets = $t10);
+	$t12.addControl($OurSonic_UIManager_ScrollBox).call($t12, $t11.assets = $t10);
 	var $t14 = this.objectFrameworkArea;
-	var $t13 = new OurSonic.UIManager.TextArea(16, 60 + size * 1, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Pieces'));
+	var $t13 = new $OurSonic_UIManager_TextArea(16, 60 + size * 1, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Pieces'));
 	$t13.color = 'black';
-	$t14.addControl(OurSonic.UIManager.TextArea).call($t14, $t13);
+	$t14.addControl($OurSonic_UIManager_TextArea).call($t14, $t13);
 	var $t16 = this.objectFrameworkArea;
-	var $t15 = new OurSonic.UIManager.Button(160, 38 + size * 1, 140, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Add Piece'));
+	var $t15 = new $OurSonic_UIManager_Button(160, 38 + size * 1, 140, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Add Piece'));
 	$t15.color = 'rgb(50,150,50)';
 	$t15.click = Function.mkdel(this, function(p1) {
-		this.objectFrameworkArea.data.objectFramework.pieces.add(OurSonic.Level.Objects.LevelObjectPiece.$ctor('Piece ' + (this.objectFrameworkArea.data.objectFramework.pieces.length + 1)));
+		this.objectFrameworkArea.data.objectFramework.pieces.add($OurSonic_Level_Objects_LevelObjectPiece.$ctor('Piece ' + (this.objectFrameworkArea.data.objectFramework.pieces.length + 1)));
 		this.populate(this.objectFrameworkArea.data.objectFramework);
 	});
-	$t16.addControl(OurSonic.UIManager.Button).call($t16, $t15);
+	$t16.addControl($OurSonic_UIManager_Button).call($t16, $t15);
 	var $t19 = this.objectFrameworkArea;
 	var $t18 = this.objectFrameworkArea.data;
-	var $t17 = new OurSonic.UIManager.ScrollBox(30, 70 + size * 1, 25, 4, 250);
+	var $t17 = new $OurSonic_UIManager_ScrollBox(30, 70 + size * 1, 25, 4, 250);
 	$t17.backColor = 'rgb(50, 60, 127)';
-	$t19.addControl(OurSonic.UIManager.ScrollBox).call($t19, $t18.pieces = $t17);
+	$t19.addControl($OurSonic_UIManager_ScrollBox).call($t19, $t18.pieces = $t17);
 	var $t21 = this.objectFrameworkArea;
-	var $t20 = new OurSonic.UIManager.TextArea(16, 60 + size * 2, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Piece Layouts'));
+	var $t20 = new $OurSonic_UIManager_TextArea(16, 60 + size * 2, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Piece Layouts'));
 	$t20.color = 'black';
-	$t21.addControl(OurSonic.UIManager.TextArea).call($t21, $t20);
+	$t21.addControl($OurSonic_UIManager_TextArea).call($t21, $t20);
 	var $t23 = this.objectFrameworkArea;
-	var $t22 = new OurSonic.UIManager.Button(160, 38 + size * 2, 140, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Add Piece Layout'));
+	var $t22 = new $OurSonic_UIManager_Button(160, 38 + size * 2, 140, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Add Piece Layout'));
 	$t22.color = 'rgb(50,150,50)';
 	$t22.click = Function.mkdel(this, function(p2) {
-		this.objectFrameworkArea.data.objectFramework.pieceLayouts.add(new OurSonic.Level.Objects.LevelObjectPieceLayout('Piece Layout ' + (this.objectFrameworkArea.data.objectFramework.pieceLayouts.length + 1)));
+		this.objectFrameworkArea.data.objectFramework.pieceLayouts.add(new $OurSonic_Level_Objects_LevelObjectPieceLayout('Piece Layout ' + (this.objectFrameworkArea.data.objectFramework.pieceLayouts.length + 1)));
 		this.populate(this.objectFrameworkArea.data.objectFramework);
 	});
-	$t23.addControl(OurSonic.UIManager.Button).call($t23, $t22);
+	$t23.addControl($OurSonic_UIManager_Button).call($t23, $t22);
 	var $t26 = this.objectFrameworkArea;
 	var $t25 = this.objectFrameworkArea.data;
-	var $t24 = new OurSonic.UIManager.ScrollBox(30, 70 + size * 2, 25, 4, 250);
+	var $t24 = new $OurSonic_UIManager_ScrollBox(30, 70 + size * 2, 25, 4, 250);
 	$t24.backColor = 'rgb(50, 60, 127)';
-	$t26.addControl(OurSonic.UIManager.ScrollBox).call($t26, $t25.pieceLayouts = $t24);
+	$t26.addControl($OurSonic_UIManager_ScrollBox).call($t26, $t25.pieceLayouts = $t24);
 	var $t28 = this.objectFrameworkArea;
-	var $t27 = new OurSonic.UIManager.TextArea(16, 60 + size * 3, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Projectiles'));
+	var $t27 = new $OurSonic_UIManager_TextArea(16, 60 + size * 3, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Projectiles'));
 	$t27.color = 'black';
-	$t28.addControl(OurSonic.UIManager.TextArea).call($t28, $t27);
+	$t28.addControl($OurSonic_UIManager_TextArea).call($t28, $t27);
 	var $t30 = this.objectFrameworkArea;
-	var $t29 = new OurSonic.UIManager.Button(160, 38 + size * 3, 140, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Add Projectile'));
+	var $t29 = new $OurSonic_UIManager_Button(160, 38 + size * 3, 140, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Add Projectile'));
 	$t29.color = 'rgb(50,150,50)';
 	$t29.click = Function.mkdel(this, function(p3) {
-		this.objectFrameworkArea.data.objectFramework.projectiles.add(OurSonic.Level.Objects.LevelObjectProjectile.$ctor('Piece Projectile ' + (this.objectFrameworkArea.data.objectFramework.projectiles.length + 1)));
+		this.objectFrameworkArea.data.objectFramework.projectiles.add($OurSonic_Level_Objects_LevelObjectProjectile.$ctor('Piece Projectile ' + (this.objectFrameworkArea.data.objectFramework.projectiles.length + 1)));
 		this.populate(this.objectFrameworkArea.data.objectFramework);
 	});
-	$t30.addControl(OurSonic.UIManager.Button).call($t30, $t29);
+	$t30.addControl($OurSonic_UIManager_Button).call($t30, $t29);
 	var $t33 = this.objectFrameworkArea;
 	var $t32 = this.objectFrameworkArea.data;
-	var $t31 = new OurSonic.UIManager.ScrollBox(30, 70 + size * 3, 25, 4, 250);
+	var $t31 = new $OurSonic_UIManager_ScrollBox(30, 70 + size * 3, 25, 4, 250);
 	$t31.backColor = 'rgb(50, 60, 127)';
-	$t33.addControl(OurSonic.UIManager.ScrollBox).call($t33, $t32.projectiles = $t31);
+	$t33.addControl($OurSonic_UIManager_ScrollBox).call($t33, $t32.projectiles = $t31);
 	var $t35 = this.objectFrameworkArea;
-	var $t34 = new OurSonic.UIManager.TextArea(320, 60, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Key: '));
-	$t34.font = OurSonic.UIManager.UIManager.smallTextFont;
+	var $t34 = new $OurSonic_UIManager_TextArea(320, 60, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Key: '));
+	$t34.font = $OurSonic_UIManager_UIManager.smallTextFont;
 	$t34.color = 'black';
-	$t35.addControl(OurSonic.UIManager.TextArea).call($t35, $t34);
+	$t35.addControl($OurSonic_UIManager_TextArea).call($t35, $t34);
 	var $t38 = this.objectFrameworkArea;
 	var $t37 = this.objectFrameworkArea.data;
-	var $t36 = new OurSonic.UIManager.TextBox(370, 40, 150, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(''));
+	var $t36 = new $OurSonic_UIManager_TextBox(370, 40, 150, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(''));
 	$t36.color = 'rgb(50,150,50)';
 	$t36.click = Function.mkdel(this, function(p4) {
 		this.objectFrameworkArea.data.objectFramework.key = this.objectFrameworkArea.data.key.text;
 	});
-	$t38.addControl(OurSonic.UIManager.TextBox).call($t38, $t37.key = $t36);
+	$t38.addControl($OurSonic_UIManager_TextBox).call($t38, $t37.key = $t36);
 	var $t40 = this.objectFrameworkArea;
-	var $t39 = new OurSonic.UIManager.TextArea(525, 56, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Description: '));
-	$t39.font = OurSonic.UIManager.UIManager.smallTextFont;
+	var $t39 = new $OurSonic_UIManager_TextArea(525, 56, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Description: '));
+	$t39.font = $OurSonic_UIManager_UIManager.smallTextFont;
 	$t39.color = 'black';
-	$t40.addControl(OurSonic.UIManager.TextArea).call($t40, $t39);
+	$t40.addControl($OurSonic_UIManager_TextArea).call($t40, $t39);
 	var $t43 = this.objectFrameworkArea;
 	var $t42 = this.objectFrameworkArea.data;
-	var $t41 = new OurSonic.UIManager.TextBox(610, 40, 220, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(''));
+	var $t41 = new $OurSonic_UIManager_TextBox(610, 40, 220, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(''));
 	$t41.color = 'rgb(50,150,50)';
 	$t41.click = Function.mkdel(this, function(p5) {
 		this.objectFrameworkArea.data.objectFramework.description = this.objectFrameworkArea.data.description.text;
 	});
-	$t43.addControl(OurSonic.UIManager.TextBox).call($t43, $t42.description = $t41);
+	$t43.addControl($OurSonic_UIManager_TextBox).call($t43, $t42.description = $t41);
 	var $t46 = this.objectFrameworkArea;
 	var $t45 = this.objectFrameworkArea.data;
-	var $t44 = new OurSonic.UIManager.Button(320, 75, 250, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('onInit'));
+	var $t44 = new $OurSonic_UIManager_Button(320, 75, 250, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('onInit'));
 	$t44.color = 'rgb(50,150,50)';
 	$t44.click = Function.mkdel(this, function(p6) {
 		this.objectFrameworkArea.data.b2.toggled = false;
@@ -7970,11 +7932,11 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea = function(manager) {
 			this.clearMainArea();
 		}
 	});
-	$t46.addControl(OurSonic.UIManager.Button).call($t46, $t45.b1 = $t44);
+	$t46.addControl($OurSonic_UIManager_Button).call($t46, $t45.b1 = $t44);
 	this.objectFrameworkArea.data.b1.toggle = true;
 	var $t49 = this.objectFrameworkArea;
 	var $t48 = this.objectFrameworkArea.data;
-	var $t47 = new OurSonic.UIManager.Button(580, 75, 250, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('onTick'));
+	var $t47 = new $OurSonic_UIManager_Button(580, 75, 250, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('onTick'));
 	$t47.color = 'rgb(50,150,50)';
 	$t47.click = Function.mkdel(this, function(p7) {
 		this.objectFrameworkArea.data.b1.toggled = false;
@@ -7989,11 +7951,11 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea = function(manager) {
 			this.clearMainArea();
 		}
 	});
-	$t49.addControl(OurSonic.UIManager.Button).call($t49, $t48.b2 = $t47);
+	$t49.addControl($OurSonic_UIManager_Button).call($t49, $t48.b2 = $t47);
 	this.objectFrameworkArea.data.b2.toggle = true;
 	var $t52 = this.objectFrameworkArea;
 	var $t51 = this.objectFrameworkArea.data;
-	var $t50 = new OurSonic.UIManager.Button(320, 110, 250, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('onCollide'));
+	var $t50 = new $OurSonic_UIManager_Button(320, 110, 250, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('onCollide'));
 	$t50.color = 'rgb(50,150,50)';
 	$t50.click = Function.mkdel(this, function(p8) {
 		this.objectFrameworkArea.data.b1.toggled = false;
@@ -8008,11 +7970,11 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea = function(manager) {
 			this.clearMainArea();
 		}
 	});
-	$t52.addControl(OurSonic.UIManager.Button).call($t52, $t51.b3 = $t50);
+	$t52.addControl($OurSonic_UIManager_Button).call($t52, $t51.b3 = $t50);
 	this.objectFrameworkArea.data.b3.toggle = true;
 	var $t55 = this.objectFrameworkArea;
 	var $t54 = this.objectFrameworkArea.data;
-	var $t53 = new OurSonic.UIManager.Button(580, 110, 250, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('onHurtSonic'));
+	var $t53 = new $OurSonic_UIManager_Button(580, 110, 250, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('onHurtSonic'));
 	$t53.color = 'rgb(50,150,50)';
 	$t53.click = Function.mkdel(this, function(p9) {
 		this.objectFrameworkArea.data.b1.toggled = false;
@@ -8027,16 +7989,16 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea = function(manager) {
 			this.clearMainArea();
 		}
 	});
-	$t55.addControl(OurSonic.UIManager.Button).call($t55, $t54.b4 = $t53);
+	$t55.addControl($OurSonic_UIManager_Button).call($t55, $t54.b4 = $t53);
 	this.objectFrameworkArea.data.b4.toggle = true;
-	this.objectFrameworkArea.addControl(Type.makeGenericType(OurSonic.UIManager.Panel$1, [OurSonic.UIManager.Areas.MainPanelData])).call(this.objectFrameworkArea, this.objectFrameworkArea.data.mainPanel = new (Type.makeGenericType(OurSonic.UIManager.Panel$1, [OurSonic.UIManager.Areas.MainPanelData]))(OurSonic.UIManager.Areas.MainPanelData.$ctor(), 320, 150, 510, 510));
+	this.objectFrameworkArea.addControl(Type.makeGenericType($OurSonic_UIManager_Panel$1, [$OurSonic_UIManager_Areas_MainPanelData])).call(this.objectFrameworkArea, this.objectFrameworkArea.data.mainPanel = new (Type.makeGenericType($OurSonic_UIManager_Panel$1, [$OurSonic_UIManager_Areas_MainPanelData]))($OurSonic_UIManager_Areas_MainPanelData.$ctor(), 320, 150, 510, 510));
 	//    setTimeout("        var sc = document.getElementById("picFieldUploader");sc.style.visibility = "hidden";sc.style.position="absolute";", 300);
 };
-OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
+$OurSonic_UIManager_Areas_ObjectFrameworkArea.prototype = {
 	$addCodeWindow: function(value, change) {
 		this.clearMainArea();
 		var $t2 = this.objectFrameworkArea.data.mainPanel;
-		var $t1 = new OurSonic.UIManager.HtmlBox(15, -35);
+		var $t1 = new $OurSonic_UIManager_HtmlBox(15, -35);
 		$t1.width = 485;
 		$t1.height = 485;
 		$t1.set_init(Function.mkdel(this, function() {
@@ -8053,10 +8015,10 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 					hlLine = this.objectFrameworkArea.data.editor.setLineClass(this.objectFrameworkArea.data.editor.getCursor().line, 'activeline');
 				}),
 				onFocus: function(editor) {
-					OurSonic.SonicManager.instance.typingInEditor = true;
+					$OurSonic_SonicManager.instance.typingInEditor = true;
 				},
 				onBlur: function(editor1) {
-					OurSonic.SonicManager.instance.typingInEditor = false;
+					$OurSonic_SonicManager.instance.typingInEditor = false;
 				}
 			};
 			this.objectFrameworkArea.data.editor = CodeMirror.fromTextArea(this.objectFrameworkArea.data.codeMirror, codeMirrorOptions);
@@ -8094,7 +8056,7 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 				sc1.style.visibility = 'hidden';
 			}
 		}));
-		$t2.addControl(OurSonic.UIManager.HtmlBox).call($t2, $t1);
+		$t2.addControl($OurSonic_UIManager_HtmlBox).call($t2, $t1);
 	},
 	clearMainArea: function() {
 		this.objectFrameworkArea.data.mainPanel.controls = [];
@@ -8117,7 +8079,7 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 		for (var index = 0; index < objectFramework.assets.length; index++) {
 			var t = objectFramework.assets[index];
 			var b = { $: null };
-			b.$ = new (Type.makeGenericType(OurSonic.UIManager.Button$1, [OurSonic.Level.Objects.LevelObjectAsset]))(null, 0, 0, 0, 0, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(Function.mkdel({ b: b }, function() {
+			b.$ = new (Type.makeGenericType($OurSonic_UIManager_Button$1, [$OurSonic_Level_Objects_LevelObjectAsset]))(null, 0, 0, 0, 0, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(Function.mkdel({ b: b }, function() {
 				return this.b.$.data.name;
 			})));
 			b.$.color = 'rgb(50,190,90)';
@@ -8130,13 +8092,13 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 				this.$this.$loadAsset(this.b1.$.data);
 			});
 			b.$.data = t;
-			this.objectFrameworkArea.data.assets.addControl(Type.makeGenericType(OurSonic.UIManager.Button$1, [OurSonic.Level.Objects.LevelObjectAsset])).call(this.objectFrameworkArea.data.assets, b.$);
+			this.objectFrameworkArea.data.assets.addControl(Type.makeGenericType($OurSonic_UIManager_Button$1, [$OurSonic_Level_Objects_LevelObjectAsset])).call(this.objectFrameworkArea.data.assets, b.$);
 		}
 		this.objectFrameworkArea.data.pieces.clearControls();
 		for (var index1 = 0; index1 < objectFramework.pieces.length; index1++) {
 			var t1 = objectFramework.pieces[index1];
 			var b2 = { $: null };
-			b2.$ = new (Type.makeGenericType(OurSonic.UIManager.Button$1, [OurSonic.Level.Objects.LevelObjectPiece]))(null, 0, 0, 0, 0, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(Function.mkdel({ b2: b2 }, function() {
+			b2.$ = new (Type.makeGenericType($OurSonic_UIManager_Button$1, [$OurSonic_Level_Objects_LevelObjectPiece]))(null, 0, 0, 0, 0, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(Function.mkdel({ b2: b2 }, function() {
 				return this.b2.$.data.name;
 			})));
 			b2.$.color = 'rgb(50,190,90)';
@@ -8148,14 +8110,14 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 				this.$this.objectFrameworkArea.data.b4.toggled = false;
 				this.$this.$loadPiece(this.b11.$.data);
 			});
-			this.objectFrameworkArea.data.pieces.addControl(Type.makeGenericType(OurSonic.UIManager.Button$1, [OurSonic.Level.Objects.LevelObjectPiece])).call(this.objectFrameworkArea.data.pieces, b2.$);
+			this.objectFrameworkArea.data.pieces.addControl(Type.makeGenericType($OurSonic_UIManager_Button$1, [$OurSonic_Level_Objects_LevelObjectPiece])).call(this.objectFrameworkArea.data.pieces, b2.$);
 			b2.$.data = t1;
 		}
 		this.objectFrameworkArea.data.pieceLayouts.clearControls();
 		for (var index2 = 0; index2 < objectFramework.pieceLayouts.length; index2++) {
 			var t2 = objectFramework.pieceLayouts[index2];
 			var b3 = { $: null };
-			b3.$ = new (Type.makeGenericType(OurSonic.UIManager.Button$1, [OurSonic.Level.Objects.LevelObjectPieceLayout]))(null, 0, 0, 0, 0, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(Function.mkdel({ b3: b3 }, function() {
+			b3.$ = new (Type.makeGenericType($OurSonic_UIManager_Button$1, [$OurSonic_Level_Objects_LevelObjectPieceLayout]))(null, 0, 0, 0, 0, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(Function.mkdel({ b3: b3 }, function() {
 				return this.b3.$.data.name;
 			})));
 			b3.$.color = 'rgb(50,190,90)';
@@ -8167,14 +8129,14 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 				this.$this.objectFrameworkArea.data.b4.toggled = false;
 				this.$this.$loadPieceLayout(this.b12.$.data);
 			});
-			this.objectFrameworkArea.data.pieceLayouts.addControl(Type.makeGenericType(OurSonic.UIManager.Button$1, [OurSonic.Level.Objects.LevelObjectPieceLayout])).call(this.objectFrameworkArea.data.pieceLayouts, b3.$);
+			this.objectFrameworkArea.data.pieceLayouts.addControl(Type.makeGenericType($OurSonic_UIManager_Button$1, [$OurSonic_Level_Objects_LevelObjectPieceLayout])).call(this.objectFrameworkArea.data.pieceLayouts, b3.$);
 			b3.$.data = t2;
 		}
 		this.objectFrameworkArea.data.projectiles.clearControls();
 		for (var index3 = 0; index3 < objectFramework.projectiles.length; index3++) {
 			var t3 = objectFramework.projectiles[index3];
 			var b4 = { $: null };
-			b4.$ = new (Type.makeGenericType(OurSonic.UIManager.Button$1, [OurSonic.Level.Objects.LevelObjectProjectile]))(null, 0, 0, 0, 0, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(Function.mkdel({ b4: b4 }, function() {
+			b4.$ = new (Type.makeGenericType($OurSonic_UIManager_Button$1, [$OurSonic_Level_Objects_LevelObjectProjectile]))(null, 0, 0, 0, 0, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(Function.mkdel({ b4: b4 }, function() {
 				return this.b4.$.data.name;
 			})));
 			b4.$.color = 'rgb(50,190,90)';
@@ -8186,52 +8148,52 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 				this.$this.objectFrameworkArea.data.b4.toggled = false;
 				this.$this.$loadProjectile(this.b13.$.data);
 			});
-			this.objectFrameworkArea.data.projectiles.addControl(Type.makeGenericType(OurSonic.UIManager.Button$1, [OurSonic.Level.Objects.LevelObjectProjectile])).call(this.objectFrameworkArea.data.projectiles, b4.$);
+			this.objectFrameworkArea.data.projectiles.addControl(Type.makeGenericType($OurSonic_UIManager_Button$1, [$OurSonic_Level_Objects_LevelObjectProjectile])).call(this.objectFrameworkArea.data.projectiles, b4.$);
 			b4.$.data = t3;
 		}
 	},
 	$loadProjectile: function(projectile) {
 		this.clearMainArea();
 		var $t2 = this.objectFrameworkArea.data.mainPanel;
-		var $t1 = new OurSonic.UIManager.TextArea(25, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Name= '));
+		var $t1 = new $OurSonic_UIManager_TextArea(25, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Name= '));
 		$t1.color = 'black';
-		$t2.addControl(OurSonic.UIManager.TextArea).call($t2, $t1);
+		$t2.addControl($OurSonic_UIManager_TextArea).call($t2, $t1);
 		var fm = null;
 		var $t4 = this.objectFrameworkArea.data.mainPanel;
-		var $t3 = new OurSonic.UIManager.TextBox(100, 5, 290, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(projectile.name));
+		var $t3 = new $OurSonic_UIManager_TextBox(100, 5, 290, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(projectile.name));
 		$t3.color = 'rgb(50,150,50)';
 		$t3.click = function(p) {
 			projectile.name = fm.text;
 		};
-		$t4.addControl(OurSonic.UIManager.TextBox).call($t4, fm = $t3);
+		$t4.addControl($OurSonic_UIManager_TextBox).call($t4, fm = $t3);
 		var b = null;
 		var $t6 = this.objectFrameworkArea.data.mainPanel;
-		var $t5 = new OurSonic.UIManager.Button(40, 160, 70, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('XFlip'));
+		var $t5 = new $OurSonic_UIManager_Button(40, 160, 70, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('XFlip'));
 		$t5.color = 'rgb(50,150,50)';
 		$t5.click = function(p1) {
 			projectile.xflip = b.toggled;
 		};
-		$t6.addControl(OurSonic.UIManager.Button).call($t6, b = $t5);
+		$t6.addControl($OurSonic_UIManager_Button).call($t6, b = $t5);
 		b.toggle = true;
 		b.toggled = projectile.xflip;
 		var c = null;
 		var $t8 = this.objectFrameworkArea.data.mainPanel;
-		var $t7 = new OurSonic.UIManager.Button(115, 160, 70, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('YFlip'));
+		var $t7 = new $OurSonic_UIManager_Button(115, 160, 70, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('YFlip'));
 		$t7.color = 'rgb(50,150,50)';
 		$t7.click = function(p2) {
 			projectile.yflip = c.toggled;
 		};
-		$t8.addControl(OurSonic.UIManager.Button).call($t8, c = $t7);
+		$t8.addControl($OurSonic_UIManager_Button).call($t8, c = $t7);
 		c.toggle = true;
 		c.toggled = projectile.yflip;
 		var jd;
 		var $t10 = this.objectFrameworkArea.data.mainPanel;
-		var $t9 = new OurSonic.UIManager.HScrollBox(20, 35, 70, 4, 112);
+		var $t9 = new $OurSonic_UIManager_HScrollBox(20, 35, 70, 4, 112);
 		$t9.backColor = 'rgb(50,60,127)';
-		$t10.addControl(OurSonic.UIManager.HScrollBox).call($t10, jd = $t9);
+		$t10.addControl($OurSonic_UIManager_HScrollBox).call($t10, jd = $t9);
 		jd.controls = [];
 		for (var i = 0; i < this.objectFrameworkArea.data.objectFramework.assets.length; i++) {
-			var bd = { $: new (Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.Level.Objects.LevelObjectAsset]))(null, 0, 0, 0, 0) };
+			var bd = { $: new (Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_Level_Objects_LevelObjectAsset]))(null, 0, 0, 0, 0) };
 			bd.$.text = Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(Function.mkdel({ bd: bd }, function() {
 				return this.bd.$.data.name;
 			}));
@@ -8239,7 +8201,7 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 				if (this.bd.$.data.frames.length === 0) {
 					return;
 				}
-				this.bd.$.data.frames[0].drawSimple(canvas, OurSonic.Utility.Point.$ctor1(x, y), this.bd.$.width, this.bd.$.height - 15, projectile.xflip, projectile.yflip);
+				this.bd.$.data.frames[0].drawSimple(canvas, $OurSonic_Utility_Point.$ctor1(x, y), this.bd.$.width, this.bd.$.height - 15, projectile.xflip, projectile.yflip);
 			});
 			bd.$.click = Function.mkdel({ bd: bd }, function(p3) {
 				for (var j = 0; j < jd.controls.length; j++) {
@@ -8250,7 +8212,7 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 						projectile.assetIndex = j;
 						continue;
 					}
-					Type.cast(jd.controls[j], OurSonic.UIManager.ImageButton).toggled = false;
+					Type.cast(jd.controls[j], $OurSonic_UIManager_ImageButton).toggled = false;
 				}
 			});
 			jd.addControl(bd.$);
@@ -8264,43 +8226,43 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 	$loadPieceLayout: function(pieceLayout) {
 		this.clearMainArea();
 		var $t2 = this.objectFrameworkArea.data.mainPanel;
-		var $t1 = new OurSonic.UIManager.TextArea(25, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Name= '));
+		var $t1 = new $OurSonic_UIManager_TextArea(25, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Name= '));
 		$t1.color = 'black';
-		$t2.addControl(OurSonic.UIManager.TextArea).call($t2, $t1);
+		$t2.addControl($OurSonic_UIManager_TextArea).call($t2, $t1);
 		var textBox = null;
-		var $t3 = new OurSonic.UIManager.TextBox(100, 5, 390, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(pieceLayout.name));
+		var $t3 = new $OurSonic_UIManager_TextBox(100, 5, 390, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(pieceLayout.name));
 		$t3.color = 'rgb(50,150,50)';
 		$t3.click = function(p) {
 			pieceLayout.name = textBox.text;
 		};
 		textBox = $t3;
-		this.objectFrameworkArea.data.mainPanel.addControl(OurSonic.UIManager.TextBox).call(this.objectFrameworkArea.data.mainPanel, textBox);
-		this.objectFrameworkArea.data.mainPanel.addControl(OurSonic.UIManager.Areas.PieceLayoutEditor).call(this.objectFrameworkArea.data.mainPanel, this.objectFrameworkArea.data.mainPanel.data.pe = new OurSonic.UIManager.Areas.PieceLayoutEditor(145, 105, OurSonic.Utility.Point.$ctor1(350, 280)));
+		this.objectFrameworkArea.data.mainPanel.addControl($OurSonic_UIManager_TextBox).call(this.objectFrameworkArea.data.mainPanel, textBox);
+		this.objectFrameworkArea.data.mainPanel.addControl($OurSonic_UIManager_Areas_PieceLayoutEditor).call(this.objectFrameworkArea.data.mainPanel, this.objectFrameworkArea.data.mainPanel.data.pe = new $OurSonic_UIManager_Areas_PieceLayoutEditor(145, 105, $OurSonic_Utility_Point.$ctor1(350, 280)));
 		this.objectFrameworkArea.data.mainPanel.data.pe.init(pieceLayout);
 		var $t6 = this.objectFrameworkArea.data.mainPanel;
 		var $t5 = this.objectFrameworkArea.data;
-		var $t4 = new OurSonic.UIManager.ScrollBox(10, 105, 70, 5, 112);
+		var $t4 = new $OurSonic_UIManager_ScrollBox(10, 105, 70, 5, 112);
 		$t4.backColor = 'rgb(50,60,127)';
-		$t6.addControl(OurSonic.UIManager.ScrollBox).call($t6, $t5.listOfPieces = $t4);
+		$t6.addControl($OurSonic_UIManager_ScrollBox).call($t6, $t5.listOfPieces = $t4);
 		var selectPieceScroll;
 		var $t9 = this.objectFrameworkArea.data.mainPanel;
 		var $t8 = this.objectFrameworkArea.data.mainPanel.data;
-		var $t7 = new OurSonic.UIManager.HScrollBox(145, 390, 70, 3, 112);
+		var $t7 = new $OurSonic_UIManager_HScrollBox(145, 390, 70, 3, 112);
 		$t7.backColor = 'rgb(50,60,127)';
-		$t9.addControl(OurSonic.UIManager.HScrollBox).call($t9, $t8.selectPieceScroll = selectPieceScroll = $t7);
+		$t9.addControl($OurSonic_UIManager_HScrollBox).call($t9, $t8.selectPieceScroll = selectPieceScroll = $t7);
 		selectPieceScroll.controls = [];
 		;
 		var $t12 = this.objectFrameworkArea.data.mainPanel;
 		var $t11 = this.objectFrameworkArea.data.mainPanel.data;
-		var $t10 = new OurSonic.UIManager.Button(148, 38, 140, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Foreground'));
+		var $t10 = new $OurSonic_UIManager_Button(148, 38, 140, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Foreground'));
 		$t10.color = 'rgb(50,150,50)';
 		$t10.click = Function.mkdel(this, function(p1) {
 			this.objectFrameworkArea.data.mainPanel.data.pe.pieceLayoutMaker.setPriority(this.objectFrameworkArea.data.mainPanel.data.priorityDrawing.toggled);
 		});
-		$t12.addControl(OurSonic.UIManager.Button).call($t12, $t11.priorityDrawing = $t10);
+		$t12.addControl($OurSonic_UIManager_Button).call($t12, $t11.priorityDrawing = $t10);
 		this.objectFrameworkArea.data.mainPanel.data.priorityDrawing.toggle = true;
 		for (var i = 0; i < this.objectFrameworkArea.data.objectFramework.pieces.length; i++) {
-			var bdc = { $: new (Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.UIManager.Areas.ObjectFrameworkArea$ObjectFrameworkAreaPiece]))(null, 0, 0, 0, 0) };
+			var bdc = { $: new (Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_UIManager_Areas_ObjectFrameworkArea$ObjectFrameworkAreaPiece]))(null, 0, 0, 0, 0) };
 			bdc.$.text = Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(Function.mkdel({ bdc: bdc, $this: this }, function() {
 				return this.$this.objectFrameworkArea.data.objectFramework.pieces[this.bdc.$.data.index].name;
 			}));
@@ -8310,29 +8272,23 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 				if (ast.frames.length === 0) {
 					return;
 				}
-				ast.frames[0].drawSimple(canvas, OurSonic.Utility.Point.$ctor1(x, y), this.bdc.$.width, this.bdc.$.height - 15, d.xflip, d.yflip);
+				ast.frames[0].drawSimple(canvas, $OurSonic_Utility_Point.$ctor1(x, y), this.bdc.$.width, this.bdc.$.height - 15, d.xflip, d.yflip);
 			});
 			bdc.$.click = Function.mkdel({ bdc: bdc, $this: this }, function(p2) {
-				Type.cast(this.$this.objectFrameworkArea.data.listOfPieces.controls[this.$this.objectFrameworkArea.data.mainPanel.data.pe.pieceLayoutMaker.selectedPieceIndex], Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.Level.Objects.LevelObjectPieceLayoutPiece])).data.pieceIndex = this.bdc.$.data.index;
-				var $t13 = selectPieceScroll.controls.getEnumerator();
-				try {
-					while ($t13.moveNext()) {
-						var t = $t13.get_current();
-						if (ss.referenceEquals(t, this.bdc.$)) {
-							t.toggled = true;
-						}
-						else {
-							t.toggled = false;
-						}
+				Type.cast(this.$this.objectFrameworkArea.data.listOfPieces.controls[this.$this.objectFrameworkArea.data.mainPanel.data.pe.pieceLayoutMaker.selectedPieceIndex], Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_Level_Objects_LevelObjectPieceLayoutPiece])).data.pieceIndex = this.bdc.$.data.index;
+				for (var $t13 = 0; $t13 < selectPieceScroll.controls.length; $t13++) {
+					var t = selectPieceScroll.controls[$t13];
+					if (ss.referenceEquals(t, this.bdc.$)) {
+						t.toggled = true;
 					}
-				}
-				finally {
-					$t13.dispose();
+					else {
+						t.toggled = false;
+					}
 				}
 			});
 			selectPieceScroll.addControl(bdc.$);
 			var $t15 = bdc.$;
-			var $t14 = OurSonic.UIManager.Areas.ObjectFrameworkArea$ObjectFrameworkAreaPiece.$ctor();
+			var $t14 = $OurSonic_UIManager_Areas_ObjectFrameworkArea$ObjectFrameworkAreaPiece.$ctor();
 			$t14.piece = pieceLayout.pieces[0];
 			$t14.index = i;
 			$t15.data = $t14;
@@ -8343,25 +8299,25 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 		}
 		var showB = null;
 		var $t17 = this.objectFrameworkArea.data.mainPanel;
-		var $t16 = new OurSonic.UIManager.Button(348, 38, 140, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Show Images'));
+		var $t16 = new $OurSonic_UIManager_Button(348, 38, 140, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Show Images'));
 		$t16.color = 'rgb(50,150,50)';
 		$t16.click = Function.mkdel(this, function(p3) {
 			this.objectFrameworkArea.data.mainPanel.data.pe.pieceLayoutMaker.showImages = showB.toggled;
 		});
-		$t17.addControl(OurSonic.UIManager.Button).call($t17, showB = $t16);
+		$t17.addControl($OurSonic_UIManager_Button).call($t17, showB = $t16);
 		showB.toggle = true;
 		var $t19 = this.objectFrameworkArea.data.mainPanel;
-		var $t18 = new OurSonic.UIManager.Button(348, 68, 140, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Add Branch'));
+		var $t18 = new $OurSonic_UIManager_Button(348, 68, 140, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Add Branch'));
 		$t18.color = 'rgb(50,150,50)';
 		$t18.click = Function.mkdel(this, function(p4) {
 			var pc;
-			this.objectFrameworkArea.data.mainPanel.data.pe.pieceLayoutMaker.pieceLayout.pieces.add(pc = OurSonic.Level.Objects.LevelObjectPieceLayoutPiece.$ctor(ss.Int32.trunc(this.objectFrameworkArea.data.objectFramework.pieces.length * Math.random())));
+			this.objectFrameworkArea.data.mainPanel.data.pe.pieceLayoutMaker.pieceLayout.pieces.add(pc = $OurSonic_Level_Objects_LevelObjectPieceLayoutPiece.$ctor(ss.Int32.trunc(this.objectFrameworkArea.data.objectFramework.pieces.length * Math.random())));
 			pc.x = ss.Int32.trunc(Math.random() * this.objectFrameworkArea.data.mainPanel.data.pe.pieceLayoutMaker.pieceLayout.width);
 			pc.y = ss.Int32.trunc(Math.random() * this.objectFrameworkArea.data.mainPanel.data.pe.pieceLayoutMaker.pieceLayout.height);
 			this.objectFrameworkArea.data.mainPanel.data.pe.pieceLayoutMaker.selectedPieceIndex = this.objectFrameworkArea.data.mainPanel.data.pe.pieceLayoutMaker.pieceLayout.pieces.length - 1;
 			this.$buildleftScroll(pieceLayout);
 		});
-		$t19.addControl(OurSonic.UIManager.Button).call($t19, $t18);
+		$t19.addControl($OurSonic_UIManager_Button).call($t19, $t18);
 		this.$buildleftScroll(pieceLayout);
 		//
 		//            Data.MainPanel.Data.UpdatePieces = () =>
@@ -8425,7 +8381,7 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 	$buildleftScroll: function(pieceLayout) {
 		this.objectFrameworkArea.data.listOfPieces.controls = [];
 		for (var i = 0; i < pieceLayout.pieces.length; i++) {
-			var bd = { $: new (Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.Level.Objects.LevelObjectPieceLayoutPiece]))(null, 0, 0, 0, 0) };
+			var bd = { $: new (Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_Level_Objects_LevelObjectPieceLayoutPiece]))(null, 0, 0, 0, 0) };
 			bd.$.text = Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(Function.mkdel({ bd: bd, $this: this }, function() {
 				return this.$this.objectFrameworkArea.data.objectFramework.pieces[this.bd.$.data.pieceIndex].name;
 			}));
@@ -8435,25 +8391,25 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 				if (ast.frames.length === 0) {
 					return;
 				}
-				ast.frames[0].drawSimple(canvas, OurSonic.Utility.Point.$ctor1(x, y), this.bd.$.width, this.bd.$.height - 15, pc.xflip, pc.yflip);
+				ast.frames[0].drawSimple(canvas, $OurSonic_Utility_Point.$ctor1(x, y), this.bd.$.width, this.bd.$.height - 15, pc.xflip, pc.yflip);
 			});
 			bd.$.click = Function.mkdel({ bd: bd, $this: this }, function(p) {
 				for (var j = 0; j < this.$this.objectFrameworkArea.data.listOfPieces.controls.length; j++) {
 					if (ss.referenceEquals(this.bd.$, this.$this.objectFrameworkArea.data.listOfPieces.controls[j])) {
-						Type.cast(this.$this.objectFrameworkArea.data.listOfPieces.controls[j], OurSonic.UIManager.ImageButton).toggled = true;
+						Type.cast(this.$this.objectFrameworkArea.data.listOfPieces.controls[j], $OurSonic_UIManager_ImageButton).toggled = true;
 						this.$this.objectFrameworkArea.data.mainPanel.data.pe.pieceLayoutMaker.selectedPieceIndex = j;
 					}
 					else {
-						Type.cast(this.$this.objectFrameworkArea.data.listOfPieces.controls[j], OurSonic.UIManager.ImageButton).toggled = false;
+						Type.cast(this.$this.objectFrameworkArea.data.listOfPieces.controls[j], $OurSonic_UIManager_ImageButton).toggled = false;
 					}
 				}
 				for (var j1 = 0; j1 < this.$this.objectFrameworkArea.data.mainPanel.data.selectPieceScroll.controls.length; j1++) {
-					var fm = Type.cast(this.$this.objectFrameworkArea.data.mainPanel.data.selectPieceScroll.controls[j1], Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.UIManager.Areas.ObjectFrameworkArea$ObjectFrameworkAreaPiece]));
+					var fm = Type.cast(this.$this.objectFrameworkArea.data.mainPanel.data.selectPieceScroll.controls[j1], Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_UIManager_Areas_ObjectFrameworkArea$ObjectFrameworkAreaPiece]));
 					fm.data.piece = this.bd.$.data;
 					fm.toggled = j1 === pieceLayout.pieces[this.$this.objectFrameworkArea.data.mainPanel.data.pe.pieceLayoutMaker.selectedPieceIndex].pieceIndex;
 				}
 			});
-			this.objectFrameworkArea.data.listOfPieces.addControl(Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.Level.Objects.LevelObjectPieceLayoutPiece])).call(this.objectFrameworkArea.data.listOfPieces, bd.$);
+			this.objectFrameworkArea.data.listOfPieces.addControl(Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_Level_Objects_LevelObjectPieceLayoutPiece])).call(this.objectFrameworkArea.data.listOfPieces, bd.$);
 			bd.$.toggle = true;
 			bd.$.data = pieceLayout.pieces[i];
 			if (i === this.objectFrameworkArea.data.mainPanel.data.pe.pieceLayoutMaker.selectedPieceIndex) {
@@ -8464,46 +8420,46 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 	$loadPiece: function(piece) {
 		this.clearMainArea();
 		var $t2 = this.objectFrameworkArea.data.mainPanel;
-		var $t1 = new OurSonic.UIManager.TextArea(25, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Name: '));
+		var $t1 = new $OurSonic_UIManager_TextArea(25, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Name: '));
 		$t1.color = 'black';
-		$t2.addControl(OurSonic.UIManager.TextArea).call($t2, $t1);
+		$t2.addControl($OurSonic_UIManager_TextArea).call($t2, $t1);
 		var textBox = null;
 		var $t4 = this.objectFrameworkArea.data.mainPanel;
-		var $t3 = new OurSonic.UIManager.TextBox(100, 5, 290, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(piece.name));
+		var $t3 = new $OurSonic_UIManager_TextBox(100, 5, 290, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(piece.name));
 		$t3.color = 'rgb(50,150,50)';
 		$t3.click = function(p) {
 			piece.name = textBox.text;
 		};
-		$t4.addControl(OurSonic.UIManager.TextBox).call($t4, textBox = $t3);
+		$t4.addControl($OurSonic_UIManager_TextBox).call($t4, textBox = $t3);
 		var b = null;
 		var $t6 = this.objectFrameworkArea.data.mainPanel;
-		var $t5 = new OurSonic.UIManager.Button(40, 160, 70, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('XFlip'));
+		var $t5 = new $OurSonic_UIManager_Button(40, 160, 70, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('XFlip'));
 		$t5.color = 'rgb(50,150,50)';
 		$t5.click = function(p1) {
 			piece.xflip = b.toggled;
 		};
-		$t6.addControl(OurSonic.UIManager.Button).call($t6, b = $t5);
+		$t6.addControl($OurSonic_UIManager_Button).call($t6, b = $t5);
 		b.toggle = true;
 		b.toggled = piece.xflip;
 		var c = null;
 		var $t8 = this.objectFrameworkArea.data.mainPanel;
-		var $t7 = new OurSonic.UIManager.Button(115, 160, 70, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('YFlip'));
+		var $t7 = new $OurSonic_UIManager_Button(115, 160, 70, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('YFlip'));
 		$t7.color = 'rgb(50,150,50)';
 		$t7.click = function(p2) {
 			piece.yflip = c.toggled;
 		};
-		$t8.addControl(OurSonic.UIManager.Button).call($t8, c = $t7);
+		$t8.addControl($OurSonic_UIManager_Button).call($t8, c = $t7);
 		c.toggle = true;
 		c.toggled = piece.yflip;
 		var jd;
 		var $t10 = this.objectFrameworkArea.data.mainPanel;
-		var $t9 = new OurSonic.UIManager.HScrollBox(20, 35, 70, 4, 112);
+		var $t9 = new $OurSonic_UIManager_HScrollBox(20, 35, 70, 4, 112);
 		$t9.backColor = 'rgb(50,60,127)';
-		$t10.addControl(OurSonic.UIManager.HScrollBox).call($t10, jd = $t9);
+		$t10.addControl($OurSonic_UIManager_HScrollBox).call($t10, jd = $t9);
 		var bd = null;
 		jd.controls = [];
 		for (var i = 0; i < this.objectFrameworkArea.data.objectFramework.assets.length; i++) {
-			bd = new (Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.Level.Objects.LevelObjectAsset]))(this.objectFrameworkArea.data.objectFramework.assets[i], 0, 0, 0, 0);
+			bd = new (Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_Level_Objects_LevelObjectAsset]))(this.objectFrameworkArea.data.objectFramework.assets[i], 0, 0, 0, 0);
 			var bd1 = { $: bd };
 			bd.text = Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(Function.mkdel({ bd1: bd1 }, function() {
 				return this.bd1.$.data.name;
@@ -8512,7 +8468,7 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 				if (this.bd1.$.data.frames.length === 0) {
 					return;
 				}
-				this.bd1.$.data.frames[0].drawSimple(canvas, OurSonic.Utility.Point.$ctor1(x, y), this.bd1.$.width, this.bd1.$.height - 15, piece.xflip, piece.yflip);
+				this.bd1.$.data.frames[0].drawSimple(canvas, $OurSonic_Utility_Point.$ctor1(x, y), this.bd1.$.width, this.bd1.$.height - 15, piece.xflip, piece.yflip);
 			});
 			bd.click = Function.mkdel({ bd1: bd1 }, function(p3) {
 				for (var j = 0; j < jd.controls.length; j++) {
@@ -8523,7 +8479,7 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 						piece.assetIndex = j;
 						continue;
 					}
-					Type.cast(jd.controls[j], OurSonic.UIManager.ImageButton).toggled = false;
+					Type.cast(jd.controls[j], $OurSonic_UIManager_ImageButton).toggled = false;
 				}
 			});
 			jd.addControl(bd);
@@ -8536,23 +8492,23 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 	$loadAsset: function(asset) {
 		this.clearMainArea();
 		var $t2 = this.objectFrameworkArea.data.mainPanel;
-		var $t1 = new OurSonic.UIManager.TextArea(25, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Name: '));
+		var $t1 = new $OurSonic_UIManager_TextArea(25, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Name: '));
 		$t1.color = 'black';
-		$t2.addControl(OurSonic.UIManager.TextArea).call($t2, $t1);
+		$t2.addControl($OurSonic_UIManager_TextArea).call($t2, $t1);
 		var tb = null;
 		var $t4 = this.objectFrameworkArea.data.mainPanel;
-		var $t3 = new OurSonic.UIManager.TextBox(100, 5, 290, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(asset.name));
+		var $t3 = new $OurSonic_UIManager_TextBox(100, 5, 290, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(asset.name));
 		$t3.color = 'rgb(50,150,50)';
 		$t3.click = function(p) {
 			asset.name = tb.text;
 		};
-		$t4.addControl(OurSonic.UIManager.TextBox).call($t4, tb = $t3);
+		$t4.addControl($OurSonic_UIManager_TextBox).call($t4, tb = $t3);
 		var $t6 = this.objectFrameworkArea.data.mainPanel;
-		var $t5 = new OurSonic.UIManager.Button(400, 5, 100, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Add Frame'));
+		var $t5 = new $OurSonic_UIManager_Button(400, 5, 100, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Add Frame'));
 		$t5.color = 'rgb(50,150,50)';
 		$t5.click = Function.mkdel(this, function(p1) {
 			var vs;
-			asset.frames.add(vs = new OurSonic.Level.Objects.LevelObjectAssetFrame('Frame ' + (asset.frames.length + 1)));
+			asset.frames.add(vs = new $OurSonic_Level_Objects_LevelObjectAssetFrame('Frame ' + (asset.frames.length + 1)));
 			vs.palette = ['000', '111', '222', '333', '444', '555', '666', '777', '888', '999', 'AAA', 'BBB', 'CCC', 'DDD', 'EEE', 'FFF'];
 			vs.width = ss.Int32.trunc(Math.floor(Math.random() * 40) + 20);
 			vs.height = ss.Int32.trunc(Math.floor(Math.random() * 40) + 20);
@@ -8565,23 +8521,23 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 			}
 			this.objectFrameworkArea.data.mainPanel.data.assetPopulate(asset);
 		});
-		$t6.addControl(OurSonic.UIManager.Button).call($t6, $t5);
+		$t6.addControl($OurSonic_UIManager_Button).call($t6, $t5);
 		var jd;
 		var $t8 = this.objectFrameworkArea.data.mainPanel;
-		var $t7 = new OurSonic.UIManager.HScrollBox(20, 35, 70, 4, 112);
+		var $t7 = new $OurSonic_UIManager_HScrollBox(20, 35, 70, 4, 112);
 		$t7.backColor = 'rgb(50,60,127)';
-		$t8.addControl(OurSonic.UIManager.HScrollBox).call($t8, jd = $t7);
+		$t8.addControl($OurSonic_UIManager_HScrollBox).call($t8, jd = $t7);
 		this.objectFrameworkArea.data.mainPanel.data.assetPopulate = Function.mkdel(this, function(ast) {
 			jd.controls = [];
 			for (var index = 0; index < ast.frames.length; index++) {
 				var t = ast.frames[index];
 				var bd = { $: null };
-				bd.$ = new (Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.Level.Objects.LevelObjectAssetFrame]))(null, 0, 0, 0, 0);
+				bd.$ = new (Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_Level_Objects_LevelObjectAssetFrame]))(null, 0, 0, 0, 0);
 				bd.$.text = Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(Function.mkdel({ bd: bd }, function() {
 					return this.bd.$.data.name;
 				}));
 				bd.$.onDraw = Function.mkdel({ bd: bd }, function(canvas, x, y) {
-					this.bd.$.data.drawSimple(canvas, OurSonic.Utility.Point.$ctor1(x, y), this.bd.$.width, this.bd.$.height - 15, false, false);
+					this.bd.$.data.drawSimple(canvas, $OurSonic_Utility_Point.$ctor1(x, y), this.bd.$.width, this.bd.$.height - 15, false, false);
 				});
 				bd.$.click = Function.mkdel({ bd: bd, $this: this }, function(p2) {
 					this.$this.objectFrameworkArea.data.mainPanel.data.loadFrame(this.bd.$.data);
@@ -8591,86 +8547,86 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 			}
 		});
 		this.objectFrameworkArea.data.mainPanel.data.assetPopulate(asset);
-		this.objectFrameworkArea.data.mainPanel.addControl(Type.makeGenericType(OurSonic.UIManager.Panel$1, [OurSonic.UIManager.Areas.FrameAreaData])).call(this.objectFrameworkArea.data.mainPanel, this.objectFrameworkArea.data.mainPanel.data.frameArea = new (Type.makeGenericType(OurSonic.UIManager.Panel$1, [OurSonic.UIManager.Areas.FrameAreaData]))(OurSonic.UIManager.Areas.FrameAreaData.$ctor(), 7, 155, 480, 350));
+		this.objectFrameworkArea.data.mainPanel.addControl(Type.makeGenericType($OurSonic_UIManager_Panel$1, [$OurSonic_UIManager_Areas_FrameAreaData])).call(this.objectFrameworkArea.data.mainPanel, this.objectFrameworkArea.data.mainPanel.data.frameArea = new (Type.makeGenericType($OurSonic_UIManager_Panel$1, [$OurSonic_UIManager_Areas_FrameAreaData]))($OurSonic_UIManager_Areas_FrameAreaData.$ctor(), 7, 155, 480, 350));
 		this.objectFrameworkArea.data.mainPanel.data.frameArea.outline = false;
 		this.objectFrameworkArea.data.mainPanel.data.loadFrame = Function.mkdel(this, function(frame) {
 			this.objectFrameworkArea.data.mainPanel.data.frameArea.controls = [];
 			//Data.MainPanel.Data.FrameArea.currentFrame = frame;
 			//var ce;
 			var $t10 = this.objectFrameworkArea.data.mainPanel.data.frameArea;
-			var $t9 = new OurSonic.UIManager.TextArea(15, 21, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Name: '));
+			var $t9 = new $OurSonic_UIManager_TextArea(15, 21, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Name: '));
 			$t9.color = 'black';
-			$t10.addControl(OurSonic.UIManager.TextArea).call($t10, $t9);
+			$t10.addControl($OurSonic_UIManager_TextArea).call($t10, $t9);
 			var textBox = null;
 			var $t12 = this.objectFrameworkArea.data.mainPanel.data.frameArea;
-			var $t11 = new OurSonic.UIManager.TextBox(90, 0, 395, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(frame.name));
+			var $t11 = new $OurSonic_UIManager_TextBox(90, 0, 395, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(frame.name));
 			$t11.color = 'rgb(50,150,50)';
 			$t11.click = function(p3) {
 				frame.name = textBox.text;
 			};
-			$t12.addControl(OurSonic.UIManager.TextBox).call($t12, $t11);
+			$t12.addControl($OurSonic_UIManager_TextBox).call($t12, $t11);
 			var $t14 = this.objectFrameworkArea.data.mainPanel.data.frameArea;
-			var $t13 = new OurSonic.UIManager.TextArea(0, 275, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(function() {
+			var $t13 = new $OurSonic_UIManager_TextArea(0, 275, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(function() {
 				return 'Width:  ' + frame.width;
 			}));
 			$t13.color = 'Black';
-			$t14.addControl(OurSonic.UIManager.TextArea).call($t14, $t13);
+			$t14.addControl($OurSonic_UIManager_TextArea).call($t14, $t13);
 			var $t16 = this.objectFrameworkArea.data.mainPanel.data.frameArea;
-			var $t15 = new OurSonic.UIManager.Button(75, 250, 14, 17, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('^'));
+			var $t15 = new $OurSonic_UIManager_Button(75, 250, 14, 17, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('^'));
 			$t15.color = 'rgb(50,150,50)';
 			$t15.click = function(p4) {
 				frame.setWidth(frame.width + 1);
 			};
-			$t16.addControl(OurSonic.UIManager.Button).call($t16, $t15);
+			$t16.addControl($OurSonic_UIManager_Button).call($t16, $t15);
 			var $t18 = this.objectFrameworkArea.data.mainPanel.data.frameArea;
-			var $t17 = new OurSonic.UIManager.Button(75, 270, 14, 20, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('v'));
+			var $t17 = new $OurSonic_UIManager_Button(75, 270, 14, 20, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('v'));
 			$t17.color = 'rgb(50,150,50)';
 			$t17.click = function(p5) {
 				frame.setWidth(frame.width - 1);
 			};
-			$t18.addControl(OurSonic.UIManager.Button).call($t18, $t17);
+			$t18.addControl($OurSonic_UIManager_Button).call($t18, $t17);
 			var $t20 = this.objectFrameworkArea.data.mainPanel.data.frameArea;
-			var $t19 = new OurSonic.UIManager.TextArea(0, 320, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(function() {
+			var $t19 = new $OurSonic_UIManager_TextArea(0, 320, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(function() {
 				return 'Height: ' + frame.height;
 			}));
 			$t19.color = 'Black';
-			$t20.addControl(OurSonic.UIManager.TextArea).call($t20, $t19);
+			$t20.addControl($OurSonic_UIManager_TextArea).call($t20, $t19);
 			var $t22 = this.objectFrameworkArea.data.mainPanel.data.frameArea;
-			var $t21 = new OurSonic.UIManager.Button(75, 295, 14, 17, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('^'));
+			var $t21 = new $OurSonic_UIManager_Button(75, 295, 14, 17, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('^'));
 			$t21.color = 'rgb(50,150,50)';
 			$t21.click = function(p6) {
 				frame.setHeight(frame.height + 1);
 			};
-			$t22.addControl(OurSonic.UIManager.Button).call($t22, $t21);
+			$t22.addControl($OurSonic_UIManager_Button).call($t22, $t21);
 			var $t24 = this.objectFrameworkArea.data.mainPanel.data.frameArea;
-			var $t23 = new OurSonic.UIManager.Button(75, 315, 14, 20, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('v'));
+			var $t23 = new $OurSonic_UIManager_Button(75, 315, 14, 20, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('v'));
 			$t23.color = 'rgb(50,150,50)';
 			$t23.click = function(p7) {
 				frame.setHeight(frame.height - 1);
 			};
-			$t24.addControl(OurSonic.UIManager.Button).call($t24, $t23);
+			$t24.addControl($OurSonic_UIManager_Button).call($t24, $t23);
 			var bt;
 			var $t26 = this.objectFrameworkArea.data.mainPanel.data.frameArea;
-			var $t25 = new OurSonic.UIManager.Button(175, 35, 150, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Collide Map'));
+			var $t25 = new $OurSonic_UIManager_Button(175, 35, 150, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Collide Map'));
 			$t25.color = 'rgb(50,150,50)';
 			$t25.click = function(p8) {
 				//    ce.showCollideMap = this.toggled;
 			};
-			$t26.addControl(OurSonic.UIManager.Button).call($t26, bt = $t25);
+			$t26.addControl($OurSonic_UIManager_Button).call($t26, bt = $t25);
 			bt.toggle = true;
 			var $t28 = this.objectFrameworkArea.data.mainPanel.data.frameArea;
-			var $t27 = new OurSonic.UIManager.Button(335, 35, 150, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Hurt Map'));
+			var $t27 = new $OurSonic_UIManager_Button(335, 35, 150, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Hurt Map'));
 			$t27.color = 'rgb(50,150,50)';
 			$t27.click = function(p9) {
 				//    ce.showHurtMap = this.toggled;
 			};
-			$t28.addControl(OurSonic.UIManager.Button).call($t28, bt = $t27);
+			$t28.addControl($OurSonic_UIManager_Button).call($t28, bt = $t27);
 			bt.toggle = true;
 			var $t31 = this.objectFrameworkArea.data.mainPanel.data.frameArea;
 			var $t30 = this.objectFrameworkArea.data.mainPanel.data.frameArea.data;
-			var $t29 = new OurSonic.UIManager.Areas.ColorEditingArea(175, 65, 310, 225);
+			var $t29 = new $OurSonic_UIManager_Areas_ColorEditingArea(175, 65, 310, 225);
 			$t29.showOffset = true;
-			$t31.addControl(OurSonic.UIManager.Areas.ColorEditingArea).call($t31, $t30.colorEditor = $t29);
+			$t31.addControl($OurSonic_UIManager_Areas_ColorEditingArea).call($t31, $t30.colorEditor = $t29);
 			var ce = this.objectFrameworkArea.data.mainPanel.data.frameArea.data.colorEditor;
 			ce.init(frame);
 			ce.editor.showOutline = false;
@@ -8750,32 +8706,32 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea.prototype = {
 			//                                }));
 			var $t34 = this.objectFrameworkArea.data.mainPanel.data.frameArea;
 			var $t33 = this.objectFrameworkArea.data.mainPanel.data.frameArea.data;
-			var $t32 = new OurSonic.UIManager.Areas.PaletteArea(175, 300);
-			$t32.scale = OurSonic.Utility.Point.$ctor1(39, 11);
+			var $t32 = new $OurSonic_UIManager_Areas_PaletteArea(175, 300);
+			$t32.scale = $OurSonic_Utility_Point.$ctor1(39, 11);
 			$t32.showCurrent = false;
-			$t34.addControl(OurSonic.UIManager.Areas.PaletteArea).call($t34, $t33.palatteArea = $t32);
+			$t34.addControl($OurSonic_UIManager_Areas_PaletteArea).call($t34, $t33.palatteArea = $t32);
 			this.objectFrameworkArea.data.mainPanel.data.frameArea.data.palatteArea.init(frame.palette, true);
 			var $t36 = this.objectFrameworkArea.data.mainPanel.data.frameArea;
-			var $t35 = new OurSonic.UIManager.Button(175, 327, 310, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Edit Map'));
+			var $t35 = new $OurSonic_UIManager_Button(175, 327, 310, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Edit Map'));
 			$t35.color = 'rgb(50,150,50)';
 			$t35.click = Function.mkdel(this, function(p11) {
-				OurSonic.SonicManager.instance.uiManager.get_uiManagerAreas().colorEditorArea.data.init(frame);
-				OurSonic.SonicManager.instance.uiManager.get_uiManagerAreas().colorEditorArea.visible = true;
-				OurSonic.SonicManager.instance.uiManager.get_uiManagerAreas().colorEditorArea.set_depth(10);
+				$OurSonic_SonicManager.instance.uiManager.get_uiManagerAreas().colorEditorArea.data.init(frame);
+				$OurSonic_SonicManager.instance.uiManager.get_uiManagerAreas().colorEditorArea.visible = true;
+				$OurSonic_SonicManager.instance.uiManager.get_uiManagerAreas().colorEditorArea.set_depth(10);
 				this.objectFrameworkArea.loseFocus();
 			});
-			$t36.addControl(OurSonic.UIManager.Button).call($t36, $t35);
+			$t36.addControl($OurSonic_UIManager_Button).call($t36, $t35);
 		});
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.ObjectFrameworkArea.ObjectFrameworkAreaPiece
-OurSonic.UIManager.Areas.ObjectFrameworkArea$ObjectFrameworkAreaPiece = function() {
+var $OurSonic_UIManager_Areas_ObjectFrameworkArea$ObjectFrameworkAreaPiece = function() {
 };
-OurSonic.UIManager.Areas.ObjectFrameworkArea$ObjectFrameworkAreaPiece.createInstance = function() {
-	return OurSonic.UIManager.Areas.ObjectFrameworkArea$ObjectFrameworkAreaPiece.$ctor();
+$OurSonic_UIManager_Areas_ObjectFrameworkArea$ObjectFrameworkAreaPiece.createInstance = function() {
+	return $OurSonic_UIManager_Areas_ObjectFrameworkArea$ObjectFrameworkAreaPiece.$ctor();
 };
-OurSonic.UIManager.Areas.ObjectFrameworkArea$ObjectFrameworkAreaPiece.$ctor = function() {
+$OurSonic_UIManager_Areas_ObjectFrameworkArea$ObjectFrameworkAreaPiece.$ctor = function() {
 	var $this = {};
 	$this.piece = null;
 	$this.index = 0;
@@ -8783,12 +8739,12 @@ OurSonic.UIManager.Areas.ObjectFrameworkArea$ObjectFrameworkAreaPiece.$ctor = fu
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.ObjectFrameworkData
-OurSonic.UIManager.Areas.ObjectFrameworkData = function() {
+var $OurSonic_UIManager_Areas_ObjectFrameworkData = function() {
 };
-OurSonic.UIManager.Areas.ObjectFrameworkData.createInstance = function() {
-	return OurSonic.UIManager.Areas.ObjectFrameworkData.$ctor();
+$OurSonic_UIManager_Areas_ObjectFrameworkData.createInstance = function() {
+	return $OurSonic_UIManager_Areas_ObjectFrameworkData.$ctor();
 };
-OurSonic.UIManager.Areas.ObjectFrameworkData.$ctor = function() {
+$OurSonic_UIManager_Areas_ObjectFrameworkData.$ctor = function() {
 	var $this = {};
 	$this.b1 = null;
 	$this.b2 = null;
@@ -8809,31 +8765,31 @@ OurSonic.UIManager.Areas.ObjectFrameworkData.$ctor = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.ObjectFrameworkListArea
-OurSonic.UIManager.Areas.ObjectFrameworkListArea = function(uiManager) {
+var $OurSonic_UIManager_Areas_ObjectFrameworkListArea = function(uiManager) {
 	var loadObject = null;
 	var $t2 = uiManager.get_uiManagerAreas();
-	var $t1 = new OurSonic.UIManager.UIArea(90, 500, 390, 300);
+	var $t1 = new $OurSonic_UIManager_UIArea(90, 500, 390, 300);
 	$t1.closable = true;
 	var objectFrameworkListArea = $t2.objectFrameworkListArea = $t1;
-	objectFrameworkListArea.visible = false;
+	objectFrameworkListArea.visible = true;
 	uiManager.addArea(objectFrameworkListArea);
-	var $t3 = new OurSonic.UIManager.TextArea(30, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Object Frameworks'));
+	var $t3 = new $OurSonic_UIManager_TextArea(30, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Object Frameworks'));
 	$t3.color = 'blue';
-	objectFrameworkListArea.addControl(OurSonic.UIManager.TextArea).call(objectFrameworkListArea, $t3);
+	objectFrameworkListArea.addControl($OurSonic_UIManager_TextArea).call(objectFrameworkListArea, $t3);
 	var fList;
-	var $t4 = new OurSonic.UIManager.ScrollBox(30, 90, 25, 6, 315);
+	var $t4 = new $OurSonic_UIManager_ScrollBox(30, 90, 25, 6, 315);
 	$t4.backColor = 'rgb(50,60,127)';
-	objectFrameworkListArea.addControl(OurSonic.UIManager.ScrollBox).call(objectFrameworkListArea, fList = $t4);
-	var $t5 = new OurSonic.UIManager.Button(35, 50, 160, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Create Framework'));
+	objectFrameworkListArea.addControl($OurSonic_UIManager_ScrollBox).call(objectFrameworkListArea, fList = $t4);
+	var $t5 = new $OurSonic_UIManager_Button(35, 50, 160, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Create Framework'));
 	$t5.color = 'rgb(50,150,50)';
 	$t5.click = function(p) {
-		uiManager.get_uiManagerAreas().objectFrameworkArea.populate(new OurSonic.Level.Objects.LevelObject('SomeKey'));
+		uiManager.get_uiManagerAreas().objectFrameworkArea.populate(new $OurSonic_Level_Objects_LevelObject('SomeKey'));
 		uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.visible = true;
 	};
-	objectFrameworkListArea.addControl(OurSonic.UIManager.Button).call(objectFrameworkListArea, $t5);
+	objectFrameworkListArea.addControl($OurSonic_UIManager_Button).call(objectFrameworkListArea, $t5);
 	var getObjects = function() {
-		OurSonic.SonicEngine.instance.client.emit('GetAllObjects', '');
-		OurSonic.SonicEngine.instance.client.on('GetAllObjects.Response', function(data) {
+		$OurSonic_SonicEngine.instance.client.emit('GetAllObjects', '');
+		$OurSonic_SonicEngine.instance.client.on('GetAllObjects.Response', function(data) {
 			var obj = data.Data;
 			fList.controls = [];
 			var $t6 = Enumerable.from(obj).orderBy(function(a) {
@@ -8844,12 +8800,12 @@ OurSonic.UIManager.Areas.ObjectFrameworkListArea = function(uiManager) {
 					var itm = $t6.get_current();
 					var d;
 					var name = { $: itm };
-					var $t7 = new OurSonic.UIManager.Button(0, 0, 0, 0, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(itm));
+					var $t7 = new $OurSonic_UIManager_Button(0, 0, 0, 0, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(itm));
 					$t7.color = 'rgb(50,190,90)';
 					$t7.click = Function.mkdel({ name: name }, function(p1) {
 						loadObject(this.name.$);
 					});
-					fList.addControl(OurSonic.UIManager.Button).call(fList, d = $t7);
+					fList.addControl($OurSonic_UIManager_Button).call(fList, d = $t7);
 				}
 			}
 			finally {
@@ -8857,33 +8813,33 @@ OurSonic.UIManager.Areas.ObjectFrameworkListArea = function(uiManager) {
 			}
 		});
 	};
-	var $t8 = new OurSonic.UIManager.Button(200, 50, 160, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Save Framework'));
+	var $t8 = new $OurSonic_UIManager_Button(200, 50, 160, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Save Framework'));
 	$t8.color = 'rgb(50,150,50)';
 	$t8.click = function(p2) {
-		var oldTitle = OurSonic.UIManager.UIManager.get_curLevelName();
-		OurSonic.UIManager.UIManager.updateTitle('Saving Object');
+		var oldTitle = $OurSonic_UIManager_UIManager.get_curLevelName();
+		$OurSonic_UIManager_UIManager.updateTitle('Saving Object');
 		var k = uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework.key;
 		var $t9 = uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework.oldKey;
 		if (ss.isNullOrUndefined($t9)) {
 			$t9 = uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework.key;
 		}
 		var o = $t9;
-		var v = OurSonic.Utility.Help.stringify(uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework);
-		var $t11 = OurSonic.SonicEngine.instance.client;
+		var v = $OurSonic_Utility_Help.stringify(uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework);
+		var $t11 = $OurSonic_SonicEngine.instance.client;
 		var $t10 = OurSonicModels.SaveObjectModel.$ctor();
 		$t10.key = k;
 		$t10.oldKey = o;
 		$t10.data = v;
 		$t11.emit('SaveObject', $t10);
-		OurSonic.SonicEngine.instance.client.on('SaveObject.Response', function(data1) {
-			OurSonic.UIManager.UIManager.updateTitle(oldTitle);
+		$OurSonic_SonicEngine.instance.client.on('SaveObject.Response', function(data1) {
+			$OurSonic_UIManager_UIManager.updateTitle(oldTitle);
 		});
 		getObjects();
 	};
-	objectFrameworkListArea.addControl(OurSonic.UIManager.Button).call(objectFrameworkListArea, $t8);
+	objectFrameworkListArea.addControl($OurSonic_UIManager_Button).call(objectFrameworkListArea, $t8);
 	getObjects();
 	loadObject = function(name1) {
-		var objects = OurSonic.SonicManager.instance.cachedObjects;
+		var objects = $OurSonic_SonicManager.instance.cachedObjects;
 		if (ss.isValue(objects)) {
 			if (ss.isValue(objects[name1])) {
 				uiManager.get_uiManagerAreas().objectFrameworkArea.populate(objects[name1]);
@@ -8891,12 +8847,12 @@ OurSonic.UIManager.Areas.ObjectFrameworkListArea = function(uiManager) {
 				return;
 			}
 		}
-		var oldTitle1 = OurSonic.UIManager.UIManager.get_curLevelName();
-		OurSonic.UIManager.UIManager.updateTitle('Downloading Object:' + name1);
-		OurSonic.SonicEngine.instance.client.emit('GetObject', new (Type.makeGenericType(OurSonicModels.Common.DataObject$1, [String]))(name1));
-		OurSonic.SonicEngine.instance.client.on('GetObject.Response', function(lvl) {
-			OurSonic.UIManager.UIManager.updateTitle(oldTitle1);
-			var d1 = OurSonic.Level.Objects.ObjectManager.extendObject($.parseJSON(lvl.Data));
+		var oldTitle1 = $OurSonic_UIManager_UIManager.get_curLevelName();
+		$OurSonic_UIManager_UIManager.updateTitle('Downloading Object:' + name1);
+		$OurSonic_SonicEngine.instance.client.emit('GetObject', new (Type.makeGenericType(OurSonicModels.Common.DataObject$1, [String]))(name1));
+		$OurSonic_SonicEngine.instance.client.on('GetObject.Response', function(lvl) {
+			$OurSonic_UIManager_UIManager.updateTitle(oldTitle1);
+			var d1 = $OurSonic_Level_Objects_ObjectManager.extendObject($.parseJSON(lvl.Data));
 			uiManager.get_uiManagerAreas().objectFrameworkArea.populate(d1);
 			uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.visible = true;
 		});
@@ -8904,7 +8860,7 @@ OurSonic.UIManager.Areas.ObjectFrameworkListArea = function(uiManager) {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.PaletteArea
-OurSonic.UIManager.Areas.PaletteArea = function(x, y) {
+var $OurSonic_UIManager_Areas_PaletteArea = function(x, y) {
 	this.palette = null;
 	this.scale = null;
 	this.clickHandled = false;
@@ -8912,9 +8868,9 @@ OurSonic.UIManager.Areas.PaletteArea = function(x, y) {
 	this.wide = false;
 	this.selectedIndex = 0;
 	this.clicking = false;
-	OurSonic.UIManager.Panel.call(this, x, y, 0, 0);
+	$OurSonic_UIManager_Panel.call(this, x, y, 0, 0);
 };
-OurSonic.UIManager.Areas.PaletteArea.prototype = {
+$OurSonic_UIManager_Areas_PaletteArea.prototype = {
 	onClick: function(e) {
 		if (!this.visible) {
 			return false;
@@ -8929,7 +8885,7 @@ OurSonic.UIManager.Areas.PaletteArea.prototype = {
 		else {
 			this.selectedIndex = _y * 2 + _x;
 		}
-		return OurSonic.UIManager.Panel.prototype.onClick.call(this, e);
+		return $OurSonic_UIManager_Panel.prototype.onClick.call(this, e);
 	},
 	onMouseOver: function(e) {
 		if (this.clicking) {
@@ -8942,7 +8898,7 @@ OurSonic.UIManager.Areas.PaletteArea.prototype = {
 				this.selectedIndex = _y * 2 + _x;
 			}
 		}
-		return OurSonic.UIManager.Panel.prototype.onMouseOver.call(this, e);
+		return $OurSonic_UIManager_Panel.prototype.onMouseOver.call(this, e);
 	},
 	onMouseUp: function(e) {
 		if (!this.visible) {
@@ -8950,10 +8906,10 @@ OurSonic.UIManager.Areas.PaletteArea.prototype = {
 		}
 		this.clickHandled = false;
 		this.clicking = false;
-		return OurSonic.UIManager.Panel.prototype.onMouseUp.call(this, e);
+		return $OurSonic_UIManager_Panel.prototype.onMouseUp.call(this, e);
 	},
 	draw: function(canv) {
-		OurSonic.UIManager.Panel.prototype.draw.call(this, canv);
+		$OurSonic_UIManager_Panel.prototype.draw.call(this, canv);
 		if (!this.visible) {
 			return;
 		}
@@ -8963,7 +8919,7 @@ OurSonic.UIManager.Areas.PaletteArea.prototype = {
 		canv.save();
 		canv.strokeStyle = '#000';
 		canv.lineWidth = 1;
-		var pos = OurSonic.Utility.Point.$ctor1(this.get_totalX(), this.get_totalY());
+		var pos = $OurSonic_Utility_Point.$ctor1(this.get_totalX(), this.get_totalY());
 		var f = ss.Int32.div(this.palette.length, 2);
 		if (this.wide) {
 			for (var h = 0; h < 2; h++) {
@@ -8996,7 +8952,7 @@ OurSonic.UIManager.Areas.PaletteArea.prototype = {
 		canv.restore();
 	},
 	construct: function() {
-		OurSonic.UIManager.Panel.prototype.construct.call(this);
+		$OurSonic_UIManager_Panel.prototype.construct.call(this);
 	},
 	init: function(palette, wide) {
 		this.clicking = false;
@@ -9015,7 +8971,7 @@ OurSonic.UIManager.Areas.PaletteArea.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.PieceLayoutEditor
-OurSonic.UIManager.Areas.PieceLayoutEditor = function(x, y, size) {
+var $OurSonic_UIManager_Areas_PieceLayoutEditor = function(x, y, size) {
 	this.size = null;
 	this.showHurtMap = false;
 	this.showCollideMap = false;
@@ -9024,7 +8980,7 @@ OurSonic.UIManager.Areas.PieceLayoutEditor = function(x, y, size) {
 	this.pieceLayout = null;
 	this.lastPosition = null;
 	this.clickHandled = false;
-	OurSonic.UIManager.Element.call(this, x, y);
+	$OurSonic_UIManager_Element.call(this, x, y);
 	this.size = size;
 	this.showHurtMap = false;
 	this.showCollideMap = false;
@@ -9033,16 +8989,16 @@ OurSonic.UIManager.Areas.PieceLayoutEditor = function(x, y, size) {
 	this.clicking = false;
 	this.pieceLayoutMaker = null;
 };
-OurSonic.UIManager.Areas.PieceLayoutEditor.prototype = {
+$OurSonic_UIManager_Areas_PieceLayoutEditor.prototype = {
 	init: function(pieceLayout) {
 		this.pieceLayout = pieceLayout;
 		this.width = this.size.x;
 		this.height = this.size.y;
-		this.pieceLayoutMaker = new OurSonic.UIManager.Areas.PieceLayoutMaker(pieceLayout);
+		this.pieceLayoutMaker = new $OurSonic_UIManager_Areas_PieceLayoutMaker(pieceLayout);
 	},
 	onScroll: function(e) {
 		this.pieceLayoutMaker.offsetScale(e.delta > 0);
-		return OurSonic.UIManager.Element.prototype.onScroll.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onScroll.call(this, e);
 	},
 	onClick: function(e) {
 		if (!this.visible) {
@@ -9055,7 +9011,7 @@ OurSonic.UIManager.Areas.PieceLayoutEditor.prototype = {
 		this.clickHandled = false;
 		this.lastPosition = e;
 		this.pieceLayoutMaker.placeItem(e, null);
-		return OurSonic.UIManager.Element.prototype.onClick.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onClick.call(this, e);
 	},
 	onMouseUp: function(e) {
 		if (!this.visible) {
@@ -9065,7 +9021,7 @@ OurSonic.UIManager.Areas.PieceLayoutEditor.prototype = {
 		this.clickHandled = false;
 		this.clicking = false;
 		this.pieceLayoutMaker.mouseUp();
-		return OurSonic.UIManager.Element.prototype.onMouseUp.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseUp.call(this, e);
 	},
 	onMouseOver: function(e) {
 		if (ss.isNullOrUndefined(this.pieceLayoutMaker)) {
@@ -9074,9 +9030,9 @@ OurSonic.UIManager.Areas.PieceLayoutEditor.prototype = {
 		if (this.clicking) {
 			this.clickHandled = true;
 			this.pieceLayoutMaker.placeItem(e, this.lastPosition);
-			this.lastPosition = OurSonic.Utility.Point.$ctor1(e.x, e.y);
+			this.lastPosition = $OurSonic_Utility_Point.$ctor1(e.x, e.y);
 		}
-		return OurSonic.UIManager.Element.prototype.onMouseOver.call(this, e);
+		return $OurSonic_UIManager_Element.prototype.onMouseOver.call(this, e);
 	},
 	draw: function(canv) {
 		if (!this.visible) {
@@ -9085,14 +9041,14 @@ OurSonic.UIManager.Areas.PieceLayoutEditor.prototype = {
 		if (ss.isNullOrUndefined(this.pieceLayoutMaker)) {
 			return;
 		}
-		var pos = OurSonic.Utility.Point.$ctor1(this.get_totalX(), this.get_totalY());
+		var pos = $OurSonic_Utility_Point.$ctor1(this.get_totalX(), this.get_totalY());
 		this.pieceLayoutMaker.draw(canv, pos, this.size);
-		OurSonic.UIManager.Element.prototype.draw.call(this, canv);
+		$OurSonic_UIManager_Element.prototype.draw.call(this, canv);
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.PieceLayoutMaker
-OurSonic.UIManager.Areas.PieceLayoutMaker = function(pieceLayout) {
+var $OurSonic_UIManager_Areas_PieceLayoutMaker = function(pieceLayout) {
 	this.$largeScale = 1;
 	this.pieceLayout = null;
 	this.selectedPieceIndex = 0;
@@ -9109,9 +9065,9 @@ OurSonic.UIManager.Areas.PieceLayoutMaker = function(pieceLayout) {
 	this.showImages = false;
 	this.selectedPieceIndex = 0;
 	this.draggingIndex = -1;
-	this.zeroPosition = OurSonic.Utility.Point.$ctor1(0, 0);
+	this.zeroPosition = $OurSonic_Utility_Point.$ctor1(0, 0);
 };
-OurSonic.UIManager.Areas.PieceLayoutMaker.prototype = {
+$OurSonic_UIManager_Areas_PieceLayoutMaker.prototype = {
 	draw: function(canvas, pos, scale) {
 		this.pieceLayout.drawUI(canvas, pos, scale, this.showOutline, this.showImages, this.selectedPieceIndex, this.zeroPosition, this.$largeScale);
 	},
@@ -9129,9 +9085,9 @@ OurSonic.UIManager.Areas.PieceLayoutMaker.prototype = {
 		}
 		for (var i = 0; i < this.pieceLayout.pieces.length; i++) {
 			var j = this.pieceLayout.pieces[i];
-			var piece = OurSonic.SonicManager.instance.uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework.pieces[j.pieceIndex];
-			var asset = OurSonic.SonicManager.instance.uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework.assets[piece.assetIndex];
-			var size = OurSonic.Utility.Point.$ctor1(10, 10);
+			var piece = $OurSonic_SonicManager.instance.uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework.pieces[j.pieceIndex];
+			var asset = $OurSonic_SonicManager.instance.uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework.assets[piece.assetIndex];
+			var size = $OurSonic_Utility_Point.$ctor1(10, 10);
 			if (asset.frames.length > 0) {
 				var frm = asset.frames[0];
 				size.x = ss.Int32.div(frm.width, 2) + 10;
@@ -9145,13 +9101,13 @@ OurSonic.UIManager.Areas.PieceLayoutMaker.prototype = {
 				j.y = goodPosition.y - this.zeroPosition.y;
 				this.selectedPieceIndex = i;
 				this.draggingIndex = i;
-				var cj = OurSonic.SonicManager.instance.uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.mainPanel.data.selectPieceScroll.controls;
+				var cj = $OurSonic_SonicManager.instance.uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.mainPanel.data.selectPieceScroll.controls;
 				for (var ci = 0; ci < cj.length; ci++) {
 					if (ci === j.pieceIndex) {
-						Type.cast(cj[ci], OurSonic.UIManager.ImageButton).toggled = true;
+						Type.cast(cj[ci], $OurSonic_UIManager_ImageButton).toggled = true;
 					}
 					else {
-						Type.cast(cj[ci], OurSonic.UIManager.ImageButton).toggled = false;
+						Type.cast(cj[ci], $OurSonic_UIManager_ImageButton).toggled = false;
 					}
 				}
 				this.pieceLayout.update();
@@ -9172,44 +9128,44 @@ OurSonic.UIManager.Areas.PieceLayoutMaker.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.UIManager.Areas.TileChunkArea
-OurSonic.UIManager.Areas.TileChunkArea = function(uiManager) {
+var $OurSonic_UIManager_Areas_TileChunkArea = function(uiManager) {
 	this.$chunkPieceList = null;
 	this.$tilePieceList = null;
 	var $t2 = uiManager.get_uiManagerAreas();
-	var $t1 = new (Type.makeGenericType(OurSonic.UIManager.UIArea$1, [OurSonic.Level.Tiles.TileChunk]))(null, 700, 500, 390, 390);
+	var $t1 = new (Type.makeGenericType($OurSonic_UIManager_UIArea$1, [$OurSonic_Level_Tiles_TileChunk]))(null, 700, 500, 390, 390);
 	$t1.closable = true;
 	var tileChunkArea = $t2.tileChunkArea = $t1;
 	tileChunkArea.visible = true;
 	uiManager.addArea(tileChunkArea);
-	var $t3 = new OurSonic.UIManager.TextArea(30, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Tile Chunks'));
+	var $t3 = new $OurSonic_UIManager_TextArea(30, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Tile Chunks'));
 	$t3.color = 'blue';
-	tileChunkArea.addControl(OurSonic.UIManager.TextArea).call(tileChunkArea, $t3);
-	var $t4 = new OurSonic.UIManager.ScrollBox(30, 70, 80, 3, 64);
+	tileChunkArea.addControl($OurSonic_UIManager_TextArea).call(tileChunkArea, $t3);
+	var $t4 = new $OurSonic_UIManager_ScrollBox(30, 70, 80, 3, 64);
 	$t4.backColor = 'rgb(50,60,127)';
-	tileChunkArea.addControl(OurSonic.UIManager.ScrollBox).call(tileChunkArea, this.$chunkPieceList = $t4);
-	var tileChunks = OurSonic.SonicManager.instance.sonicLevel.chunks;
+	tileChunkArea.addControl($OurSonic_UIManager_ScrollBox).call(tileChunkArea, this.$chunkPieceList = $t4);
+	var tileChunks = $OurSonic_SonicManager.instance.sonicLevel.chunks;
 	for (var index = 0; index < tileChunks.length; index++) {
 		var tileChunk = { $: tileChunks[index] };
-		var chunkButton = { $: new (Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.Level.Tiles.TileChunk]))(tileChunk.$, 0, 0, 0, 0) };
+		var chunkButton = { $: new (Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_Level_Tiles_TileChunk]))(tileChunk.$, 0, 0, 0, 0) };
 		chunkButton.$.onDraw = Function.mkdel({ chunkButton: chunkButton }, function(cnv, x, y) {
-			this.chunkButton.$.data.drawUI(cnv, OurSonic.Utility.Point.$ctor1(x, y), OurSonic.Utility.DoublePoint.$ctor1(0.5, 0.5), 0);
-			this.chunkButton.$.data.drawUI(cnv, OurSonic.Utility.Point.$ctor1(x, y), OurSonic.Utility.DoublePoint.$ctor1(0.5, 0.5), 1);
+			this.chunkButton.$.data.drawUI(cnv, $OurSonic_Utility_Point.$ctor1(x, y), $OurSonic_Utility_DoublePoint.$ctor1(0.5, 0.5), 0);
+			this.chunkButton.$.data.drawUI(cnv, $OurSonic_Utility_Point.$ctor1(x, y), $OurSonic_Utility_DoublePoint.$ctor1(0.5, 0.5), 1);
 		});
-		chunkButton.$.font = OurSonic.UIManager.UIManager.smallTextFont;
+		chunkButton.$.font = $OurSonic_UIManager_UIManager.smallTextFont;
 		chunkButton.$.text = Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Chunk #' + index);
 		chunkButton.$.click = Function.mkdel({ tileChunk: tileChunk }, function(e) {
 			tileChunkArea.data = this.tileChunk.$;
 		});
-		this.$chunkPieceList.addControl(Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.Level.Tiles.TileChunk])).call(this.$chunkPieceList, chunkButton.$);
+		this.$chunkPieceList.addControl(Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_Level_Tiles_TileChunk])).call(this.$chunkPieceList, chunkButton.$);
 	}
-	var image = new OurSonic.UIManager.Image(125, 70, 256, 256);
+	var image = new $OurSonic_UIManager_Image(125, 70, 256, 256);
 	var areaDrawScale = 2;
 	image.onDraw = Function.combine(image.onDraw, function(context, x1, y1) {
 		if (ss.isNullOrUndefined(tileChunkArea.data)) {
 			return;
 		}
-		tileChunkArea.data.drawUI(context, OurSonic.Utility.Point.$ctor1(x1, y1), OurSonic.Utility.DoublePoint.op_Implicit(OurSonic.Utility.Point.$ctor1(areaDrawScale, areaDrawScale)), 0);
-		tileChunkArea.data.drawUI(context, OurSonic.Utility.Point.$ctor1(x1, y1), OurSonic.Utility.DoublePoint.op_Implicit(OurSonic.Utility.Point.$ctor1(areaDrawScale, areaDrawScale)), 1);
+		tileChunkArea.data.drawUI(context, $OurSonic_Utility_Point.$ctor1(x1, y1), $OurSonic_Utility_DoublePoint.op_Implicit($OurSonic_Utility_Point.$ctor1(areaDrawScale, areaDrawScale)), 0);
+		tileChunkArea.data.drawUI(context, $OurSonic_Utility_Point.$ctor1(x1, y1), $OurSonic_Utility_DoublePoint.op_Implicit($OurSonic_Utility_Point.$ctor1(areaDrawScale, areaDrawScale)), 1);
 	});
 	image.click = Function.combine(image.click, Function.mkdel(this, function(e1) {
 		if (ss.isNullOrUndefined(tileChunkArea.data)) {
@@ -9220,7 +9176,7 @@ OurSonic.UIManager.Areas.TileChunkArea = function(uiManager) {
 		uiManager.get_uiManagerAreas().tilePieceArea.data = tilePiece;
 		this.$tilePieceList.scrollIndex = Math.max(uiManager.sonicManager.sonicLevel.tilePieces.indexOf(tilePiece) - 1, 0);
 	}));
-	tileChunkArea.addControl(OurSonic.UIManager.Image).call(tileChunkArea, image);
+	tileChunkArea.addControl($OurSonic_UIManager_Image).call(tileChunkArea, image);
 	this.$buildTilePiece(uiManager);
 	//
 	//                        var table=tileChunkArea.AddControl(new Table(10, 40, 350, 280));
@@ -9253,19 +9209,19 @@ OurSonic.UIManager.Areas.TileChunkArea = function(uiManager) {
 	//
 	//                        cell.AddControl(new Button(0, 50, 100, 50, "Text2"));
 };
-OurSonic.UIManager.Areas.TileChunkArea.prototype = {
+$OurSonic_UIManager_Areas_TileChunkArea.prototype = {
 	$buildTilePiece: function(uiManager) {
 		var $t2 = uiManager.get_uiManagerAreas();
-		var $t1 = new (Type.makeGenericType(OurSonic.UIManager.UIArea$1, [OurSonic.Level.Tiles.TilePiece]))(null, 1100, 400, 390, 390);
+		var $t1 = new (Type.makeGenericType($OurSonic_UIManager_UIArea$1, [$OurSonic_Level_Tiles_TilePiece]))(null, 1100, 400, 390, 390);
 		$t1.closable = true;
 		var tilePieceArea = $t2.tilePieceArea = $t1;
 		tilePieceArea.visible = false;
 		uiManager.addArea(tilePieceArea);
-		var $t3 = new OurSonic.UIManager.TextArea(30, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Tile Pieces'));
+		var $t3 = new $OurSonic_UIManager_TextArea(30, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Tile Pieces'));
 		$t3.color = 'blue';
-		tilePieceArea.addControl(OurSonic.UIManager.TextArea).call(tilePieceArea, $t3);
+		tilePieceArea.addControl($OurSonic_UIManager_TextArea).call(tilePieceArea, $t3);
 		var showHeightMap = false;
-		var $t4 = new OurSonic.UIManager.Button(100, 50, 50, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(function() {
+		var $t4 = new $OurSonic_UIManager_Button(100, 50, 50, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(function() {
 			return (showHeightMap ? 'Hide Height Map' : 'Show Height Map');
 		}));
 		$t4.click = function(e) {
@@ -9274,41 +9230,41 @@ OurSonic.UIManager.Areas.TileChunkArea.prototype = {
 			}
 			showHeightMap = !showHeightMap;
 		};
-		tilePieceArea.addControl(OurSonic.UIManager.Button).call(tilePieceArea, $t4);
-		var $t5 = new OurSonic.UIManager.ScrollBox(10, 35, 80, 4, 64);
+		tilePieceArea.addControl($OurSonic_UIManager_Button).call(tilePieceArea, $t4);
+		var $t5 = new $OurSonic_UIManager_ScrollBox(10, 35, 80, 4, 64);
 		$t5.backColor = 'rgb(50,60,127)';
 		this.$tilePieceList = $t5;
-		tilePieceArea.addControl(OurSonic.UIManager.ScrollBox).call(tilePieceArea, this.$tilePieceList);
-		var tilePieces = OurSonic.SonicManager.instance.sonicLevel.tilePieces;
+		tilePieceArea.addControl($OurSonic_UIManager_ScrollBox).call(tilePieceArea, this.$tilePieceList);
+		var tilePieces = $OurSonic_SonicManager.instance.sonicLevel.tilePieces;
 		for (var index = 0; index < tilePieces.length; index++) {
 			var tilePiece = { $: tilePieces[index] };
-			var tilePieceButton = { $: new (Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.Level.Tiles.TilePiece]))(tilePiece.$, 0, 0, 0, 0) };
+			var tilePieceButton = { $: new (Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_Level_Tiles_TilePiece]))(tilePiece.$, 0, 0, 0, 0) };
 			tilePieceButton.$.onDraw = Function.mkdel({ tilePieceButton: tilePieceButton, tilePiece: tilePiece }, function(cnv, x, y) {
 				cnv.save();
 				cnv.translate(x, y);
 				cnv.scale(4, 4);
-				this.tilePieceButton.$.data.draw(cnv, OurSonic.Utility.Point.$ctor1(0, 0), 0, false, false, 0);
-				this.tilePieceButton.$.data.draw(cnv, OurSonic.Utility.Point.$ctor1(0, 0), 1, false, false, 0);
+				this.tilePieceButton.$.data.draw(cnv, $OurSonic_Utility_Point.$ctor1(0, 0), 0, false, false, 0);
+				this.tilePieceButton.$.data.draw(cnv, $OurSonic_Utility_Point.$ctor1(0, 0), 1, false, false, 0);
 				if (showHeightMap) {
 					var hmap;
-					if (OurSonic.SonicManager.instance.sonicLevel.curHeightMap) {
+					if ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap) {
 						hmap = this.tilePiece.$.getLayer1HeightMaps();
 					}
 					else {
 						hmap = this.tilePiece.$.getLayer2HeightMaps();
 					}
-					hmap.draw(cnv, OurSonic.Utility.Point.$ctor1(0, 0), false, false, 1, 0);
+					hmap.draw(cnv, $OurSonic_Utility_Point.$ctor1(0, 0), false, false, 1, 0);
 				}
 				cnv.restore();
 			});
-			tilePieceButton.$.font = OurSonic.UIManager.UIManager.smallTextFont;
+			tilePieceButton.$.font = $OurSonic_UIManager_UIManager.smallTextFont;
 			tilePieceButton.$.text = Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Tile Piece #' + index);
 			tilePieceButton.$.click = Function.mkdel({ tilePiece: tilePiece }, function(e1) {
 				tilePieceArea.data = this.tilePiece.$;
 			});
-			this.$tilePieceList.addControl(Type.makeGenericType(OurSonic.UIManager.ImageButton$1, [OurSonic.Level.Tiles.TilePiece])).call(this.$tilePieceList, tilePieceButton.$);
+			this.$tilePieceList.addControl(Type.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_Level_Tiles_TilePiece])).call(this.$tilePieceList, tilePieceButton.$);
 		}
-		var image = new OurSonic.UIManager.Image(105, 120, 256, 256);
+		var image = new $OurSonic_UIManager_Image(105, 120, 256, 256);
 		image.onDraw = Function.combine(image.onDraw, function(context, x1, y1) {
 			if (ss.isNullOrUndefined(tilePieceArea.data)) {
 				return;
@@ -9316,29 +9272,28 @@ OurSonic.UIManager.Areas.TileChunkArea.prototype = {
 			context.save();
 			context.translate(x1, y1);
 			context.scale(16, 16);
-			tilePieceArea.data.draw(context, OurSonic.Utility.Point.$ctor1(0, 0), 0, false, false, 0);
-			tilePieceArea.data.draw(context, OurSonic.Utility.Point.$ctor1(0, 0), 1, false, false, 0);
+			tilePieceArea.data.draw(context, $OurSonic_Utility_Point.$ctor1(0, 0), 0, false, false, 0);
+			tilePieceArea.data.draw(context, $OurSonic_Utility_Point.$ctor1(0, 0), 1, false, false, 0);
 			context.restore();
 		});
-		tilePieceArea.addControl(OurSonic.UIManager.Image).call(tilePieceArea, image);
+		tilePieceArea.addControl($OurSonic_UIManager_Image).call(tilePieceArea, image);
 	}
 };
-Type.registerNamespace('OurSonic.Utility');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.CanvasHandler
-OurSonic.Utility.CanvasHandler = function(canvas) {
+var $OurSonic_Utility_CanvasHandler = function(canvas) {
 	this.$myCanvas = null;
 	this.$myCanvas = canvas;
 	canvas.save();
 };
-OurSonic.Utility.CanvasHandler.prototype = {
+$OurSonic_Utility_CanvasHandler.prototype = {
 	dispose: function() {
 		this.$myCanvas.restore();
 	}
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.CanvasInformation
-OurSonic.Utility.CanvasInformation = function(context, domCanvas) {
+var $OurSonic_Utility_CanvasInformation = function(context, domCanvas) {
 	this.context = null;
 	this.domCanvas = null;
 	this.canvas = null;
@@ -9346,11 +9301,11 @@ OurSonic.Utility.CanvasInformation = function(context, domCanvas) {
 	this.domCanvas = domCanvas;
 	this.canvas = domCanvas[0];
 };
-OurSonic.Utility.CanvasInformation.create = function(w, h) {
+$OurSonic_Utility_CanvasInformation.create = function(w, h) {
 	var canvas = document.createElement('canvas');
-	return OurSonic.Utility.CanvasInformation.create$1(canvas, w, h);
+	return $OurSonic_Utility_CanvasInformation.create$1(canvas, w, h);
 };
-OurSonic.Utility.CanvasInformation.create$1 = function(canvas, w, h) {
+$OurSonic_Utility_CanvasInformation.create$1 = function(canvas, w, h) {
 	if (w === 0) {
 		w = 1;
 	}
@@ -9363,59 +9318,59 @@ OurSonic.Utility.CanvasInformation.create$1 = function(canvas, w, h) {
 	ctx.webkitImageSmoothingEnabled = false;
 	ctx.mozImageSmoothingEnabled = false;
 	ctx.imageSmoothingEnabled = false;
-	return new OurSonic.Utility.CanvasInformation(ctx, $(canvas));
+	return new $OurSonic_Utility_CanvasInformation(ctx, $(canvas));
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.ClickState
-OurSonic.Utility.ClickState = function() {
+var $OurSonic_Utility_ClickState = function() {
 };
-OurSonic.Utility.ClickState.prototype = { dragging: 0, placeChunk: 1, placeRing: 2, placeObject: 3 };
-OurSonic.Utility.ClickState.registerEnum('OurSonic.Utility.ClickState', false);
+$OurSonic_Utility_ClickState.prototype = { dragging: 0, placeChunk: 1, placeRing: 2, placeObject: 3 };
+Type.registerEnum(global, 'OurSonic.Utility.ClickState', $OurSonic_Utility_ClickState, false);
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.Color
-OurSonic.Utility.Color = function() {
+var $OurSonic_Utility_Color = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.Constants
-OurSonic.Utility.Constants = function() {
+var $OurSonic_Utility_Constants = function() {
 };
-OurSonic.Utility.Constants.defaultWindowLocation = function(state, canvas, scale) {
+$OurSonic_Utility_Constants.defaultWindowLocation = function(state, canvas, scale) {
 	switch (state) {
 		case 0: {
-			return new OurSonic.Utility.IntersectingRectangle(0, 0, 320, 224);
+			return new $OurSonic_Utility_IntersectingRectangle(0, 0, 320, 224);
 		}
 		case 1: {
 			var x = 0;
 			var y = 0;
-			if (OurSonic.SonicManager.instance.sonicLevel && OurSonic.SonicManager.instance.sonicLevel.startPositions && OurSonic.SonicManager.instance.sonicLevel.startPositions[0]) {
-				x = OurSonic.SonicManager.instance.sonicLevel.startPositions[0].x - 128 * scale.x;
-				y = OurSonic.SonicManager.instance.sonicLevel.startPositions[0].y - 128 * scale.y;
+			if ($OurSonic_SonicManager.instance.sonicLevel && $OurSonic_SonicManager.instance.sonicLevel.startPositions && $OurSonic_SonicManager.instance.sonicLevel.startPositions[0]) {
+				x = $OurSonic_SonicManager.instance.sonicLevel.startPositions[0].x - 128 * scale.x;
+				y = $OurSonic_SonicManager.instance.sonicLevel.startPositions[0].y - 128 * scale.y;
 			}
-			return new OurSonic.Utility.IntersectingRectangle(x, y, canvas.domCanvas.width(), canvas.domCanvas.height());
+			return new $OurSonic_Utility_IntersectingRectangle(x, y, canvas.domCanvas.width(), canvas.domCanvas.height());
 		}
 	}
 	return null;
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.DoublePoint
-OurSonic.Utility.DoublePoint = function() {
+var $OurSonic_Utility_DoublePoint = function() {
 };
-OurSonic.Utility.DoublePoint.offset = function($this, windowLocation) {
-	return OurSonic.Utility.DoublePoint.$ctor1($this.x + windowLocation.x, $this.y + windowLocation.y);
+$OurSonic_Utility_DoublePoint.offset = function($this, windowLocation) {
+	return $OurSonic_Utility_DoublePoint.$ctor1($this.x + windowLocation.x, $this.y + windowLocation.y);
 };
-OurSonic.Utility.DoublePoint.negate = function($this, windowLocation) {
-	return OurSonic.Utility.DoublePoint.$ctor1($this.x - windowLocation.x, $this.y - windowLocation.y);
+$OurSonic_Utility_DoublePoint.negate = function($this, windowLocation) {
+	return $OurSonic_Utility_DoublePoint.$ctor1($this.x - windowLocation.x, $this.y - windowLocation.y);
 };
-OurSonic.Utility.DoublePoint.negate$1 = function($this, x, y) {
-	return OurSonic.Utility.DoublePoint.$ctor1($this.x - x, $this.y - y);
+$OurSonic_Utility_DoublePoint.negate$1 = function($this, x, y) {
+	return $OurSonic_Utility_DoublePoint.$ctor1($this.x - x, $this.y - y);
 };
-OurSonic.Utility.DoublePoint.op_Implicit = function(p) {
-	return OurSonic.Utility.DoublePoint.$ctor1(p.x, p.y);
+$OurSonic_Utility_DoublePoint.op_Implicit = function(p) {
+	return $OurSonic_Utility_DoublePoint.$ctor1(p.x, p.y);
 };
-OurSonic.Utility.DoublePoint.string = function($this) {
+$OurSonic_Utility_DoublePoint.string = function($this) {
 	return String.format('{{X:{0}, Y:{1}}}', $this.x, $this.y);
 };
-OurSonic.Utility.DoublePoint.$ctor1 = function(x, y) {
+$OurSonic_Utility_DoublePoint.$ctor1 = function(x, y) {
 	var $this = {};
 	$this.x = 0;
 	$this.y = 0;
@@ -9423,7 +9378,7 @@ OurSonic.Utility.DoublePoint.$ctor1 = function(x, y) {
 	$this.y = y;
 	return $this;
 };
-OurSonic.Utility.DoublePoint.$ctor = function(pos) {
+$OurSonic_Utility_DoublePoint.$ctor = function(pos) {
 	var $this = {};
 	$this.x = 0;
 	$this.y = 0;
@@ -9433,7 +9388,7 @@ OurSonic.Utility.DoublePoint.$ctor = function(pos) {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.Dragger
-OurSonic.Utility.Dragger = function(onFling) {
+var $OurSonic_Utility_Dragger = function(onFling) {
 	this.$myOnFling = null;
 	this.$lag = 0.925000011920929;
 	this.$lastPos = null;
@@ -9441,9 +9396,9 @@ OurSonic.Utility.Dragger = function(onFling) {
 	this.$ysp = 0;
 	this.$myOnFling = onFling;
 };
-OurSonic.Utility.Dragger.prototype = {
+$OurSonic_Utility_Dragger.prototype = {
 	click: function(cell) {
-		this.$lastPos = OurSonic.Utility.Point.$ctor1(cell.x, cell.y);
+		this.$lastPos = $OurSonic_Utility_Point.$ctor1(cell.x, cell.y);
 	},
 	isDragging: function(cell) {
 		return this.$lastPos;
@@ -9459,7 +9414,7 @@ OurSonic.Utility.Dragger.prototype = {
 		this.$ysp += (this.$lastPos.y - cell.y) * 2.70000004768372;
 		this.$xsp = ((this.$xsp > 0) ? 1 : -1) * Math.min(Math.abs(this.$xsp), 60);
 		this.$ysp = ((this.$ysp > 0) ? 1 : -1) * Math.min(Math.abs(this.$ysp), 60);
-		this.$lastPos = OurSonic.Utility.Point.$ctor1(cell.x, cell.y);
+		this.$lastPos = $OurSonic_Utility_Point.$ctor1(cell.x, cell.y);
 	},
 	tick: function() {
 		if (this.$xsp === 0 && this.$ysp === 0) {
@@ -9488,22 +9443,22 @@ OurSonic.Utility.Dragger.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.Extensions
-OurSonic.Utility.Extensions = function() {
+var $OurSonic_Utility_Extensions = function() {
 };
-OurSonic.Utility.Extensions.withData = function(T, T2) {
+$OurSonic_Utility_Extensions.withData = function(T, T2) {
 	return function(item, data) {
-		return new (Type.makeGenericType(OurSonic.Utility.ExtraData$2, [T, T2]))(item, data);
+		return new (Type.makeGenericType($OurSonic_Utility_ExtraData$2, [T, T2]))(item, data);
 	};
 };
-OurSonic.Utility.Extensions.percent$1 = function(num) {
+$OurSonic_Utility_Extensions.percent$1 = function(num) {
 	return num + '%';
 };
-OurSonic.Utility.Extensions.percent = function(num) {
+$OurSonic_Utility_Extensions.percent = function(num) {
 	return num + '%';
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.ExtraData
-OurSonic.Utility.ExtraData$2 = function(T, T2) {
+var $OurSonic_Utility_ExtraData$2 = function(T, T2) {
 	var $type = function(item, data) {
 		this.item = T.getDefaultValue();
 		this.data = T2.getDefaultValue();
@@ -9516,58 +9471,58 @@ OurSonic.Utility.ExtraData$2 = function(T, T2) {
 	$type.op_Implicit$1 = function(d) {
 		return d.data;
 	};
-	$type.registerGenericClassInstance($type, OurSonic.Utility.ExtraData$2, [T, T2], function() {
+	Type.registerGenericClassInstance($type, $OurSonic_Utility_ExtraData$2, [T, T2], function() {
 		return Object;
 	}, function() {
 		return [];
 	});
 	return $type;
 };
-OurSonic.Utility.ExtraData$2.registerGenericClass('OurSonic.Utility.ExtraData$2', 2);
+Type.registerGenericClass(global, 'OurSonic.Utility.ExtraData$2', $OurSonic_Utility_ExtraData$2, 2);
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.GameState
-OurSonic.Utility.GameState = function() {
+var $OurSonic_Utility_GameState = function() {
 };
-OurSonic.Utility.GameState.prototype = { playing: 0, editing: 1 };
-OurSonic.Utility.GameState.registerEnum('OurSonic.Utility.GameState', false);
+$OurSonic_Utility_GameState.prototype = { playing: 0, editing: 1 };
+Type.registerEnum(global, 'OurSonic.Utility.GameState', $OurSonic_Utility_GameState, false);
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.Help
-OurSonic.Utility.Help = function() {
+var $OurSonic_Utility_Help = function() {
 };
-OurSonic.Utility.Help.toPx$1 = function(number) {
+$OurSonic_Utility_Help.toPx$1 = function(number) {
 	return number + 'px';
 };
-OurSonic.Utility.Help.toPx = function(number) {
+$OurSonic_Utility_Help.toPx = function(number) {
 	return number + 'px';
 };
-OurSonic.Utility.Help.sin = function(f) {
-	return OurSonic.Utility.Help.cos_table[f + 64 & 255];
+$OurSonic_Utility_Help.sin = function(f) {
+	return $OurSonic_Utility_Help.cos_table[f + 64 & 255];
 };
-OurSonic.Utility.Help.cos = function(f) {
-	return OurSonic.Utility.Help.cos_table[f & 255];
+$OurSonic_Utility_Help.cos = function(f) {
+	return $OurSonic_Utility_Help.cos_table[f & 255];
 };
-OurSonic.Utility.Help.mod = function(j, n) {
+$OurSonic_Utility_Help.mod = function(j, n) {
 	return (j % n + n) % n;
 };
-OurSonic.Utility.Help.scaleSprite = function(image, scale) {
-	var canv = OurSonic.Utility.CanvasInformation.create(image.width * scale.x, image.height * scale.y);
+$OurSonic_Utility_Help.scaleSprite = function(image, scale) {
+	var canv = $OurSonic_Utility_CanvasInformation.create(image.width * scale.x, image.height * scale.y);
 	canv.context.save();
 	canv.context.scale(scale.x, scale.y);
 	canv.context.drawImage(image, 0, 0);
 	canv.context.restore();
 	return canv;
 };
-OurSonic.Utility.Help.scalePixelData = function(scale, data) {
+$OurSonic_Utility_Help.scalePixelData = function(scale, data) {
 	var pixelArray = data.data;
 	var colors = new Array(ss.Int32.div(pixelArray.length, 4));
 	for (var f = 0; f < pixelArray.length; f += 4) {
-		colors[ss.Int32.div(f, 4)] = OurSonic.Utility.Help.$colorObjectFromData(pixelArray, f);
+		colors[ss.Int32.div(f, 4)] = $OurSonic_Utility_Help.$colorObjectFromData(pixelArray, f);
 	}
-	var d = OurSonic.Utility.CanvasInformation.create(1, 1).context.createImageData(data.width * scale.x, data.height * scale.y);
-	OurSonic.Utility.Help.$setDataFromColors(d.data, colors, scale, data.width, colors[0]);
+	var d = $OurSonic_Utility_CanvasInformation.create(1, 1).context.createImageData(data.width * scale.x, data.height * scale.y);
+	$OurSonic_Utility_Help.$setDataFromColors(d.data, colors, scale, data.width, colors[0]);
 	return d;
 };
-OurSonic.Utility.Help.$setDataFromColors = function(data, colors, scale, width, transparent) {
+$OurSonic_Utility_Help.$setDataFromColors = function(data, colors, scale, width, transparent) {
 	for (var i = 0; i < colors.length; i++) {
 		var curX = i % width;
 		var curY = ss.Int32.div(i, width);
@@ -9598,7 +9553,7 @@ OurSonic.Utility.Help.$setDataFromColors = function(data, colors, scale, width, 
 		}
 	}
 };
-OurSonic.Utility.Help.$getBase64Image = function(data) {
+$OurSonic_Utility_Help.$getBase64Image = function(data) {
 	// Create an empty canvas element
 	var canvas = document.createElement('canvas');
 	canvas.width = data.width;
@@ -9609,14 +9564,14 @@ OurSonic.Utility.Help.$getBase64Image = function(data) {
 	var dataURL = canvas.toDataURL('image/png');
 	return Type.cast(dataURL, String);
 };
-OurSonic.Utility.Help.$colorObjectFromData = function(data, c) {
+$OurSonic_Utility_Help.$colorObjectFromData = function(data, c) {
 	var r = ss.Nullable.unbox(Type.cast(data[c], ss.Int32));
 	var g = ss.Nullable.unbox(Type.cast(data[c + 1], ss.Int32));
 	var b = ss.Nullable.unbox(Type.cast(data[c + 2], ss.Int32));
 	var a = ss.Nullable.unbox(Type.cast(data[c + 3], ss.Int32));
 	return { r: r, g: g, b: b, a: a };
 };
-OurSonic.Utility.Help.getImageData = function(image) {
+$OurSonic_Utility_Help.getImageData = function(image) {
 	var canvas = document.createElement('canvas');
 	canvas.width = image.width;
 	canvas.height = image.height;
@@ -9625,28 +9580,28 @@ OurSonic.Utility.Help.getImageData = function(image) {
 	var data = ctx.getImageData(0, 0, image.width, image.height);
 	return data;
 };
-OurSonic.Utility.Help.scaleCsImage = function(image, scale, complete) {
+$OurSonic_Utility_Help.scaleCsImage = function(image, scale, complete) {
 	var df = image.bytes;
 	var colors = new Array(df.length);
 	for (var f = 0; f < df.length; f++) {
 		var c = image.palette[df[f]];
 		colors[f] = { r: c[0], g: c[1], b: c[2], a: c[3] };
 	}
-	var dc = OurSonic.Utility.CanvasInformation.create(1, 1);
+	var dc = $OurSonic_Utility_CanvasInformation.create(1, 1);
 	var d = dc.context.createImageData(image.width * scale.x, image.height * scale.y);
-	OurSonic.Utility.Help.$setDataFromColors(d.data, colors, scale, image.width, colors[0]);
-	return OurSonic.Utility.Help.loadSprite(OurSonic.Utility.Help.$getBase64Image(d), complete);
+	$OurSonic_Utility_Help.$setDataFromColors(d.data, colors, scale, image.width, colors[0]);
+	return $OurSonic_Utility_Help.loadSprite($OurSonic_Utility_Help.$getBase64Image(d), complete);
 };
-OurSonic.Utility.Help.loaded = function(element) {
+$OurSonic_Utility_Help.loaded = function(element) {
 	return element.getAttribute('loaded') === 'true';
 };
-OurSonic.Utility.Help.loaded$1 = function(element, set) {
+$OurSonic_Utility_Help.loaded$1 = function(element, set) {
 	element.setAttribute('loaded', (set ? 'true' : 'false'));
 };
-OurSonic.Utility.Help.loadSprite = function(src, complete) {
+$OurSonic_Utility_Help.loadSprite = function(src, complete) {
 	var sprite1 = new Image();
 	sprite1.addEventListener('load', function(e) {
-		OurSonic.Utility.Help.loaded$1(sprite1, true);
+		$OurSonic_Utility_Help.loaded$1(sprite1, true);
 		if (complete) {
 			complete(sprite1);
 		}
@@ -9654,10 +9609,10 @@ OurSonic.Utility.Help.loadSprite = function(src, complete) {
 	sprite1.src = src;
 	return sprite1;
 };
-OurSonic.Utility.Help.decodeString = function(lvl) {
+$OurSonic_Utility_Help.decodeString = function(lvl) {
 	return (new Compressor()).DecompressText(lvl);
 };
-OurSonic.Utility.Help.decodeString$1 = function(T) {
+$OurSonic_Utility_Help.decodeString$1 = function(T) {
 	return function(lvl, complete) {
 		if (hasWebWorker()) {
 			(new FunctionWorker('lib/FunctionWorker.js')).threadedFunction(function(e) {
@@ -9674,39 +9629,39 @@ OurSonic.Utility.Help.decodeString$1 = function(T) {
 		}
 	};
 };
-OurSonic.Utility.Help.fixAngle = function(angle) {
+$OurSonic_Utility_Help.fixAngle = function(angle) {
 	var fixedAng = ss.Int32.trunc(Math.floor((256 - angle) * 1.4062)) % 360;
 	var flop = 360 - fixedAng;
-	return OurSonic.Utility.Help.degToRad(flop);
+	return $OurSonic_Utility_Help.degToRad(flop);
 };
-OurSonic.Utility.Help.degToRad = function(angle) {
+$OurSonic_Utility_Help.degToRad = function(angle) {
 	return angle * Math.PI / 180;
 };
-OurSonic.Utility.Help.sign = function(m) {
+$OurSonic_Utility_Help.sign = function(m) {
 	return ((m === 0) ? 0 : ((m < 0) ? -1 : 1));
 };
-OurSonic.Utility.Help.floor = function(spinDashSpeed) {
+$OurSonic_Utility_Help.floor = function(spinDashSpeed) {
 	if (spinDashSpeed > 0) {
 		return ss.Nullable.unbox(Type.cast(~~spinDashSpeed, ss.Int32));
 	}
 	return ss.Int32.trunc(Math.floor(spinDashSpeed));
 };
-OurSonic.Utility.Help.max = function(f1, f2) {
+$OurSonic_Utility_Help.max = function(f1, f2) {
 	return ((f1 < f2) ? f2 : f1);
 };
-OurSonic.Utility.Help.min = function(f1, f2) {
+$OurSonic_Utility_Help.min = function(f1, f2) {
 	return ((f1 > f2) ? f2 : f1);
 };
-OurSonic.Utility.Help.clone = function(o) {
+$OurSonic_Utility_Help.clone = function(o) {
 	return T.getDefaultValue();
 };
-OurSonic.Utility.Help.mergeRect = function(main, small) {
+$OurSonic_Utility_Help.mergeRect = function(main, small) {
 	main.x = Math.min(small.x, main.x);
 	main.width = Math.max(small.x + small.width + main.x, main.width);
 	main.y = Math.min(small.y, main.y);
 	main.height = Math.max(small.y + small.height + main.y, main.height);
 };
-OurSonic.Utility.Help.roundRect = function(ctx, x, y, width, height, radius, fill, stroke) {
+$OurSonic_Utility_Help.roundRect = function(ctx, x, y, width, height, radius, fill, stroke) {
 	ctx.save();
 	ctx.lineWidth = 3;
 	ctx.beginPath();
@@ -9728,17 +9683,17 @@ OurSonic.Utility.Help.roundRect = function(ctx, x, y, width, height, radius, fil
 	}
 	ctx.restore();
 };
-OurSonic.Utility.Help.getCursorPosition = function(ev) {
+$OurSonic_Utility_Help.getCursorPosition = function(ev) {
 	if (!!(ev.targetTouches && ev.targetTouches.length > 0)) {
 		ev = ev.targetTouches[0];
 	}
 	if (!!(ss.isValue(ev.pageX) && ss.isValue(ev.pageY))) {
-		return OurSonic.UIManager.Pointer.$ctor(ev.pageX, ev.pageY, 0, ev.which === 3);
+		return $OurSonic_UIManager_Pointer.$ctor(ev.pageX, ev.pageY, 0, ev.which === 3);
 	}
 	//if (ev.x != null && ev.y != null) return new { x: ev.x, y: ev.y };
-	return OurSonic.UIManager.Pointer.$ctor(ev.clientX, ev.clientY, 0, ev.which === 3);
+	return $OurSonic_UIManager_Pointer.$ctor(ev.clientX, ev.clientY, 0, ev.which === 3);
 };
-OurSonic.Utility.Help.stringify = function(obj) {
+$OurSonic_Utility_Help.stringify = function(obj) {
 	return JSON.stringify(obj, function(key, value) {
 		if (key === 'image') {
 			return null;
@@ -9767,14 +9722,14 @@ OurSonic.Utility.Help.stringify = function(obj) {
 	});
 	//.replaceAll("false", "0").replaceAll("true", "1");
 };
-OurSonic.Utility.Help.safeResize = function(block, width, height) {
-	var m = OurSonic.Utility.CanvasInformation.create(width, height);
+$OurSonic_Utility_Help.safeResize = function(block, width, height) {
+	var m = $OurSonic_Utility_CanvasInformation.create(width, height);
 	//var img=block.Context.GetImageData(0, 0, block.Canvas.Width, block.Canvas.Height);
 	//m.Context.PutImageData(img, 0, 0);
 	m.context.drawImage(block.canvas, 0, 0);
 	return m;
 };
-OurSonic.Utility.Help.getQueryString = function() {
+$OurSonic_Utility_Help.getQueryString = function() {
 	var result = {};
 	var queryString = window.location.search.substring(1);
 	var re = new RegExp('/([^&=]+)=([^&]*)/g');
@@ -9786,7 +9741,7 @@ OurSonic.Utility.Help.getQueryString = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.IntersectingRectangle
-OurSonic.Utility.IntersectingRectangle = function(x, y, width, height) {
+var $OurSonic_Utility_IntersectingRectangle = function(x, y, width, height) {
 	this.x = 0;
 	this.y = 0;
 	this.width = 0;
@@ -9796,35 +9751,35 @@ OurSonic.Utility.IntersectingRectangle = function(x, y, width, height) {
 	this.width = width;
 	this.height = height;
 };
-OurSonic.Utility.IntersectingRectangle.prototype = {
+$OurSonic_Utility_IntersectingRectangle.prototype = {
 	intersects: function(p) {
 		return this.x < p.x && this.x + this.width > p.x && this.y < p.y && this.y + this.height > p.y;
 	}
 };
-OurSonic.Utility.IntersectingRectangle.intersectsRect = function(r, p) {
+$OurSonic_Utility_IntersectingRectangle.intersectsRect = function(r, p) {
 	return r.x < p.x && r.x + r.width > p.x && r.y < p.y && r.y + r.height > p.y;
 };
-OurSonic.Utility.IntersectingRectangle.intersectRect = function(r1, r2) {
+$OurSonic_Utility_IntersectingRectangle.intersectRect = function(r1, r2) {
 	return !(r2.x > r1.x + r1.width || r2.x + 0 < r1.x || r2.y > r1.y + r1.height || r2.y + 0 < r1.y);
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.Point
-OurSonic.Utility.Point = function() {
+var $OurSonic_Utility_Point = function() {
 };
-OurSonic.Utility.Point.offset = function($this, windowLocation) {
-	return OurSonic.Utility.Point.$ctor1($this.x + windowLocation.x, $this.y + windowLocation.y);
+$OurSonic_Utility_Point.offset = function($this, windowLocation) {
+	return $OurSonic_Utility_Point.$ctor1($this.x + windowLocation.x, $this.y + windowLocation.y);
 };
-OurSonic.Utility.Point.negate = function($this, windowLocation) {
-	return OurSonic.Utility.Point.$ctor1($this.x - windowLocation.x, $this.y - windowLocation.y);
+$OurSonic_Utility_Point.negate = function($this, windowLocation) {
+	return $OurSonic_Utility_Point.$ctor1($this.x - windowLocation.x, $this.y - windowLocation.y);
 };
-OurSonic.Utility.Point.negate$1 = function($this, x, y) {
-	return OurSonic.Utility.Point.$ctor1($this.x - x, $this.y - y);
+$OurSonic_Utility_Point.negate$1 = function($this, x, y) {
+	return $OurSonic_Utility_Point.$ctor1($this.x - x, $this.y - y);
 };
-OurSonic.Utility.Point.set = function($this, x, y) {
+$OurSonic_Utility_Point.set = function($this, x, y) {
 	$this.x = x;
 	$this.y = y;
 };
-OurSonic.Utility.Point.$ctor1 = function(x, y) {
+$OurSonic_Utility_Point.$ctor1 = function(x, y) {
 	var $this = {};
 	$this.x = 0;
 	$this.y = 0;
@@ -9832,7 +9787,7 @@ OurSonic.Utility.Point.$ctor1 = function(x, y) {
 	$this.y = y;
 	return $this;
 };
-OurSonic.Utility.Point.$ctor = function(pos) {
+$OurSonic_Utility_Point.$ctor = function(pos) {
 	var $this = {};
 	$this.x = 0;
 	$this.y = 0;
@@ -9842,19 +9797,19 @@ OurSonic.Utility.Point.$ctor = function(pos) {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.Rectangle
-OurSonic.Utility.Rectangle = function() {
+var $OurSonic_Utility_Rectangle = function() {
 };
-OurSonic.Utility.Rectangle.createInstance = function() {
-	return OurSonic.Utility.Rectangle.$ctor();
+$OurSonic_Utility_Rectangle.createInstance = function() {
+	return $OurSonic_Utility_Rectangle.$ctor();
 };
-OurSonic.Utility.Rectangle.$ctor = function() {
-	var $this = OurSonic.Utility.Point.$ctor1(0, 0);
+$OurSonic_Utility_Rectangle.$ctor = function() {
+	var $this = $OurSonic_Utility_Point.$ctor1(0, 0);
 	$this.width = 0;
 	$this.height = 0;
 	return $this;
 };
-OurSonic.Utility.Rectangle.$ctor1 = function(x, y, width, height) {
-	var $this = OurSonic.Utility.Point.$ctor1(x, y);
+$OurSonic_Utility_Rectangle.$ctor1 = function(x, y, width, height) {
+	var $this = $OurSonic_Utility_Point.$ctor1(x, y);
 	$this.width = 0;
 	$this.height = 0;
 	$this.width = width;
@@ -9863,30 +9818,30 @@ OurSonic.Utility.Rectangle.$ctor1 = function(x, y, width, height) {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.SizeNumber
-OurSonic.Utility.SizeNumber = function(s) {
+var $OurSonic_Utility_SizeNumber = function(s) {
 	this.$value = null;
 	this.$value = s.toString();
 };
-OurSonic.Utility.SizeNumber.$ctor1 = function(s) {
+$OurSonic_Utility_SizeNumber.$ctor1 = function(s) {
 	this.$value = null;
 	this.$value = s;
 };
-OurSonic.Utility.SizeNumber.$ctor1.prototype = OurSonic.Utility.SizeNumber.prototype;
-OurSonic.Utility.SizeNumber.op_Implicit$3 = function(d) {
-	return new OurSonic.Utility.SizeNumber.$ctor1(d);
+$OurSonic_Utility_SizeNumber.$ctor1.prototype = $OurSonic_Utility_SizeNumber.prototype;
+$OurSonic_Utility_SizeNumber.op_Implicit$3 = function(d) {
+	return new $OurSonic_Utility_SizeNumber.$ctor1(d);
 };
-OurSonic.Utility.SizeNumber.op_Implicit$2 = function(d) {
-	return new OurSonic.Utility.SizeNumber(d);
+$OurSonic_Utility_SizeNumber.op_Implicit$2 = function(d) {
+	return new $OurSonic_Utility_SizeNumber(d);
 };
-OurSonic.Utility.SizeNumber.op_Implicit$1 = function(d) {
+$OurSonic_Utility_SizeNumber.op_Implicit$1 = function(d) {
 	return d.$value;
 };
-OurSonic.Utility.SizeNumber.op_Implicit = function(d) {
+$OurSonic_Utility_SizeNumber.op_Implicit = function(d) {
 	return parseFloat(d.$value.replaceAll('%', ''));
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.SpriteLoader
-OurSonic.Utility.SpriteLoader = function(completed, update) {
+var $OurSonic_Utility_SpriteLoader = function(completed, update) {
 	this.$myCompleted = null;
 	this.$myUpdate = null;
 	this.$done = false;
@@ -9896,7 +9851,7 @@ OurSonic.Utility.SpriteLoader = function(completed, update) {
 	this.$myCompleted = completed;
 	this.$myUpdate = update;
 };
-OurSonic.Utility.SpriteLoader.prototype = {
+$OurSonic_Utility_SpriteLoader.prototype = {
 	tick: function() {
 		if (this.$stepIndex === this.$steps.length) {
 			if (!this.$done) {
@@ -9926,7 +9881,7 @@ OurSonic.Utility.SpriteLoader.prototype = {
 		if (disable) {
 			return -1;
 		}
-		this.$steps.add(new OurSonic.Utility.SpriteLoaderStep(title, method, onFinish));
+		this.$steps.add(new $OurSonic_Utility_SpriteLoaderStep(title, method, onFinish));
 		return this.$steps.length - 1;
 	},
 	addIterationToStep: function(spriteStep, i) {
@@ -9938,7 +9893,7 @@ OurSonic.Utility.SpriteLoader.prototype = {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonic.Utility.SpriteLoaderStep
-OurSonic.Utility.SpriteLoaderStep = function(title, method, onFinish) {
+var $OurSonic_Utility_SpriteLoaderStep = function(title, method, onFinish) {
 	this.title = null;
 	this.method = null;
 	this.onFinish = null;
@@ -9948,122 +9903,122 @@ OurSonic.Utility.SpriteLoaderStep = function(title, method, onFinish) {
 	this.onFinish = onFinish;
 	this.iterations = [];
 };
-OurSonic.Page.registerClass('OurSonic.Page', Object);
-OurSonic.SonicEngine.registerClass('OurSonic.SonicEngine', Object);
-OurSonic.SonicManager.registerClass('OurSonic.SonicManager', Object);
-OurSonic.SpeedTester.registerClass('OurSonic.SpeedTester', Object);
-OurSonic.Level.HeightMap.registerClass('OurSonic.Level.HeightMap', Object);
-OurSonic.Level.PaletteItem.registerClass('OurSonic.Level.PaletteItem', Object);
-OurSonic.Level.PaletteItemPieces.registerClass('OurSonic.Level.PaletteItemPieces', Object);
-OurSonic.Level.SonicBackground.registerClass('OurSonic.Level.SonicBackground', Object);
-OurSonic.Level.SonicImage.registerClass('OurSonic.Level.SonicImage', Object);
-OurSonic.Level.SonicLevel.registerClass('OurSonic.Level.SonicLevel', Object);
-OurSonic.Level.SpriteCache.registerClass('OurSonic.Level.SpriteCache', Object);
-OurSonic.Level.SpriteCacheIndexes.registerClass('OurSonic.Level.SpriteCacheIndexes', Object);
-OurSonic.Level.Animations.Animation.registerClass('OurSonic.Level.Animations.Animation', Object);
-OurSonic.Level.Animations.AnimationFrame.registerClass('OurSonic.Level.Animations.AnimationFrame', Object);
-OurSonic.Level.Animations.AnimationInstance.registerClass('OurSonic.Level.Animations.AnimationInstance', Object);
-OurSonic.Level.Events.LevelEvent.registerClass('OurSonic.Level.Events.LevelEvent', Object);
-OurSonic.Level.Objects.LevelObject.registerClass('OurSonic.Level.Objects.LevelObject', Object);
-OurSonic.Level.Objects.LevelObjectAsset.registerClass('OurSonic.Level.Objects.LevelObjectAsset', Object);
-OurSonic.Level.Objects.LevelObjectAssetFrame.registerClass('OurSonic.Level.Objects.LevelObjectAssetFrame', Object);
-OurSonic.Level.Objects.LevelObjectData.registerClass('OurSonic.Level.Objects.LevelObjectData', Object);
-OurSonic.Level.Objects.LevelObjectInfo.registerClass('OurSonic.Level.Objects.LevelObjectInfo', Object);
-OurSonic.Level.Objects.LevelObjectPiece.registerClass('OurSonic.Level.Objects.LevelObjectPiece', Object);
-OurSonic.Level.Objects.LevelObjectPieceLayout.registerClass('OurSonic.Level.Objects.LevelObjectPieceLayout', Object);
-OurSonic.Level.Objects.LevelObjectPieceLayoutPiece.registerClass('OurSonic.Level.Objects.LevelObjectPieceLayoutPiece', Object);
-OurSonic.Level.Objects.LevelObjectProjectile.registerClass('OurSonic.Level.Objects.LevelObjectProjectile', Object);
-OurSonic.Level.Objects.ObjectManager.registerClass('OurSonic.Level.Objects.ObjectManager', Object);
-OurSonic.Level.Tiles.Tile.registerClass('OurSonic.Level.Tiles.Tile', Object);
-OurSonic.Level.Tiles.TileCacheBlock.registerClass('OurSonic.Level.Tiles.TileCacheBlock', Object);
-OurSonic.Level.Tiles.TileChunk.registerClass('OurSonic.Level.Tiles.TileChunk', Object);
-OurSonic.Level.Tiles.TileItem.registerClass('OurSonic.Level.Tiles.TileItem', Object);
-OurSonic.Level.Tiles.TilePiece.registerClass('OurSonic.Level.Tiles.TilePiece', Object);
-OurSonic.Level.Tiles.TilePieceInfo.registerClass('OurSonic.Level.Tiles.TilePieceInfo', Object);
-OurSonic.Sonic.Sensor.registerClass('OurSonic.Sonic.Sensor', Object);
-OurSonic.Sonic.SensorM.registerClass('OurSonic.Sonic.SensorM', Object);
-OurSonic.Sonic.SensorManager.registerClass('OurSonic.Sonic.SensorManager', Object);
-OurSonic.Sonic.Sonic.registerClass('OurSonic.Sonic.Sonic', Object);
-OurSonic.Sonic.SonicConstants.registerClass('OurSonic.Sonic.SonicConstants', Object);
-OurSonic.Sonic.Watcher.registerClass('OurSonic.Sonic.Watcher', Object);
-OurSonic.UIManager.EditorEngine.registerClass('OurSonic.UIManager.EditorEngine', Object);
-OurSonic.UIManager.EditorEnginePoint.registerClass('OurSonic.UIManager.EditorEnginePoint', Object);
-OurSonic.UIManager.Element.registerClass('OurSonic.UIManager.Element', Object);
-OurSonic.UIManager.Element$ForceRedrawing.registerClass('OurSonic.UIManager.Element$ForceRedrawing', Object);
-OurSonic.UIManager.HScrollBox.registerClass('OurSonic.UIManager.HScrollBox', OurSonic.UIManager.Element);
-OurSonic.UIManager.HtmlBox.registerClass('OurSonic.UIManager.HtmlBox', OurSonic.UIManager.Element);
-OurSonic.UIManager.Image.registerClass('OurSonic.UIManager.Image', OurSonic.UIManager.Element);
-OurSonic.UIManager.ImageButton.registerClass('OurSonic.UIManager.ImageButton', OurSonic.UIManager.Element);
-OurSonic.UIManager.Panel.registerClass('OurSonic.UIManager.Panel', OurSonic.UIManager.Element);
-OurSonic.UIManager.PropertyButton.registerClass('OurSonic.UIManager.PropertyButton', OurSonic.UIManager.Element);
-OurSonic.UIManager.ScrollBox.registerClass('OurSonic.UIManager.ScrollBox', OurSonic.UIManager.Element);
-OurSonic.UIManager.Table.registerClass('OurSonic.UIManager.Table', OurSonic.UIManager.Element);
-OurSonic.UIManager.TableCell.registerClass('OurSonic.UIManager.TableCell', OurSonic.UIManager.Panel);
-OurSonic.UIManager.TableRow.registerClass('OurSonic.UIManager.TableRow', OurSonic.UIManager.Element);
-OurSonic.UIManager.TextArea.registerClass('OurSonic.UIManager.TextArea', OurSonic.UIManager.Element);
-OurSonic.UIManager.TextBox.registerClass('OurSonic.UIManager.TextBox', OurSonic.UIManager.Element);
-OurSonic.UIManager.UIArea.registerClass('OurSonic.UIManager.UIArea', OurSonic.UIManager.Panel);
-OurSonic.UIManager.UIManager.registerClass('OurSonic.UIManager.UIManager', Object);
-OurSonic.UIManager.UIManagerAreas.registerClass('OurSonic.UIManager.UIManagerAreas', Object);
-OurSonic.UIManager.UIManagerData.registerClass('OurSonic.UIManager.UIManagerData', Object);
-OurSonic.UIManager.UIManagerDataIndexes.registerClass('OurSonic.UIManager.UIManagerDataIndexes', Object);
-OurSonic.UIManager.Areas.ColorEditingArea.registerClass('OurSonic.UIManager.Areas.ColorEditingArea', OurSonic.UIManager.Panel);
-OurSonic.UIManager.Areas.ColorEditorArea.registerClass('OurSonic.UIManager.Areas.ColorEditorArea', Object);
-OurSonic.UIManager.Areas.ColorEditorAreaData.registerClass('OurSonic.UIManager.Areas.ColorEditorAreaData', Object);
-OurSonic.UIManager.Areas.DebugConsoleData.registerClass('OurSonic.UIManager.Areas.DebugConsoleData', Object);
-OurSonic.UIManager.Areas.Editor.registerClass('OurSonic.UIManager.Areas.Editor', Object);
-OurSonic.UIManager.Areas.FrameAreaData.registerClass('OurSonic.UIManager.Areas.FrameAreaData', Object);
-OurSonic.UIManager.Areas.LevelInformationArea.registerClass('OurSonic.UIManager.Areas.LevelInformationArea', Object);
-OurSonic.UIManager.Areas.LiveObjectsArea.registerClass('OurSonic.UIManager.Areas.LiveObjectsArea', Object);
-OurSonic.UIManager.Areas.LiveObjectsAreaData.registerClass('OurSonic.UIManager.Areas.LiveObjectsAreaData', Object);
-OurSonic.UIManager.Areas.LivePopulateModel.registerClass('OurSonic.UIManager.Areas.LivePopulateModel', Object);
-OurSonic.UIManager.Areas.MainPanelData.registerClass('OurSonic.UIManager.Areas.MainPanelData', Object);
-OurSonic.UIManager.Areas.ObjectFrameworkArea.registerClass('OurSonic.UIManager.Areas.ObjectFrameworkArea', Object);
-OurSonic.UIManager.Areas.ObjectFrameworkArea$ObjectFrameworkAreaPiece.registerClass('OurSonic.UIManager.Areas.ObjectFrameworkArea$ObjectFrameworkAreaPiece', Object);
-OurSonic.UIManager.Areas.ObjectFrameworkData.registerClass('OurSonic.UIManager.Areas.ObjectFrameworkData', Object);
-OurSonic.UIManager.Areas.ObjectFrameworkListArea.registerClass('OurSonic.UIManager.Areas.ObjectFrameworkListArea', Object);
-OurSonic.UIManager.Areas.PaletteArea.registerClass('OurSonic.UIManager.Areas.PaletteArea', OurSonic.UIManager.Panel);
-OurSonic.UIManager.Areas.PieceLayoutEditor.registerClass('OurSonic.UIManager.Areas.PieceLayoutEditor', OurSonic.UIManager.Element);
-OurSonic.UIManager.Areas.PieceLayoutMaker.registerClass('OurSonic.UIManager.Areas.PieceLayoutMaker', Object);
-OurSonic.UIManager.Areas.TileChunkArea.registerClass('OurSonic.UIManager.Areas.TileChunkArea', Object);
-OurSonic.Utility.CanvasHandler.registerClass('OurSonic.Utility.CanvasHandler', Object, ss.IDisposable);
-OurSonic.Utility.CanvasInformation.registerClass('OurSonic.Utility.CanvasInformation', Object);
-OurSonic.Utility.Color.registerClass('OurSonic.Utility.Color', Object);
-OurSonic.Utility.Constants.registerClass('OurSonic.Utility.Constants', Object);
-OurSonic.Utility.DoublePoint.registerClass('OurSonic.Utility.DoublePoint', Object);
-OurSonic.Utility.Dragger.registerClass('OurSonic.Utility.Dragger', Object);
-OurSonic.Utility.Extensions.registerClass('OurSonic.Utility.Extensions', Object);
-OurSonic.Utility.Help.registerClass('OurSonic.Utility.Help', Object);
-OurSonic.Utility.IntersectingRectangle.registerClass('OurSonic.Utility.IntersectingRectangle', Object);
-OurSonic.Utility.Point.registerClass('OurSonic.Utility.Point', Object);
-OurSonic.Utility.Rectangle.registerClass('OurSonic.Utility.Rectangle');
-OurSonic.Utility.SizeNumber.registerClass('OurSonic.Utility.SizeNumber', Object);
-OurSonic.Utility.SpriteLoader.registerClass('OurSonic.Utility.SpriteLoader', Object);
-OurSonic.Utility.SpriteLoaderStep.registerClass('OurSonic.Utility.SpriteLoaderStep', Object);
-OurSonic.Level.Ring.registerClass('OurSonic.Level.Ring');
-OurSonic.UIManager.Button.registerClass('OurSonic.UIManager.Button', OurSonic.UIManager.Element);
-OurSonic.UIManager.Pointer.registerClass('OurSonic.UIManager.Pointer');
-OurSonic.SonicEngine.instance = null;
-OurSonic.SonicManager.instance = null;
-OurSonic.SonicManager.$base64chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'.split('');
-OurSonic.SonicManager.$base64Inv = null;
-OurSonic.SonicManager.$_cachedOffs = {};
-OurSonic.SonicManager.$base64Inv = {};
-for (var i = 0; i < OurSonic.SonicManager.$base64chars.length; i++) {
-	OurSonic.SonicManager.$base64Inv[OurSonic.SonicManager.$base64chars[i]] = i;
+Type.registerClass(global, 'OurSonic.Page', $OurSonic_Page, Object);
+Type.registerClass(global, 'OurSonic.SonicEngine', $OurSonic_SonicEngine, Object);
+Type.registerClass(global, 'OurSonic.SonicManager', $OurSonic_SonicManager, Object);
+Type.registerClass(global, 'OurSonic.SpeedTester', $OurSonic_SpeedTester, Object);
+Type.registerClass(global, 'OurSonic.Level.HeightMap', $OurSonic_Level_HeightMap, Object);
+Type.registerClass(global, 'OurSonic.Level.PaletteItem', $OurSonic_Level_PaletteItem, Object);
+Type.registerClass(global, 'OurSonic.Level.PaletteItemPieces', $OurSonic_Level_PaletteItemPieces, Object);
+Type.registerClass(global, 'OurSonic.Level.SonicBackground', $OurSonic_Level_SonicBackground, Object);
+Type.registerClass(global, 'OurSonic.Level.SonicImage', $OurSonic_Level_SonicImage, Object);
+Type.registerClass(global, 'OurSonic.Level.SonicLevel', $OurSonic_Level_SonicLevel, Object);
+Type.registerClass(global, 'OurSonic.Level.SpriteCache', $OurSonic_Level_SpriteCache, Object);
+Type.registerClass(global, 'OurSonic.Level.SpriteCacheIndexes', $OurSonic_Level_SpriteCacheIndexes, Object);
+Type.registerClass(global, 'OurSonic.Level.Animations.Animation', $OurSonic_Level_Animations_Animation, Object);
+Type.registerClass(global, 'OurSonic.Level.Animations.AnimationFrame', $OurSonic_Level_Animations_AnimationFrame, Object);
+Type.registerClass(global, 'OurSonic.Level.Animations.AnimationInstance', $OurSonic_Level_Animations_AnimationInstance, Object);
+Type.registerClass(global, 'OurSonic.Level.Events.LevelEvent', $OurSonic_Level_Events_LevelEvent, Object);
+Type.registerClass(global, 'OurSonic.Level.Objects.LevelObject', $OurSonic_Level_Objects_LevelObject, Object);
+Type.registerClass(global, 'OurSonic.Level.Objects.LevelObjectAsset', $OurSonic_Level_Objects_LevelObjectAsset, Object);
+Type.registerClass(global, 'OurSonic.Level.Objects.LevelObjectAssetFrame', $OurSonic_Level_Objects_LevelObjectAssetFrame, Object);
+Type.registerClass(global, 'OurSonic.Level.Objects.LevelObjectData', $OurSonic_Level_Objects_LevelObjectData, Object);
+Type.registerClass(global, 'OurSonic.Level.Objects.LevelObjectInfo', $OurSonic_Level_Objects_LevelObjectInfo, Object);
+Type.registerClass(global, 'OurSonic.Level.Objects.LevelObjectPiece', $OurSonic_Level_Objects_LevelObjectPiece, Object);
+Type.registerClass(global, 'OurSonic.Level.Objects.LevelObjectPieceLayout', $OurSonic_Level_Objects_LevelObjectPieceLayout, Object);
+Type.registerClass(global, 'OurSonic.Level.Objects.LevelObjectPieceLayoutPiece', $OurSonic_Level_Objects_LevelObjectPieceLayoutPiece, Object);
+Type.registerClass(global, 'OurSonic.Level.Objects.LevelObjectProjectile', $OurSonic_Level_Objects_LevelObjectProjectile, Object);
+Type.registerClass(global, 'OurSonic.Level.Objects.ObjectManager', $OurSonic_Level_Objects_ObjectManager, Object);
+Type.registerClass(global, 'OurSonic.Level.Tiles.Tile', $OurSonic_Level_Tiles_Tile, Object);
+Type.registerClass(global, 'OurSonic.Level.Tiles.TileCacheBlock', $OurSonic_Level_Tiles_TileCacheBlock, Object);
+Type.registerClass(global, 'OurSonic.Level.Tiles.TileChunk', $OurSonic_Level_Tiles_TileChunk, Object);
+Type.registerClass(global, 'OurSonic.Level.Tiles.TileItem', $OurSonic_Level_Tiles_TileItem, Object);
+Type.registerClass(global, 'OurSonic.Level.Tiles.TilePiece', $OurSonic_Level_Tiles_TilePiece, Object);
+Type.registerClass(global, 'OurSonic.Level.Tiles.TilePieceInfo', $OurSonic_Level_Tiles_TilePieceInfo, Object);
+Type.registerClass(global, 'OurSonic.Sonic.Sensor', $OurSonic_Sonic_Sensor, Object);
+Type.registerClass(global, 'OurSonic.Sonic.SensorM', $OurSonic_Sonic_SensorM, Object);
+Type.registerClass(global, 'OurSonic.Sonic.SensorManager', $OurSonic_Sonic_SensorManager, Object);
+Type.registerClass(global, 'OurSonic.Sonic.Sonic', $OurSonic_Sonic_Sonic, Object);
+Type.registerClass(global, 'OurSonic.Sonic.SonicConstants', $OurSonic_Sonic_SonicConstants, Object);
+Type.registerClass(global, 'OurSonic.Sonic.Watcher', $OurSonic_Sonic_Watcher, Object);
+Type.registerClass(global, 'OurSonic.UIManager.EditorEngine', $OurSonic_UIManager_EditorEngine, Object);
+Type.registerClass(global, 'OurSonic.UIManager.EditorEnginePoint', $OurSonic_UIManager_EditorEnginePoint, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Element', $OurSonic_UIManager_Element, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Element$ForceRedrawing', $OurSonic_UIManager_Element$ForceRedrawing, Object);
+Type.registerClass(global, 'OurSonic.UIManager.HScrollBox', $OurSonic_UIManager_HScrollBox, $OurSonic_UIManager_Element);
+Type.registerClass(global, 'OurSonic.UIManager.HtmlBox', $OurSonic_UIManager_HtmlBox, $OurSonic_UIManager_Element);
+Type.registerClass(global, 'OurSonic.UIManager.Image', $OurSonic_UIManager_Image, $OurSonic_UIManager_Element);
+Type.registerClass(global, 'OurSonic.UIManager.ImageButton', $OurSonic_UIManager_ImageButton, $OurSonic_UIManager_Element);
+Type.registerClass(global, 'OurSonic.UIManager.Panel', $OurSonic_UIManager_Panel, $OurSonic_UIManager_Element);
+Type.registerClass(global, 'OurSonic.UIManager.PropertyButton', $OurSonic_UIManager_PropertyButton, $OurSonic_UIManager_Element);
+Type.registerClass(global, 'OurSonic.UIManager.ScrollBox', $OurSonic_UIManager_ScrollBox, $OurSonic_UIManager_Element);
+Type.registerClass(global, 'OurSonic.UIManager.Table', $OurSonic_UIManager_Table, $OurSonic_UIManager_Element);
+Type.registerClass(global, 'OurSonic.UIManager.TableCell', $OurSonic_UIManager_TableCell, $OurSonic_UIManager_Panel);
+Type.registerClass(global, 'OurSonic.UIManager.TableRow', $OurSonic_UIManager_TableRow, $OurSonic_UIManager_Element);
+Type.registerClass(global, 'OurSonic.UIManager.TextArea', $OurSonic_UIManager_TextArea, $OurSonic_UIManager_Element);
+Type.registerClass(global, 'OurSonic.UIManager.TextBox', $OurSonic_UIManager_TextBox, $OurSonic_UIManager_Element);
+Type.registerClass(global, 'OurSonic.UIManager.UIArea', $OurSonic_UIManager_UIArea, $OurSonic_UIManager_Panel);
+Type.registerClass(global, 'OurSonic.UIManager.UIManager', $OurSonic_UIManager_UIManager, Object);
+Type.registerClass(global, 'OurSonic.UIManager.UIManagerAreas', $OurSonic_UIManager_UIManagerAreas, Object);
+Type.registerClass(global, 'OurSonic.UIManager.UIManagerData', $OurSonic_UIManager_UIManagerData, Object);
+Type.registerClass(global, 'OurSonic.UIManager.UIManagerDataIndexes', $OurSonic_UIManager_UIManagerDataIndexes, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.ColorEditingArea', $OurSonic_UIManager_Areas_ColorEditingArea, $OurSonic_UIManager_Panel);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.ColorEditorArea', $OurSonic_UIManager_Areas_ColorEditorArea, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.ColorEditorAreaData', $OurSonic_UIManager_Areas_ColorEditorAreaData, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.DebugConsoleData', $OurSonic_UIManager_Areas_DebugConsoleData, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.Editor', $OurSonic_UIManager_Areas_Editor, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.FrameAreaData', $OurSonic_UIManager_Areas_FrameAreaData, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.LevelInformationArea', $OurSonic_UIManager_Areas_LevelInformationArea, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.LiveObjectsArea', $OurSonic_UIManager_Areas_LiveObjectsArea, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.LiveObjectsAreaData', $OurSonic_UIManager_Areas_LiveObjectsAreaData, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.LivePopulateModel', $OurSonic_UIManager_Areas_LivePopulateModel, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.MainPanelData', $OurSonic_UIManager_Areas_MainPanelData, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.ObjectFrameworkArea', $OurSonic_UIManager_Areas_ObjectFrameworkArea, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.ObjectFrameworkArea$ObjectFrameworkAreaPiece', $OurSonic_UIManager_Areas_ObjectFrameworkArea$ObjectFrameworkAreaPiece, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.ObjectFrameworkData', $OurSonic_UIManager_Areas_ObjectFrameworkData, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.ObjectFrameworkListArea', $OurSonic_UIManager_Areas_ObjectFrameworkListArea, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.PaletteArea', $OurSonic_UIManager_Areas_PaletteArea, $OurSonic_UIManager_Panel);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.PieceLayoutEditor', $OurSonic_UIManager_Areas_PieceLayoutEditor, $OurSonic_UIManager_Element);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.PieceLayoutMaker', $OurSonic_UIManager_Areas_PieceLayoutMaker, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.TileChunkArea', $OurSonic_UIManager_Areas_TileChunkArea, Object);
+Type.registerClass(global, 'OurSonic.Utility.CanvasHandler', $OurSonic_Utility_CanvasHandler, Object, ss.IDisposable);
+Type.registerClass(global, 'OurSonic.Utility.CanvasInformation', $OurSonic_Utility_CanvasInformation, Object);
+Type.registerClass(global, 'OurSonic.Utility.Color', $OurSonic_Utility_Color, Object);
+Type.registerClass(global, 'OurSonic.Utility.Constants', $OurSonic_Utility_Constants, Object);
+Type.registerClass(global, 'OurSonic.Utility.DoublePoint', $OurSonic_Utility_DoublePoint, Object);
+Type.registerClass(global, 'OurSonic.Utility.Dragger', $OurSonic_Utility_Dragger, Object);
+Type.registerClass(global, 'OurSonic.Utility.Extensions', $OurSonic_Utility_Extensions, Object);
+Type.registerClass(global, 'OurSonic.Utility.Help', $OurSonic_Utility_Help, Object);
+Type.registerClass(global, 'OurSonic.Utility.IntersectingRectangle', $OurSonic_Utility_IntersectingRectangle, Object);
+Type.registerClass(global, 'OurSonic.Utility.Point', $OurSonic_Utility_Point, Object);
+Type.registerClass(global, 'OurSonic.Utility.Rectangle', $OurSonic_Utility_Rectangle);
+Type.registerClass(global, 'OurSonic.Utility.SizeNumber', $OurSonic_Utility_SizeNumber, Object);
+Type.registerClass(global, 'OurSonic.Utility.SpriteLoader', $OurSonic_Utility_SpriteLoader, Object);
+Type.registerClass(global, 'OurSonic.Utility.SpriteLoaderStep', $OurSonic_Utility_SpriteLoaderStep, Object);
+Type.registerClass(global, 'OurSonic.Level.Ring', $OurSonic_Level_Ring);
+Type.registerClass(global, 'OurSonic.UIManager.Button', $OurSonic_UIManager_Button, $OurSonic_UIManager_Element);
+Type.registerClass(global, 'OurSonic.UIManager.Pointer', $OurSonic_UIManager_Pointer);
+$OurSonic_SonicEngine.instance = null;
+$OurSonic_SonicManager.instance = null;
+$OurSonic_SonicManager.$base64chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'.split('');
+$OurSonic_SonicManager.$base64Inv = null;
+$OurSonic_SonicManager.$_cachedOffs = {};
+$OurSonic_SonicManager.$base64Inv = {};
+for (var i = 0; i < $OurSonic_SonicManager.$base64chars.length; i++) {
+	$OurSonic_SonicManager.$base64Inv[$OurSonic_SonicManager.$base64chars[i]] = i;
 }
-OurSonic.Level.HeightMap.colors = ['', 'rgba(255,98,235,0.6)', 'rgba(24,218,235,0.6)', 'rgba(24,98,235,0.6)'];
-OurSonic.Level.Objects.ObjectManager.broken = OurSonic.Utility.Help.loadSprite('assets/Sprites/broken.png', function(e) {
+$OurSonic_Level_HeightMap.colors = ['', 'rgba(255,98,235,0.6)', 'rgba(24,218,235,0.6)', 'rgba(24,98,235,0.6)'];
+$OurSonic_Level_Objects_ObjectManager.broken = $OurSonic_Utility_Help.loadSprite('assets/Sprites/broken.png', function(e) {
 });
-OurSonic.Level.Tiles.TileChunk.$numOfPiecesWide = 8;
-OurSonic.Level.Tiles.TileChunk.$numOfPiecesLong = 8;
-OurSonic.Level.Tiles.TilePiece.$drawInfo = [[0, 0], [1, 0], [0, 1], [1, 1]];
-OurSonic.Level.Tiles.TilePiece.$drawOrder = [[3, 2, 1, 0], [1, 0, 3, 2], [2, 3, 0, 1], [0, 1, 2, 3]];
-OurSonic.UIManager.UIManager.smallTextFont = '8pt Calibri ';
-OurSonic.UIManager.UIManager.buttonFont = '12pt Calibri ';
-OurSonic.UIManager.UIManager.smallButtonFont = '13pt Arial bold ';
-OurSonic.UIManager.UIManager.textFont = '11pt Arial bold ';
-OurSonic.UIManager.UIManager.$_curLevelName = null;
-OurSonic.UIManager.UIManager.instance = null;
-OurSonic.Utility.Help.cos_table = [1, 0.9997, 0.9988, 0.99729, 0.99518, 0.99248, 0.98918, 0.98528, 0.98079, 0.9757, 0.97003, 0.96378, 0.95694, 0.94953, 0.94154, 0.93299, 0.92388, 0.91421, 0.90399, 0.89322, 0.88192, 0.87009, 0.85773, 0.84485, 0.83147, 0.81758, 0.80321, 0.78835, 0.77301, 0.75721, 0.74095, 0.72425, 0.70711, 0.68954, 0.67156, 0.65317, 0.63439, 0.61523, 0.5957, 0.57581, 0.55557, 0.535, 0.5141, 0.4929, 0.4714, 0.44961, 0.42755, 0.40524, 0.38268, 0.3599, 0.33689, 0.31368, 0.29028, 0.26671, 0.24298, 0.2191, 0.19509, 0.17096, 0.14673, 0.12241, 0.09802, 0.07356, 0.04907, 0.02454, 0, -0.02454, -0.04907, -0.07356, -0.09802, -0.12241, -0.14673, -0.17096, -0.19509, -0.2191, -0.24298, -0.26671, -0.29028, -0.31368, -0.33689, -0.3599, -0.38268, -0.40524, -0.42755, -0.44961, -0.4714, -0.4929, -0.5141, -0.535, -0.55557, -0.57581, -0.5957, -0.61523, -0.63439, -0.65317, -0.67156, -0.68954, -0.70711, -0.72425, -0.74095, -0.75721, -0.77301, -0.78835, -0.80321, -0.81758, -0.83147, -0.84485, -0.85773, -0.87009, -0.88192, -0.89322, -0.90399, -0.91421, -0.92388, -0.93299, -0.94154, -0.94953, -0.95694, -0.96378, -0.97003, -0.9757, -0.98079, -0.98528, -0.98918, -0.99248, -0.99518, -0.99729, -0.9988, -0.9997, -1, -0.9997, -0.9988, -0.99729, -0.99518, -0.99248, -0.98918, -0.98528, -0.98079, -0.9757, -0.97003, -0.96378, -0.95694, -0.94953, -0.94154, -0.93299, -0.92388, -0.91421, -0.90399, -0.89322, -0.88192, -0.87009, -0.85773, -0.84485, -0.83147, -0.81758, -0.80321, -0.78835, -0.77301, -0.75721, -0.74095, -0.72425, -0.70711, -0.68954, -0.67156, -0.65317, -0.63439, -0.61523, -0.5957, -0.57581, -0.55557, -0.535, -0.5141, -0.4929, -0.4714, -0.44961, -0.42756, -0.40524, -0.38268, -0.3599, -0.33689, -0.31368, -0.29028, -0.26671, -0.24298, -0.2191, -0.19509, -0.17096, -0.14673, -0.12241, -0.09802, -0.07356, -0.04907, -0.02454, 0, 0.02454, 0.04907, 0.07356, 0.09802, 0.12241, 0.14673, 0.17096, 0.19509, 0.2191, 0.24298, 0.26671, 0.29028, 0.31368, 0.33689, 0.3599, 0.38268, 0.40524, 0.42756, 0.44961, 0.4714, 0.4929, 0.5141, 0.535, 0.55557, 0.57581, 0.5957, 0.61523, 0.63439, 0.65317, 0.67156, 0.68954, 0.70711, 0.72425, 0.74095, 0.75721, 0.77301, 0.78835, 0.80321, 0.81758, 0.83147, 0.84485, 0.85773, 0.87009, 0.88192, 0.89322, 0.90399, 0.91421, 0.92388, 0.93299, 0.94154, 0.94953, 0.95694, 0.96378, 0.97003, 0.9757, 0.98079, 0.98528, 0.98918, 0.99248, 0.99518, 0.99729, 0.9988, 0.9997];
-$(function(){new OurSonic.Page();});
+$OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide = 8;
+$OurSonic_Level_Tiles_TileChunk.$numOfPiecesLong = 8;
+$OurSonic_Level_Tiles_TilePiece.$drawInfo = [[0, 0], [1, 0], [0, 1], [1, 1]];
+$OurSonic_Level_Tiles_TilePiece.$drawOrder = [[3, 2, 1, 0], [1, 0, 3, 2], [2, 3, 0, 1], [0, 1, 2, 3]];
+$OurSonic_UIManager_UIManager.smallTextFont = '8pt Calibri ';
+$OurSonic_UIManager_UIManager.buttonFont = '12pt Calibri ';
+$OurSonic_UIManager_UIManager.smallButtonFont = '13pt Arial bold ';
+$OurSonic_UIManager_UIManager.textFont = '11pt Arial bold ';
+$OurSonic_UIManager_UIManager.$_curLevelName = null;
+$OurSonic_UIManager_UIManager.instance = null;
+$OurSonic_Utility_Help.cos_table = [1, 0.9997, 0.9988, 0.99729, 0.99518, 0.99248, 0.98918, 0.98528, 0.98079, 0.9757, 0.97003, 0.96378, 0.95694, 0.94953, 0.94154, 0.93299, 0.92388, 0.91421, 0.90399, 0.89322, 0.88192, 0.87009, 0.85773, 0.84485, 0.83147, 0.81758, 0.80321, 0.78835, 0.77301, 0.75721, 0.74095, 0.72425, 0.70711, 0.68954, 0.67156, 0.65317, 0.63439, 0.61523, 0.5957, 0.57581, 0.55557, 0.535, 0.5141, 0.4929, 0.4714, 0.44961, 0.42755, 0.40524, 0.38268, 0.3599, 0.33689, 0.31368, 0.29028, 0.26671, 0.24298, 0.2191, 0.19509, 0.17096, 0.14673, 0.12241, 0.09802, 0.07356, 0.04907, 0.02454, 0, -0.02454, -0.04907, -0.07356, -0.09802, -0.12241, -0.14673, -0.17096, -0.19509, -0.2191, -0.24298, -0.26671, -0.29028, -0.31368, -0.33689, -0.3599, -0.38268, -0.40524, -0.42755, -0.44961, -0.4714, -0.4929, -0.5141, -0.535, -0.55557, -0.57581, -0.5957, -0.61523, -0.63439, -0.65317, -0.67156, -0.68954, -0.70711, -0.72425, -0.74095, -0.75721, -0.77301, -0.78835, -0.80321, -0.81758, -0.83147, -0.84485, -0.85773, -0.87009, -0.88192, -0.89322, -0.90399, -0.91421, -0.92388, -0.93299, -0.94154, -0.94953, -0.95694, -0.96378, -0.97003, -0.9757, -0.98079, -0.98528, -0.98918, -0.99248, -0.99518, -0.99729, -0.9988, -0.9997, -1, -0.9997, -0.9988, -0.99729, -0.99518, -0.99248, -0.98918, -0.98528, -0.98079, -0.9757, -0.97003, -0.96378, -0.95694, -0.94953, -0.94154, -0.93299, -0.92388, -0.91421, -0.90399, -0.89322, -0.88192, -0.87009, -0.85773, -0.84485, -0.83147, -0.81758, -0.80321, -0.78835, -0.77301, -0.75721, -0.74095, -0.72425, -0.70711, -0.68954, -0.67156, -0.65317, -0.63439, -0.61523, -0.5957, -0.57581, -0.55557, -0.535, -0.5141, -0.4929, -0.4714, -0.44961, -0.42756, -0.40524, -0.38268, -0.3599, -0.33689, -0.31368, -0.29028, -0.26671, -0.24298, -0.2191, -0.19509, -0.17096, -0.14673, -0.12241, -0.09802, -0.07356, -0.04907, -0.02454, 0, 0.02454, 0.04907, 0.07356, 0.09802, 0.12241, 0.14673, 0.17096, 0.19509, 0.2191, 0.24298, 0.26671, 0.29028, 0.31368, 0.33689, 0.3599, 0.38268, 0.40524, 0.42756, 0.44961, 0.4714, 0.4929, 0.5141, 0.535, 0.55557, 0.57581, 0.5957, 0.61523, 0.63439, 0.65317, 0.67156, 0.68954, 0.70711, 0.72425, 0.74095, 0.75721, 0.77301, 0.78835, 0.80321, 0.81758, 0.83147, 0.84485, 0.85773, 0.87009, 0.88192, 0.89322, 0.90399, 0.91421, 0.92388, 0.93299, 0.94154, 0.94953, 0.95694, 0.96378, 0.97003, 0.9757, 0.98079, 0.98528, 0.98918, 0.99248, 0.99518, 0.99729, 0.9988, 0.9997];
+$OurSonic_Page.main();

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Serialization;
-using NodeJSLibrary;
 using OurSonic.Level;
 using OurSonic.Level.Animations;
 using OurSonic.Level.Objects;
@@ -315,7 +314,7 @@ namespace OurSonic
                                finished();
                                ForceResize();
                            },
-                           (s) => { Global.Console.Log("ff " + s); });
+                           (s) => { });
             ForceResize();
             OnLevelLoad(SonicLevel);
 

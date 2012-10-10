@@ -1,9 +1,10 @@
-﻿using System;
+﻿#define FTP
+//#define COMPRESS
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Limilabs.FTP.Client;
-using Yahoo.Yui.Compressor;
 namespace Build
 {
     public class Program
@@ -13,24 +14,6 @@ namespace Build
             string shufSharp = "OurSonicSharp";
 
             var projs = new[] {
-/*
-                    shufSharp+@"\Libraries\CommonLibraries\",
-                    shufSharp+@"\Libraries\CommonShuffleLibrary\",
-                    shufSharp+@"\Libraries\ShuffleGameLibrary\",
-*/
-/*
-                    shufSharp+@"\Servers\AdminServer\",
-                    shufSharp+@"\Servers\ChatServer\",
-                    shufSharp+@"\Servers\DebugServer\",
-                    shufSharp+@"\Servers\GameServer\",
-                    shufSharp+@"\Servers\GatewayServer\",
-                    shufSharp+@"\Servers\HeadServer\",
-                    shufSharp+@"\Servers\SiteServer\",
-*/
-/*
-                    shufSharp+@"\Models\",
-                    shufSharp+@"\Client\",
-*/
                                       shufSharp + @"\OurSonic\",
                                       shufSharp + @"\OurSonicNode\",
                                       shufSharp + @"\OurSonicModels\",
@@ -40,24 +23,23 @@ namespace Build
             var pre = md.Parent.Parent.Parent.Parent.FullName + "\\";
             Console.WriteLine("starting");
 
-            foreach (var proj in projs)
-            {
+            foreach (var proj in projs) {
 #if DEBUG
-                var from = pre + proj + @"\bin\debug\" + proj.Split(new[] { "\\" }, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
+                var from = pre + proj + @"\bin\debug\" + proj.Split(new[] {"\\"}, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
 #else
                 var from = pre + proj + @"\bin\release\" + proj.Split(new[] {"\\"}, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
 #endif
-                var to = pre + shufSharp + @"\output\" + proj.Split(new[] { "\\" }, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
+                var to = pre + shufSharp + @"\output\" + proj.Split(new[] {"\\"}, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
                 if (File.Exists(to)) File.Delete(to);
                 File.Copy(from, to);
                 Console.WriteLine("copying " + to);
             }
 
-            //client happens in buildsite.cs
-            var depends = new Dictionary<string, Application> {
+            //client imports happens in buildsite.cs
+            var imports = new Dictionary<string, Application> {
                                                                       {
                                                                               shufSharp + @"\OurSonic\",
-                                                                              new Application(false, "$(function(){new OurSonic.Page();});",
+                                                                              new Application(false,
                                                                                               new List<string> {
 /*
                                 @"./CommonLibraries.js",
@@ -65,68 +47,57 @@ namespace Build
                                 @"./ShuffleGameLibrary.js",
                                 @"./RawDeflate.js",
 */
-                                
-
                                                                                                                })
                                                                       }, {
                                                                                  shufSharp + @"\OurSonicNode\",
-                                                                                 new Application(true, "new OurSonicNode.Server();", new List<string> {
-                                                                                                                                                              @"./RawDeflate.js",
-                                @"./OurSonicModels.js",
-
-                                                                                                                                                      })
+                                                                                 new Application(true,
+                                                                                                 new List<string> {
+                                                                                                                          @"./RawDeflate.js",
+                                                                                                                          @"./OurSonicModels.js",
+                                                                                                                  })
                                                                          },
                                                               };
 
+#if FTP
             Console.WriteLine("connecting ftp");
-
             Ftp webftp = new Ftp();
             webftp.Connect("dested.com");
             webftp.Login("dested", "Ddested");
             Console.WriteLine("connected");
 
-            webftp.Progress += (e,c) => {
-                 
-
+            webftp.Progress += (e, c) => {
                                    Console.SetCursorPosition(65, 5);
                                    Console.Write("|");
-                
-                for (int i = 0; i < c.Percentage / 10; i++)
-                {
-                    Console.Write("=");
-                }
-                for (int i = (int) ( c.Percentage / 10 ); i < 10; i++)
-                {
-                    Console.Write("-");
-                }
-                Console.Write("|");
 
-                Console.Write(c.Percentage + "  %  ");
-                Console.WriteLine();
+                                   for (int i = 0; i < c.Percentage / 10; i++) {
+                                       Console.Write("=");
+                                   }
+                                   for (int i = (int) ( c.Percentage / 10 ); i < 10; i++) {
+                                       Console.Write("-");
+                                   }
+                                   Console.Write("|");
 
+                                   Console.Write(c.Percentage + "  %  ");
+                                   Console.WriteLine();
                                };
 
-/*            Ftp serverftp = new Ftp();
+#endif
+            /*            Ftp serverftp = new Ftp();
             serverftp.Connect("50.116.22.241");
             serverftp.Login("dested", "FuckYou1!");*/
 
-            foreach (var depend in depends)
-            {
-                var to = pre + shufSharp + @"\output\" + depend.Key.Split(new[] { "\\" }, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
+            foreach (var depend in imports) {
+                var to = pre + shufSharp + @"\output\" + depend.Key.Split(new[] {"\\"}, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
                 var output = "";
 
-                if (depend.Value.Node)
-                {
-                    output += "require('./mscorlib.node.debug.js');";
+                if (depend.Value.Node) {
+                    output += "require('./mscorlib.debug.js');";
                     output += "Enumerable=require('./linq.js');";
-                }
-                else
-                {
+                } else {
                     //output += "require('./mscorlib.debug.js');";
                 }
 
-                foreach (var depe in depend.Value.IncludesAfter)
-                {
+                foreach (var depe in depend.Value.IncludesAfter) {
                     output += string.Format("require('{0}');", depe);
                 }
 
@@ -134,25 +105,27 @@ namespace Build
                 lines.Add(output);
                 lines.AddRange(File.ReadAllLines(to));
 
-                lines.Add(depend.Value.After);
+                string text = lines.Aggregate("", (a, b) => a + b + "\n");
 
-                string text  = lines.Aggregate("", (a, b) => a + b + "\n");
-
+#if COMPRESS
                 Yahoo.Yui.Compressor.JavaScriptCompressor jc = new JavaScriptCompressor();
                 jc.ObfuscateJavascript = true;
-                //text=jc.Compress(text);
-                
+                text=jc.Compress(text);
+#endif
+
                 File.WriteAllText(to, text);
-                Console.WriteLine("writing "+to);
+                Console.WriteLine("writing " + to);
 
+                var name = to.Split(new char[] {'\\'}, StringSplitOptions.RemoveEmptyEntries).Last();
+                File.WriteAllText(@"C:\inetpub\wwwroot\" + name, text);
+
+#if FTP
                 Console.WriteLine("ftp start " + text.Length.ToString("N0"));
-
-
-                webftp.Upload("/httpdocs/nsonic/" + to.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries).Last(), to);
+                webftp.Upload("/httpdocs/nsonic/" + name, to);
                 Console.WriteLine("ftp complete " + to);
+#endif
 
                 //serverftp.Upload("/usr/local/src/sonic/" + to.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries).Last(), to);
-
             }
 
             /*
@@ -175,13 +148,11 @@ namespace Build
 
         public class Application
         {
-            public string After { get; set; }
             public bool Node { get; set; }
             public List<string> IncludesAfter { get; set; }
 
-            public Application(bool node, string prepend, List<string> includesAfter)
+            public Application(bool node, List<string> includesAfter)
             {
-                After = prepend;
                 Node = node;
                 IncludesAfter = includesAfter;
             }

@@ -10,7 +10,6 @@ namespace OurSonicModels
         public string OldKey { get; set; }
         public string Data { get; set; }
     }
-
     [Serializable]
     public class SLData
     {

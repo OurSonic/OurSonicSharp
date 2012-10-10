@@ -1,12 +1,12 @@
 using System.Runtime.CompilerServices;
-namespace SocketIONodeLibrary
+namespace SocketIOLibrary
 {
     [IgnoreNamespace]
     [Imported(IsRealType = true)]
     public class SocketIOClient
     {
-        [ScriptName("sockets")] public SocketNamespace Sockets;
-        private SocketNamespace sockets;
+        [IntrinsicProperty]
+        public Socket Sockets { get; set; }
 
         [ScriptName("set")]
         public void Set(string option, int value) {}

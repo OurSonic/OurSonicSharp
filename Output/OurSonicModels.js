@@ -1,26 +1,25 @@
-﻿Type.registerNamespace('OurSonicModels');
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.AnimatedPaletteItem
-OurSonicModels.AnimatedPaletteItem = function() {
+var $OurSonicModels_AnimatedPaletteItem = function() {
 };
-OurSonicModels.AnimatedPaletteItem.createInstance = function() {
+$OurSonicModels_AnimatedPaletteItem.createInstance = function() {
 	return {};
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.AnimatedPalettePiece
-OurSonicModels.AnimatedPalettePiece = function() {
+var $OurSonicModels_AnimatedPalettePiece = function() {
 };
-OurSonicModels.AnimatedPalettePiece.createInstance = function() {
+$OurSonicModels_AnimatedPalettePiece.createInstance = function() {
 	return {};
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.SaveObjectModel
-OurSonicModels.SaveObjectModel = function() {
+var $OurSonicModels_SaveObjectModel = function() {
 };
-OurSonicModels.SaveObjectModel.createInstance = function() {
-	return OurSonicModels.SaveObjectModel.$ctor();
+$OurSonicModels_SaveObjectModel.createInstance = function() {
+	return $OurSonicModels_SaveObjectModel.$ctor();
 };
-OurSonicModels.SaveObjectModel.$ctor = function() {
+$OurSonicModels_SaveObjectModel.$ctor = function() {
 	var $this = {};
 	$this.key = null;
 	$this.oldKey = null;
@@ -29,92 +28,91 @@ OurSonicModels.SaveObjectModel.$ctor = function() {
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.SLData
-OurSonicModels.SLData = function() {
+var $OurSonicModels_SLData = function() {
 };
-OurSonicModels.SLData.createInstance = function() {
+$OurSonicModels_SLData.createInstance = function() {
 	return {};
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.SLDataAnimation
-OurSonicModels.SLDataAnimation = function() {
+var $OurSonicModels_SLDataAnimation = function() {
 };
-OurSonicModels.SLDataAnimation.createInstance = function() {
+$OurSonicModels_SLDataAnimation.createInstance = function() {
 	return {};
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.SLDataAnimationFrame
-OurSonicModels.SLDataAnimationFrame = function() {
+var $OurSonicModels_SLDataAnimationFrame = function() {
 };
-OurSonicModels.SLDataAnimationFrame.createInstance = function() {
+$OurSonicModels_SLDataAnimationFrame.createInstance = function() {
 	return {};
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.SLDataChunkBlock
-OurSonicModels.SLDataChunkBlock = function() {
+var $OurSonicModels_SLDataChunkBlock = function() {
 };
-OurSonicModels.SLDataChunkBlock.createInstance = function() {
+$OurSonicModels_SLDataChunkBlock.createInstance = function() {
 	return {};
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.SLDataCNZBumperEntry
-OurSonicModels.SLDataCNZBumperEntry = function() {
+var $OurSonicModels_SLDataCNZBumperEntry = function() {
 };
-OurSonicModels.SLDataCNZBumperEntry.createInstance = function() {
+$OurSonicModels_SLDataCNZBumperEntry.createInstance = function() {
 	return {};
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.SLDataObjectEntry
-OurSonicModels.SLDataObjectEntry = function() {
+var $OurSonicModels_SLDataObjectEntry = function() {
 };
-OurSonicModels.SLDataObjectEntry.createInstance = function() {
+$OurSonicModels_SLDataObjectEntry.createInstance = function() {
 	return {};
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.SLDataPatternIndex
-OurSonicModels.SLDataPatternIndex = function() {
+var $OurSonicModels_SLDataPatternIndex = function() {
 };
-OurSonicModels.SLDataPatternIndex.createInstance = function() {
+$OurSonicModels_SLDataPatternIndex.createInstance = function() {
 	return {};
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.SLDataRingEntry
-OurSonicModels.SLDataRingEntry = function() {
+var $OurSonicModels_SLDataRingEntry = function() {
 };
-OurSonicModels.SLDataRingEntry.createInstance = function() {
+$OurSonicModels_SLDataRingEntry.createInstance = function() {
 	return {};
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.SLDataStartPositionEntry
-OurSonicModels.SLDataStartPositionEntry = function() {
+var $OurSonicModels_SLDataStartPositionEntry = function() {
 };
-OurSonicModels.SLDataStartPositionEntry.createInstance = function() {
+$OurSonicModels_SLDataStartPositionEntry.createInstance = function() {
 	return {};
 };
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.Solidity
-OurSonicModels.Solidity = function() {
+var $OurSonicModels_Solidity = function() {
 };
-OurSonicModels.Solidity.prototype = { NotSolid: 0, TopSolid: 1, LRBSolid: 2, AllSolid: 3 };
-OurSonicModels.Solidity.registerEnum('OurSonicModels.Solidity', false);
-Type.registerNamespace('OurSonicModels.Common');
+$OurSonicModels_Solidity.prototype = { NotSolid: 0, TopSolid: 1, LRBSolid: 2, AllSolid: 3 };
+Type.registerEnum(global, 'OurSonicModels.Solidity', $OurSonicModels_Solidity, false);
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.Common.DataObject
-OurSonicModels.Common.DataObject$1 = function(T) {
+var $OurSonicModels_Common_DataObject$1 = function(T) {
 	var $type = function(data) {
 		this.Data = T.getDefaultValue();
 		this.Data = data;
 	};
-	$type.registerGenericClassInstance($type, OurSonicModels.Common.DataObject$1, [T], function() {
+	Type.registerGenericClassInstance($type, $OurSonicModels_Common_DataObject$1, [T], function() {
 		return Object;
 	}, function() {
 		return [];
 	});
 	return $type;
 };
-OurSonicModels.Common.DataObject$1.registerGenericClass('OurSonicModels.Common.DataObject$1', 1);
+Type.registerGenericClass(global, 'OurSonicModels.Common.DataObject$1', $OurSonicModels_Common_DataObject$1, 1);
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicModels.Common.DelegateOrValue
-OurSonicModels.Common.DelegateOrValue$1 = function(T) {
+var $OurSonicModels_Common_DelegateOrValue$1 = function(T) {
 	var $type = function(d) {
 		this.isValue = false;
 		this.$method = null;
@@ -142,31 +140,31 @@ OurSonicModels.Common.DelegateOrValue$1 = function(T) {
 	};
 	$type.$ctor1.prototype = $type.prototype;
 	$type.op_Implicit$2 = function(d) {
-		return new (Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [T]).$ctor1)(d);
+		return new (Type.makeGenericType($OurSonicModels_Common_DelegateOrValue$1, [T]).$ctor1)(d);
 	};
 	$type.op_Implicit$1 = function(d) {
-		return new (Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [T]))(d);
+		return new (Type.makeGenericType($OurSonicModels_Common_DelegateOrValue$1, [T]))(d);
 	};
 	$type.op_Implicit = function(d) {
 		return d.$evaluate();
 	};
-	$type.registerGenericClassInstance($type, OurSonicModels.Common.DelegateOrValue$1, [T], function() {
+	Type.registerGenericClassInstance($type, $OurSonicModels_Common_DelegateOrValue$1, [T], function() {
 		return Object;
 	}, function() {
 		return [];
 	});
 	return $type;
 };
-OurSonicModels.Common.DelegateOrValue$1.registerGenericClass('OurSonicModels.Common.DelegateOrValue$1', 1);
-OurSonicModels.AnimatedPaletteItem.registerClass('OurSonicModels.AnimatedPaletteItem', Object);
-OurSonicModels.AnimatedPalettePiece.registerClass('OurSonicModels.AnimatedPalettePiece', Object);
-OurSonicModels.SaveObjectModel.registerClass('OurSonicModels.SaveObjectModel', Object);
-OurSonicModels.SLData.registerClass('OurSonicModels.SLData', Object);
-OurSonicModels.SLDataAnimation.registerClass('OurSonicModels.SLDataAnimation', Object);
-OurSonicModels.SLDataAnimationFrame.registerClass('OurSonicModels.SLDataAnimationFrame', Object);
-OurSonicModels.SLDataChunkBlock.registerClass('OurSonicModels.SLDataChunkBlock', Object);
-OurSonicModels.SLDataCNZBumperEntry.registerClass('OurSonicModels.SLDataCNZBumperEntry', Object);
-OurSonicModels.SLDataObjectEntry.registerClass('OurSonicModels.SLDataObjectEntry', Object);
-OurSonicModels.SLDataPatternIndex.registerClass('OurSonicModels.SLDataPatternIndex', Object);
-OurSonicModels.SLDataRingEntry.registerClass('OurSonicModels.SLDataRingEntry', Object);
-OurSonicModels.SLDataStartPositionEntry.registerClass('OurSonicModels.SLDataStartPositionEntry', Object);
+Type.registerGenericClass(global, 'OurSonicModels.Common.DelegateOrValue$1', $OurSonicModels_Common_DelegateOrValue$1, 1);
+Type.registerClass(global, 'OurSonicModels.AnimatedPaletteItem', $OurSonicModels_AnimatedPaletteItem, Object);
+Type.registerClass(global, 'OurSonicModels.AnimatedPalettePiece', $OurSonicModels_AnimatedPalettePiece, Object);
+Type.registerClass(global, 'OurSonicModels.SaveObjectModel', $OurSonicModels_SaveObjectModel, Object);
+Type.registerClass(global, 'OurSonicModels.SLData', $OurSonicModels_SLData, Object);
+Type.registerClass(global, 'OurSonicModels.SLDataAnimation', $OurSonicModels_SLDataAnimation, Object);
+Type.registerClass(global, 'OurSonicModels.SLDataAnimationFrame', $OurSonicModels_SLDataAnimationFrame, Object);
+Type.registerClass(global, 'OurSonicModels.SLDataChunkBlock', $OurSonicModels_SLDataChunkBlock, Object);
+Type.registerClass(global, 'OurSonicModels.SLDataCNZBumperEntry', $OurSonicModels_SLDataCNZBumperEntry, Object);
+Type.registerClass(global, 'OurSonicModels.SLDataObjectEntry', $OurSonicModels_SLDataObjectEntry, Object);
+Type.registerClass(global, 'OurSonicModels.SLDataPatternIndex', $OurSonicModels_SLDataPatternIndex, Object);
+Type.registerClass(global, 'OurSonicModels.SLDataRingEntry', $OurSonicModels_SLDataRingEntry, Object);
+Type.registerClass(global, 'OurSonicModels.SLDataStartPositionEntry', $OurSonicModels_SLDataStartPositionEntry, Object);

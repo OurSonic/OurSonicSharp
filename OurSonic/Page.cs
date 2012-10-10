@@ -1,15 +1,21 @@
 ﻿using System.Html;
 using OurSonic.Utility;
+using jQueryApi;
 namespace OurSonic
 {
     public class Page
     {
-        public Page()
+        private Page()
         {
             var stats = new XStats();
             Document.Body.AppendChild(stats.Element);
 
             new SonicEngine();
+        }
+
+        public static void Main()
+        {
+            jQuery.OnDocumentReady(() => { new Page(); });
         }
     }
 }

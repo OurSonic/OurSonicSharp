@@ -387,9 +387,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             canvas.Scale(Scale.X, Scale.Y);
             drawLowChunks(canvas, bounds, localPoint, offs, fyP, fxP);
 
-            if (ShowHeightMap) {
-                drawHighChunks(canvas, fxP, fyP, offs, bounds, localPoint);
-            }
+            if (ShowHeightMap) drawHighChunks(canvas, fxP, fyP, offs, bounds, localPoint);
 
             drawObjects(canvas, localPoint);
             drawAnimations(canvas);
@@ -399,10 +397,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             //editing^
 
             if (!ShowHeightMap)
-            {
                 drawHighChunks(canvas, fxP, fyP, offs, bounds, localPoint);
-            }
-
 
             canvas.Restore();
 
@@ -580,9 +575,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                                 var posm = new Point(posj1.X + ( __x * 16 ), posj1.Y + ( __y * 16 ));
 
                                 if (hd.Falsey()) continue;
-                                if (hd.Full == false) { }
-                                else if (hd.Full == true)
-                                {
+                                if (hd.Full == false) {} else if (hd.Full == true) {
                                     if (solid > 0) {
                                         ctx.FillStyle = HeightMap.colors[solid];
                                         ctx.FillRect(posj1.X + ( __x * 16 ),

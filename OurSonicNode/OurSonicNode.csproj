@@ -6,7 +6,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{1F57228D-11FC-49D8-AB36-7B026D5FE5DF}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OurSonicNode</RootNamespace>
     <AssemblyName>OurSonicNode</AssemblyName>
@@ -31,6 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
@@ -43,21 +46,13 @@
       <Project>{48C25DF7-AFC5-4AC0-B11A-535DEF87076D}</Project>
       <Name>Fibers</Name>
     </ProjectReference>
-    <ProjectReference Include="..\NodeLibraries\MongoDB\MongoDB.csproj">
-      <Project>{EAC709D8-477C-41F5-93E9-1C39C3C5E5A9}</Project>
-      <Name>MongoDB</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NodeLibraries\NodeJS\NodeJS.csproj">
-      <Project>{79800429-B885-4F5E-9A3B-48E50390214A}</Project>
-      <Name>NodeJS</Name>
-    </ProjectReference>
     <ProjectReference Include="..\NodeLibraries\Redis\Redis.csproj">
       <Project>{5214FA01-BBBF-425F-B77D-1F6DA7AEB4ED}</Project>
       <Name>Redis</Name>
     </ProjectReference>
-    <ProjectReference Include="..\NodeLibraries\SocketIO\SocketIO.csproj">
+    <ProjectReference Include="..\NodeLibraries\SocketIO\SocketIOLibrary.csproj">
       <Project>{BD7C6F4F-3798-4C32-9EE1-306CF197F81E}</Project>
-      <Name>SocketIO</Name>
+      <Name>SocketIOLibrary</Name>
     </ProjectReference>
     <ProjectReference Include="..\OurSonicModels\OurSonicModels.csproj">
       <Project>{D16CB407-F890-4670-8DB6-37DF76880297}</Project>
@@ -73,15 +68,17 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib">
-      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.1.4.0\tools\Assemblies\mscorlib.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.1.4.0.18\tools\Assemblies\mscorlib.dll</HintPath>
     </Reference>
     <Reference Include="Script.Linq, Version=1.4.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Saltarelle.Linq.1.4.0\lib\Script.Linq.dll</HintPath>
+      <HintPath>..\packages\Saltarelle.Linq.1.4.0.1\lib\Script.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="Script.NodeJS">
+      <HintPath>..\packages\Saltarelle.NodeJS.1.4.0.12\lib\Script.NodeJS.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.4.0\tools\Saltarelle.Compiler.targets')" />
-  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.1.4.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.4.0\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.4.0.28\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.1.4.0.28\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.4.0.28\tools\Saltarelle.Compiler.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

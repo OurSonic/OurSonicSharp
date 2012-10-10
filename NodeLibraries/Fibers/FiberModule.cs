@@ -1,13 +1,12 @@
 using System;
 using System.Runtime.CompilerServices;
-using NodeJSLibrary;
 namespace FibersLibrary
 {
-    [IgnoreNamespace]
     [Imported(IsRealType = true)]
-    [ScriptName("Fiber")]
+    [ModuleName("Fiber")]
     [IgnoreGenericArguments]
-    public class FiberModule<T> : NodeModule
+    [Imported]
+    public class FiberModule<T>
     {
         public FiberModule(Func<T, bool> action) {}
 

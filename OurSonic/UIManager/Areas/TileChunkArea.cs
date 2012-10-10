@@ -106,7 +106,7 @@ namespace OurSonic.UIManager.Areas
                                                      hmap = tilePiece.GetLayer1HeightMaps();
                                                  else
                                                      hmap = tilePiece.GetLayer2HeightMaps();
-                                                 
+
                                                  hmap.Draw(cnv, new Point(0, 0), false, false, 1, 0);
                                              }
 

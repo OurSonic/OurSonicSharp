@@ -209,6 +209,5 @@ namespace OurSonic.Level.Tiles
         {
             CurPaletteIndexes = null;
         }
-
-     }
+    }
 }

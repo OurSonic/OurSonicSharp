@@ -115,7 +115,7 @@ namespace OurSonic.Level.Objects
             return ObjectData.PieceLayouts[PieceIndex];
         }
 
-        public Rectangle GetRect( )
+        public Rectangle GetRect()
         {
             if (ObjectData.PieceLayouts.Count == 0) {
                 _rect.X = (int) X;
@@ -138,11 +138,11 @@ namespace OurSonic.Level.Objects
                 var asset = ObjectData.Assets[piece.AssetIndex];
                 if (asset.Frames.Count > 0) {
                     var frm = asset.Frames[j.FrameIndex];
-                    Help.MergeRect(_rect, new Rectangle(frm.OffsetX + j.X, frm.OffsetY + j.Y, frm.Width  , frm.Height ));
+                    Help.MergeRect(_rect, new Rectangle(frm.OffsetX + j.X, frm.OffsetY + j.Y, frm.Width, frm.Height));
                 }
             }
-            _rect.X = _rect.X ;
-            _rect.Y = _rect.Y ;
+            _rect.X = _rect.X;
+            _rect.Y = _rect.Y;
             _rect.Width -= _rect.X;
             _rect.Height -= _rect.Y;
 

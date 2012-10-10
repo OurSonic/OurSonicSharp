@@ -5,7 +5,7 @@
 * Licenced under the BSD License.
 * See https://raw.github.com/RobertWHurst/KeyboardJS/master/license.txt
 */
-(function (root, factory) {
+(function(root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define(factory);
@@ -13,11 +13,22 @@
         // Browser globals
         root.KeyboardJS = factory();
     }
-} (this, function () {
+}(this, function() {
 
     //polyfills for ms's peice o' shit browsers
-    function bind(target, type, handler) { if (target.addEventListener) { target.addEventListener(type, handler, false); } else { target.attachEvent("on" + type, function (event) { return handler.call(target, event); }); } }
-    [ ].indexOf || (Array.prototype.indexOf = function (a, b, c) { for (c = this.length, b = (c + ~ ~b) % c; b < c && (!(b in this) || this[b] !== a); b++); return b ^ c ? b : -1; });
+
+    function bind(target, type, handler) {
+        if (target.addEventListener) {
+            target.addEventListener(type, handler, false);
+        } else {
+            target.attachEvent("on" + type, function(event) { return handler.call(target, event); });
+        }
+    }
+
+    [].indexOf || (Array.prototype.indexOf = function(a, b, c) {
+        for (c = this.length, b = (c + ~~b) % c; b < c && (!(b in this) || this[b] !== a); b++) ;
+        return b ^ c ? b : -1;
+    });
 
     //locals
     var locals = {
@@ -28,10 +39,13 @@
             "shift": 16,
             "ctrl": 17,
             "alt": 18,
-            "pause": 19, "break": 19,
+            "pause": 19,
+            "break": 19,
             "capslock": 20,
-            "escape": 27, "esc": 27,
-            "space": 32, "spacebar": 32,
+            "escape": 27,
+            "esc": 27,
+            "space": 32,
+            "spacebar": 32,
             "pageup": 33,
             "pagedown": 34,
             "end": 35,
@@ -42,26 +56,87 @@
             "down": 40,
             "insert": 45,
             "delete": 46,
-            "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 53, "6": 54, "7": 55, "8": 56, "9": 57,
-            "a": 65, "b": 66, "c": 67, "d": 68, "e": 69, "f": 70, "g": 71, "h": 72, "i": 73, "j": 74, "k": 75, "l": 76, "m": 77, "n": 78, "o": 79, "p": 80, "q": 81, "r": 82, "s": 83, "t": 84, "u": 85, "v": 86, "w": 87, "x": 88, "y": 89, "z": 90,
-            "meta": 91, "command": 91, "windows": 91, "win": 91,
+            "0": 48,
+            "1": 49,
+            "2": 50,
+            "3": 51,
+            "4": 52,
+            "5": 53,
+            "6": 54,
+            "7": 55,
+            "8": 56,
+            "9": 57,
+            "a": 65,
+            "b": 66,
+            "c": 67,
+            "d": 68,
+            "e": 69,
+            "f": 70,
+            "g": 71,
+            "h": 72,
+            "i": 73,
+            "j": 74,
+            "k": 75,
+            "l": 76,
+            "m": 77,
+            "n": 78,
+            "o": 79,
+            "p": 80,
+            "q": 81,
+            "r": 82,
+            "s": 83,
+            "t": 84,
+            "u": 85,
+            "v": 86,
+            "w": 87,
+            "x": 88,
+            "y": 89,
+            "z": 90,
+            "meta": 91,
+            "command": 91,
+            "windows": 91,
+            "win": 91,
             "_91": 92,
             "select": 93,
-            "num0": 96, "num1": 97, "num2": 98, "num3": 99, "num4": 100, "num5": 101, "num6": 102, "num7": 103, "num8": 104, "num9": 105,
+            "num0": 96,
+            "num1": 97,
+            "num2": 98,
+            "num3": 99,
+            "num4": 100,
+            "num5": 101,
+            "num6": 102,
+            "num7": 103,
+            "num8": 104,
+            "num9": 105,
             "multiply": 106,
             "add": 107,
             "subtract": 109,
             "decimal": 110,
             "divide": 111,
-            "f1": 112, "f2": 113, "f3": 114, "f4": 115, "f5": 116, "f6": 117, "f7": 118, "f8": 119, "f9": 120, "f10": 121, "f11": 122, "f12": 123,
-            "numlock": 144, "num": 144,
-            "scrolllock": 145, "scroll": 145,
+            "f1": 112,
+            "f2": 113,
+            "f3": 114,
+            "f4": 115,
+            "f5": 116,
+            "f6": 117,
+            "f7": 118,
+            "f8": 119,
+            "f9": 120,
+            "f10": 121,
+            "f11": 122,
+            "f12": 123,
+            "numlock": 144,
+            "num": 144,
+            "scrolllock": 145,
+            "scroll": 145,
             "semicolon": 186,
-            "equal": 187, "equalsign": 187,
+            "equal": 187,
+            "equalsign": 187,
             "comma": 188,
             "dash": 189,
             "period": 190,
-            "slash": 191, "forwardslash": 191,
+            "slash": 191,
+            "forwardslash": 191,
             "graveaccent": 192,
             "openbracket": 219,
             "backslash": 220,
@@ -75,12 +150,12 @@
 
     //keys
     var keys = locals['us'],
-		activeKeys = [],
-		activeBindings = {},
-		keyBindingGroups = [];
+        activeKeys = [],
+        activeBindings = { },
+        keyBindingGroups = [];
 
     //adds keys to the active keys array
-    bind(document, "keydown", function (event) {
+    bind(document, "keydown", function(event) {
         if (OurSonic && OurSonic.SonicManager.instance.typingInEditor) return false;
 
         //lookup the key pressed and save it to the active keys array
@@ -98,7 +173,7 @@
     });
 
     //removes keys from the active array
-    bind(document, "keyup", function (event) {
+    bind(document, "keyup", function(event) {
         if (OurSonic && OurSonic.SonicManager.instance.typingInEditor) return false;
 
         //lookup the key released and prune it from the active keys array
@@ -121,6 +196,7 @@
     /**
     * Generates an array of active key bindings
     */
+
     function queryActiveBindings() {
         var bindingStack = [];
 
@@ -132,9 +208,8 @@
                 //loop through the key bindings of the same key length.
                 for (var bindingIndex = 0; bindingIndex < KeyBindingGroup.length; bindingIndex += 1) {
                     var binding = KeyBindingGroup[bindingIndex],
-
-                    //assume the binding is active till a required key is found to be unsatisfied
-						keyBindingActive = true;
+                        //assume the binding is active till a required key is found to be unsatisfied
+                        keyBindingActive = true;
 
                     //loop through each key required by the binding.
                     for (var keyIndex = 0; keyIndex < binding.keys.length; keyIndex += 1) {
@@ -161,6 +236,7 @@
     * Collects active keys, sets active binds and fires on key down callbacks
     * @param event
     */
+
     function executeActiveKeyBindings(event) {
 
         if (activeKeys < 1) {
@@ -168,13 +244,13 @@
         }
 
         var bindingStack = queryActiveBindings(),
-			spentKeys = [],
-			output;
+            spentKeys = [],
+            output;
 
         //loop through each active binding
         for (var bindingIndex = 0; bindingIndex < bindingStack.length; bindingIndex += 1) {
             var binding = bindingStack[bindingIndex],
-				usesSpentKey = false;
+                usesSpentKey = false;
 
             //check each of the required keys. Make sure they have not been used by another binding
             for (var keyIndex = 0; keyIndex < binding.keys.length; keyIndex += 1) {
@@ -223,6 +299,7 @@
     * Removes no longer active keys and fires the on key up callbacks for associated active bindings.
     * @param event
     */
+
     function pruneActiveKeyBindings(event) {
         var bindingStack = queryActiveBindings();
         var output;
@@ -231,7 +308,7 @@
         for (var bindingCombo in activeBindings) {
             if (activeBindings.hasOwnProperty(bindingCombo)) {
                 var binding = activeBindings[bindingCombo],
-					active = false;
+                    active = false;
 
                 //loop thorugh the active bindings
                 for (var bindingIndex = 0; bindingIndex < bindingStack.length; bindingIndex += 1) {
@@ -269,6 +346,7 @@
     * @param callback
     * @param endCallback
     */
+
     function bindKey(keyCombo, callback, endCallback) {
 
         function clear() {
@@ -293,7 +371,9 @@
 
             //if there are keys in the current combo
             if (keys.length) {
-                if (!keyBindingGroups[keys.length]) { keyBindingGroups[keys.length] = []; }
+                if (!keyBindingGroups[keys.length]) {
+                    keyBindingGroups[keys.length] = [];
+                }
 
                 //define the
                 var keyBinding = {
@@ -324,14 +404,25 @@
     * @param right
     * @param callback
     */
+
     function bindAxis(up, down, left, right, callback) {
 
         function clear() {
-            if (typeof clearUp === 'function') { clearUp(); }
-            if (typeof clearDown === 'function') { clearDown(); }
-            if (typeof clearLeft === 'function') { clearLeft(); }
-            if (typeof clearRight === 'function') { clearRight(); }
-            if (typeof timer === 'function') { clearInterval(timer); }
+            if (typeof clearUp === 'function') {
+                clearUp();
+            }
+            if (typeof clearDown === 'function') {
+                clearDown();
+            }
+            if (typeof clearLeft === 'function') {
+                clearLeft();
+            }
+            if (typeof clearRight === 'function') {
+                clearRight();
+            }
+            if (typeof timer === 'function') {
+                clearInterval(timer);
+            }
         }
 
         var axis = [0, 0];
@@ -341,42 +432,42 @@
         }
 
         //up
-        var clearUp = bindKey(up, function () {
+        var clearUp = bindKey(up, function() {
             if (axis[0] === 0) {
                 axis[0] = -1;
             }
-        }, function () {
+        }, function() {
             axis[0] = 0;
         }).clear;
 
         //down
-        var clearDown = bindKey(down, function () {
+        var clearDown = bindKey(down, function() {
             if (axis[0] === 0) {
                 axis[0] = 1;
             }
-        }, function () {
+        }, function() {
             axis[0] = 0;
         }).clear;
 
         //left
-        var clearLeft = bindKey(left, function () {
+        var clearLeft = bindKey(left, function() {
             if (axis[1] === 0) {
                 axis[1] = -1;
             }
-        }, function () {
+        }, function() {
             axis[1] = 0;
         }).clear;
 
         //right
-        var clearRight = bindKey(right, function () {
+        var clearRight = bindKey(right, function() {
             if (axis[1] === 0) {
                 axis[1] = 1;
             }
-        }, function () {
+        }, function() {
             axis[1] = 0;
         }).clear;
 
-        var timer = setInterval(function () {
+        var timer = setInterval(function() {
 
             //NO CHANGE
             if (axis[0] === 0 && axis[1] === 0) {
@@ -397,6 +488,7 @@
     * Clears all key and key combo binds containing a given key or keys.
     * @param keys
     */
+
     function unbindKey(keys) {
 
         if (keys === 'all') {
@@ -414,7 +506,7 @@
                 //loop through the key bindings.
                 for (var iB = 0; iB < KeyBindingGroup.length; iB += 1) {
                     var keyBinding = KeyBindingGroup[iB],
-						remove = false;
+                        remove = false;
 
                     //loop through the current key binding keys.
                     for (var iKB = 0; iKB < keyBinding.keys.length; iKB += 1) {
@@ -428,10 +520,13 @@
                                 break;
                             }
                         }
-                        if (remove) { break; }
+                        if (remove) {
+                            break;
+                        }
                     }
                     if (remove) {
-                        keyBindingGroups[iKCL].splice(iB, 1); iB -= 1;
+                        keyBindingGroups[iKCL].splice(iB, 1);
+                        iB -= 1;
                         if (keyBindingGroups[iKCL].length < 1) {
                             delete keyBindingGroups[iKCL];
                         }
@@ -444,6 +539,7 @@
     /**
     * Gets an array of active keys
     */
+
     function getActiveKeys() {
         return activeKeys;
     }
@@ -453,6 +549,7 @@
     * @param local
     * @param keys
     */
+
     function addLocale(local, keys) {
         locals[local] = keys;
     }
@@ -461,6 +558,7 @@
     * Changes the keyboard local
     * @param local
     */
+
     function setLocale(local) {
         if (locals[local]) {
             keys = locals[local];

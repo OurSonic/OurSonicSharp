@@ -231,7 +231,6 @@ namespace OurSonic.Utility
 
         public static void DecodeString<T>(string lvl, Action<T> complete)
         {
-
             if (FunctionWorker.HasWebWorker()) {
                 new FunctionWorker("lib/FunctionWorker.js").ThreadedFunction<string, string>
                         ((e) => {
@@ -244,10 +243,7 @@ namespace OurSonic.Utility
                          (e) => complete(Json.Parse<T>(e.Data)),
                          (e) => { },
                          lvl);
-            } else {
-                complete(Json.Parse<T>(new Compressor().DecompressText(lvl)));
-            }
-            
+            } else complete(Json.Parse<T>(new Compressor().DecompressText(lvl)));
         }
 
         [InlineCode("debugger")]

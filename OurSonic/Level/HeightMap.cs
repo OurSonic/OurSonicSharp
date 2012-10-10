@@ -13,24 +13,23 @@ namespace OurSonic.Level
         [IntrinsicProperty]
         protected int Height { get; set; }
         [IntrinsicProperty]
-        public int[] Items { get; set; } 
+        public int[] Items { get; set; }
         [IntrinsicProperty]
         protected int Index { get; set; }
+        public bool? Full { get; set; }
 
         public HeightMap(int[] heightMap, int i)
         {
             Items = heightMap;
             Width = 16;
-            Height = 16; 
+            Height = 16;
             Index = i;
         }
+
         public HeightMap(bool full)
         {
             Full = full;
         }
-
-        public bool? Full { get; set; }
-          
 
         public void SetItem(int x, int y, RotationMode rotationMode)
         {
@@ -59,9 +58,7 @@ namespace OurSonic.Level
 
         public void Draw(CanvasContext2D canvas, Point pos, bool xflip, bool yflip, int solid, int angle)
         {
-            if (this.Items == null) {
-                return;
-            }
+            if (Items == null) return;
             canvas.Save();
 
             var oPos = new Point(pos);
@@ -98,7 +95,7 @@ namespace OurSonic.Level
                                     ncanvas.LineWidth = 1;
                                     ncanvas.StrokeStyle = "rgba(163,241,255,0.8)";
                                     ncanvas.MoveTo(16 / 2, 16 / 2);
-                                    ncanvas.LineTo(16 / 2 - Help.Sin(angle) * 8,16 / 2 - Help.Cos(angle) * 8);
+                                    ncanvas.LineTo(16 / 2 - Help.Sin(angle) * 8, 16 / 2 - Help.Cos(angle) * 8);
                                     ncanvas.Stroke();
                                     /*ncanvas.BeginPath();
                                     ncanvas.FillStyle = "rgba(163,241,255,0.8)";
@@ -129,6 +126,5 @@ namespace OurSonic.Level
                 return Math.Abs(items[x]) >= y;
             return items[x] >= 16 - y;
         }
-
-     }
+    }
 }
