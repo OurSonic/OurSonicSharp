@@ -368,6 +368,7 @@ namespace OurSonic
             Document.Body.Style.Cursor = "default";
             lastMouseMove = Help.GetCursorPosition(queryEvent);
             if (sonicManager.UIManager.OnMouseMove(lastMouseMove)) return;
+            if (sonicManager.MouseMove(queryEvent)) return;
 
             return;
         }
@@ -383,6 +384,7 @@ namespace OurSonic
         {
             queryEvent.PreventDefault();
             sonicManager.UIManager.OnMouseUp(lastMouseMove);
+            if (sonicManager.MouseUp(queryEvent)) return;
         }
 
         public void resizeCanvas(bool resetOverride)

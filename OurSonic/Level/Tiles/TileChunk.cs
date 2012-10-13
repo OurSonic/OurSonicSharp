@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonic.Level.Animations;
+using OurSonic.UIManager;
 using OurSonic.Utility;
 using OurSonicModels;
 namespace OurSonic.Level.Tiles
@@ -247,14 +248,34 @@ namespace OurSonic.Level.Tiles
             */
         }
 
-        private static void drawBlock(CanvasContext2D canvas, Point position, TileCacheBlock tileCacheBlock)
+        private   void drawBlock(CanvasContext2D canvas, Point position, TileCacheBlock tileCacheBlock)
         {
             canvas.DrawImage(tileCacheBlock.Block.Canvas, position.X /*tileCacheBlock.X * pieceWidth*/, position.Y /*tileCacheBlock.Y * pieceHeight*/);
+            UIManagerAreas areas = SonicManager.Instance.UIManager.UIManagerAreas;
+            if (areas.TileChunkArea != null && areas.TileChunkArea.Data != null && areas.TileChunkArea.Data.Index == this.Index)
+            {
+                canvas.Save();
+                canvas.StrokeStyle = "yellow";
+                canvas.LineWidth = 2;
+                canvas.StrokeRect(position.X, position.Y, tileCacheBlock.Block.Canvas.Width, tileCacheBlock.Block.Canvas.Height);
+                canvas.Restore();
+            }
         }
 
         private void drawFullChunk(CanvasContext2D canvas, Point position, int layer)
         {
             canvas.DrawImage(neverAnimateCache[layer].Canvas, position.X, position.Y);
+
+
+            UIManagerAreas areas = SonicManager.Instance.UIManager.UIManagerAreas;
+            if (areas.TileChunkArea != null && areas.TileChunkArea.Data != null && areas.TileChunkArea.Data.Index == this.Index)
+            {
+                canvas.Save();
+                canvas.StrokeStyle = "yellow";
+                canvas.LineWidth = 2;
+                canvas.StrokeRect(position.X, position.Y, neverAnimateCache[layer].Canvas.Width, neverAnimateCache[layer].Canvas.Height);
+                canvas.Restore();
+            }
 
             /*
                         canvas.Save();

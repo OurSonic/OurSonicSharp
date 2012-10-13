@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonic.UIManager;
 using OurSonic.Utility;
 namespace OurSonic.Level.Tiles
 {
@@ -201,6 +202,16 @@ namespace OurSonic.Level.Tiles
         private void DrawIt(CanvasContext2D canvas, CanvasElement fd, Point position)
         {
             canvas.DrawImage(fd, position.X, position.Y);
+
+            UIManagerAreas areas = SonicManager.Instance.UIManager.UIManagerAreas;
+            if (areas.TilePieceArea != null && areas.TilePieceArea.Data != null && areas.TilePieceArea.Data.Index == this.Index)
+            {
+                canvas.Save();
+                canvas.StrokeStyle = "light green";
+                canvas.LineWidth = 2;
+                canvas.StrokeRect(position.X, position.Y, fd.Width, fd.Height);
+                canvas.Restore();
+            }
         }
 
         public int GetLayer1Angles()

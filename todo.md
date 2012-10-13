@@ -39,8 +39,7 @@ better ui area scheme
 run simulator area
 maybe window manager, minimize and shit
 live object = editing
-
-
+think about backgrounds?
 
 
 

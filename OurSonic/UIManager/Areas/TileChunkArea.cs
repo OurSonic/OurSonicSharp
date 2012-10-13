@@ -12,7 +12,7 @@ namespace OurSonic.UIManager.Areas
         public TileChunkArea(UIManager uiManager)
         {
             var tileChunkArea = uiManager.UIManagerAreas.TileChunkArea = new UIArea<TileChunk>(null, 700, 500, 390, 390) {Closable = true};
-            tileChunkArea.Visible = true;
+            tileChunkArea.Visible = false;
 
             uiManager.AddArea(tileChunkArea);
             tileChunkArea.AddControl(new TextArea(30, 25, "Tile Chunks") {Color = "blue"});
@@ -44,7 +44,7 @@ namespace OurSonic.UIManager.Areas
                                if (tileChunkArea.Data == null) return;
                                var tilePiece = tileChunkArea.Data.GetBlockAt(e.X / areaDrawScale, e.Y / areaDrawScale);
 
-                               uiManager.UIManagerAreas.TilePieceArea.Visible = true;
+                               uiManager.UIManagerAreas.TilePieceArea.Visible = false;
                                uiManager.UIManagerAreas.TilePieceArea.Data = tilePiece;
                                tilePieceList.ScrollIndex = Math.Max(uiManager.sonicManager.SonicLevel.TilePieces.IndexOf(tilePiece) - 1, 0);
                            };

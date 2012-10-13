@@ -29,6 +29,7 @@ namespace OurSonic
         public int tickCount;
         private bool waitingForDrawContinue;
         public bool waitingForTickContinue;
+        private bool clicking;
         [IntrinsicProperty]
         public GameState CurrentGameState { get; set; }
         [IntrinsicProperty]
@@ -151,12 +152,43 @@ namespace OurSonic
         public bool OnClick(jQueryEvent elementEvent)
         {
             //Help.Debugger();
-            var e = new Point((int) ( (double) elementEvent.ClientX / Scale.X / RealScale.X + WindowLocation.X ),
-                              (int) ( (double) elementEvent.ClientY / Scale.Y / RealScale.Y + WindowLocation.Y ));
-
-            //then clicking
+           //then clicking
             //then chunk editor/tilepiece editor/tile editor/ heightmap editor/ and proper map editor;
 
+            clicking = true;
+            if (effectClick(elementEvent)) return true;
+            return false;
+
+            /* 
+                case ClickState.PlaceObject:
+                    var ex = _H.floor((e.x));
+                    var ey = _H.floor((e.y));
+
+                    for (var l = 0; l < sonicManager.SonicLevel.Objects.length; l++) {
+                        var o = sonicManager.SonicLevel.Objects[l];
+
+                        if (_H.intersects2(o.getRect(scale), { X: ex, Y: ey })) {
+                            alert("Object Data: " + _H.stringify(o));
+                        }
+                    }
+
+                    return true;
+
+                    break;  
+             */
+        }
+
+        private bool effectClick(jQueryEvent elementEvent )
+        {
+            var e = new Point((int)((double)elementEvent.ClientX / Scale.X / RealScale.X + WindowLocation.X),
+                        (int)((double)elementEvent.ClientY / Scale.Y / RealScale.Y + WindowLocation.Y));
+
+       
+
+            /*if (CurrentGameState == GameState.Playing) {
+                SonicToon.X = e.X;
+                SonicToon.X = e.Y;
+            }*/
             int ey;
             int ex;
 
@@ -180,7 +212,7 @@ namespace OurSonic
             if (elementEvent.Button == 0) {
                 switch (ClickState) {
                     case ClickState.Dragging:
-                        return false;
+                        return true;
                     case ClickState.PlaceChunk:
                         ex = e.X / 128;
                         ey = e.Y / 128;
@@ -188,15 +220,17 @@ namespace OurSonic
                         TilePiece tp = ch.GetBlockAt(e.X - ex * 128, e.Y - ey * 128);
 
                         if (UIManager.UIManagerAreas.TileChunkArea != null) {
-                            UIManager.UIManagerAreas.TileChunkArea.Visible = true;
+                            UIManager.UIManagerAreas.TileChunkArea.Visible = false;
                             UIManager.UIManagerAreas.TileChunkArea.Data = ch;
                             //tilePieceList.ScrollIndex = Math.Max(uiManager.sonicManager.SonicLevel.TilePieces.IndexOf(tilePiece) - 1, 0);
                         }
                         if (UIManager.UIManagerAreas.TilePieceArea != null) {
-                            UIManager.UIManagerAreas.TilePieceArea.Visible = true;
+                            UIManager.UIManagerAreas.TilePieceArea.Visible = false;
                             UIManager.UIManagerAreas.TilePieceArea.Data = tp;
                             //UIManager.UIManagerAreas.TilePieceArea.ScrollIndex = Math.Max(SonicLevel.TilePieces.IndexOf(tp) - 1, 0);
                         }
+
+                        this.ClearCache();
 
                         return true;
                     case ClickState.PlaceRing:
@@ -217,24 +251,6 @@ namespace OurSonic
                 }
             }
             return false;
-
-            /* 
-                case ClickState.PlaceObject:
-                    var ex = _H.floor((e.x));
-                    var ey = _H.floor((e.y));
-
-                    for (var l = 0; l < sonicManager.SonicLevel.Objects.length; l++) {
-                        var o = sonicManager.SonicLevel.Objects[l];
-
-                        if (_H.intersects2(o.getRect(scale), { X: ex, Y: ey })) {
-                            alert("Object Data: " + _H.stringify(o));
-                        }
-                    }
-
-                    return true;
-
-                    break;  
-             */
         }
 
         private void tickObjects()
@@ -723,6 +739,21 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
         {
             SonicLevel.ClearCache();
             SpriteCache.ClearCache();
+        }
+
+        public bool MouseUp(jQueryEvent queryEvent)
+        {
+            clicking = false;
+            return false;
+        }
+
+        public bool MouseMove(jQueryEvent queryEvent)
+        {
+
+            if (clicking) {
+                if (effectClick(queryEvent)) return true;
+            }
+            return false;
         }
     }
 }
