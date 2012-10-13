@@ -43,8 +43,6 @@ namespace OurSonic.Level.Tiles
         [IntrinsicProperty]
         private bool? Empty { get; set; }
         [IntrinsicProperty]
-        private List<string> Sprites { get; set; }
-        [IntrinsicProperty]
         public TilePieceInfo[][] TilePieces { get; set; }
         [IntrinsicProperty]
         public JsDictionary<int, Animation> Animated { get; set; }
@@ -61,7 +59,6 @@ namespace OurSonic.Level.Tiles
 
         public TileChunk( /*TilePiece[][] tilePieces*/)
         {
-            Sprites = new List<string>();
             IsOnlyBackground = null;
             neverAnimateCache = new CanvasInformation[2];
             layerCacheBlocks = new List<TileCacheBlock>[2];
@@ -78,6 +75,12 @@ namespace OurSonic.Level.Tiles
             return TilePieces[x / 16][y / 16].GetTilePiece();
         }
 
+        public void SetBlockAt(int x, int y, TilePiece tp)
+        {
+            TilePieces[x / 16][y / 16].SetTilePiece(tp);
+            ClearCache();
+        }
+
         public TilePieceInfo GetTilePiece(int x, int y)
         {
             return TilePieces[x / 16][y / 16];
@@ -85,46 +88,50 @@ namespace OurSonic.Level.Tiles
 
         public bool OnlyBackground()
         {
-            if (IsOnlyBackground.HasValue) return IsOnlyBackground.Value;
-
-            var tpl = TilePieces.Length;
-            var tph = TilePieces[0].Length;
-            for (int i = 0; i < tpl; i++) {
-                for (int j = 0; j < tph; j++) {
-                    var r = TilePieces[i][j].GetTilePiece();
-                    if (!r.OnlyBackground())
-                        return ( IsOnlyBackground = false ).Value;
+            if (!IsOnlyBackground.HasValue) {
+                var tpl = TilePieces.Length;
+                var tph = TilePieces[0].Length;
+                for (int i = 0; i < tpl; i++) {
+                    for (int j = 0; j < tph; j++) {
+                        TilePiece tilePiece = TilePieces[i][j].GetTilePiece();
+                        if (tilePiece != null && !tilePiece.OnlyBackground())
+                            return ( IsOnlyBackground = false ).Value;
+                    }
                 }
+                IsOnlyBackground = true;
+                return IsOnlyBackground.Value;
             }
-            IsOnlyBackground = true;
             return IsOnlyBackground.Value;
         }
 
         public bool OnlyForeground()
         {
-            if (IsOnlyForeground.HasValue) return IsOnlyForeground.Value;
-
-            var tpl = TilePieces.Length;
-            var tph = TilePieces[0].Length;
-            for (int i = 0; i < tpl; i++) {
-                for (int j = 0; j < tph; j++) {
-                    if (!TilePieces[i][j].GetTilePiece().OnlyForeground())
-                        return ( IsOnlyForeground = false ).Value;
+            if (!IsOnlyForeground.HasValue) {
+                var tpl = TilePieces.Length;
+                var tph = TilePieces[0].Length;
+                for (int i = 0; i < tpl; i++) {
+                    for (int j = 0; j < tph; j++) {
+                        TilePiece tilePiece = TilePieces[i][j].GetTilePiece();
+                        if (tilePiece != null && !tilePiece.OnlyForeground())
+                            return ( IsOnlyForeground = false ).Value;
+                    }
                 }
+                IsOnlyForeground = true;
+                return IsOnlyForeground.Value;
             }
-            IsOnlyForeground = true;
+
             return IsOnlyForeground.Value;
         }
 
         public bool IsEmpty()
         {
-            if (Empty.Falsey()) {
+            if (!Empty.HasValue) {
                 var tpl = TilePieces.Length;
                 var tph = TilePieces[0].Length;
                 for (int i = 0; i < tpl; i++) {
                     for (int j = 0; j < tph; j++) {
                         var r = TilePieces[i][j];
-                        if (r.Block != 0)
+                        if (r != null && r.Block != 0)
                             return ( Empty = false ).Value;
                     }
                 }
@@ -135,7 +142,7 @@ namespace OurSonic.Level.Tiles
 
         public bool NeverAnimates()
         {
-            if (myNeverAnimate == null) {
+            if (!myNeverAnimate.HasValue) {
                 var len1 = TilePieces.Length;
                 var len2 = TilePieces[0].Length;
 
@@ -143,7 +150,8 @@ namespace OurSonic.Level.Tiles
                 for (int i = 0; i < len1; i++) {
                     for (int j = 0; j < len2; j++) {
                         var pm = TilePieces[i][j].GetTilePiece();
-                        if (( Animated.Truthy() && ( Animated[j * len1 + i].Truthy() ) ) || pm.AnimatedFrames.Length > 0) {
+                        if (pm == null) continue;
+                        if (( Animated.Truthy() && ( Animated[j * len1 + i].Truthy() ) ) || pm.AnimatedFrames.Count > 0) {
                             nothing = false;
                             goto done;
                         }
@@ -301,6 +309,7 @@ namespace OurSonic.Level.Tiles
             for (int pieceX = 0; pieceX < numOfPiecesWide; pieceX++) {
                 for (int pieceY = 0; pieceY < numOfPiecesLong; pieceY++) {
                     var cacheBlock = buildCacheBlock(layer, pieceWidth, pieceHeight, TilePieces[pieceX][pieceY], isBack, pieceX, pieceY, block);
+
                     switch (cacheBlock.Type) {
                         case TileCacheBlockType.Block:
                             block = cacheBlock;
@@ -331,6 +340,7 @@ namespace OurSonic.Level.Tiles
             //if (isBack ? (piece.onlyForeground) : (piece.onlyBackground)) return null;
 
             var piece = pieceInfo.GetTilePiece();
+            if (piece == null) return oldCacheBlock;
             int animatedIndex = 0;
             Animation animation = Animated[pieceY * numOfPiecesWide + pieceX];
 
@@ -340,7 +350,7 @@ namespace OurSonic.Level.Tiles
             if (Animated.Truthy() && ( animation.Truthy() ))
                 animatedIndex = animation.LastAnimatedIndex;
             else {
-                if (piece.AnimatedFrames.Length == 0 && ( !shouldAnimate || myNeverAnimate.Value ))
+                if (piece.AnimatedFrames.Count == 0 && ( !shouldAnimate || myNeverAnimate.Value ))
                     cacheBlockNeeded = true;
             }
 

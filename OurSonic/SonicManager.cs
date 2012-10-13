@@ -157,9 +157,27 @@ namespace OurSonic
             //then clicking
             //then chunk editor/tilepiece editor/tile editor/ heightmap editor/ and proper map editor;
 
+            int ey;
+            int ex;
+
+            if (elementEvent.CtrlKey) {
+                ex = e.X / 128;
+                ey = e.Y / 128;
+                TileChunk ch = SonicLevel.GetChunkAt(ex, ey);
+                if (UIManager.UIManagerAreas.TilePieceArea != null)
+                    ch.SetBlockAt(e.X - ex * 128, e.Y - ey * 128, UIManager.UIManagerAreas.TilePieceArea.Data);
+                return true;
+            }
+            if (elementEvent.ShiftKey) {
+                ex = e.X / 128;
+                ey = e.Y / 128;
+                TileChunk ch = SonicLevel.GetChunkAt(ex, ey);
+                if (UIManager.UIManagerAreas.TileChunkArea != null)
+                    SonicLevel.SetChunkAt(ex, ey, UIManager.UIManagerAreas.TileChunkArea.Data);
+                return true;
+            }
+
             if (elementEvent.Button == 0) {
-                int ey;
-                int ex;
                 switch (ClickState) {
                     case ClickState.Dragging:
                         return false;
@@ -360,7 +378,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             }
         }
 
-        public void Draw(CanvasContext2D canvas)
+        public void MainDraw(CanvasContext2D canvas)
         {
             if (InHaltMode)
                 if (drawHaltMode(canvas)) return;
@@ -442,8 +460,8 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 }
             }
             canvas.Translate(ScreenOffset.X, ScreenOffset.Y);
-            canvas.FillStyle = "#000000";
-            canvas.FillRect(0, 0, WindowLocation.Width * Scale.X, WindowLocation.Height * Scale.Y);
+            //canvas.FillStyle = "#000000";
+            //canvas.FillRect(0, 0, WindowLocation.Width * Scale.X, WindowLocation.Height * Scale.Y);
 
             WindowLocation.X = (int) ( SonicToon.X ) - WindowLocation.Width / 2;
             WindowLocation.Y = (int) ( SonicToon.Y ) - WindowLocation.Height / 2;
@@ -504,15 +522,13 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
 
                     for (int j = 0; j <= pal.TotalLength; j += pal.SkipIndex) {
                         if (DrawTickCount % ( pal.TotalLength + pal.SkipIndex ) == j)
-                            SonicLevel.PaletteAnimations[k] = j / pal.SkipIndex;
+                            SonicLevel.PaletteAnimationIndexes[k] = j / pal.SkipIndex;
                     }
 
                     for (int m = 0; m < pal.Pieces.Count; m++) {
                         var mj = pal.Pieces[m];
-                        SonicLevel.Palette[mj.PaletteIndex][mj.PaletteOffset / 2] =
-                                pal.Palette[SonicLevel.PaletteAnimations[k] * ( pal.Pieces.Count * 2 ) + 0 + ( mj.PaletteMultiply )];
-                        SonicLevel.Palette[mj.PaletteIndex][mj.PaletteOffset / 2 + 1] =
-                                pal.Palette[SonicLevel.PaletteAnimations[k] * ( pal.Pieces.Count * 2 ) + 1 + ( mj.PaletteMultiply )];
+                        SonicLevel.Palette[mj.PaletteIndex][( mj.PaletteOffset ) / 2] =
+                                pal.Palette[SonicLevel.PaletteAnimationIndexes[k] * ( pal.Pieces.Count * 2 ) + 0 + ( mj.PaletteMultiply )];
                     }
                 }
             }

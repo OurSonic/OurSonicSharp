@@ -1,219 +1,243 @@
-
-var topLevel=(typeof global !== 'undefined')?global:window;
-
-
-
 //! Script# Core Runtime
 //! More information at http://projects.nikhilk.net/ScriptSharp
 //!
+if (typeof(global) === "undefined")
+  global = window;
 
-(function () {
-  var globals = {
-    version: '0.7.4.0',
+var ss = {};
 
-    isUndefined: function (o) {
-      return (o === undefined);
-    },
+ss.isUndefined = function (o) {
+  return (o === undefined);
+};
 
-    isNull: function (o) {
-      return (o === null);
-    },
+ss.isNull = function (o) {
+  return (o === null);
+};
 
-    isNullOrUndefined: function (o) {
-      return (o === null) || (o === undefined);
-    },
+ss.isNullOrUndefined = function (o) {
+  return (o === null) || (o === undefined);
+};
 
-    isValue: function (o) {
-      return (o !== null) && (o !== undefined);
-    },
+ss.isValue = function (o) {
+  return (o !== null) && (o !== undefined);
+};
 
-    referenceEquals: function (a, b) {
-      return ss.isValue(a) ? a === b : !ss.isValue(b);
-    },
+ss.referenceEquals = function (a, b) {
+  return ss.isValue(a) ? a === b : !ss.isValue(b);
+};
 
-    mkdict: function (a) {
-      a = (arguments.length != 1 ? arguments : arguments[0]);
-      var r = {};
-      for (var i = 0; i < a.length; i += 2) {
-        r[a[i]] = a[i + 1];
-      }
-      return r;
-    },
-
-    coalesce: function (a, b) {
-      return ss.isValue(a) ? a : b;
-    }
-  };
-
-  var ss = topLevel.ss;
-  if (!ss) {
-    topLevel.ss = ss = {};
+ss.mkdict = function (a) {
+  a = (arguments.length != 1 ? arguments : arguments[0]);
+  var r = {};
+  for (var i = 0; i < a.length; i += 2) {
+    r[a[i]] = a[i + 1];
   }
-  for (var n in globals) {
-    ss[n] = globals[n];
-  }
-  if (topLevel && !topLevel.Element) {
-    topLevel.Element = function() {
+  return r;
+};
+
+ss.coalesce = function (a, b) {
+  return ss.isValue(a) ? a : b;
+};
+
+if (typeof(window) == 'object') {
+  // Browser-specific stuff that could go into the Web assembly, but that assembly does not have an associated JS file.
+  if (!window.Element) {
+  // IE does not have an Element constructor. This implementation should make casting to elements work.
+    window.Element = function() {
     };
-    topLevel.Element.isInstanceOfType = function(instance) { return instance && typeof instance.constructor === 'undefined' && typeof instance.tagName === 'string'; };
+    window.Element.isInstanceOfType = function(instance) { return instance && typeof instance.constructor === 'undefined' && typeof instance.tagName === 'string'; };
   }
-})();
+
+  if (!window.XMLHttpRequest) {
+    window.XMLHttpRequest = function() {
+      var progIDs = [ 'Msxml2.XMLHTTP', 'Microsoft.XMLHTTP' ];
+  
+      for (var i = 0; i < progIDs.length; i++) {
+        try {
+          var xmlHttp = new ActiveXObject(progIDs[i]);
+          return xmlHttp;
+        }
+        catch (ex) {
+        }
+      }
+  
+      return null;
+    };
+  }
+
+  ss.parseXml = function(markup) {
+    try {
+      if (DOMParser) {
+        var domParser = new DOMParser();
+        return domParser.parseFromString(markup, 'text/xml');
+      }
+      else {
+        var progIDs = [ 'Msxml2.DOMDocument.3.0', 'Msxml2.DOMDocument' ];
+          
+        for (var i = 0; i < progIDs.length; i++) {
+          var xmlDOM = new ActiveXObject(progIDs[i]);
+          xmlDOM.async = false;
+          xmlDOM.loadXML(markup);
+          xmlDOM.setProperty('SelectionLanguage', 'XPath');
+                  
+          return xmlDOM;
+        }
+      }
+    }
+    catch (ex) {
+    }
+  
+    return null;
+  };
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Type System Implementation
 
-topLevel.Type = Function;
+global.Type = Function;
 
-topLevel.__Namespace = function(name) {
-    this.__typeName = name;
-}
-__Namespace.prototype = {
-    __namespace: true,
-    getName: function() {
-        return this.__typeName;
-    }
-}
+Type.registerType = function Type$registerType(root, typeName, type) {
+    var ns = root;
+    var nameParts = typeName.split('.');
 
-Type.registerNamespace = function Type$registerNamespace(name) {
-    if (!topLevel.__namespaces) {
-        topLevel.__namespaces = {};
-    }
-    if (!topLevel.__rootNamespaces) {
-        topLevel.__rootNamespaces = [];
-    }
-
-    if (topLevel.__namespaces[name]) {
-        return;
-    }
-
-    var ns = topLevel;
-    var nameParts = name.split('.');
-
-    for (var i = 0; i < nameParts.length; i++) {
+    for (var i = 0; i < nameParts.length - 1; i++) {
         var part = nameParts[i];
         var nso = ns[part];
         if (!nso) {
-            ns[part] = nso = new __Namespace(nameParts.slice(0, i + 1).join('.'));
-            if (i == 0) {
-                topLevel.__rootNamespaces.add(nso);
-            }
+            ns[part] = nso = {};
         }
         ns = nso;
     }
-
-    topLevel.__namespaces[name] = ns;
-}
+    ns[nameParts[nameParts.length - 1]] = type;
+};
 
 Type.__genericCache = {};
+
 Type._makeGenericTypeName = function Type$_makeGenericTypeName(genericType, typeArguments) {
 	var result = genericType.__typeName;
 	for (var i = 0; i < typeArguments.length; i++)
 		result += (i === 0 ? '[' : ',') + typeArguments[i].__typeName;
 	result += ']';
 	return result;
-}
+};
+
 Type.makeGenericType = function Type$makeGenericType(genericType, typeArguments) {
 	var name = Type._makeGenericTypeName(genericType, typeArguments);
 	return Type.__genericCache[name] || genericType.apply(null, typeArguments);
-}
+};
 
 Type.prototype.registerGenericClassInstance = function Type$registerGenericInstance(instance, genericType, typeArguments, baseType, interfaceTypes) {
 	var name = Type._makeGenericTypeName(genericType, typeArguments);
 	Type.__genericCache[name] = instance;
 	instance.__genericTypeDefinition = genericType;
 	instance.__typeArguments = typeArguments;
-	instance.registerClass(name, baseType(), interfaceTypes());
-}
+	Type.registerClass(null, name, instance, baseType(), interfaceTypes());
+};
 
-Type.prototype.registerGenericInterfaceInstance = function Type$registerGenericInstance(instance, genericType, typeArguments, baseInterfaces) {
+Type.registerGenericInterfaceInstance = function Type$registerGenericInstance(instance, genericType, typeArguments, baseInterfaces) {
 	var name = Type._makeGenericTypeName(genericType, typeArguments);
 	Type.__genericCache[name] = instance;
 	instance.__genericTypeDefinition = genericType;
 	instance.__typeArguments = typeArguments;
-	instance.registerInterface(name, baseInterfaces());
-}
+	Type.registerInterface(null, name, instance, baseInterfaces());
+};
 
 Type.prototype.get_isGenericTypeDefinition = function Type$get_isGenericTypeDefinition() {
 	return this.__isGenericTypeDefinition || false;
-}
+};
 
 Type.prototype.getGenericTypeDefinition = function Type$getGenericTypeDefinition() {
 	return this.__genericTypeDefinition || null;
-}
+};
 
 Type.prototype.get_genericParameterCount = function Type$get_genericParameterCount() {
 	return this.__typeArgumentCount || 0;
-}
+};
 
 Type.prototype.getGenericArguments = function Type$getGenericArguments() {
     return this.__typeArguments || null;
-}
+};
 
-Type.prototype.registerClass = function Type$registerClass(name, baseType, interfaceType) {
-    this.prototype.constructor = this;
-    this.__typeName = name;
-    this.__class = true;
-    this.__baseType = baseType || Object;
+Type.registerClass = function Type$registerClass(root, name, ctor, baseType, interfaceType) {
+	if (root)
+		Type.registerType(root, name, ctor);
+
+    ctor.prototype.constructor = ctor;
+    ctor.__typeName = name;
+    ctor.__class = true;
+    ctor.__baseType = baseType || Object;
     if (baseType) {
-        this.setupBase(baseType);
+        ctor.setupBase(baseType);
     }
 
 	if (interfaceType instanceof Array) {
-		this.__interfaces = interfaceType;
+		ctor.__interfaces = interfaceType;
 	}
 	else if (interfaceType) {
-        this.__interfaces = [];
-        for (var i = 2; i < arguments.length; i++) {
+        ctor.__interfaces = [];
+        for (var i = 4; i < arguments.length; i++) {
             interfaceType = arguments[i];
-            this.__interfaces.add(interfaceType);
+            ctor.__interfaces.add(interfaceType);
         }
     }
-}
+};
 
-Type.prototype.registerGenericClass = function Type$registerGenericClass(name, typeArgumentCount) {
-    this.prototype.constructor = this;
-    this.__typeName = name;
-    this.__class = true;
-	this.__typeArgumentCount = typeArgumentCount;
-	this.__isGenericTypeDefinition = true;
-    this.__baseType = Object;
-}
+Type.registerGenericClass = function Type$registerGenericClass(root, name, ctor, typeArgumentCount) {
+	if (root)
+		Type.registerType(root, name, ctor);
 
-Type.prototype.registerInterface = function Type$createInterface(name, baseInterface) {
-    this.__typeName = name;
-    this.__interface = true;
+    ctor.prototype.constructor = ctor;
+    ctor.__typeName = name;
+    ctor.__class = true;
+	ctor.__typeArgumentCount = typeArgumentCount;
+	ctor.__isGenericTypeDefinition = true;
+    ctor.__baseType = Object;
+};
+
+Type.registerInterface = function Type$createInterface(root, name, ctor, baseInterface) {
+	if (root)
+		Type.registerType(root, name, ctor);
+
+    ctor.__typeName = name;
+    ctor.__interface = true;
 	if (baseInterface instanceof Array) {
-		this.__interfaces = baseInterface;
+		ctor.__interfaces = baseInterface;
 	}
 	else if (baseInterface) {
-        this.__interfaces = [];
-        for (var i = 1; i < arguments.length; i++) {
-            this.__interfaces.add(arguments[i]);
+        ctor.__interfaces = [];
+        for (var i = 3; i < arguments.length; i++) {
+            ctor.__interfaces.add(arguments[i]);
         }
     }
-}
+};
 
-Type.prototype.registerGenericInterface = function Type$registerGenericClass(name, typeArgumentCount) {
-    this.prototype.constructor = this;
-    this.__typeName = name;
-    this.__interface = true;;
-	this.__typeArgumentCount = typeArgumentCount;
-	this.__isGenericTypeDefinition = true;
-}
+Type.registerGenericInterface = function Type$registerGenericClass(root, name, ctor, typeArgumentCount) {
+	if (root)
+		Type.registerType(root, name, ctor);
 
-Type.prototype.registerEnum = function Type$createEnum(name, flags) {
-    for (var field in this.prototype) {
-         this[field] = this.prototype[field];
+    ctor.prototype.constructor = ctor;
+    ctor.__typeName = name;
+    ctor.__interface = true;;
+	ctor.__typeArgumentCount = typeArgumentCount;
+	ctor.__isGenericTypeDefinition = true;
+};
+
+Type.prototype.registerEnum = function Type$createEnum(root, name, ctor, flags) {
+	if (root)
+		Type.registerType(root, name, ctor);
+
+    for (var field in ctor.prototype) {
+        ctor[field] = ctor.prototype[field];
     }
 
-    this.__typeName = name;
-    this.__enum = true;
+    ctor.__typeName = name;
+    ctor.__enum = true;
     if (flags) {
-        this.__flags = true;
+        ctor.__flags = true;
     }
-    this.getDefaultValue = this.createInstance = function() { return 0; };
-    this.isInstanceOfType = function(instance) { return typeof(instance) == 'number'; };
-}
+    ctor.getDefaultValue = ctor.createInstance = function() { return 0; };
+    ctor.isInstanceOfType = function(instance) { return typeof(instance) == 'number'; };
+};
 
 Type.prototype.setupBase = function Type$setupBase() {
 	var baseType = this.__baseType;
@@ -224,40 +248,21 @@ Type.prototype.setupBase = function Type$setupBase() {
 			this.prototype[memberName] = memberValue;
 		}
 	}
-}
+};
 
 if (!Type.prototype.resolveInheritance) {
     // This function is not used by Script#; Visual Studio relies on it
     // for JavaScript IntelliSense support of derived types.
     Type.prototype.resolveInheritance = Type.prototype.setupBase;
-}
-
-Type.prototype.initializeBase = function Type$initializeBase(instance, args) {
-    if (!args) {
-        this.__baseType.apply(instance);
-    }
-    else {
-        this.__baseType.apply(instance, args);
-    }
-}
-
-Type.prototype.callBaseMethod = function Type$callBaseMethod(instance, name, args) {
-    var baseMethod = this.__baseType.prototype[name];
-    if (!args) {
-        return baseMethod.apply(instance);
-    }
-    else {
-        return baseMethod.apply(instance, args);
-    }
-}
+};
 
 Type.prototype.get_baseType = function Type$get_baseType() {
     return this.__baseType || null;
-}
+};
 
 Type.prototype.get_fullName = function Type$get_fullName() {
     return this.__typeName;
-}
+};
 
 Type.prototype.get_name = function Type$get_name() {
     var fullName = this.__typeName;
@@ -266,11 +271,11 @@ Type.prototype.get_name = function Type$get_name() {
         return fullName.substr(nsIndex + 1);
     }
     return fullName;
-}
+};
 
 Type.prototype.getInterfaces = function Type$getInterfaces() {
     return this.__interfaces;
-}
+};
 
 Type.prototype.isInstanceOfType = function Type$isInstanceOfType(instance) {
     if (ss.isNullOrUndefined(instance)) {
@@ -282,11 +287,11 @@ Type.prototype.isInstanceOfType = function Type$isInstanceOfType(instance) {
 
     var type = Type.getInstanceType(instance);
     return this.isAssignableFrom(type);
-}
+};
 
 Type.isInstanceOfType = function Type$isInstanceOfTypeStatic(instance, type) {
     return instance instanceof type || (type !== Function && type.isInstanceOfType && type.isInstanceOfType(instance));
-}
+};
 
 Type.prototype.isAssignableFrom = function Type$isAssignableFrom(type) {
     if ((this == Object) || (this == type)) {
@@ -317,56 +322,54 @@ Type.prototype.isAssignableFrom = function Type$isAssignableFrom(type) {
         }
     }
     return false;
-}
+};
 
 Type.hasProperty = function Type$hasProperty(instance, name) {
 	return typeof(instance['get_' + name]) === 'function' || typeof(instance['set_' + name]) === 'function';
-}
+};
 
 Type.prototype.get_isClass = function Type$get_isClass() {
     return (this.__class == true);
-}
+};
 
 Type.prototype.get_isEnum = function Type$get_isEnum() {
     return (this.__enum == true);
-}
+};
 
 Type.prototype.get_isFlags = function Type$get_isFlags() {
     return ((this.__enum == true) && (this.__flags == true));
-}
+};
 
 Type.prototype.get_isInterface = function Type$get_isInterface() {
     return (this.__interface == true);
-}
-
-Type.isNamespace = function Type$isNamespace(object) {
-    return (object.__namespace == true);
-}
+};
 
 Type.canCast = function Type$canCast(instance, type) {
     return Type.isInstanceOfType(instance, type);
-}
+};
 
 Type.safeCast = function Type$safeCast(instance, type) {
     if (Type.isInstanceOfType(instance, type)) {
         return instance;
     }
     return null;
-}
+};
 
 Type.cast = function Type$cast(instance, type) {
 	if (instance === null)
 		return null;
-    else if (Type.isInstanceOfType(instance, type)) {
+    else if (typeof(instance) === "undefined" || Type.isInstanceOfType(instance, type)) {
         return instance;
     }
     throw 'Cannot cast object to type ' + type.__typeName;
-}
+};
 
 Type.getInstanceType = function Type$getInstanceType(instance) {
-	if (instance === null) {
-		throw 'Cannot get type of null'
-	}
+	if (instance === null)
+		throw 'Cannot get type of null';
+	if (typeof(instance) === "undefined")
+		throw 'Cannot get type of undefined';
+
     var ctor = null;
 
     // NOTE: We have to catch exceptions because the constructor
@@ -380,7 +383,7 @@ Type.getInstanceType = function Type$getInstanceType(instance) {
         ctor = Object;
     }
     return ctor;
-}
+};
 
 Type.getType = function Type$getType(typeName) {
     if (!typeName) {
@@ -393,23 +396,32 @@ Type.getType = function Type$getType(typeName) {
 
     var type = Type.__typeCache[typeName];
     if (!type) {
-        type = eval(typeName);
-        Type.__typeCache[typeName] = type;
+		var arr = typeName.split(',');
+		var type = (arr.length > 1 ? require(arr[1].trim) : global);
+
+		var parts = arr[0].trim().split('.');
+		for (var i = 0; i < parts.length; i++) {
+			type = type[parts[i]];
+			if (!type)
+				break;
+		}
+
+        Type.__typeCache[typeName] = type || null;
     }
     return type;
-}
+};
 
 Type.prototype.getDefaultValue = function Type$getDefaultValue() {
 	return null;
-}
+};
 
 Type.prototype.createInstance = function Type$createInstance() {
     return new this();
-}
+};
 
 Type.parse = function Type$parse(typeName) {
     return Type.getType(typeName);
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // Object Extensions
@@ -423,11 +435,11 @@ Object.clearKeys = function Object$clearKeys(d) {
 		if (d.hasOwnProperty(n))
 			delete d[n];
     }
-}
+};
 
 Object.keyExists = function Object$keyExists(d, key) {
     return d[key] !== undefined;
-}
+};
 
 if (!Object.keys) {
     Object.keys = function Object$keys(d) {
@@ -437,7 +449,7 @@ if (!Object.keys) {
 		        keys.push(n);
         }
         return keys;
-    }
+    };
 
     Object.getKeyCount = function Object$getKeyCount(d) {
         var count = 0;
@@ -446,17 +458,17 @@ if (!Object.keys) {
 		        count++;
         }
         return count;
-    }
+    };
 }
 else {
     Object.getKeyCount = function Object$getKeyCount(d) {
         return Object.keys(d).length;
-    }
+    };
 }
 
 Object.getObjectEnumerator = function Object$getObjectEnumerator(d) {
-	return new ss.ObjectEnumerator(d);
-}
+	return new ss_ObjectEnumerator(d);
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // Boolean Extensions
@@ -465,11 +477,11 @@ Boolean.__typeName = 'Boolean';
 
 Boolean.getDefaultValue = Boolean.createInstance = function Boolean$getDefaultValue() {
 	return false;
-}
+};
 
 Boolean.parse = function Boolean$parse(s) {
     return (s.toLowerCase() == 'true');
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // Number Extensions
@@ -478,7 +490,7 @@ Number.__typeName = 'Number';
 
 Number.getDefaultValue = Number.createInstance = function Number$getDefaultValue() {
 	return 0;
-}
+};
 
 Number.parse = function Number$parse(s) {
     if (!s || !s.length) {
@@ -489,21 +501,21 @@ Number.parse = function Number$parse(s) {
         return parseFloat(s);
     }
     return parseInt(s, 10);
-}
+};
 
 Number.prototype.format = function Number$format(format) {
     if (ss.isNullOrUndefined(format) || (format.length == 0) || (format == 'i')) {
         return this.toString();
     }
     return this._netFormat(format, false);
-}
+};
 
 Number.prototype.localeFormat = function Number$format(format) {
     if (ss.isNullOrUndefined(format) || (format.length == 0) || (format == 'i')) {
         return this.toLocaleString();
     }
     return this._netFormat(format, true);
-}
+};
 
 Number._commaFormat = function Number$_commaFormat(number, groups, decimal, comma) {
     var decimalPart = null;
@@ -559,10 +571,10 @@ Number._commaFormat = function Number$_commaFormat(number, groups, decimal, comm
         s = '-' + s;
     }    
     return decimalPart ? s + decimalPart : s;
-}
+};
 
 Number.prototype._netFormat = function Number$_netFormat(format, useLocale) {
-    var nf = useLocale ? ss.CultureInfo.CurrentCulture.numberFormat : ss.CultureInfo.InvariantCulture.numberFormat;
+    var nf = useLocale ? ss_CultureInfo.CurrentCulture.numberFormat : ss_CultureInfo.InvariantCulture.numberFormat;
 
     var s = '';    
     var precision = -1;
@@ -653,12 +665,14 @@ Number.prototype._netFormat = function Number$_netFormat(format, useLocale) {
     }
 
     return s;
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // String Extensions
 
-String.registerClass('String');
+String.__typeName = 'String';
+String.__baseType = 'Object';
+String.__class = true;
 
 String.empty = '';
 
@@ -681,15 +695,15 @@ String.compare = function String$compare(s1, s2, ignoreCase) {
         return -1;
     }
     return 1;
-}
+};
 
 String.prototype.compareTo = function String$compareTo(s, ignoreCase) {
     return String.compare(this, s, ignoreCase);
-}
+};
 
 String.concat = function String$concat() {
     return Array.prototype.join.call(arguments, '');
-}
+};
 
 String.prototype.endsWith = function String$endsWith(suffix) {
     if (!suffix.length) {
@@ -699,11 +713,11 @@ String.prototype.endsWith = function String$endsWith(suffix) {
         return false;
     }
     return (this.substr(this.length - suffix.length) == suffix);
-}
+};
 
 String.equals = function String$equals1(s1, s2, ignoreCase) {
     return String.compare(s1, s2, ignoreCase) == 0;
-}
+};
 
 String._format = function String$_format(format, values, useLocale) {
     if (!String._formatRE) {
@@ -729,11 +743,11 @@ String._format = function String$_format(format, values, useLocale) {
                                   return useLocale ? value.toLocaleString() : value.toString();
                               }
                           });
-}
+};
 
 String.format = function String$format(format) {
     return String._format(format, arguments, /* useLocale */ false);
-}
+};
 
 String.fromChar = function String$fromChar(ch, count) {
     var s = ch;
@@ -741,19 +755,19 @@ String.fromChar = function String$fromChar(ch, count) {
         s += ch;
     }
     return s;
-}
+};
 
 String.prototype.htmlDecode = function String$htmlDecode() {
     var div = document.createElement('div');
     div.innerHTML = this;
     return div.textContent || div.innerText;
-}
+};
 
 String.prototype.htmlEncode = function String$htmlEncode() {
     var div = document.createElement('div');
     div.appendChild(document.createTextNode(this));
     return div.innerHTML.replace(/\"/g, '&quot;');
-}
+};
 
 String.prototype.indexOfAny = function String$indexOfAny(chars, startIndex, count) {
     var length = this.length;
@@ -776,7 +790,7 @@ String.prototype.indexOfAny = function String$indexOfAny(chars, startIndex, coun
         }
     }
     return -1;
-}
+};
 
 String.prototype.insert = function String$insert(index, value) {
     if (!value) {
@@ -788,11 +802,11 @@ String.prototype.insert = function String$insert(index, value) {
     var s1 = this.substr(0, index);
     var s2 = this.substr(index);
     return s1 + value + s2;
-}
+};
 
 String.isNullOrEmpty = function String$isNullOrEmpty(s) {
     return !s || !s.length;
-}
+};
 
 String.prototype.lastIndexOfAny = function String$lastIndexOfAny(chars, startIndex, count) {
     var length = this.length;
@@ -815,11 +829,11 @@ String.prototype.lastIndexOfAny = function String$lastIndexOfAny(chars, startInd
         }
     }
     return -1;
-}
+};
 
 String.localeFormat = function String$localeFormat(format) {
     return String._format(format, arguments, /* useLocale */ true);
-}
+};
 
 String.prototype.padLeft = function String$padLeft(totalWidth, ch) {
     if (this.length < totalWidth) {
@@ -827,7 +841,7 @@ String.prototype.padLeft = function String$padLeft(totalWidth, ch) {
         return String.fromChar(ch, totalWidth - this.length) + this;
     }
     return this.valueOf();
-}
+};
 
 String.prototype.padRight = function String$padRight(totalWidth, ch) {
     if (this.length < totalWidth) {
@@ -835,19 +849,19 @@ String.prototype.padRight = function String$padRight(totalWidth, ch) {
         return this + String.fromChar(ch, totalWidth - this.length);
     }
     return this.valueOf();
-}
+};
 
 String.prototype.remove = function String$remove(index, count) {
     if (!count || ((index + count) > this.length)) {
         return this.substr(0, index);
     }
     return this.substr(0, index) + this.substr(index + count);
-}
+};
 
 String.prototype.replaceAll = function String$replaceAll(oldValue, newValue) {
     newValue = newValue || '';
     return this.split(oldValue).join(newValue);
-}
+};
 
 String.prototype.startsWith = function String$startsWith(prefix) {
     if (!prefix.length) {
@@ -857,40 +871,41 @@ String.prototype.startsWith = function String$startsWith(prefix) {
         return false;
     }
     return (this.substr(0, prefix.length) == prefix);
-}
+};
 
 if (!String.prototype.trim) {
     String.prototype.trim = function String$trim() {
         return this.trimEnd().trimStart();
-    }
+    };
 }
 
 String.prototype.trimEnd = function String$trimEnd() {
     return this.replace(/\s*$/, '');
-}
+};
 
 String.prototype.trimStart = function String$trimStart() {
     return this.replace(/^\s*/, '');
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // Array Extensions
 
 Array.__typeName = 'Array';
-Array.__interfaces = [ ss.IEnumerable, ss.ICollection, ss.IList ];
+Array.__baseType = Object;
+Array.__interfaces = [ ss_IEnumerable, ss_ICollection, ss_IList ];
 Array.__class = true;
 
 Array.prototype.get_item = function Array$get_item(index) {
 	return this[index];
-}
+};
 
 Array.prototype.set_item = function Array$set_item(index, value) {
 	this[index] = value;
-}
+};
 
 Array.prototype.get_count = function Array$get_count() {
 	return this.length;
-}
+};
 
 Array.prototype.getValue = function Array$getValue(indices) {
 	if (indices.length != (this._sizes ? this._sizes.length : 1))
@@ -903,11 +918,11 @@ Array.prototype.getValue = function Array$getValue(indices) {
 	}
 	var r = this[idx];
 	return typeof r !== 'undefined' ? r : this._defvalue;
-}
+};
 
 Array.prototype.get = function Array$get() {
 	return this.getValue(arguments);
-}
+};
 
 Array.prototype.setValue = function Array$setValue(value, indices) {
 	if (indices.length != (this._sizes ? this._sizes.length : 1))
@@ -919,32 +934,32 @@ Array.prototype.setValue = function Array$setValue(value, indices) {
 			idx = idx * this._sizes[i] + indices[i];
 	}
 	this[idx] = value;
-}
+};
 
 Array.prototype.set = function Array$set() {
 	return this.setValue(arguments[arguments.length - 1], Array.prototype.slice.call(arguments, 0, arguments.length - 1));
-}
+};
 
 Array.prototype.get_rank = function Array$get_rank() {
 	return this._sizes ? this._sizes.length : 1;
-}
+};
 
 Array.prototype.getLength = function Array$getLength(dimension) {
 	if (dimension >= (this._sizes ? this._sizes.length : 1))
 		throw 'Invalid dimension';
 	return this._sizes ? this._sizes[dimension] : this.length;
-}
+};
 
 Array.prototype.extract = function Array$extract(start, count) {
    if (!ss.isValue(count)) {
        return this.slice(start);
    }
    return this.slice(start, start + count);
-}
+};
 
 Array.prototype.add = function Array$add(item) {
     this[this.length] = item;
-}
+};
 
 Array.prototype.addRange = function Array$addRange(items) {
 	if (items instanceof Array) {
@@ -958,16 +973,16 @@ Array.prototype.addRange = function Array$addRange(items) {
 			}
 		}
 		finally {
-			if (ss.IDisposable.isInstanceOfType(e)) {
-				Type.cast(e, ss.IDisposable).dispose();
+			if (ss_IDisposable.isInstanceOfType(e)) {
+				Type.cast(e, ss_IDisposable).dispose();
 			}
 		}
 	}
-}
+};
 
 Array.prototype.clear = function Array$clear() {
     this.length = 0;
-}
+};
 
 Array.prototype.clone = function Array$clone() {
     if (this.length === 1) {
@@ -976,24 +991,24 @@ Array.prototype.clone = function Array$clone() {
     else {
         return Array.apply(null, this);
     }
-}
+};
 
 Array.prototype.contains = function Array$contains(item) {
     var index = this.indexOf(item);
     return (index >= 0);
-}
+};
 
 Array.prototype.peekFront = function Array$peekFront(item) {
 	if (this.length)
 		return this[0];
 	throw 'Array is empty';
-}
+};
 
 Array.prototype.peekBack = function Array$peekBack(item) {
 	if (this.length)
 		return this[this.length - 1];
 	throw 'Array is empty';
-}
+};
 
 if (!Array.prototype.every) {
     Array.prototype.every = function Array$every(callback, instance) {
@@ -1004,7 +1019,7 @@ if (!Array.prototype.every) {
             }
         }
         return true;
-    }
+    };
 }
 
 if (!Array.prototype.filter) {
@@ -1020,7 +1035,7 @@ if (!Array.prototype.filter) {
             }
         }
         return filtered;
-    }
+    };
 }
 
 if (!Array.prototype.forEach) {
@@ -1031,12 +1046,12 @@ if (!Array.prototype.forEach) {
                 callback.call(instance, this[i], i, this);
             }
         }
-    }
+    };
 }
 
 Array.prototype.getEnumerator = function Array$getEnumerator() {
-    return new ss.ArrayEnumerator(this);
-}
+    return new ss_ArrayEnumerator(this);
+};
 
 if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function Array$indexOf(item, startIndex) {
@@ -1050,12 +1065,12 @@ if (!Array.prototype.indexOf) {
             }
         }
         return -1;
-    }
+    };
 }
 
 Array.prototype.insert = function Array$insert(index, item) {
     this.splice(index, 0, item);
-}
+};
 
 Array.prototype.insertRange = function Array$insertRange(index, items) {
 	if (items instanceof Array) {
@@ -1077,12 +1092,12 @@ Array.prototype.insertRange = function Array$insertRange(index, items) {
 			}
 		}
 		finally {
-			if (ss.IDisposable.isInstanceOfType(e)) {
-				Type.cast(e, ss.IDisposable).dispose();
+			if (ss_IDisposable.isInstanceOfType(e)) {
+				Type.cast(e, ss_IDisposable).dispose();
 			}
 		}
 	}
-}
+};
 
 if (!Array.prototype.map) {
     Array.prototype.map = function Array$map(callback, instance) {
@@ -1094,12 +1109,12 @@ if (!Array.prototype.map) {
             }
         }
         return mapped;
-    }
+    };
 }
 
 Array.parse = function Array$parse(s) {
     return eval('(' + s + ')');
-}
+};
 
 Array.prototype.remove = function Array$remove(item) {
     var index = this.indexOf(item);
@@ -1108,15 +1123,15 @@ Array.prototype.remove = function Array$remove(item) {
         return true;
     }
     return false;
-}
+};
 
 Array.prototype.removeAt = function Array$removeAt(index) {
     this.splice(index, 1);
-}
+};
 
 Array.prototype.removeRange = function Array$removeRange(index, count) {
     this.splice(index, count);
-}
+};
 
 if (!Array.prototype.some) {
     Array.prototype.some = function Array$some(callback, instance) {
@@ -1127,12 +1142,12 @@ if (!Array.prototype.some) {
             }
         }
         return false;
-    }
+    };
 }
 
 Array.toArray = function Array$toArray(obj) {
     return Array.prototype.slice.call(obj);
-}
+};
 
 Array.fromEnumerable = function Array$fromEnumerable(enm) {
 	var e = enm.getEnumerator(), r = [];
@@ -1144,7 +1159,7 @@ Array.fromEnumerable = function Array$fromEnumerable(enm) {
 		e.dispose();
 	}
 	return r;
-}
+};
 
 Array.multidim = function Array$multidim(defvalue, sizes) {
 	var arr = [];
@@ -1157,31 +1172,33 @@ Array.multidim = function Array$multidim(defvalue, sizes) {
 	}
 	arr.length = length;
 	return arr;
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // RegExp Extensions
 
 RegExp.__typeName = 'RegExp';
+RegExp.__baseType = Object;
 RegExp.__class = true;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Date Extensions
 
 Date.__typeName = 'Date';
+Date.__baseType = 'Object';
 
 Date.getDefaultValue = Date.createInstance = function Date$getDefaultValue() {
 	return new Date(0);
-}
+};
 
 Date.get_now = function Date$get_now() {
     return new Date();
-}
+};
 
 Date.get_today = function Date$get_today() {
     var d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-}
+};
 
 Date.areEqual = function Date$areEqual(a, b) {
     if (!ss.isValue(a))
@@ -1190,11 +1207,11 @@ Date.areEqual = function Date$areEqual(a, b) {
         return false;
     else
         return a.valueOf() === b.valueOf();
-}
+};
 
 Date.areNotEqual = function Date$areNotEqual(a, b) {
     return !Date.areEqual(a, b);
-}
+};
 
 Date.prototype.format = function Date$format(format) {
     if (ss.isNullOrUndefined(format) || (format.length == 0) || (format == 'i')) {
@@ -1208,7 +1225,7 @@ Date.prototype.format = function Date$format(format) {
     }
 
     return this._netFormat(format, false);
-}
+};
 
 Date.prototype.localeFormat = function Date$localeFormat(format) {
     if (ss.isNullOrUndefined(format) || (format.length == 0) || (format == 'i')) {
@@ -1222,11 +1239,11 @@ Date.prototype.localeFormat = function Date$localeFormat(format) {
     }
 
     return this._netFormat(format, true);
-}
+};
 
 Date.prototype._netFormat = function Date$_netFormat(format, useLocale) {
     var dt = this;
-    var dtf = useLocale ? ss.CultureInfo.CurrentCulture.dateFormat : ss.CultureInfo.InvariantCulture.dateFormat;
+    var dtf = useLocale ? ss_CultureInfo.CurrentCulture.dateFormat : ss_CultureInfo.InvariantCulture.dateFormat;
 
     if (format.length == 1) {
         switch (format) {
@@ -1243,7 +1260,7 @@ Date.prototype._netFormat = function Date$_netFormat(format, useLocale) {
             case 'G': format = dtf.shortDatePattern + ' ' + dtf.longTimePattern; break;
 
             case 'R': case 'r':
-                dtf = ss.CultureInfo.InvariantCulture.dateFormat;
+                dtf = ss_CultureInfo.InvariantCulture.dateFormat;
                 format = dtf.gmtDateTimePattern;
                 break;
             case 'u': format = dtf.universalDateTimePattern; break;
@@ -1266,7 +1283,7 @@ Date.prototype._netFormat = function Date$_netFormat(format, useLocale) {
     }
 
     var re = Date._formatRE;
-    var sb = new ss.StringBuilder();
+    var sb = new ss_StringBuilder();
 
     re.lastIndex = 0;
     while (true) {
@@ -1377,16 +1394,16 @@ Date.prototype._netFormat = function Date$_netFormat(format, useLocale) {
     }
 
     return sb.toString();
-}
+};
 
 Date.parseDate = function Date$parse(s) {
     // Date.parse returns the number of milliseconds
     // so we use that to create an actual Date instance
     return new Date(Date.parse(s));
-}
+};
 
 Date._parseExact = function Date$_parseExact(val, format, culture, utc) {
-    culture = culture || ss.CultureInfo.CurrentCulture;
+    culture = culture || ss_CultureInfo.CurrentCulture;
 	var AM = culture.amDesignator, PM = culture.pmDesignator;
 
 	var _isInteger = function(val) {
@@ -1546,16 +1563,17 @@ Date._parseExact = function Date$_parseExact(val, format, culture, utc) {
 
 Date.parseExact = function Date$parseExact(val, format, culture) {
     return Date._parseExact(val, format, culture, false);
-}
+};
 
 Date.parseExactUTC = function Date$parseExactUTC(val, format, culture) {
     return Date._parseExact(val, format, culture, true);
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // Error Extensions
 
 Error.__typeName = 'Error';
+Error.__baseType = Object;
 
 Error.prototype.popStackFrame = function Error$popStackFrame() {
     if (ss.isNullOrUndefined(this.stack) ||
@@ -1587,7 +1605,7 @@ Error.prototype.popStackFrame = function Error$popStackFrame() {
     this.stack = stackFrames.join("\n");
     this.fileName = nextFrameParts[1];
     this.lineNumber = parseInt(nextFrameParts[2]);
-}
+};
 
 Error.createError = function Error$createError(message, errorInfo, innerException) {
     var e = new Error(message);
@@ -1602,12 +1620,13 @@ Error.createError = function Error$createError(message, errorInfo, innerExceptio
 
     e.popStackFrame();
     return e;
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // Function Extensions
 
 Function.__typeName = 'Function';
+Function.__baseType = Object;
 Function.__class = true;
 
 Function.empty = function () { };
@@ -1619,7 +1638,7 @@ Function._contains = function Function$_contains(targets, object, method) {
         }
     }
     return false;
-}
+};
 
 Function._mkdel = function Function$_mkdel(targets) {
     var delegate = function() {
@@ -1639,14 +1658,14 @@ Function._mkdel = function Function$_mkdel(targets) {
     delegate._targets = targets;
 
     return delegate;
-}
+};
 
 Function.mkdel = function Function$mkdel(object, method) {
     if (!object) {
         return method;
     }
     return Function._mkdel([object, method]);
-}
+};
 
 Function.combine = function Function$combine(delegate1, delegate2) {
     if (!delegate1) {
@@ -1666,7 +1685,7 @@ Function.combine = function Function$combine(delegate1, delegate2) {
     var targets2 = delegate2._targets ? delegate2._targets : [null, delegate2];
 
     return Function._mkdel(targets1.concat(targets2));
-}
+};
 
 Function.remove = function Function$remove(delegate1, delegate2) {
     if (!delegate1 || (delegate1 === delegate2)) {
@@ -1698,11 +1717,11 @@ Function.remove = function Function$remove(delegate1, delegate2) {
     }
 
     return delegate1;
-}
+};
 
 Function.clone = function Function$clone(source) {
 	return source._targets ? Function._mkdel(source._targets) : function() { return source.apply(this, arguments); };
-}
+};
 
 Function.thisFix = function Function$thisFix(source) {
     return function() {
@@ -1711,38 +1730,38 @@ Function.thisFix = function Function$thisFix(source) {
             x.push(arguments[i]);
         return source.apply(source, x);
     };
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // Debug Extensions
 
-ss.Debug = topLevel.Debug || function() {};
+ss.Debug = global.Debug || function() {};
 ss.Debug.__typeName = 'Debug';
 
 if (!ss.Debug.writeln) {
     ss.Debug.writeln = function Debug$writeln(text) {
-        if (topLevel.console) {
-            if (topLevel.console.debug) {
-                topLevel.console.debug(text);
+        if (global.console) {
+            if (global.console.debug) {
+                global.console.debug(text);
                 return;
             }
-            else if (topLevel.console.log) {
-                topLevel.console.log(text);
+            else if (global.console.log) {
+                global.console.log(text);
                 return;
             }
         }
-        else if (topLevel.opera &&
-            topLevel.opera.postError) {
-            topLevel.opera.postError(text);
+        else if (global.opera &&
+            global.opera.postError) {
+            global.opera.postError(text);
             return;
         }
     }
-}
+};
 
 ss.Debug._fail = function Debug$_fail(message) {
     ss.Debug.writeln(message);
     eval('debugger;');
-}
+};
 
 ss.Debug.assert = function Debug$assert(condition, message) {
     if (!condition) {
@@ -1751,20 +1770,20 @@ ss.Debug.assert = function Debug$assert(condition, message) {
             ss.Debug._fail(message);
         }
     }
-}
+};
 
 ss.Debug.fail = function Debug$fail(message) {
     ss.Debug._fail(message);
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // Enum
 
-ss.Enum = function Enum$() {
+var ss_Enum = function Enum$() {
 };
-ss.Enum.registerClass('ss.Enum');
+Type.registerClass(global, 'ss.Enum', ss_Enum);
 
-ss.Enum.parse = function  Enum$parse(enumType, s) {
+ss_Enum.parse = function Enum$parse(enumType, s) {
 	var values = enumType.prototype;
 	if (!enumType.__flags) {
 		for (var f in values) {
@@ -1802,7 +1821,7 @@ ss.Enum.parse = function  Enum$parse(enumType, s) {
 	throw 'Invalid Enumeration Value';
 };
 
-ss.Enum.toString = function  Enum$toString(enumType, value) {
+ss_Enum.toString = function  Enum$toString(enumType, value) {
 	var values = enumType.prototype;
 	if (!enumType.__flags || (value === 0)) {
 		for (var i in values) {
@@ -1829,14 +1848,14 @@ ss.Enum.toString = function  Enum$toString(enumType, value) {
 ///////////////////////////////////////////////////////////////////////////////
 // CultureInfo
 
-ss.CultureInfo = function CultureInfo$(name, numberFormat, dateFormat) {
+var ss_CultureInfo = function CultureInfo$(name, numberFormat, dateFormat) {
     this.name = name;
     this.numberFormat = numberFormat;
     this.dateFormat = dateFormat;
-}
-ss.CultureInfo.registerClass('ss.CultureInfo');
+};
+Type.registerClass(global, 'ss.CultureInfo', ss_CultureInfo);
 
-ss.CultureInfo.InvariantCulture = new ss.CultureInfo('en-US',
+ss_CultureInfo.InvariantCulture = new ss_CultureInfo('en-US',
     {
         naNSymbol: 'NaN',
         negativeSign: '-',
@@ -1891,141 +1910,141 @@ ss.CultureInfo.InvariantCulture = new ss.CultureInfo('en-US',
         monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December',''],
         shortMonthNames: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','']
     });
-ss.CultureInfo.CurrentCulture = ss.CultureInfo.InvariantCulture;
+ss_CultureInfo.CurrentCulture = ss_CultureInfo.InvariantCulture;
 
 ///////////////////////////////////////////////////////////////////////////////
 // IEnumerator
 
-ss.IEnumerator = function IEnumerator$() { };
-ss.IEnumerator.prototype = {
+var ss_IEnumerator = function IEnumerator$() { };
+ss_IEnumerator.prototype = {
     get_current: null,
     moveNext: null,
     reset: null
-}
+};
 
-ss.IEnumerator.registerInterface('ss.IEnumerator', ss.IDisposable);
+Type.registerInterface(global, 'ss.IEnumerator', ss_IEnumerator, ss_IDisposable);
 
 ///////////////////////////////////////////////////////////////////////////////
 // IEnumerable
 
-ss.IEnumerable = function IEnumerable$() { };
-ss.IEnumerable.prototype = {
+var ss_IEnumerable = function IEnumerable$() { };
+ss_IEnumerable.prototype = {
     getEnumerator: null
-}
+};
 
-ss.IEnumerable.isAssignableFrom = function IEnumerable$isAssignableFrom(type) {
+ss_IEnumerable.isAssignableFrom = function IEnumerable$isAssignableFrom(type) {
 	if (type == Array)
 		return true;
 	else
 		return Type.prototype.isAssignableFrom.call(this, type);
 };
 
-ss.IEnumerable.registerInterface('ss.IEnumerable');
+Type.registerInterface(global, 'ss.IEnumerable', ss_IEnumerable);
 
 ///////////////////////////////////////////////////////////////////////////////
 // IEnumerable
 
-ss.ICollection = function ICollection$() { };
-ss.ICollection.prototype = {
+var ss_ICollection = function ICollection$() { };
+ss_ICollection.prototype = {
 	get_count: null,
 	add: null,
 	clear: null,
 	contains: null,
 	remove: null
-}
+};
 
-ss.ICollection.isAssignableFrom = function ICollection$isAssignableFrom(type) {
+ss_ICollection.isAssignableFrom = function ICollection$isAssignableFrom(type) {
 	if (type == Array)
 		return true;
 	else
 		return Type.prototype.isAssignableFrom.call(this, type);
 };
 
-ss.ICollection.registerInterface('ss.ICollection', ss.IEnumerable);
+Type.registerInterface(global, 'ss.ICollection', ss_IEnumerable);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Nullable
 
-ss.Nullable = function Nullable$() {
+var ss_Nullable = function Nullable$() {
 };
 
-ss.Nullable.registerClass('ss.Nullable');
+Type.registerClass(global, 'ss.Nullable', ss_Nullable);
 
-ss.Nullable.unbox = function Nullable$unbox(instance) {
+ss_Nullable.unbox = function Nullable$unbox(instance) {
 	if (!ss.isValue(instance))
 		throw 'Instance is null';
 	return instance;
 };
 
-ss.Nullable.eq = function Nullable$eq(a, b) {
+ss_Nullable.eq = function Nullable$eq(a, b) {
 	return !ss.isValue(a) ? !ss.isValue(b) : (a === b);
 };
 
-ss.Nullable.ne = function Nullable$eq(a, b) {
+ss_Nullable.ne = function Nullable$eq(a, b) {
 	return !ss.isValue(a) ? ss.isValue(b) : (a !== b);
 };
 
-ss.Nullable.le = function Nullable$le(a, b) {
+ss_Nullable.le = function Nullable$le(a, b) {
 	return ss.isValue(a) && ss.isValue(b) && a <= b;
 };
 
-ss.Nullable.ge = function Nullable$ge(a, b) {
+ss_Nullable.ge = function Nullable$ge(a, b) {
 	return ss.isValue(a) && ss.isValue(b) && a >= b;
 };
 
-ss.Nullable.lt = function Nullable$lt(a, b) {
+ss_Nullable.lt = function Nullable$lt(a, b) {
 	return ss.isValue(a) && ss.isValue(b) && a < b;
 };
 
-ss.Nullable.gt = function Nullable$gt(a, b) {
+ss_Nullable.gt = function Nullable$gt(a, b) {
 	return ss.isValue(a) && ss.isValue(b) && a > b;
 };
 
-ss.Nullable.sub = function Nullable$sub(a, b) {
+ss_Nullable.sub = function Nullable$sub(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a - b : null;
 };
 
-ss.Nullable.add = function Nullable$add(a, b) {
+ss_Nullable.add = function Nullable$add(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a + b : null;
 };
 
-ss.Nullable.mod = function Nullable$mod(a, b) {
+ss_Nullable.mod = function Nullable$mod(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a % b : null;
 };
 
-ss.Nullable.div = function Nullable$divf(a, b) {
+ss_Nullable.div = function Nullable$divf(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a / b : null;
 };
 
-ss.Nullable.mul = function Nullable$mul(a, b) {
+ss_Nullable.mul = function Nullable$mul(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a * b : null;
 };
 
-ss.Nullable.band = function Nullable$band(a, b) {
+ss_Nullable.band = function Nullable$band(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a & b : null;
 };
 
-ss.Nullable.bor = function Nullable$bor(a, b) {
+ss_Nullable.bor = function Nullable$bor(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a | b : null;
 };
 
-ss.Nullable.xor = function Nullable$xor(a, b) {
+ss_Nullable.xor = function Nullable$xor(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a ^ b : null;
 };
 
-ss.Nullable.shl = function Nullable$shl(a, b) {
+ss_Nullable.shl = function Nullable$shl(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a << b : null;
 };
 
-ss.Nullable.srs = function Nullable$srs(a, b) {
+ss_Nullable.srs = function Nullable$srs(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a >> b : null;
 };
 
-ss.Nullable.sru = function Nullable$sru(a, b) {
+ss_Nullable.sru = function Nullable$sru(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a >>> b : null;
 };
 
-ss.Nullable.and = function Nullable$and(a, b) {
+ss_Nullable.and = function Nullable$and(a, b) {
 	if (a === true && b === true)
 		return true;
 	else if (a === false || b === false)
@@ -2034,7 +2053,7 @@ ss.Nullable.and = function Nullable$and(a, b) {
 		return null;
 };
 
-ss.Nullable.or = function Nullable$or(a, b) {
+ss_Nullable.or = function Nullable$or(a, b) {
 	if (a === true || b === true)
 		return true;
 	else if (a === false && b === false)
@@ -2043,48 +2062,48 @@ ss.Nullable.or = function Nullable$or(a, b) {
 		return null;
 };
 
-ss.Nullable.not = function Nullable$not(a) {
+ss_Nullable.not = function Nullable$not(a) {
 	return ss.isValue(a) ? !a : null;
 };
 
-ss.Nullable.neg = function Nullable$neg(a) {
+ss_Nullable.neg = function Nullable$neg(a) {
 	return ss.isValue(a) ? -a : null;
 };
 
-ss.Nullable.pos = function Nullable$pos(a) {
+ss_Nullable.pos = function Nullable$pos(a) {
 	return ss.isValue(a) ? +a : null;
 };
 
-ss.Nullable.cpl = function Nullable$cpl(a) {
+ss_Nullable.cpl = function Nullable$cpl(a) {
 	return ss.isValue(a) ? ~a : null;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 // IEnumerable
 
-ss.IList = function IList$() { };
-ss.IList.prototype = {
+var ss_IList = function IList$() { };
+ss_IList.prototype = {
 	get_item: null,
 	set_item: null,
 	indexOf: null,
 	insert: null,
 	removeAt: null
-}
+};
 
-ss.IList.isAssignableFrom = function IList$isAssignableFrom(type) {
+ss_IList.isAssignableFrom = function IList$isAssignableFrom(type) {
 	if (type == Array)
 		return true;
 	else
 		return Type.prototype.isAssignableFrom.call(this, type);
 };
 
-ss.IList.registerInterface('ss.IList', ss.ICollection, ss.IEnumerable);
+Type.registerInterface(global, 'ss.IList', ss_IList, ss_ICollection, ss_IEnumerable);
 
 ///////////////////////////////////////////////////////////////////////////////
 // IDictionary
 
-ss.IDictionary = function IDictionary$() { };
-ss.IDictionary.prototype = {
+var ss_IDictionary = function IDictionary$() { };
+ss_IDictionary.prototype = {
 	get_item: null,
 	set_item: null,
 	get_keys: null,
@@ -2093,57 +2112,57 @@ ss.IDictionary.prototype = {
 	add: null,
 	remove: null,
 	tryGetValue: null
-}
+};
 
-ss.IDictionary.registerInterface('ss.IDictionary', [ss.IEnumerable]);
+Type.registerInterface(global, 'ss.IDictionary', ss_IDictionary, [ss_IEnumerable]);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Int32
 
-ss.Int32 = function Int32$() { };
+var ss_Int32 = function Int32$() { };
 
-ss.Int32.registerClass('ss.Int32');
-ss.Int32.__class = false;
+Type.registerClass(global, 'ss.Int32', ss_Int32);
+ss_Int32.__class = false;
 
-ss.Int32.isInstanceOfType = function Int32$isInstanceOfType(instance) {
+ss_Int32.isInstanceOfType = function Int32$isInstanceOfType(instance) {
 	return typeof(instance) === 'number' && isFinite(instance) && Math.round(instance, 0) == instance;
-}
+};
 
-ss.Int32.getDefaultValue = ss.Int32.createInstance = function Int32$getDefaultValue() {
+ss_Int32.getDefaultValue = ss_Int32.createInstance = function Int32$getDefaultValue() {
 	return 0;
-}
+};
 
-ss.Int32.div = function Int32$div(a, b) {
+ss_Int32.div = function Int32$div(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? (a / b) | 0 : null;
-}
+};
 
-ss.Int32.trunc = function Int32$trunc(n) {
+ss_Int32.trunc = function Int32$trunc(n) {
 	return ss.isValue(n) ? n | 0 : null;
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // MutableDateTime
 
-ss.JsDate = function JsDate$() { };
+var ss_JsDate = function JsDate$() { };
 
-ss.JsDate.registerClass('ss.JsDate');
+Type.registerClass(global, 'ss.JsDate', ss_JsDate);
 
-ss.JsDate.createInstance = function JsDate$createInstance() {
+ss_JsDate.createInstance = function JsDate$createInstance() {
 	return new Date();
-}
+};
 
-ss.JsDate.isInstanceOfType = function JsDate$isInstanceOfType(instance) {
+ss_JsDate.isInstanceOfType = function JsDate$isInstanceOfType(instance) {
 	return instance instanceof Date;
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // ArrayEnumerator
 
-ss.ArrayEnumerator = function ArrayEnumerator$(array) {
+var ss_ArrayEnumerator = function ArrayEnumerator$(array) {
     this._array = array;
     this._index = -1;
-}
-ss.ArrayEnumerator.prototype = {
+};
+ss_ArrayEnumerator.prototype = {
     moveNext: function ArrayEnumerator$moveNext() {
         this._index++;
         return (this._index < this._array.length);
@@ -2158,19 +2177,19 @@ ss.ArrayEnumerator.prototype = {
 	},
     dispose: function ArrayEnumerator$dispose() {
     }
-}
+};
 
-ss.ArrayEnumerator.registerClass('ss.ArrayEnumerator', null, [ss.IEnumerator, ss.IDisposable]);
+Type.registerClass(global, 'ss.ArrayEnumerator', ss_ArrayEnumerator, null, [ss_IEnumerator, ss_IDisposable]);
 
 ///////////////////////////////////////////////////////////////////////////////
 // ObjectEnumerator
 
-ss.ObjectEnumerator = function ObjectEnumerator$(o) {
+var ss_ObjectEnumerator = function ObjectEnumerator$(o) {
     this._keys = Object.keys(o);
     this._index = -1;
 	this._object = o;
 };
-ss.ObjectEnumerator.prototype = {
+ss_ObjectEnumerator.prototype = {
     moveNext: function ObjectEnumerator$moveNext() {
         this._index++;
         return (this._index < this._keys.length);
@@ -2188,15 +2207,15 @@ ss.ObjectEnumerator.prototype = {
     }
 };
 
-ss.ObjectEnumerator.registerClass('ss.ObjectEnumerator', null, [ss.IEnumerator, ss.IDisposable]);
+Type.registerClass(global, 'ss.ObjectEnumerator', ss_ObjectEnumerator, null, [ss_IEnumerator, ss_IDisposable]);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Dictionary
-ss.Dictionary$2 = function Dictionary$2$(TKey, TValue) {
+var ss_Dictionary$2 = function Dictionary$2$(TKey, TValue) {
 	var $type = function(o) {
 		this._o = {};
-		if (ss.IDictionary.isInstanceOfType(o)) {
-			var e = Type.cast(o, ss.IDictionary).getEnumerator();
+		if (ss_IDictionary.isInstanceOfType(o)) {
+			var e = Type.cast(o, ss_IDictionary).getEnumerator();
 			try {
 				while (e.moveNext()) {
 					var c = e.get_current();
@@ -2204,8 +2223,8 @@ ss.Dictionary$2 = function Dictionary$2$(TKey, TValue) {
 				}
 			}
 			finally {
-				if (ss.IDisposable.isInstanceOfType(e)) {
-					Type.cast(e, ss.IDisposable).dispose();
+				if (ss_IDisposable.isInstanceOfType(e)) {
+					Type.cast(e, ss_IDisposable).dispose();
 				}
 			}
 		}
@@ -2244,7 +2263,7 @@ ss.Dictionary$2 = function Dictionary$2$(TKey, TValue) {
 			this._o[key] = value;
 		},
 		getEnumerator: function Dictionary$2$getEnumerator() {
-			return new ss.ObjectEnumerator(this._o);
+			return new ss_ObjectEnumerator(this._o);
 		},
 		remove: function Dictionary$2$remove(key, value) {
 			var result = Object.keyExists(this._o, key);
@@ -2268,28 +2287,28 @@ ss.Dictionary$2 = function Dictionary$2$(TKey, TValue) {
 			Object.clearKeys(this._o);
 		}
 	};
-	$type.registerGenericClassInstance($type, ss.Dictionary$2, [TKey, TValue], function() { return null }, function() { return [ ss.IDictionary, ss.IEnumerable ] });
+	$type.registerGenericClassInstance($type, ss_Dictionary$2, [TKey, TValue], function() { return null }, function() { return [ ss_IDictionary, ss_IEnumerable ] });
 	return $type;
 };
-ss.Dictionary$2.registerGenericClass('ss.Dictionary$2', 2);
+Type.registerGenericClass(global, 'ss.Dictionary$2', ss_Dictionary$2, 2);
 
 ///////////////////////////////////////////////////////////////////////////////
 // IDisposable
 
-ss.IDisposable = function IDisposable$() { };
-ss.IDisposable.prototype = {
+var ss_IDisposable = function IDisposable$() { };
+ss_IDisposable.prototype = {
     dispose: null
-}
-ss.IDisposable.registerInterface('ss.IDisposable');
+};
+Type.registerInterface(global, 'ss.IDisposable', ss_IDisposable);
 
 ///////////////////////////////////////////////////////////////////////////////
 // StringBuilder
 
-ss.StringBuilder = function StringBuilder$(s) {
+var ss_StringBuilder = function StringBuilder$(s) {
     this._parts = ss.isNullOrUndefined(s) || s === '' ? [] : [s];
     this.isEmpty = this._parts.length == 0;
 }
-ss.StringBuilder.prototype = {
+ss_StringBuilder.prototype = {
     append: function StringBuilder$append(s) {
         if (!ss.isNullOrUndefined(s) && s !== '') {
             this._parts.add(s);
@@ -2323,27 +2342,27 @@ ss.StringBuilder.prototype = {
     }
 };
 
-ss.StringBuilder.registerClass('ss.StringBuilder');
+Type.registerClass(global, 'ss.StringBuilder', ss_StringBuilder);
 
 ///////////////////////////////////////////////////////////////////////////////
 // EventArgs
 
-ss.EventArgs = function EventArgs$() {
+var ss_EventArgs = function EventArgs$() {
 }
-ss.EventArgs.registerClass('ss.EventArgs');
+Type.registerClass(global, 'ss.EventArgs', ss_EventArgs);
 
-ss.EventArgs.Empty = new ss.EventArgs();
+ss_EventArgs.Empty = new ss_EventArgs();
 
 ///////////////////////////////////////////////////////////////////////////////
 // Exception
 
-ss.Exception = function Exception$(message, innerException) {
+var ss_Exception = function Exception$(message, innerException) {
 	this._message = message || null;
 	this._innerException = innerException || null;
 }
-ss.Exception.registerClass('ss.Exception');
+Type.registerClass(global, 'ss.Exception', ss_Exception);
 
-ss.Exception.prototype = {
+ss_Exception.prototype = {
 	get_message: function Exception$get_message() {
 		return this._message;
 	},
@@ -2352,83 +2371,101 @@ ss.Exception.prototype = {
 	}
 };
 
-ss.Exception.wrap = function Exception$get_message(o) {
-	if (ss.Exception.isInstanceOfType(o)) {
+ss_Exception.wrap = function Exception$wrap(o) {
+	if (ss_Exception.isInstanceOfType(o)) {
 		return o;
 	}
+	else if (o instanceof Error) {
+		return new ss_JsErrorException(o);
+	}
 	else {
-		return new ss.Exception(o);
+		return new ss_Exception(o.toString());
 	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // NotSupportedException
 
-ss.NotSupportedException = function NotSupportedException$(message, innerException) {
-	ss.Exception.call(this, message, innerException);
+var ss_NotSupportedException = function NotSupportedException$(message, innerException) {
+	ss_Exception.call(this, message, innerException);
 };
-ss.NotSupportedException.registerClass('ss.NotSupportedException', ss.Exception);
+Type.registerClass(global, 'ss.NotSupportedException', ss_NotSupportedException, ss_Exception);
 
 ////////////////////////////////////////////////////////////////////////////////
 // AggregateException
 
-ss.AggregateException = function AggregateException$(message, innerExceptions) {
+var ss_AggregateException = function AggregateException$(message, innerExceptions) {
 	if (typeof(message) !== 'string') {
 		innerExceptions = message;
 		message = 'One or more errors occurred.';
 	}
 	innerExceptions = ss.isValue(innerExceptions) ? Array.fromEnumerable(innerExceptions) : null;
 
-	ss.Exception.call(this, message, innerExceptions && innerExceptions.length ? innerExceptions[0] : null);
+	ss_Exception.call(this, message, innerExceptions && innerExceptions.length ? innerExceptions[0] : null);
 	this._innerExceptions = innerExceptions;
 };
-ss.AggregateException.prototype = {
+ss_AggregateException.prototype = {
 	get_innerExceptions: function AggregateException$get_innerExceptions() {
 		return this._innerExceptions;
 	}
 };
-ss.AggregateException.registerClass('ss.AggregateException', ss.Exception);
+Type.registerClass(global, 'ss.AggregateException', ss_AggregateException, ss_Exception);
 
 ////////////////////////////////////////////////////////////////////////////////
 // PromiseException
 
-ss.PromiseException = function PromiseException(args) {
+var ss_PromiseException = function PromiseException(args) {
+	ss_Exception.call(this, args[0] ? args[0].toString() : 'An error occurred');
 	this._arguments = args.clone();
 };
-ss.PromiseException.prototype = {
+ss_PromiseException.prototype = {
 	get_arguments: function PromiseException$get_arguments() {
 		return this._arguments;
 	}
 };
-ss.PromiseException.registerClass('ss.PromiseException', ss.Exception);
+Type.registerClass(global, 'ss.PromiseException', ss_PromiseException, ss_Exception);
+
+////////////////////////////////////////////////////////////////////////////////
+// JsErrorException
+
+var ss_JsErrorException = function JsErrorException$(error) {
+	ss_Exception.call(this, error.message);
+	this._error = error;
+};
+ss_JsErrorException.prototype = {
+	get_error: function JsErrorException$get_error() {
+		return this._error;
+	}
+};
+Type.registerClass(global, 'ss.JsErrorException', ss_JsErrorException, ss_Exception);
 
 ///////////////////////////////////////////////////////////////////////////////
 // IteratorBlockEnumerable
 
-ss.IteratorBlockEnumerable = function IteratorBlockEnumerable$(getEnumerator, $this) {
+var ss_IteratorBlockEnumerable = function IteratorBlockEnumerable$(getEnumerator, $this) {
     this._getEnumerator = getEnumerator;
     this._this = $this;
 };
 
-ss.IteratorBlockEnumerable.prototype = {
+ss_IteratorBlockEnumerable.prototype = {
     getEnumerator: function IteratorBlockEnumerable$getEnumerator() {
         return this._getEnumerator.call(this._this);
     }
 };
 
-ss.IteratorBlockEnumerable.registerClass('ss.IteratorBlockEnumerable', null, ss.IEnumerable);
+Type.registerClass(global, 'ss.IteratorBlockEnumerable', ss_IteratorBlockEnumerable, null, ss_IEnumerable);
 
 ///////////////////////////////////////////////////////////////////////////////
 // IteratorBlockEnumerator
 
-ss.IteratorBlockEnumerator = function IteratorBlockEnumerator$(moveNext, getCurrent, dispose, $this) {
+var ss_IteratorBlockEnumerator = function IteratorBlockEnumerator$(moveNext, getCurrent, dispose, $this) {
     this._moveNext = moveNext;
     this._getCurrent = getCurrent;
     this._dispose = dispose;
     this._this = $this;
 };
 
-ss.IteratorBlockEnumerator.prototype = {
+ss_IteratorBlockEnumerator.prototype = {
 	moveNext: function IteratorBlockEnumerator$moveNext() {
         try {
 		    return this._moveNext.call(this._this);
@@ -2443,7 +2480,7 @@ ss.IteratorBlockEnumerator.prototype = {
 		return this._getCurrent.call(this._this);
 	},
 	reset: function IteratorBlockEnumerator$reset() {
-		throw new ss.NotSupportedException('Reset is not supported.');
+		throw new ss_NotSupportedException('Reset is not supported.');
 	},
 	dispose: function IteratorBlockEnumerator$dispose() {
 		if (this._dispose)
@@ -2451,29 +2488,30 @@ ss.IteratorBlockEnumerator.prototype = {
 	}
 };
 
-ss.IteratorBlockEnumerator.registerClass('ss.IteratorBlockEnumerator', null, [ss.IEnumerator, ss.IDisposable]);
+Type.registerClass(global, 'ss.IteratorBlockEnumerator', ss_IteratorBlockEnumerator, null, [ss_IEnumerator, ss_IDisposable]);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Task
 
-ss.Task = function Task$(action, state) {
+var ss_Task = function Task$(action, state) {
 	this._action = action;
 	this._state = state;
 	this.exception = null;
 	this.status = 0;
 	this._thens = [];
 	this._result = null;
-}
-ss.Task.prototype = {
+};
+
+ss_Task.prototype = {
 	continueWith: function Task$continueWith(continuation) {
-		var tcs = new ss.TaskCompletionSource();
+		var tcs = new ss_TaskCompletionSource();
 		var _this = this;
 		var fn = function() {
 			try {
 				tcs.setResult(continuation(_this));
 			}
 			catch (e) {
-				tcs.setException(ss.Exception.wrap(e));
+				tcs.setException(ss_Exception.wrap(e));
 			}
 		};
 		if (this.isCompleted()) {
@@ -2497,7 +2535,7 @@ ss.Task.prototype = {
 				_this._complete(result);
 			}
 			catch (e) {
-				_this._fail(new ss.AggregateException([ss.Exception.wrap(e)]));
+				_this._fail(new ss_AggregateException([ss_Exception.wrap(e)]));
 			}
 		}, 0);
 	},
@@ -2554,36 +2592,36 @@ ss.Task.prototype = {
 	}
 };
 
-ss.Task.delay = function Task$delay(delay) {
-	var tcs = new ss.TaskCompletionSource();
+ss_Task.delay = function Task$delay(delay) {
+	var tcs = new ss_TaskCompletionSource();
 	setTimeout(function() {
 		tcs.setResult(0);
 	}, delay);
 	return tcs.task;
 };
 
-ss.Task.fromResult = function Task$fromResult(result) {
-	var t = new ss.Task();
+ss_Task.fromResult = function Task$fromResult(result) {
+	var t = new ss_Task();
 	t.status = 5;
 	t._result = result;
 	return t;
 };
 
-ss.Task.run = function Task$fromResult(f) {
-	var tcs = new ss.TaskCompletionSource();
+ss_Task.run = function Task$fromResult(f) {
+	var tcs = new ss_TaskCompletionSource();
 	setTimeout(function() {
 		try {
 			tcs.setResult(f());
 		}
 		catch (e) {
-			tcs.setException(ss.Exception.wrap(e));
+			tcs.setException(ss_Exception.wrap(e));
 		}
 	}, 0);
 	return tcs.task;
 };
 
-ss.Task.whenAll = function Task$whenAll(tasks) {
-	var tcs = new ss.TaskCompletionSource();
+ss_Task.whenAll = function Task$whenAll(tasks) {
+	var tcs = new ss_TaskCompletionSource();
 	if (tasks.length === 0) {
 		tcs.setResult([]);
 	}
@@ -2620,11 +2658,11 @@ ss.Task.whenAll = function Task$whenAll(tasks) {
 	return tcs.task;
 };
 
-ss.Task.whenAny = function Task$whenAny(tasks) {
+ss_Task.whenAny = function Task$whenAny(tasks) {
 	if (!tasks.length)
 		throw 'Must wait for at least one task';
 
-	var tcs = new ss.TaskCompletionSource();
+	var tcs = new ss_TaskCompletionSource();
 	for (var i = 0; i < tasks.length; i++) {
 		tasks[i].continueWith(function(t) {
 			switch (t.status) {
@@ -2645,8 +2683,8 @@ ss.Task.whenAny = function Task$whenAny(tasks) {
 	return tcs.task;
 };
 
-ss.Task.fromDoneCallback = function Task$fromDoneCallback(t, i, m) {
-	var tcs = new ss.TaskCompletionSource(), args;
+ss_Task.fromDoneCallback = function Task$fromDoneCallback(t, i, m) {
+	var tcs = new ss_TaskCompletionSource(), args;
     if (typeof(i) === 'number') {
         args = Array.prototype.slice.call(arguments, 3);
         if (i < 0)
@@ -2668,8 +2706,8 @@ ss.Task.fromDoneCallback = function Task$fromDoneCallback(t, i, m) {
 	return tcs.task;
 };
 
-ss.Task.fromPromise = function Task$fromPromise(p, f) {
-	var tcs = new ss.TaskCompletionSource();
+ss_Task.fromPromise = function Task$fromPromise(p, f) {
+	var tcs = new ss_TaskCompletionSource();
 	if (typeof(f) === 'number')
 		f = (function(i) { return function() { return arguments[i >= 0 ? i : (arguments.length + i)]; }; })(f);
     else if (typeof(f) !== 'function')
@@ -2678,28 +2716,52 @@ ss.Task.fromPromise = function Task$fromPromise(p, f) {
 	p.then(function() {
 		tcs.setResult(typeof(f) === 'function' ? f.apply(null, arguments) : null);
 	}, function() {
-		tcs.setException(new ss.PromiseException(Array.prototype.slice.call(arguments, 0)));
+		tcs.setException(new ss_PromiseException(Array.prototype.slice.call(arguments, 0)));
 	});
 	return tcs.task;
 };
 
-ss.Task.registerClass('ss.Task', null, ss.IDisposable);
+ss_Task.fromNode = function  Task$fromNode(t, f, m) {
+	var tcs = new ss_TaskCompletionSource(), args;
+    if (typeof(f) === 'function') {
+        args = Array.prototype.slice.call(arguments, 3);
+    }
+    else {
+        args = Array.prototype.slice.call(arguments, 2);
+        m = f;
+		f = function() { return arguments[0]; };
+    }
+
+	var cb = function(e) {
+		if (e)
+			tcs.setException(ss_Exception.wrap(e));
+		else
+			tcs.setResult(f.apply(null, Array.prototype.slice.call(arguments, 1)));
+	};
+	
+	args.push(cb);
+
+	t[m].apply(t, args);
+	return tcs.task;
+};
+
+Type.registerClass(global, 'ss.Task', ss_Task, null, ss_IDisposable);
 
 ////////////////////////////////////////////////////////////////////////////////
 // TaskStatus
-ss.TaskStatus = function() {
+var ss_TaskStatus = function() {
 };
-ss.TaskStatus.prototype = { created: 0, running: 3, ranToCompletion: 5, canceled: 6, faulted: 7 };
-ss.TaskStatus.registerEnum('ss.TaskStatus', false);
+ss_TaskStatus.prototype = { created: 0, running: 3, ranToCompletion: 5, canceled: 6, faulted: 7 };
+Type.registerEnum(global, 'ss.TaskStatus', ss_TaskStatus, false);
 
 ///////////////////////////////////////////////////////////////////////////////
 // TaskCompletionSource
 
-ss.TaskCompletionSource = function TaskCompletionSource$() {
-	this.task = new ss.Task();
+var ss_TaskCompletionSource = function TaskCompletionSource$() {
+	this.task = new ss_Task();
 	this.task.status = 3;
 };
-ss.TaskCompletionSource.prototype = {
+ss_TaskCompletionSource.prototype = {
 	setCanceled: function TaskCompletionSource$setCanceled() {
 		if (!this.task._cancel())
 			throw 'Task was already completed.';
@@ -2719,85 +2781,50 @@ ss.TaskCompletionSource.prototype = {
 		return this.task._complete(result);
 	},
 	trySetException: function TaskCompletionSource$setException(exception) {
-		if (!Type.canCast(exception, ss.AggregateException)) {
-			if (Type.canCast(exception, ss.Exception))
+		if (!Type.canCast(exception, ss_AggregateException)) {
+			if (Type.canCast(exception, ss_Exception))
 				exception = [exception];
-			exception = new ss.AggregateException(exception);
+			exception = new ss_AggregateException(exception);
 		}
 		return this.task._fail(exception);
 	}
 };
 
-ss.TaskCompletionSource.registerClass('ss.TaskCompletionSource');
-
-///////////////////////////////////////////////////////////////////////////////
-// XMLHttpRequest and XML parsing helpers
-
-if (!topLevel.XMLHttpRequest) {
-  topLevel.XMLHttpRequest = function() {
-    var progIDs = [ 'Msxml2.XMLHTTP', 'Microsoft.XMLHTTP' ];
-
-    for (var i = 0; i < progIDs.length; i++) {
-      try {
-        var xmlHttp = new ActiveXObject(progIDs[i]);
-        return xmlHttp;
-      }
-      catch (ex) {
-      }
-    }
-
-    return null;
-  }
-}
-
-ss.parseXml = function(markup) {
-  try {
-    if (DOMParser) {
-      var domParser = new DOMParser();
-      return domParser.parseFromString(markup, 'text/xml');
-    }
-    else {
-      var progIDs = [ 'Msxml2.DOMDocument.3.0', 'Msxml2.DOMDocument' ];
-        
-      for (var i = 0; i < progIDs.length; i++) {
-        var xmlDOM = new ActiveXObject(progIDs[i]);
-        xmlDOM.async = false;
-        xmlDOM.loadXML(markup);
-        xmlDOM.setProperty('SelectionLanguage', 'XPath');
-                
-        return xmlDOM;
-      }
-    }
-  }
-  catch (ex) {
-  }
-
-  return null;
-}
+Type.registerClass(global, 'ss.TaskCompletionSource', ss_TaskCompletionSource);
 
 ///////////////////////////////////////////////////////////////////////////////
 // CancelEventArgs
 
-ss.CancelEventArgs = function CancelEventArgs$() {
-    ss.CancelEventArgs.initializeBase(this);
+var ss_CancelEventArgs = function CancelEventArgs$() {
+    ss_CancelEventArgs.call(this);
     this.cancel = false;
 }
-ss.CancelEventArgs.registerClass('ss.CancelEventArgs', ss.EventArgs);
+Type.registerClass(global, 'ss.CancelEventArgs', ss_CancelEventArgs, ss_EventArgs);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Interfaces
 
-ss.IApplication = function() { };
-ss.IApplication.registerInterface('ss.IApplication');
+var ss_IApplication = function() { };
+Type.registerInterface(global, 'ss.IApplication', ss_IApplication);
 
-ss.IContainer = function () { };
-ss.IContainer.registerInterface('ss.IContainer');
+var ss_IContainer = function () { };
+Type.registerInterface(global, 'ss.IContainer', ss_IContainer);
 
-ss.IObjectFactory = function () { };
-ss.IObjectFactory.registerInterface('ss.IObjectFactory');
+var ss_IObjectFactory = function () { };
+Type.registerInterface(global, 'ss.IObjectFactory', ss_IObjectFactory);
 
-ss.IEventManager = function () { };
-ss.IEventManager.registerInterface('ss.IEventManager');
+var ss_IEventManager = function () { };
+Type.registerInterface(global, 'ss.IEventManager', ss_IEventManager);
 
-ss.IInitializable = function () { };
-ss.IInitializable.registerInterface('ss.IInitializable');
+var ss_IInitializable = function () { };
+Type.registerInterface(global, 'ss.IInitializable', ss_IInitializable);
+
+if (global.ss) {
+  for (var n in ss) {
+    if (ss.hasOwnProperty(n))
+      global.ss[n] = ss[n];
+  }
+}
+else {
+  global.ss = ss;
+}

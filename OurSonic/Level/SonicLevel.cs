@@ -35,7 +35,7 @@ namespace OurSonic.Level
         [IntrinsicProperty]
         public string[][] Palette { get; set; }
         [IntrinsicProperty]
-        public List<int> PaletteAnimations { get; set; }
+        public List<int> PaletteAnimationIndexes { get; set; }
         [IntrinsicProperty]
         public Point[] StartPositions { get; set; }
         [IntrinsicProperty]
@@ -62,7 +62,7 @@ namespace OurSonic.Level
             Rings = new List<Ring>();
             Objects = new List<LevelObjectInfo>();
             HeightMaps = new List<HeightMap>();
-            PaletteAnimations = new List<int>();
+            PaletteAnimationIndexes = new List<int>();
             Tiles = new List<Tile>();
             CurHeightMap = true;
             CurPaletteIndex = 0;
@@ -97,6 +97,11 @@ namespace OurSonic.Level
         public TilePiece GetTilePiece(int block)
         {
             return TilePieces[block];
+        }
+
+        public void SetChunkAt(int x, int y, TileChunk tileChunk)
+        {
+            ChunkMap[x][y] = tileChunk.Index;
         }
     }
     public class PaletteItem

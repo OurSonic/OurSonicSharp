@@ -1,4 +1,4 @@
-require('./mscorlib.debug.js');Enumerable=require('./linq.js');require('./RawDeflate.js');require('./OurSonicModels.js');
+require('./mscorlib.debug.js');Enumerable=require('./linq.js');require('./lib/RawDeflate.js');require('./OurSonicModels.js');
 require('mscorlib');
 var fs = require('fs');
 var http = require('http');
@@ -26,6 +26,7 @@ var $OurSonicNode_Compress = function() {
 						fs.appendFile('abcdef.js', String.format('window.levelData[{0}] = \'{1}\';\r\n\r\n', lines[0]++, fm), 'utf8', function(ecr) {
 						});
 						var imj = (__dirname + this.s1.$ + '\\' + this.s3.$).replaceAll('.js', '.min.js');
+						fs.unlink(__dirname + this.s1.$ + '\\' + this.s3.$);
 						fs.writeFile(imj, fm, function(ecr2) {
 						});
 					}));
@@ -161,6 +162,7 @@ $OurSonicNode_Server.prototype = {
 	}
 };
 $OurSonicNode_Server.main = function() {
+	new $OurSonicNode_Compress();
 	new $OurSonicNode_Server();
 };
 Type.registerClass(global, 'OurSonicNode.Compress', $OurSonicNode_Compress, Object);

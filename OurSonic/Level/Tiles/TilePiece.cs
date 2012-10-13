@@ -20,9 +20,8 @@ namespace OurSonic.Level.Tiles
         [IntrinsicProperty]
         public List<TileItem> Tiles { get; set; }
         [IntrinsicProperty]
-        public int[] AnimatedFrames { get; set; }
-        [IntrinsicProperty]
         public int Index { get; set; }
+        public List<int> AnimatedFrames { get; set; }
 
         public TilePiece()
         {
@@ -83,8 +82,44 @@ namespace OurSonic.Level.Tiles
         {
             var drawOrderIndex = 0;
             drawOrderIndex = xFlip ? ( yFlip ? 0 : 1 ) : ( yFlip ? 2 : 3 );
-            var fd = GetCache(layer, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.PaletteAnimations);
-            if (fd.Falsey()) fd = buildCache(layer, xFlip, yFlip, animatedIndex, drawOrderIndex);
+
+            /*
+
+
+
+            var i = 0;
+
+            var localPoint=new Point(0,0);
+
+
+            foreach (TileItem t in Tiles.Array())
+            {
+                var mj = t;
+                var tile = t.GetTile();
+                if (tile.Truthy())
+                {
+                    if (mj.Priority == (layer == 1))
+                    {
+                        var _xf = xFlip ^ mj.XFlip;
+                        var _yf = yFlip ^ mj.YFlip;
+                        var df = DrawInfo[DrawOrder[drawOrderIndex][i]];
+                        localPoint.X = position.X+ df[0] * 8;
+                        localPoint.Y = position.Y + df[1] * 8;
+                        tile.Draw(canvas, localPoint, _xf, _yf, mj.Palette,  animatedIndex);
+                    }
+                }
+                i++;
+            }
+
+
+
+
+*/
+
+            var fd = GetCache(layer, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.PaletteAnimationIndexes);
+            if (fd.Falsey())
+
+                fd = buildCache(layer, xFlip, yFlip, animatedIndex, drawOrderIndex);
             DrawIt(canvas, fd, position);
             return true;
         }
@@ -123,7 +158,7 @@ namespace OurSonic.Level.Tiles
                         var df = DrawInfo[DrawOrder[drawOrderIndex][i]];
                         localPoint.X = df[0] * sX;
                         localPoint.Y = df[1] * sY;
-                        tile.Draw(ac.Context, localPoint, _xf, _yf, mj.Palette, layer, animatedIndex);
+                        tile.Draw(ac.Context, localPoint, _xf, _yf, mj.Palette, animatedIndex);
                     }
                 }
                 i++;
@@ -133,7 +168,7 @@ namespace OurSonic.Level.Tiles
             //            ac.Context.StrokeRect(0, 0, 2*8 * SonicManager.Instance.Scale.X, 2*8 * SonicManager.Instance.Scale.Y);
 
             fd = ac.Canvas;
-            SetCache(layer, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.PaletteAnimations, fd);
+            SetCache(layer, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.PaletteAnimationIndexes, fd);
             return fd;
         }
 
@@ -144,8 +179,8 @@ namespace OurSonic.Level.Tiles
                               CanvasElement image)
         {
             dynamic val = ( ( drawOrder << 8 ) + ( animationFrame << 20 ) + ( ( layer + 1 ) << 24 ) ); //okay
-            if (AnimatedFrames.Length > 0) {
-                for (int index = 0; index < AnimatedFrames.Length; index++) {
+            if (AnimatedFrames.Count > 0) {
+                for (int index = 0; index < AnimatedFrames.Count; index++) {
                     var animatedFrame = AnimatedFrames[index];
                     val += palAn[animatedFrame] + " ";
                 }
@@ -153,21 +188,21 @@ namespace OurSonic.Level.Tiles
             Image.Me()[val] = image;
         }
 
-        private void DrawIt(CanvasContext2D canvas, CanvasElement fd, Point position)
-        {
-            canvas.DrawImage(fd, position.X, position.Y);
-        }
-
         private CanvasElement GetCache(int layer, int drawOrder, int animationFrame, List<int> palAn)
         {
             dynamic val = ( ( drawOrder << 8 ) + ( animationFrame << 20 ) + ( ( layer + 1 ) << 24 ) ); //okay
-            if (AnimatedFrames.Length > 0) {
+            if (AnimatedFrames.Count > 0) {
                 foreach (var animatedFrame in AnimatedFrames) {
                     val += palAn[animatedFrame] + " ";
                 }
             }
 
             return Script.Reinterpret<CanvasElement>(Image.Me()[val]);
+        }
+
+        private void DrawIt(CanvasContext2D canvas, CanvasElement fd, Point position)
+        {
+            canvas.DrawImage(fd, position.X, position.Y);
         }
 
         public int GetLayer1Angles()

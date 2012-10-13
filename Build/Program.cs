@@ -52,7 +52,7 @@ namespace Build
                                                                                  shufSharp + @"\OurSonicNode\",
                                                                                  new Application(true,
                                                                                                  new List<string> {
-                                                                                                                          @"./RawDeflate.js",
+                                                                                                                          @"./lib/RawDeflate.js",
                                                                                                                           @"./OurSonicModels.js",
                                                                                                                   })
                                                                          },

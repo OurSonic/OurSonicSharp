@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Html;
 using System.Runtime.CompilerServices;
 using OurSonic.UIManager;
@@ -12,6 +13,7 @@ namespace OurSonic
 {
     public class SonicEngine
     {
+        private bool WideScreen = true;
         public int canvasHeight;
         public int canvasWidth;
         public SocketIOClient client;
@@ -165,6 +167,9 @@ namespace OurSonic
                                                if (sonicManager.CurrentGameState == GameState.Playing)
                                                    sonicManager.SonicToon.Hit(sonicManager.SonicToon.X, sonicManager.SonicToon.Y);
                                            },
+                                           () => { });
+            KeyboardJS.Instance().Bind.Key("u",
+                                           () => { WideScreen = !WideScreen; },
                                            () => { });
 
             KeyboardJS.Instance().Bind.Key("c",
@@ -389,9 +394,13 @@ namespace OurSonic
             sonicManager.WindowLocation = Constants.DefaultWindowLocation(sonicManager.CurrentGameState,
                                                                           uiCanvas,
                                                                           sonicManager.Scale);
+
+            var wide = new DoublePoint(( canvasWidth / 320d / sonicManager.Scale.X ), ( canvasHeight / 224d / sonicManager.Scale.Y ));
+            var even = new DoublePoint(Math.Min(( canvasWidth / 320d / sonicManager.Scale.X ), ( canvasHeight / 224d / sonicManager.Scale.Y )), Math.Min(( canvasWidth / 320d / sonicManager.Scale.X ), ( canvasHeight / 224d / sonicManager.Scale.Y )));
+
             sonicManager.RealScale = !fullscreenMode
                                              ? new DoublePoint(1, 1)
-                                             : new DoublePoint(( canvasWidth / 320d / sonicManager.Scale.X ), ( canvasHeight / 224d / sonicManager.Scale.Y ));
+                                             : ( WideScreen ? wide : even );
 
             if (resetOverride || sonicManager.overrideRealScale == null)
                 sonicManager.overrideRealScale = new DoublePoint(sonicManager.RealScale);
@@ -442,7 +451,7 @@ namespace OurSonic
             gameCanvas.Context.Me().mozImageSmoothingEnabled = false;
             gameCanvas.Context.Me().imageSmoothingEnabled = false;
 
-            sonicManager.Draw(gameCanvas.Context);
+            sonicManager.MainDraw(gameCanvas.Context);
         }
 
         public void UIDraw()

@@ -118,7 +118,7 @@ namespace OurSonic.Sonic
                 Mode = RotationMode.RightWall;
             //        x = _H.floor(x);
             //        y = _H.floor(y);
-            myRec = new Rectangle((int) ( X - 5 ), (int) ( Y - 20 ), 5 * 2, 20 * 2);
+            myRec = new Rectangle((int) ( X - 10 ), (int) ( Y - 20 ), 5 * 2, 20 * 2);
             if (InAir)
                 Mode = RotationMode.Floor;
         }

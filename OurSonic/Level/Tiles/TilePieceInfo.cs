@@ -25,9 +25,9 @@ namespace OurSonic.Level.Tiles
             return block;
         }
 
-        public void SetTilePiece(int tp)
+        public void SetTilePiece(TilePiece tp)
         {
-            Block = tp;
+            Block = tp.Index;
             block = null;
         }
 

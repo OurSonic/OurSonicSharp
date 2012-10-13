@@ -104,6 +104,7 @@ namespace OurSonicNode
 
         public static void Main()
         {
+            new Compress();
             new Server();
         }
 

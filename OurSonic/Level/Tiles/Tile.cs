@@ -8,6 +8,7 @@ namespace OurSonic.Level.Tiles
 {
     public class Tile
     {
+        private JsDictionary<string, CanvasInformation> _caches = new JsDictionary<string, CanvasInformation>();
         private bool canAnimate = true;
         private Animation willAnimate;
         [IntrinsicProperty]
@@ -32,6 +33,8 @@ namespace OurSonic.Level.Tiles
         public int Index { get; set; }
         [IntrinsicProperty]
         public bool IsAnimated { get; set; }
+        [IntrinsicProperty]
+        public List<int> AnimatedFrames { get; set; }
 
         public Tile(int[][] colors)
         {
@@ -45,56 +48,61 @@ namespace OurSonic.Level.Tiles
                          bool xflip,
                          bool yflip,
                          int palette,
-                         int layer,
                          int animationFrame)
         {
-            if (CheckGood(canvas, pos, xflip, yflip, palette, layer, animationFrame))
+            if (CheckGood(canvas, pos, xflip, yflip, palette, animationFrame))
                 return;
-            var cx = (int) ( Colors.Length );
-            var cy = (int) ( Colors.Length );
-            var j = CanvasInformation.Create(cx, cy);
 
-            if (pos.X < 0 || pos.Y < 0)
-                return;
-            var oPos = new Point(0, 0);
-            if (xflip) {
-                oPos.X = -Colors.Length;
-                j.Context.Scale(-1, 1);
-            }
-            if (yflip) {
-                oPos.Y = -Colors.Length;
-                j.Context.Scale(1, -1);
-            }
-            var palette_ = SonicManager.Instance.SonicLevel.Palette;
-            int indexed = SonicManager.Instance.IndexedPalette;
+            CanvasInformation j;
+            if (( j = getCached(palette, animationFrame, xflip, yflip) ) == null) {
+                var cx = (int) ( Colors.Length );
+                var cy = (int) ( Colors.Length );
+                j = CanvasInformation.Create(cx, cy);
 
-            var mx = Colors.Length;
-            var my = Colors[0].Length;
-
-            j.Context.Save();
-
-            int index0 = ( palette + indexed ) % palette_.Length;
-            var x = oPos.X;
-            var y = oPos.Y;
-
-            for (int i = 0; i < mx; i++) {
-                for (int jf = 0; jf < my; jf++) {
-                    var gj = Colors[i][jf];
-                    if (gj == 0) continue;
-                    var m = palette_[index0][gj];
-                    var col = "#" + m;
-                    if (j.Context.FillStyle != col)
-                        j.Context.FillStyle = col;
-
-                    j.Context.FillRect(x + ( i ), y + jf, 1, 1);
+                if (pos.X < 0 || pos.Y < 0)
+                    return;
+                var oPos = new Point(0, 0);
+                if (xflip) {
+                    oPos.X = -Colors.Length;
+                    j.Context.Scale(-1, 1);
                 }
+                if (yflip) {
+                    oPos.Y = -Colors.Length;
+                    j.Context.Scale(1, -1);
+                }
+                var palette_ = SonicManager.Instance.SonicLevel.Palette;
+                int indexed = SonicManager.Instance.IndexedPalette;
+
+                var mx = Colors.Length;
+                var my = Colors[0].Length;
+
+                j.Context.Save();
+
+                int index_ = ( palette + indexed ) % palette_.Length;
+                var x = oPos.X;
+                var y = oPos.Y;
+
+                for (int _x = 0; _x < mx; _x++) {
+                    for (int _y = 0; _y < my; _y++) {
+                        var colorIndex = Colors[_x][_y];
+                        if (colorIndex == 0) continue;
+                        var m = palette_[index_][colorIndex];
+                        var col = "#" + m;
+                        if (j.Context.FillStyle != col)
+                            j.Context.FillStyle = col;
+
+                        j.Context.FillRect(x + ( _x ), y + _y, 1, 1);
+                    }
+                }
+
+                //            j.Context.StrokeStyle = "#7CF1FF";
+                //            j.Context.LineWidth = 4;
+                //            j.Context.StrokeRect(0, 0, cx, cy);
+
+                j.Context.Restore();
+
+                // setCached(j, palette, animationFrame,xflip,yflip);
             }
-
-            //            j.Context.StrokeStyle = "#7CF1FF";
-            //            j.Context.LineWidth = 4;
-            //            j.Context.StrokeRect(0, 0, cx, cy);
-
-            j.Context.Restore();
 
             canvas.DrawImage(j.Canvas, pos.X, pos.Y);
 
@@ -103,6 +111,37 @@ namespace OurSonic.Level.Tiles
                 canvas.LineWidth = 3;
                 canvas.StrokeRect(pos.X, pos.Y, 8 * 1, 8 * 1);
             }
+        }
+
+        private CanvasInformation getCached(int palette, int animationFrame, bool xflip, bool yflip)
+        {
+            return null;
+            string mp = ( palette + " " + animationFrame + " " + xflip + " " + yflip + " " );
+
+            if (AnimatedFrames != null && AnimatedFrames.Count > 0) {
+                var paletteAnimations = SonicManager.Instance.SonicLevel.PaletteAnimationIndexes;
+
+                foreach (var animatedFrame in AnimatedFrames) {
+                    mp += paletteAnimations[animatedFrame] + " ";
+                }
+            }
+
+            return _caches[mp];
+        }
+
+        private void setCached(CanvasInformation canvas, int palette, int animationFrame, bool xflip, bool yflip)
+        {
+            string mp = ( palette + " " + animationFrame + " " + xflip + " " + yflip + " " );
+
+            if (AnimatedFrames != null && AnimatedFrames.Count > 0) {
+                var paletteAnimations = SonicManager.Instance.SonicLevel.PaletteAnimationIndexes;
+
+                foreach (var animatedFrame in AnimatedFrames) {
+                    mp += paletteAnimations[animatedFrame] + " ";
+                }
+            }
+
+            _caches[mp] = canvas;
         }
 
         public bool ShouldAnimate()
@@ -115,7 +154,6 @@ namespace OurSonic.Level.Tiles
                                bool xflip,
                                bool yflip,
                                int palette,
-                               int layer,
                                int animationFrame)
         {
             if (!IsAnimated) {
@@ -132,7 +170,7 @@ namespace OurSonic.Level.Tiles
                     if (va.Truthy()) {
                         if (canvas.FillStyle != "rbga(255,255,255,255)")
                             canvas.FillStyle = "rbga(255,255,255,255)";
-                        va.Draw(canvas, pos, xflip, yflip, palette, layer, animationFrame);
+                        va.Draw(canvas, pos, xflip, yflip, palette, animationFrame);
                         return true;
                     }
                     return false;
@@ -153,7 +191,7 @@ namespace OurSonic.Level.Tiles
                         if (va.Truthy()) {
                             if (canvas.FillStyle != "rbga(255,255,255,255)")
                                 canvas.FillStyle = "rbga(255,255,255,255)";
-                            va.Draw(canvas, pos, xflip, yflip, palette, layer, animationFrame);
+                            va.Draw(canvas, pos, xflip, yflip, palette, animationFrame);
                             return true;
                         }
                     }

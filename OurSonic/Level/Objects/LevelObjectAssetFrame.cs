@@ -251,11 +251,12 @@ namespace OurSonic.Level.Objects
 
             if (xflip) {
                 if (yflip) {
-                    _canvas.Translate(0, size.Y);
-                    _canvas.Scale(1, -1);
                     _canvas.Translate(fd.Canvas.Width / 2d, fd.Canvas.Height / 2d);
                     _canvas.Rotate(-90 * Math.PI / 180);
                     _canvas.Translate(-fd.Canvas.Width / 2d, -fd.Canvas.Height / 2d);
+
+                    _canvas.Translate(0, size.Y);
+                    _canvas.Scale(1, -1);
                 } else {
                     _canvas.Translate(fd.Canvas.Width / 2d, fd.Canvas.Height / 2d);
                     _canvas.Rotate(-90 * Math.PI / 180);

@@ -84,7 +84,9 @@ setTimeout(tim, 100);*/
                                                                      bool load = true;
                                                                      foreach (var level in data.Data.OrderBy(a => a)) {
                                                                          if (load) {
+#if RELEASE
                                                                              loadLevel(level);
+#endif
                                                                              load = false;
                                                                          }
                                                                          string area = level;
