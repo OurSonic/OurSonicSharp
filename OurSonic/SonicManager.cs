@@ -209,9 +209,7 @@ namespace OurSonic
                         ex = e.X;
                         ey = e.Y;
                         var pos = new Point(ex, ey);
-                        for (var l = 0; l < SonicLevel.Objects.Count; l++) {
-                            var o = SonicLevel.Objects[l];
-
+                        foreach (var o in SonicLevel.Objects) {
                             if (IntersectingRectangle.IntersectsRect(o.GetRect(), pos)) Window.Alert("Object Data: " + Help.Stringify(o));
                         }
 
@@ -245,8 +243,7 @@ namespace OurSonic
             InFocusObjects = new List<LevelObjectInfo>();
             var levelObjectInfos = SonicLevel.Objects;
 
-            for (int index = 0; index < levelObjectInfos.Count; index++) {
-                LevelObjectInfo obj = levelObjectInfos[index];
+            foreach (LevelObjectInfo obj in levelObjectInfos) {
                 localPoint.X = (int) obj.X;
                 localPoint.Y = (int) obj.Y;
                 if (BigWindowLocation.Intersects(localPoint)) {
@@ -258,8 +255,7 @@ namespace OurSonic
             if (UIManager.UIManagerAreas.LiveObjectsArea != null)
                 UIManager.UIManagerAreas.LiveObjectsArea.Data.Populate(InFocusObjects);
 
-            for (int index = 0; index < AnimationInstances.Count; index++) {
-                AnimationInstance animationInstance = AnimationInstances[index];
+            foreach (AnimationInstance animationInstance in AnimationInstances) {
                 animationInstance.Tick();
             }
         }
@@ -525,8 +521,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                             SonicLevel.PaletteAnimationIndexes[k] = j / pal.SkipIndex;
                     }
 
-                    for (int m = 0; m < pal.Pieces.Count; m++) {
-                        var mj = pal.Pieces[m];
+                    foreach (var mj in pal.Pieces) {
                         SonicLevel.Palette[mj.PaletteIndex][( mj.PaletteOffset ) / 2] =
                                 pal.Palette[SonicLevel.PaletteAnimationIndexes[k] * ( pal.Pieces.Count * 2 ) + 0 + ( mj.PaletteMultiply )];
                     }
@@ -693,8 +688,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
 
         private void drawAnimations(CanvasContext2D canvas)
         {
-            for (int index = 0; index < AnimationInstances.Count; index++) {
-                AnimationInstance ano = AnimationInstances[index];
+            foreach (AnimationInstance ano in AnimationInstances) {
                 ano.Draw(canvas, -WindowLocation.X, -WindowLocation.Y);
             }
         }
@@ -702,8 +696,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
         private void drawObjects(CanvasContext2D canvas, Point localPoint)
         {
             List<LevelObjectInfo> levelObjectInfos = SonicLevel.Objects;
-            for (int index = 0; index < levelObjectInfos.Count; index++) {
-                LevelObjectInfo o = levelObjectInfos[index];
+            foreach (LevelObjectInfo o in levelObjectInfos) {
                 localPoint.X = Script.Reinterpret<int>(o.X);
                 localPoint.Y = Script.Reinterpret<int>(o.Y);
                 if (o.Dead || BigWindowLocation.Intersects(localPoint)) {
@@ -717,8 +710,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
 
         private Animation containsAnimatedTile(int tile, SonicLevel sonLevel)
         {
-            for (int i = 0; i < sonLevel.Animations.Count; i++) {
-                var an = sonLevel.Animations[i];
+            foreach (var an in sonLevel.Animations) {
                 var anin = an.AnimationTileIndex;
                 var num = an.NumberOfTiles;
                 if (tile >= anin && tile < anin + num)

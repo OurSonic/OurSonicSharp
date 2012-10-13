@@ -32,8 +32,7 @@ namespace OurSonic.UIManager
         public bool ChildrenAreEditing()
         {
             var ch = Rows;
-            for (int index = 0; index < ch.Count; index++) {
-                TableRow t = ch[index];
+            foreach (TableRow t in ch) {
                 if (t.EditorEngine.Dragging.Truthy() || t.EditorEngine.Editing)
                     return true;
                 if (t.ChildrenAreEditing())
@@ -213,8 +212,7 @@ namespace OurSonic.UIManager
         public bool ChildrenAreEditing()
         {
             var ch = Cells;
-            for (int index = 0; index < ch.Count; index++) {
-                TableCell t = ch[index];
+            foreach (TableCell t in ch) {
                 if (t.EditorEngine.Dragging.Truthy() || t.EditorEngine.Editing)
                     return true;
                 if (t.ChildrenAreEditing())

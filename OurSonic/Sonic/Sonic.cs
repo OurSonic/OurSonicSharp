@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonic.Level;
+using OurSonic.Level.Objects;
 using OurSonic.Level.Tiles;
 using OurSonic.Utility;
 namespace OurSonic.Sonic
@@ -968,8 +969,7 @@ namespace OurSonic.Sonic
             var me = new Point(x, y);
             var levelObjectInfos = SonicManager.Instance.InFocusObjects;
 
-            for (int index = 0; index < levelObjectInfos.Count; index++) {
-                var ob = levelObjectInfos[index];
+            foreach (var ob in levelObjectInfos) {
                 var dj = ob.Collides(me);
                 var dj2 = ob.HurtsSonic(me);
 

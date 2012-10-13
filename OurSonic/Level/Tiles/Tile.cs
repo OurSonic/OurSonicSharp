@@ -175,8 +175,7 @@ namespace OurSonic.Level.Tiles
                     }
                     return false;
                 }
-                for (int i = 0; i < SonicManager.Instance.SonicLevel.Animations.Count; i++) {
-                    var acn = SonicManager.Instance.SonicLevel.Animations[i];
+                foreach (var acn in SonicManager.Instance.SonicLevel.Animations) {
                     var anin = acn.AnimationTileIndex;
                     var num = acn.NumberOfTiles;
                     if (Index >= anin && Index < anin + num) {
@@ -229,13 +228,13 @@ namespace OurSonic.Level.Tiles
         {
             if (CurPaletteIndexes.Falsey()) {
                 var d = new List<int>();
-                for (int i = 0; i < Colors.Length; i++) {
-                    var color = Colors[i];
-                    for (int jf = 0; jf < color.Length; jf++) {
-                        var gj = color[jf];
-                        if (gj == 0) continue;
-                        if (!d.Any(D => D == gj))
-                            d.Add(gj);
+                for (int _x = 0; _x < Colors.Length; _x++) {
+                    var color = Colors[_x];
+                    for (int _y = 0; _y < color.Length; _y++) {
+                        var col = color[_y];
+                        if (col == 0) continue;
+                        if (d.All(a => a != col))
+                            d.Add(col);
                     }
                 }
                 CurPaletteIndexes = (int[]) d.Slice(0);

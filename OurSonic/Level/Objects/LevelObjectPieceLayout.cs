@@ -26,8 +26,7 @@ namespace OurSonic.Level.Objects
 
         public void Update()
         {
-            for (int index = 0; index < SonicManager.Instance.SonicLevel.Objects.Count; index++) {
-                LevelObjectInfo t = SonicManager.Instance.SonicLevel.Objects[index];
+            foreach (LevelObjectInfo t in SonicManager.Instance.SonicLevel.Objects) {
                 t.Reset();
             }
         }
@@ -125,8 +124,7 @@ namespace OurSonic.Level.Objects
 
         public void Draw(CanvasContext2D canvas, int x, int y, LevelObject framework, LevelObjectInfo instance, bool showHeightMap)
         {
-            for (var i = 0; i < instance.Pieces.Count; i++) {
-                var j = instance.Pieces[i];
+            foreach (var j in instance.Pieces) {
                 if (!j.Visible) continue;
                 var piece = framework.Pieces[j.PieceIndex];
                 var asset = framework.Assets[piece.AssetIndex];

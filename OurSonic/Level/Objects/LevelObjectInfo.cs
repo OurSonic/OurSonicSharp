@@ -83,8 +83,8 @@ namespace OurSonic.Level.Objects
 
             Pieces = new List<LevelObjectPiece>();
 
-            for (int i = 0; i < pcs.Count; i++) {
-                Pieces.Add(pcs[i].Me<LevelObjectPiece>());
+            foreach (LevelObjectPieceLayoutPiece t in pcs) {
+                Pieces.Add(t.Me<LevelObjectPiece>());
             }
         }
 
@@ -132,8 +132,7 @@ namespace OurSonic.Level.Objects
             _rect.Width = 0;
             _rect.Height = 0;
 
-            for (var pieceIndex = 0; pieceIndex < pcs.Count; pieceIndex++) {
-                var j = pcs[pieceIndex];
+            foreach (var j in pcs) {
                 var piece = ObjectData.Pieces[j.PieceIndex];
                 var asset = ObjectData.Assets[piece.AssetIndex];
                 if (asset.Frames.Count > 0) {
@@ -224,9 +223,7 @@ namespace OurSonic.Level.Objects
             }
 */
 
-            for (var pieceIndex = 0; pieceIndex < pcs.Count; pieceIndex++) {
-                var j = pcs[pieceIndex];
-
+            foreach (var j in pcs) {
                 var piece = ObjectData.Pieces[j.PieceIndex];
                 var asset = ObjectData.Assets[piece.AssetIndex];
                 if (asset.Frames.Count > 0) {

@@ -130,13 +130,11 @@ namespace OurSonic.UIManager
 
             //uiManager.propertyList.populate(this.Element);
 
-            for (var i = 0; i < points.Length; i++) {
-                var j = points[i];
+            foreach (var j in points) {
                 j.Editing = false;
             }
 
-            for (var i = 0; i < points.Length; i++) {
-                var j = points[i];
+            foreach (var j in points) {
                 var sz = j.Size * 5;
 
                 var rect = new Rectangle(x + ( w * j.X / 100 ) - sz / 2, y + ( h * j.Y / 100 ) - sz / 2, sz, sz);
@@ -162,8 +160,7 @@ namespace OurSonic.UIManager
 
         public bool MouseUp(Pointer e)
         {
-            for (var i = 0; i < points.Length; i++) {
-                var j = points[i];
+            foreach (var j in points) {
                 j.Editing = false;
             }
             Editing = false;
@@ -202,8 +199,7 @@ namespace OurSonic.UIManager
 
                 return false;
             }
-            for (var i = 0; i < points.Length; i++) {
-                var j = points[i];
+            foreach (var j in points) {
                 var sz = j.Size * 5;
 
                 if (j.Editing) {
@@ -254,8 +250,7 @@ namespace OurSonic.UIManager
             var w = Element.Width;
             var h = Element.Height;
 
-            for (var i = 0; i < points.Length; i++) {
-                var j = points[i];
+            foreach (var j in points) {
                 canv.FillRect(x + ( w * j.X / 100 ) - j.Size / 2, y + ( h * j.Y / 100 ) - j.Size / 2, j.Size, j.Size);
             }
 

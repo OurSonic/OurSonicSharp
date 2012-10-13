@@ -5,8 +5,11 @@ namespace OurSonic.UIManager
 {
     public class UIManagerAreas
     {
+        
         [IntrinsicProperty]
         public UIArea<TileChunk> TileChunkArea { get; set; }
+        [IntrinsicProperty]
+        public UIArea LevelManagerArea { get; set; }
         [IntrinsicProperty]
         public UIArea<TilePiece> TilePieceArea { get; set; }
         [IntrinsicProperty]

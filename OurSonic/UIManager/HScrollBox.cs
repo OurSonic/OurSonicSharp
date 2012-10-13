@@ -103,8 +103,7 @@ namespace OurSonic.UIManager
         public override bool OnMouseOver(Pointer e)
         {
             if (!Visible) return false;
-            for (var ij = 0; ij < Controls.Count; ij++) {
-                var control = Controls[ij];
+            foreach (var control in Controls) {
                 if (control.Y <= e.Y && control.Y + control.Height > e.Y && control.X + 2 <= e.X && control.X + control.Width + 2 > e.X) {
                     e.X -= control.X;
                     e.Y -= control.Y;
@@ -133,8 +132,8 @@ namespace OurSonic.UIManager
                 if (ScrollOffset < Controls.Count - VisibleItems)
                     ScrollOffset++;
             }
-            for (var ij = 0; ij < Controls.Count; ij++) {
-                var control = Controls[ij];
+            
+            foreach (var control in Controls) {
                 if (control.Y <= e.Y && control.Y + control.Height > e.Y && control.X <= e.X && control.X + control.Width > e.X) {
                     e.X -= control.X;
                     e.Y -= control.Y;

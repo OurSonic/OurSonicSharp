@@ -43,8 +43,7 @@ namespace OurSonic.Level.Tiles
         {
             if (onlyBackgroundSet) return onlyBackground;
 
-            for (int index = 0; index < Tiles.Count; index++) {
-                var mj = Tiles[index];
+            foreach (var mj in Tiles) {
                 if (mj.Truthy()) {
                     if (mj.Priority) {
                         onlyBackgroundSet = true;
@@ -60,8 +59,7 @@ namespace OurSonic.Level.Tiles
         {
             if (onlyForegroundSet) return onlyForeground;
 
-            for (int index = 0; index < Tiles.Count; index++) {
-                var mj = Tiles[index];
+            foreach (var mj in Tiles) {
                 if (mj.Truthy()) {
                     if (!mj.Priority) {
                         onlyForegroundSet = true;
@@ -127,8 +125,8 @@ namespace OurSonic.Level.Tiles
         public bool ShouldAnimate()
         {
             if (shouldAnimate == null) {
-                for (int index = 0; index < Tiles.Count; index++) {
-                    var mj = Tiles[index].GetTile();
+                foreach (TileItem t in Tiles) {
+                    var mj = t.GetTile();
                     if (mj.Truthy()) {
                         if (mj.ShouldAnimate())
                             return ( shouldAnimate = true ).Value;

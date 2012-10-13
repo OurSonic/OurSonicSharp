@@ -17,16 +17,15 @@ namespace OurSonic.UIManager.Areas
             liveObjectsArea.AddControl(scl = new HScrollBox(20, 60, 85, 8, 85) {BackColor = "rgb(50,150,50)"});
 
             liveObjectsArea.Data.Populate = (liveObjects) => {
-                                                for (var i = 0; i < scl.Controls.Count; i++) {
-                                                    ( (ImageButton<LivePopulateModel>) scl.Controls[i] ).Data.@checked = false;
+                                                foreach (Element t in scl.Controls) {
+                                                    ( (ImageButton<LivePopulateModel>) t ).Data.@checked = false;
                                                 }
 
-                                                for (int index = 0; index < liveObjects.Count; index++) {
-                                                    var lo = liveObjects[index];
+                                                foreach (var lo in liveObjects) {
                                                     var satisfied = false;
-                                                    for (var i = 0; i < scl.Controls.Count; i++) {
-                                                        if (lo.Index == ( (ImageButton<LivePopulateModel>) scl.Controls[i] ).Data.@object.Index) {
-                                                            ( (ImageButton<LivePopulateModel>) scl.Controls[i] ).Data.@checked = true;
+                                                    foreach (Element t in scl.Controls) {
+                                                        if (lo.Index == ( (ImageButton<LivePopulateModel>) t ).Data.@object.Index) {
+                                                            ( (ImageButton<LivePopulateModel>) t ).Data.@checked = true;
                                                             satisfied = true;
                                                             break;
                                                         }
@@ -64,8 +63,8 @@ namespace OurSonic.UIManager.Areas
                                                                       }
                                                                   }
 
-                                                                  for (var l = 0; l < SonicManager.Instance.SonicLevel.Objects.Count; l++) {
-                                                                      SonicManager.Instance.SonicLevel.Objects[l].ConsoleLog = null;
+                                                                  foreach (LevelObjectInfo t in SonicManager.Instance.SonicLevel.Objects) {
+                                                                      t.ConsoleLog = null;
                                                                   }
 
                                                                   obj.ConsoleLog = (txt) => {

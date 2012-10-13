@@ -92,8 +92,7 @@ namespace OurSonic.UIManager
                 cv.StrokeStyle = "#000000";
                 cv.Stroke();
 
-                for (int index = 0; index < Controls.Count; index++) {
-                    Element t1 = Controls[index];
+                foreach (Element t1 in Controls) {
                     var good = t1.ForceDrawing();
                     if (good.Redraw)
                         t1.Draw(cv);
@@ -110,8 +109,8 @@ namespace OurSonic.UIManager
             if (CachedDrawing.Canvas.Width != Width + 20 || CachedDrawing.Canvas.Height != Height + 20)
                 CachedDrawing = null;
 
-            for (int index = 0; index < Controls.Count; index++) {
-                Element t = Controls[index];
+            
+            foreach (Element t in Controls) {
                 var good = t.ForceDrawing();
                 if (!good.Redraw)
                     t.Draw(canv);

@@ -18,15 +18,15 @@ namespace OurSonic
         {
             cachedObjects = new JsDictionary<string, LevelObject>();
 
-            for (int l = 0; l < SonicLevel.Objects.Count; l++) {
-                var o = SonicLevel.Objects[l].Key;
+            foreach (LevelObjectInfo t in SonicLevel.Objects) {
+                var o = t.Key;
                 if (cachedObjects.ContainsKey(o)) {
-                    SonicLevel.Objects[l].SetObjectData(cachedObjects[o]);
+                    t.SetObjectData(cachedObjects[o]);
                     continue;
                 }
                 var d = objects.First(p => p.Key == o);
                 if (d.Falsey()) {
-                    SonicLevel.Objects[l].SetObjectData(new LevelObject(o));
+                    t.SetObjectData(new LevelObject(o));
                     continue;
                 }
                 LevelObjectData dat;
@@ -35,7 +35,7 @@ namespace OurSonic
 
                 var dr = ObjectManager.ExtendObject(dat);
                 cachedObjects[o] = dr;
-                SonicLevel.Objects[l].SetObjectData(dr);
+                t.SetObjectData(dr);
             }
 
             /* 
@@ -109,8 +109,9 @@ namespace OurSonic
             }
 
             var objectKeys = new List<string>();
-            for (int l = 0; l < SonicLevel.Objects.Count; l++) {
-                var o = SonicLevel.Objects[l].Key;
+            
+            foreach (LevelObjectInfo t in SonicLevel.Objects) {
+                var o = t.Key;
                 if (objectKeys.All(p => p != o)) objectKeys.Add(o);
             }
             loadObjects(objectKeys);
@@ -140,17 +141,17 @@ namespace OurSonic
 
             if (sonicLevel.AnimatedFiles.Truthy()) {
                 SonicLevel.AnimatedFiles = new Tile[sonicLevel.AnimatedFiles.Length][];
-                for (var jc = 0; jc < sonicLevel.AnimatedFiles.Length; jc++) {
-                    var fcc = sonicLevel.AnimatedFiles[jc];
-                    SonicLevel.AnimatedFiles[jc] = new Tile[fcc.Length];
+                for (var animatedFileIndex = 0; animatedFileIndex < sonicLevel.AnimatedFiles.Length; animatedFileIndex++) {
+                    var animatedFile = sonicLevel.AnimatedFiles[animatedFileIndex];
+                    SonicLevel.AnimatedFiles[animatedFileIndex] = new Tile[animatedFile.Length];
 
-                    for (int j = 0; j < fcc.Length; j++) {
-                        var c = fcc[j];
+                    for (int filePiece = 0; filePiece < animatedFile.Length; filePiece++) {
+                        var c = animatedFile[filePiece];
                         var tiles = c;
                         List<int> mjc = new List<int>();
 
                         for (int l = 0; l < tiles.Length; l++) {
-                            var value = fcc[j][l];
+                            var value = animatedFile[filePiece][l];
                             mjc.Add(( value >> 4 ));
                             mjc.Add(( value & 0xF ));
                         }
@@ -164,8 +165,8 @@ namespace OurSonic
                         Tile tile = new Tile(mfc);
                         tile.IsAnimated = true;
 
-                        tile.Index = j * 10000 + jc;
-                        SonicLevel.AnimatedFiles[jc][j] = tile;
+                        tile.Index = filePiece * 10000 + animatedFileIndex;
+                        SonicLevel.AnimatedFiles[animatedFileIndex][filePiece] = tile;
                     }
                 }
             }
@@ -253,9 +254,7 @@ namespace OurSonic
                     for (int tpY = 0; tpY < mj.TilePieces[tpX].Length; tpY++) {
                         var pm = mj.TilePieces[tpX][tpY].GetTilePiece();
                         if (pm != null) {
-                            for (int ci = 0; ci < pm.Tiles.Count; ci++) {
-                                var mjc = pm.Tiles[ci];
-
+                            foreach (var mjc in pm.Tiles) {
                                 var fa = containsAnimatedTile(mjc._Tile, SonicLevel);
                                 if (fa.Truthy()) {
                                     mj.Animated[tpY * 8 + tpX] = fa;
@@ -285,12 +284,11 @@ namespace OurSonic
                                               };
                 }
             }
-            for (int kd = 0; kd < SonicLevel.TilePieces.Count; kd++) {
-                var dj = SonicLevel.TilePieces[kd];
+            
+            foreach (var dj in SonicLevel.TilePieces) {
                 dj.AnimatedFrames = new List<int>();
                 if (sonicLevel.PaletteItems.Length > 0) {
-                    for (int index = 0; index < dj.Tiles.Count; index++) {
-                        var mj = dj.Tiles[index];
+                    foreach (var mj in dj.Tiles) {
                         Tile tile = mj.GetTile();
 
                         if (tile.Truthy()) {

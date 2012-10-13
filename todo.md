@@ -27,6 +27,19 @@ window border and spindsash lag
 
 
 
+proper big window size, window size, in both modes
+  clicking too
+editors, maybe one big one for both chunk and tile and piece?
+have hard obejcts on server, query on, get first chunk for image
+  same for objects, in list
+animated tile and palette editor
+resize window
+  prettier?
+better ui area scheme
+run simulator area
+maybe window manager, minimize and shit
+live object = editing
+
 
 
 

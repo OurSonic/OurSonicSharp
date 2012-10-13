@@ -1,4 +1,4 @@
-﻿#define FTP
+﻿//#define FTP
 //#define COMPRESS
 using System;
 using System.Collections.Generic;

@@ -169,7 +169,9 @@ namespace OurSonic
                                            },
                                            () => { });
             KeyboardJS.Instance().Bind.Key("u",
-                                           () => { WideScreen = !WideScreen; },
+                                           () => { WideScreen = !WideScreen;
+                                               resizeCanvas(true);
+                                           },
                                            () => { });
 
             KeyboardJS.Instance().Bind.Key("c",

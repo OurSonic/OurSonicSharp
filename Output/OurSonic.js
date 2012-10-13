@@ -179,6 +179,7 @@ $OurSonic_SonicEngine.prototype = {
 		});
 		KeyboardJS.bind.key('u', Function.mkdel(this, function() {
 			this.$wideScreen = !this.$wideScreen;
+			this.resizeCanvas(true);
 		}), function() {
 		});
 		KeyboardJS.bind.key('c', Function.mkdel(this, function() {
@@ -7270,11 +7271,12 @@ var $OurSonic_UIManager_UIManager = function(sonicManager, mainCanvas) {
 		sonicManager.bigWindowLocation.y = sonicManager.windowLocation.y;
 	});
 	this.set_uiManagerAreas(new $OurSonic_UIManager_UIManagerAreas());
-	new $OurSonic_UIManager_Areas_LevelInformationArea(this);
+	new $OurSonic_UIManager_Areas_LevelSelectorArea(this);
 	new $OurSonic_UIManager_Areas_ColorEditorArea(this);
 	new $OurSonic_UIManager_Areas_ObjectFrameworkArea(this);
 	new $OurSonic_UIManager_Areas_ObjectFrameworkListArea(this);
 	sonicManager.onLevelLoad = Function.combine(sonicManager.onLevelLoad, Function.mkdel(this, function(level) {
+		new $OurSonic_UIManager_Areas_LevelManagerArea(this);
 		new $OurSonic_UIManager_Areas_TileChunkArea(this);
 	}));
 };
@@ -7411,6 +7413,7 @@ $OurSonic_UIManager_UIManager.updateTitle = function(title) {
 // OurSonic.UIManager.UIManagerAreas
 var $OurSonic_UIManager_UIManagerAreas = function() {
 	this.tileChunkArea = null;
+	this.levelManagerArea = null;
 	this.tilePieceArea = null;
 	this.colorEditorArea = null;
 	this.objectFrameworkArea = null;
@@ -7720,8 +7723,26 @@ $OurSonic_UIManager_Areas_FrameAreaData.$ctor = function() {
 	return $this;
 };
 ////////////////////////////////////////////////////////////////////////////////
-// OurSonic.UIManager.Areas.LevelInformationArea
-var $OurSonic_UIManager_Areas_LevelInformationArea = function(manager) {
+// OurSonic.UIManager.Areas.LevelManagerArea
+var $OurSonic_UIManager_Areas_LevelManagerArea = function(uiManager) {
+	var $t2 = uiManager.get_uiManagerAreas();
+	var $t1 = new $OurSonic_UIManager_UIArea(850, 100, 390, 390);
+	$t1.closable = true;
+	var levelManagerArea = $t2.levelManagerArea = $t1;
+	levelManagerArea.visible = true;
+	uiManager.addArea(levelManagerArea);
+	var $t3 = new $OurSonic_UIManager_TextArea(30, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Level Manager'));
+	$t3.color = 'blue';
+	levelManagerArea.addControl($OurSonic_UIManager_TextArea).call(levelManagerArea, $t3);
+	var $t4 = new $OurSonic_UIManager_Button(50, 70, 120, 28, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Live Objects'));
+	$t4.click = function(p) {
+		new $OurSonic_UIManager_Areas_LiveObjectsArea(uiManager);
+	};
+	levelManagerArea.addControl($OurSonic_UIManager_Button).call(levelManagerArea, $t4);
+};
+////////////////////////////////////////////////////////////////////////////////
+// OurSonic.UIManager.Areas.LevelSelectorArea
+var $OurSonic_UIManager_Areas_LevelSelectorArea = function(manager) {
 	var levelInformation = new $OurSonic_UIManager_UIArea(70, 70, 460, 420);
 	manager.addArea(levelInformation);
 	var $t1 = new $OurSonic_UIManager_TextArea(30, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Level Selector'));
@@ -7792,7 +7813,6 @@ var $OurSonic_UIManager_Areas_LevelInformationArea = function(manager) {
 			if (sonicManager.currentGameState === 0) {
 				$OurSonic_SonicEngine.runGame();
 			}
-			$OurSonic_SonicEngine.runGame();
 		});
 	});
 	$OurSonic_SonicEngine.instance.client.on('GetLevels.Response', function(data1) {
@@ -9411,7 +9431,7 @@ $OurSonic_UIManager_Areas_TileChunkArea.prototype = {
 		$t3.color = 'blue';
 		tilePieceArea.addControl($OurSonic_UIManager_TextArea).call(tilePieceArea, $t3);
 		var showHeightMap = false;
-		var $t4 = new $OurSonic_UIManager_Button(100, 50, 50, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(function() {
+		var $t4 = new $OurSonic_UIManager_Button(100, 50, 125, 25, Type.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$1(function() {
 			return (showHeightMap ? 'Hide Height Map' : 'Show Height Map');
 		}));
 		$t4.click = function(e) {
@@ -10158,7 +10178,8 @@ Type.registerClass(global, 'OurSonic.UIManager.Areas.ColorEditorAreaData', $OurS
 Type.registerClass(global, 'OurSonic.UIManager.Areas.DebugConsoleData', $OurSonic_UIManager_Areas_DebugConsoleData, Object);
 Type.registerClass(global, 'OurSonic.UIManager.Areas.Editor', $OurSonic_UIManager_Areas_Editor, Object);
 Type.registerClass(global, 'OurSonic.UIManager.Areas.FrameAreaData', $OurSonic_UIManager_Areas_FrameAreaData, Object);
-Type.registerClass(global, 'OurSonic.UIManager.Areas.LevelInformationArea', $OurSonic_UIManager_Areas_LevelInformationArea, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.LevelManagerArea', $OurSonic_UIManager_Areas_LevelManagerArea, Object);
+Type.registerClass(global, 'OurSonic.UIManager.Areas.LevelSelectorArea', $OurSonic_UIManager_Areas_LevelSelectorArea, Object);
 Type.registerClass(global, 'OurSonic.UIManager.Areas.LiveObjectsArea', $OurSonic_UIManager_Areas_LiveObjectsArea, Object);
 Type.registerClass(global, 'OurSonic.UIManager.Areas.LiveObjectsAreaData', $OurSonic_UIManager_Areas_LiveObjectsAreaData, Object);
 Type.registerClass(global, 'OurSonic.UIManager.Areas.LivePopulateModel', $OurSonic_UIManager_Areas_LivePopulateModel, Object);

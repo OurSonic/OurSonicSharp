@@ -79,7 +79,7 @@ namespace OurSonic.UIManager.Areas
             tilePieceArea.AddControl(new TextArea(30, 25, "Tile Pieces") {Color = "blue"});
 
             bool showHeightMap = false;
-            tilePieceArea.AddControl(new Button(100, 50, 50, 25, (Func<string>) ( () => showHeightMap ? "Hide Height Map" : "Show Height Map" )) {
+            tilePieceArea.AddControl(new Button(100, 50, 125, 25, (Func<string>) ( () => showHeightMap ? "Hide Height Map" : "Show Height Map" )) {
                                                                                                                                                          Click = (e) => {
                                                                                                                                                                      if (tilePieceArea.Data == null) return;
                                                                                                                                                                      showHeightMap = !showHeightMap;

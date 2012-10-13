@@ -59,20 +59,22 @@ namespace OurSonic.UIManager
 
             UIManagerAreas = new UIManagerAreas();
 
-            new LevelInformationArea(this);
+            new LevelSelectorArea(this);
             new ColorEditorArea(this);
             new ObjectFrameworkArea(this);
             new ObjectFrameworkListArea(this);
 
-            sonicManager.OnLevelLoad += (level) => { new TileChunkArea(this); };
+            sonicManager.OnLevelLoad += (level) => {
+                                            new LevelManagerArea(this);
+                                            new TileChunkArea(this);
+                                        };
         }
 
         public bool OnClick(Pointer cell)
         {
             UIArea goodArea = null;
             var cl = ( UIAreas ).OrderBy((f) => -f.Depth).ToArray();
-            for (var ij = 0; ij < cl.Length; ij++) {
-                var are = cl[ij];
+            foreach (var are in cl) {
                 if (are.Visible &&
                     ( are.IsEditMode()
                               ? are.Y - are.EditorEngine.MaxSize() <= cell.Y &&
@@ -91,8 +93,7 @@ namespace OurSonic.UIManager
             }
 
             if (goodArea.Truthy()) {
-                for (int index = 0; index < UIAreas.Count; index++) {
-                    var are = UIAreas[index];
+                foreach (var are in UIAreas) {
                     if (goodArea == are) {
                         are.Depth = 1;
                         are.Focus(cell);
@@ -106,8 +107,7 @@ namespace OurSonic.UIManager
 
                 return true;
             } else {
-                for (int index = 0; index < UIAreas.Count; index++) {
-                    var are = UIAreas[index];
+                foreach (var are in UIAreas) {
                     if (are.Visible) {
                         are.Depth = 0;
                         are.LoseFocus();
@@ -123,8 +123,7 @@ namespace OurSonic.UIManager
         {
             var cl = ( UIAreas ).OrderBy((f) => { return -f.Depth; }).ToArray();
 
-            for (var ij = 0; ij < cl.Length; ij++) {
-                var are = cl[ij];
+            foreach (var are in cl) {
                 if (are.Dragging.Truthy() || are.IsEditMode() || ( are.Visible && are.Y <= cell.Y &&
                                                                    are.Y + are.Height > cell.Y &&
                                                                    are.X <= cell.X &&
@@ -159,8 +158,7 @@ namespace OurSonic.UIManager
 
             var cell = Help.GetCursorPosition(e);
 
-            for (int index = 0; index < UIAreas.Count; index++) {
-                var are = UIAreas[index];
+            foreach (var are in UIAreas) {
                 if (are.Visible && are.Y <= cell.Y && are.Y + are.Height > cell.Y && are.X <= cell.X && are.X + are.Width > cell.X) {
                     var cell2 = new Pointer(cell.X - are.X, cell.Y - are.Y, delta, cell.Right);
                     return are.OnScroll(cell2);
@@ -171,8 +169,7 @@ namespace OurSonic.UIManager
 
         public bool OnKeyDown(ElementEvent jQueryEvent)
         {
-            for (int index = 0; index < UIAreas.Count; index++) {
-                var are = UIAreas[index];
+            foreach (var are in UIAreas) {
                 if (are.OnKeyDown(jQueryEvent)) return true;
             }
             return false;
@@ -196,8 +193,7 @@ namespace OurSonic.UIManager
             dragger.Tick();
             canvas.Save();
 
-            for (int index = 0; index < canvasDepths.Length; index++) {
-                var are = canvasDepths[index];
+            foreach (var are in canvasDepths) {
                 are.Draw(canvas);
             }
 

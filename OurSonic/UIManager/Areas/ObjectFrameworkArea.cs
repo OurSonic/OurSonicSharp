@@ -258,8 +258,7 @@ namespace OurSonic.UIManager.Areas
             objectFrameworkArea.Data.Key.Text = objectFramework.Key;
             objectFrameworkArea.Data.Description.Text = objectFramework.Description ?? "";
             objectFrameworkArea.Data.Assets.ClearControls();
-            for (int index = 0; index < objectFramework.Assets.Count; index++) {
-                var t = objectFramework.Assets[index];
+            foreach (var t in objectFramework.Assets) {
                 Button<LevelObjectAsset> b = null;
                 b = new Button<LevelObjectAsset>(null, 0, 0, 0, 0, (Func<string>) ( () => b.Data.Name ));
                 b.Color = "rgb(50,190,90)";
@@ -276,8 +275,7 @@ namespace OurSonic.UIManager.Areas
             }
 
             objectFrameworkArea.Data.Pieces.ClearControls();
-            for (int index = 0; index < objectFramework.Pieces.Count; index++) {
-                var t = objectFramework.Pieces[index];
+            foreach (var t in objectFramework.Pieces) {
                 Button<LevelObjectPiece> b = null;
                 b = new Button<LevelObjectPiece>(null, 0, 0, 0, 0, (Func<string>) ( () => b.Data.Name ));
 
@@ -295,8 +293,7 @@ namespace OurSonic.UIManager.Areas
             }
 
             objectFrameworkArea.Data.PieceLayouts.ClearControls();
-            for (int index = 0; index < objectFramework.PieceLayouts.Count; index++) {
-                var t = objectFramework.PieceLayouts[index];
+            foreach (var t in objectFramework.PieceLayouts) {
                 Button<LevelObjectPieceLayout> b = null;
                 b = new Button<LevelObjectPieceLayout>(null, 0, 0, 0, 0, (Func<string>) ( () => b.Data.Name ));
 
@@ -314,8 +311,7 @@ namespace OurSonic.UIManager.Areas
             }
 
             objectFrameworkArea.Data.Projectiles.ClearControls();
-            for (int index = 0; index < objectFramework.Projectiles.Count; index++) {
-                var t = objectFramework.Projectiles[index];
+            foreach (var t in objectFramework.Projectiles) {
                 Button<LevelObjectProjectile> b = null;
                 b = new Button<LevelObjectProjectile>(null, 0, 0, 0, 0, (Func<string>) ( () => b.Data.Name ));
 
@@ -625,8 +621,7 @@ namespace OurSonic.UIManager.Areas
             objectFrameworkArea.Data.MainPanel.AddControl(jd = new HScrollBox(20, 35, 70, 4, 112) {BackColor = "rgb(50,60,127)"});
             objectFrameworkArea.Data.MainPanel.Data.AssetPopulate = (ast) => {
                                                                         jd.Controls = new List<Element>();
-                                                                        for (int index = 0; index < ast.Frames.Count; index++) {
-                                                                            LevelObjectAssetFrame t = ast.Frames[index];
+                                                                        foreach (LevelObjectAssetFrame t in ast.Frames) {
                                                                             ImageButton<LevelObjectAssetFrame> bd = null;
                                                                             bd = new ImageButton<LevelObjectAssetFrame>(null, 0, 0, 0, 0);
 

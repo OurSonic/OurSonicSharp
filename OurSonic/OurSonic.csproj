@@ -62,6 +62,7 @@
     <Compile Include="Sonic\SensorManager.cs" />
     <Compile Include="Sonic\Sonic.cs" />
     <Compile Include="Sonic\SonicConstants.cs" />
+    <Compile Include="UIManager\Areas\LevelManagerArea.cs" />
     <Compile Include="UIManager\Areas\TileChunkArea.cs" />
     <Compile Include="UIManager\Image.cs" />
     <Compile Include="UIManager\Table.cs" />
@@ -90,7 +91,7 @@
     <Compile Include="UIManager\Areas\LiveObjectsArea.cs" />
     <Compile Include="UIManager\Areas\ObjectFrameworkListArea.cs" />
     <Compile Include="UIManager\Areas\Editor.cs" />
-    <Compile Include="UIManager\Areas\LevelInformationArea.cs" />
+    <Compile Include="UIManager\Areas\LevelSelectorArea.cs" />
     <Compile Include="UIManager\Areas\PieceLayoutEditor.cs" />
     <Compile Include="UIManager\Areas\PieceLayoutMaker.cs" />
     <Compile Include="UIManager\Button.cs" />
