@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonic.Areas;
 using OurSonic.UIManager;
 using OurSonic.Utility;
 namespace OurSonic.Level.Tiles
@@ -115,7 +116,7 @@ namespace OurSonic.Level.Tiles
 
 */
 
-            var fd = GetCache(layer, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.PaletteAnimationIndexes);
+            var fd = GetCache(layer, drawOrderIndex, animatedIndex);
             if (fd.Falsey())
 
                 fd = buildCache(layer, xFlip, yFlip, animatedIndex, drawOrderIndex);
@@ -167,16 +168,17 @@ namespace OurSonic.Level.Tiles
             //            ac.Context.StrokeRect(0, 0, 2*8 * SonicManager.Instance.Scale.X, 2*8 * SonicManager.Instance.Scale.Y);
 
             fd = ac.Canvas;
-            SetCache(layer, drawOrderIndex, animatedIndex, SonicManager.Instance.SonicLevel.PaletteAnimationIndexes, fd);
+            SetCache(layer, drawOrderIndex, animatedIndex, fd);
             return fd;
         }
 
         private void SetCache(int layer,
                               int drawOrder,
                               int animationFrame,
-                              List<int> palAn,
+                              
                               CanvasElement image)
         {
+            List<int> palAn = SonicManager.Instance.SonicLevel.PaletteAnimationIndexes;
             dynamic val = ( ( drawOrder << 8 ) + ( animationFrame << 20 ) + ( ( layer + 1 ) << 24 ) ); //okay
             if (AnimatedFrames.Count > 0) {
                 for (int index = 0; index < AnimatedFrames.Count; index++) {
@@ -187,8 +189,9 @@ namespace OurSonic.Level.Tiles
             Image.Me()[val] = image;
         }
 
-        private CanvasElement GetCache(int layer, int drawOrder, int animationFrame, List<int> palAn)
+        private CanvasElement GetCache(int layer, int drawOrder, int animationFrame)
         {
+            List<int> palAn = SonicManager.Instance.SonicLevel.PaletteAnimationIndexes;
             dynamic val = ( ( drawOrder << 8 ) + ( animationFrame << 20 ) + ( ( layer + 1 ) << 24 ) ); //okay
             if (AnimatedFrames.Count > 0) {
                 foreach (var animatedFrame in AnimatedFrames) {
@@ -204,8 +207,7 @@ namespace OurSonic.Level.Tiles
             canvas.DrawImage(fd, position.X, position.Y);
 
             UIManagerAreas areas = SonicManager.Instance.UIManager.UIManagerAreas;
-            if (areas.TilePieceArea != null && areas.TilePieceArea.Data != null && areas.TilePieceArea.Data.Index == this.Index)
-            {
+            if (areas.TilePieceArea != null && areas.TilePieceArea.Data != null && areas.TilePieceArea.Data.Index == Index) {
                 canvas.Save();
                 canvas.StrokeStyle = "light green";
                 canvas.LineWidth = 2;

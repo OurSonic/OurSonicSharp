@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 namespace NodeJSLibrary
 {
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     public class FS : NodeModule
     {
         public void ReadFile(string s, string encoding, Action<FileSystemError, string> done) {}

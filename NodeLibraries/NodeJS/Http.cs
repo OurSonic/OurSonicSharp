@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 namespace NodeJSLibrary
 {
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     public class Http : NodeModule
     {
         [ScriptName("createServer")]

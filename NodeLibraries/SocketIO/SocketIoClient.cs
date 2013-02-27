@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 namespace SocketIOLibrary
 {
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     public class SocketIOClient
     {
         [IntrinsicProperty]

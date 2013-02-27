@@ -4,7 +4,7 @@ using System.Html;
 using System.Html.Media.Graphics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using OurSonic.UIManager.Areas;
+using OurSonic.Areas;
 using OurSonic.Utility;
 using jQueryApi;
 namespace OurSonic.UIManager
@@ -63,9 +63,11 @@ namespace OurSonic.UIManager
             new ColorEditorArea(this);
             new ObjectFrameworkArea(this);
             new ObjectFrameworkListArea(this);
-
+            var l = new LevelManagerArea(this);
+            l.LevelManager.Visible = false;
             sonicManager.OnLevelLoad += (level) => {
-                                            new LevelManagerArea(this);
+                l.LevelManager.Visible = true;
+                                          
                                             new TileChunkArea(this);
                                         };
         }

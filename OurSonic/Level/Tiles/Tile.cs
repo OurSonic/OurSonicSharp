@@ -70,15 +70,13 @@ namespace OurSonic.Level.Tiles
                     oPos.Y = -Colors.Length;
                     j.Context.Scale(1, -1);
                 }
-                var palette_ = SonicManager.Instance.SonicLevel.Palette;
-                int indexed = SonicManager.Instance.IndexedPalette;
+                var palette_ = SonicManager.Instance.SonicLevel.Palette; 
 
                 var mx = Colors.Length;
                 var my = Colors[0].Length;
 
-                j.Context.Save();
 
-                int index_ = ( palette + indexed ) % palette_.Length;
+                int index_ = (palette + SonicManager.Instance.IndexedPalette) % palette_.Length;
                 var x = oPos.X;
                 var y = oPos.Y;
 
@@ -86,22 +84,11 @@ namespace OurSonic.Level.Tiles
                     for (int _y = 0; _y < my; _y++) {
                         var colorIndex = Colors[_x][_y];
                         if (colorIndex == 0) continue;
-                        var m = palette_[index_][colorIndex];
-                        var col = "#" + m;
-                        if (j.Context.FillStyle != col)
-                            j.Context.FillStyle = col;
 
-                        j.Context.FillRect(x + ( _x ), y + _y, 1, 1);
+                        j.Context.DrawImage(palette_[index_][colorIndex], x + _x, y + _y);
                     }
                 }
-
-                //            j.Context.StrokeStyle = "#7CF1FF";
-                //            j.Context.LineWidth = 4;
-                //            j.Context.StrokeRect(0, 0, cx, cy);
-
-                j.Context.Restore();
-
-                // setCached(j, palette, animationFrame,xflip,yflip);
+                 setCached(j, palette, animationFrame,xflip,yflip);
             }
 
             canvas.DrawImage(j.Canvas, pos.X, pos.Y);
@@ -131,7 +118,8 @@ namespace OurSonic.Level.Tiles
 
         private void setCached(CanvasInformation canvas, int palette, int animationFrame, bool xflip, bool yflip)
         {
-            string mp = ( palette + " " + animationFrame + " " + xflip + " " + yflip + " " );
+            return ;
+            string mp = (palette + " " + animationFrame + " " + xflip + " " + yflip + " ");
 
             if (AnimatedFrames != null && AnimatedFrames.Count > 0) {
                 var paletteAnimations = SonicManager.Instance.SonicLevel.PaletteAnimationIndexes;
@@ -168,8 +156,6 @@ namespace OurSonic.Level.Tiles
                     var file = SonicManager.Instance.SonicLevel.AnimatedFiles[an.AnimationFile];
                     var va = file[frame.StartingTileIndex + ( Index - anin )];
                     if (va.Truthy()) {
-                        if (canvas.FillStyle != "rbga(255,255,255,255)")
-                            canvas.FillStyle = "rbga(255,255,255,255)";
                         va.Draw(canvas, pos, xflip, yflip, palette, animationFrame);
                         return true;
                     }
@@ -188,30 +174,13 @@ namespace OurSonic.Level.Tiles
 
                         var va = file[frame.StartingTileIndex + ( Index - anin )];
                         if (va.Truthy()) {
-                            if (canvas.FillStyle != "rbga(255,255,255,255)")
-                                canvas.FillStyle = "rbga(255,255,255,255)";
+
                             va.Draw(canvas, pos, xflip, yflip, palette, animationFrame);
                             return true;
                         }
                     }
                 }
-                /*
-                    this.willAnimate = an;
-                    var ind = animationFrame;
-                    var frame = an.Frames[ind];
-                    if (!frame) frame = an.Frames[0];
-                    var file = sonicManager.SonicLevel.AnimatedFiles[an.AnimationFile];
-                    var va = file[frame.StartingTileIndex + (this.index - anin)];
-                    if (va) {
-                        if (canvas.fillStyle != "rbga(255,255,255,255)")
-                            canvas.fillStyle = "rbga(255,255,255,255)";
-                        va.draw(canvas, pos, scale, xflip, yflip, palette, layer, animationFrame);
-                        return true;
-                    }
 
-                }
-            }
-*/
             }
             canAnimate = false;
 

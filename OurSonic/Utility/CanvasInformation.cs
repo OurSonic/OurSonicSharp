@@ -6,12 +6,28 @@ namespace OurSonic.Utility
 {
     public class CanvasInformation
     {
+        private static CanvasElement blackPixel;
         [IntrinsicProperty]
         public CanvasContext2D Context { get; set; }
         [IntrinsicProperty]
         public jQueryObject DomCanvas { get; set; }
         [IntrinsicProperty]
         public CanvasElement Canvas { get; set; }
+        public static CanvasElement BlackPixel
+        {
+            get
+            {
+                if (blackPixel == null) {
+                    var m = Create(0, 0);
+
+                    m.Context.FillStyle = "black";
+                    m.Context.FillRect(0, 0, 1, 1);
+
+                    blackPixel = m.Canvas;
+                }
+                return blackPixel;
+            }
+        }
 
         public CanvasInformation(CanvasContext2D context, jQueryObject domCanvas)
         {

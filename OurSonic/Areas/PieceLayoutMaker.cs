@@ -1,8 +1,9 @@
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonic.Level.Objects;
+using OurSonic.UIManager;
 using OurSonic.Utility;
-namespace OurSonic.UIManager.Areas
+namespace OurSonic.Areas
 {
     public class PieceLayoutMaker
     {

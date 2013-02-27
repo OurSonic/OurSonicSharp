@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 namespace Redis
 {
-    [Imported(IsRealType = true)]
+    [Imported()]
     [IgnoreNamespace]
     [ModuleName("redis")]
     public class RedisModule

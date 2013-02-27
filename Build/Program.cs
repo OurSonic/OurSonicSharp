@@ -1,10 +1,12 @@
-﻿
+﻿#define FTP
 //#define COMPRESS
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using Limilabs.FTP.Client;
+using Renci.SshNet;
 namespace Build
 {
     public class Program
@@ -58,12 +60,42 @@ namespace Build
                                                                          },
                                                               };
 
+#if FTP
+            Console.WriteLine("connecting ftp");
+             
+
+            SftpClient client = new SftpClient("50.116.28.16", "root", "FuckYou1!");
+            client.Connect();
+
+         /*   Ftp webftp = new Ftp();
+            webftp.Connect("dested.com");
+            webftp.Login("dested", "Ddested");
+            Console.WriteLine("connected");
+
+            webftp.Progress += (e, c) => {
+                                   Console.SetCursorPosition(65, 5);
+                                   Console.Write("|");
+
+                                   for (int i = 0; i < c.Percentage / 10; i++) {
+                                       Console.Write("=");
+                                   }
+                                   for (int i = (int) ( c.Percentage / 10 ); i < 10; i++) {
+                                       Console.Write("-");
+                                   }
+                                   Console.Write("|");
+
+                                   Console.Write(c.Percentage + "  %  ");
+                                   Console.WriteLine();
+                               };
+*/
+#endif 
+
             foreach (var depend in imports) {
                 var to = pre + shufSharp + @"\output\" + depend.Key.Split(new[] {"\\"}, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
                 var output = "";
 
                 if (depend.Value.Node) {
-                    output += "require('./mscorlib.debug.js');";
+                    output += "require('./mscorlib.js');";
                     output += "Enumerable=require('./linq.js');";
                 } else {
                     //output += "require('./mscorlib.debug.js');";
@@ -91,8 +123,14 @@ namespace Build
                 var name = to.Split(new char[] {'\\'}, StringSplitOptions.RemoveEmptyEntries).Last();
                 File.WriteAllText(@"C:\inetpub\wwwroot\" + name, text);
 
+#if FTP
+                Console.WriteLine("ftp start " + text.Length.ToString("N0"));
+                //webFTP.Upload("/httpdocs/nsonic/" + name, to);
+                client.UploadFile(File.OpenRead(@"C:\inetpub\wwwroot\" + name), "/var/www/sonic/" + name);
+                Console.WriteLine("ftp complete " + to);
+#endif
 
-                //
+                //serverftp.Upload("/usr/local/src/sonic/" + to.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries).Last(), to);
             }
 
             /*

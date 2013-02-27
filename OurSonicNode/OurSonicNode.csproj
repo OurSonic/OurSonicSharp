@@ -46,6 +46,10 @@
       <Project>{48C25DF7-AFC5-4AC0-B11A-535DEF87076D}</Project>
       <Name>Fibers</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NodeLibraries\NodeJS\NodeJS.csproj">
+      <Project>{79800429-B885-4F5E-9A3B-48E50390214A}</Project>
+      <Name>NodeJS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NodeLibraries\Redis\Redis.csproj">
       <Project>{5214FA01-BBBF-425F-B77D-1F6DA7AEB4ED}</Project>
       <Name>Redis</Name>
@@ -67,18 +71,18 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="please-uninstall.txt" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="mscorlib">
-      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.1.4.0.18\tools\Assemblies\mscorlib.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.2.0.4\tools\Assemblies\mscorlib.dll</HintPath>
     </Reference>
-    <Reference Include="Script.Linq, Version=1.4.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Saltarelle.Linq.1.4.0.1\lib\Script.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="Script.NodeJS">
-      <HintPath>..\packages\Saltarelle.NodeJS.1.4.0.12\lib\Script.NodeJS.dll</HintPath>
+    <Reference Include="Saltarelle.Linq">
+      <HintPath>..\packages\Saltarelle.Linq.2.0.1\lib\Saltarelle.Linq.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.4.0.28\tools\Saltarelle.Compiler.targets')" />
-  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.1.4.0.28\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.4.0.28\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.0.4\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.0.4\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.0.4\tools\Saltarelle.Compiler.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

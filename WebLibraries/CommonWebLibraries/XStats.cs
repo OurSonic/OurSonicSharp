@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 namespace CommonWebLibraries
 {
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     [ScriptName("xStats")]
     public class XStats
     {

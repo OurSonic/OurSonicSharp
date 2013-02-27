@@ -25,10 +25,13 @@ namespace OurSonic.Level.Tiles
             return block;
         }
 
-        public void SetTilePiece(TilePiece tp)
+        public bool SetTilePiece(TilePiece tp)
         {
+            if (Block == tp.Index) return false;
+
             Block = tp.Index;
             block = null;
+            return true;
         }
 
         public int GetLayer1Angles()

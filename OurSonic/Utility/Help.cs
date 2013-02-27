@@ -31,7 +31,7 @@ namespace OurSonic.Utility
     }
     public static class Help
     {
-        public static double[] cos_table = new[] {
+        private static double[] cos_table = new[] {
                                                          1.00000, 0.99970, 0.99880, 0.99729, 0.99518, 0.99248, 0.98918, 0.98528,
                                                          0.98079, 0.97570, 0.97003, 0.96378, 0.95694, 0.94953, 0.94154, 0.93299,
                                                          0.92388, 0.91421, 0.90399, 0.89322, 0.88192, 0.87009, 0.85773, 0.84485,
@@ -87,7 +87,9 @@ namespace OurSonic.Utility
         }
 
         public static int Mod(int j, int n)
-        {
+        { 
+            
+
             return ( ( j % n ) + n ) % n;
         }
 
@@ -295,7 +297,7 @@ namespace OurSonic.Utility
             return f1 > f2 ? f2 : f1;
         }
 
-        [IgnoreGenericArguments]
+        
         public static T Clone<T>(T o)
         {
             return default( T );
@@ -350,7 +352,7 @@ namespace OurSonic.Utility
 
         public static Pointer GetCursorPosition(jQueryEvent ev)
         {
-            if (ev.Me().targetTouches && ev.Me().targetTouches.length > 0) ev = ev.Me().targetTouches[0];
+            if (ev.Me().originalEvent && ev.Me().originalEvent.targetTouches && ev.Me().originalEvent.targetTouches.length > 0) ev = ev.Me().originalEvent.targetTouches[0];
 
             if (ev.PageX.Me() != null && ev.PageY.Me() != null)
                 return new Pointer(ev.PageX, ev.PageY, 0, ev.Which == 3);

@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace CodeMirrorLibrary
 {
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     [Serializable]
     public sealed class CodeMirrorOptions
     {

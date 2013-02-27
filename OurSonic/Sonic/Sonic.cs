@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonic.Level;
-using OurSonic.Level.Objects;
 using OurSonic.Level.Tiles;
 using OurSonic.Utility;
 namespace OurSonic.Sonic
@@ -557,7 +556,7 @@ namespace OurSonic.Sonic
                 Ysp = 0;
             }
 
-            if (!InAir && !Rolling) {
+            if (!InAir && !Rolling && !SpinDash) {
                 if (!HoldingLeft && !HoldingRight && !JustHit) {
                     //friction
                     Gsp -= ( Math.Min(Math.Abs(Gsp), Watcher.Multiply(physics.Frc)) * ( Gsp > 0 ? 1 : -1 ) );
@@ -991,8 +990,8 @@ namespace OurSonic.Sonic
                 var ring = rings[index];
                 var pos = ring;
                 if (obtainedRing[index]) continue;
-                rectangle.X = pos.X - 8;
-                rectangle.Y = pos.Y - 8;
+                rectangle.X = pos.X  ;
+                rectangle.Y = pos.Y  ;
                 if (IntersectingRectangle.IntersectRect(me, rectangle)) {
                     Rings++;
                     obtainedRing[index] = true;

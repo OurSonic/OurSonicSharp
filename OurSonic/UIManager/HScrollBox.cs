@@ -132,7 +132,7 @@ namespace OurSonic.UIManager
                 if (ScrollOffset < Controls.Count - VisibleItems)
                     ScrollOffset++;
             }
-            
+
             foreach (var control in Controls) {
                 if (control.Y <= e.Y && control.Y + control.Height > e.Y && control.X <= e.X && control.X + control.Width > e.X) {
                     e.X -= control.X;

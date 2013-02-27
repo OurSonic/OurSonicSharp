@@ -1,7 +1,9 @@
+using System;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonic.UIManager;
 using OurSonic.Utility;
-namespace OurSonic.UIManager.Areas
+namespace OurSonic.Areas
 {
     public class PaletteArea : Panel
     {
@@ -71,9 +73,9 @@ namespace OurSonic.UIManager.Areas
             canv.Save();
 
             canv.StrokeStyle = "#000";
-            canv.LineWidth = 1;
+            canv.LineWidth = 2;
             var pos = new Point(TotalX, TotalY);
-            var f = Palette.Length / 2;
+            var f = Math.Round(Palette.Length / 2.0);
 
             if (Wide) {
                 for (var h = 0; h < 2; h++) {
@@ -85,8 +87,8 @@ namespace OurSonic.UIManager.Areas
                 }
                 if (ShowCurrent) {
                     canv.FillStyle = Palette[SelectedIndex];
-                    canv.FillRect(pos.X, pos.Y + f * Scale.Y, Scale.X * 2, Scale.Y * 2);
-                    canv.StrokeRect(pos.X, pos.Y + f * Scale.Y, Scale.X * 2, Scale.Y * 2);
+                    canv.FillRect(pos.X + f * Scale.X , pos.Y, Scale.X * 2, Scale.Y * 2);
+                    canv.StrokeRect(pos.X + f * Scale.X , pos.Y, Scale.X * 2, Scale.Y * 2);
                 }
             } else {
                 for (var h = 0; h < f; h++) {
@@ -98,8 +100,8 @@ namespace OurSonic.UIManager.Areas
                 }
                 if (ShowCurrent) {
                     canv.FillStyle = Palette[SelectedIndex];
-                    canv.FillRect(pos.X, pos.Y + f * Scale.Y, Scale.X * 2, Scale.Y * 2);
-                    canv.StrokeRect(pos.X, pos.Y + f * Scale.Y, Scale.X * 2, Scale.Y * 2);
+                    canv.FillRect(pos.X, pos.Y + f * Scale.Y , Scale.X * 2, Scale.Y * 2);
+                    canv.StrokeRect(pos.X, pos.Y + f * Scale.Y , Scale.X * 2, Scale.Y * 2);
                 }
             }
 

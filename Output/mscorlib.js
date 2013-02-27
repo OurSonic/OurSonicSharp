@@ -1,1 +1,3010 @@
-if(typeof global==="undefined")global=window;var ss={};ss.isUndefined=function(a){return a===undefined};ss.isNull=function(a){return a===null};ss.isNullOrUndefined=function(a){return a===null||a===undefined};ss.isValue=function(a){return a!==null&&a!==undefined};ss.referenceEquals=function(a,b){return ss.isValue(a)?a===b:!ss.isValue(b)};ss.mkdict=function(a){a=arguments.length!=1?arguments:arguments[0];for(var c={},b=0;b<a.length;b+=2)c[a[b]]=a[b+1];return c};ss.coalesce=function(a,b){return ss.isValue(a)?a:b};if(typeof window=="object"){if(!window.Element){window.Element=function(){};window.Element.isInstanceOfType=function(a){return a&&typeof a.constructor==="undefined"&&typeof a.tagName==="string"}}if(!window.XMLHttpRequest)window.XMLHttpRequest=function(){for(var b=["Msxml2.XMLHTTP","Microsoft.XMLHTTP"],a=0;a<b.length;a++)try{return new ActiveXObject(b[a])}catch(d){}return null};ss.parseXml=function(d){try{if(DOMParser){var e=new DOMParser;return e.parseFromString(d,"text/xml")}else for(var c=["Msxml2.DOMDocument.3.0","Msxml2.DOMDocument"],b=0;b<c.length;b++){var a=new ActiveXObject(c[b]);a.async=false;a.loadXML(d);a.setProperty("SelectionLanguage","XPath");return a}}catch(f){}return null}}global.Type=Function;Type.registerType=function(g,f,h){for(var b=g,a=f.split("."),d=0;d<a.length-1;d++){var e=a[d],c=b[e];if(!c)b[e]=c={};b=c}b[a[a.length-1]]=h};Type.__genericCache={};Type._makeGenericTypeName=function(d,c){for(var b=d.__typeName,a=0;a<c.length;a++)b+=(a===0?"[":",")+c[a].__typeName;b+="]";return b};Type.makeGenericType=function(b,a){var c=Type._makeGenericTypeName(b,a);return Type.__genericCache[c]||b.apply(null,a)};Type.prototype.registerGenericClassInstance=function(a,c,b,f,e){var d=Type._makeGenericTypeName(c,b);Type.__genericCache[d]=a;a.__genericTypeDefinition=c;a.__typeArguments=b;Type.registerClass(null,d,a,f(),e())};Type.registerGenericInterfaceInstance=function(a,c,b,e){var d=Type._makeGenericTypeName(c,b);Type.__genericCache[d]=a;a.__genericTypeDefinition=c;a.__typeArguments=b;Type.registerInterface(null,d,a,e())};Type.prototype.get_isGenericTypeDefinition=function(){return this.__isGenericTypeDefinition||false};Type.prototype.getGenericTypeDefinition=function(){return this.__genericTypeDefinition||null};Type.prototype.get_genericParameterCount=function(){return this.__typeArgumentCount||0};Type.prototype.getGenericArguments=function(){return this.__typeArguments||null};Type.registerClass=function(f,e,a,c,b){f&&Type.registerType(f,e,a);a.prototype.constructor=a;a.__typeName=e;a.__class=true;a.__baseType=c||Object;c&&a.setupBase(c);if(b instanceof Array)a.__interfaces=b;else if(b){a.__interfaces=[];for(var d=4;d<arguments.length;d++){b=arguments[d];a.__interfaces.add(b)}}};Type.registerGenericClass=function(c,b,a,d){c&&Type.registerType(c,b,a);a.prototype.constructor=a;a.__typeName=b;a.__class=true;a.__typeArgumentCount=d;a.__isGenericTypeDefinition=true;a.__baseType=Object};Type.registerInterface=function(e,d,a,b){e&&Type.registerType(e,d,a);a.__typeName=d;a.__interface=true;if(b instanceof Array)a.__interfaces=b;else if(b){a.__interfaces=[];for(var c=3;c<arguments.length;c++)a.__interfaces.add(arguments[c])}};Type.registerGenericInterface=function(c,b,a,d){c&&Type.registerType(c,b,a);a.prototype.constructor=a;a.__typeName=b;a.__interface=true;a.__typeArgumentCount=d;a.__isGenericTypeDefinition=true};Type.prototype.registerEnum=function(d,c,a,e){d&&Type.registerType(d,c,a);for(var b in a.prototype)a[b]=a.prototype[b];a.__typeName=c;a.__enum=true;if(e)a.__flags=true;a.getDefaultValue=a.createInstance=function(){return 0};a.isInstanceOfType=function(a){return typeof a=="number"}};Type.prototype.setupBase=function(){var b=this.__baseType;for(var a in b.prototype){var c=b.prototype[a];if(!this.prototype[a])this.prototype[a]=c}};if(!Type.prototype.resolveInheritance)Type.prototype.resolveInheritance=Type.prototype.setupBase;Type.prototype.get_baseType=function(){return this.__baseType||null};Type.prototype.get_fullName=function(){return this.__typeName};Type.prototype.get_name=function(){var a=this.__typeName,b=a.lastIndexOf(".");return b>0?a.substr(b+1):a};Type.prototype.getInterfaces=function(){return this.__interfaces};Type.prototype.isInstanceOfType=function(a){if(ss.isNullOrUndefined(a))return false;if(this==Object||a instanceof this)return true;var b=Type.getInstanceType(a);return this.isAssignableFrom(b)};Type.isInstanceOfType=function(b,a){return b instanceof a||a!==Function&&a.isInstanceOfType&&a.isInstanceOfType(b)};Type.prototype.isAssignableFrom=function(c){if(this==Object||this==c)return true;if(this.__class){var a=c.__baseType;while(a){if(this==a)return true;a=a.__baseType}}else if(this.__interface){var b=c.__interfaces;if(b&&b.contains(this))return true;var a=c.__baseType;while(a){b=a.__interfaces;if(b&&b.contains(this))return true;a=a.__baseType}}return false};Type.hasProperty=function(a,b){return typeof a["get_"+b]==="function"||typeof a["set_"+b]==="function"};Type.prototype.get_isClass=function(){return this.__class==true};Type.prototype.get_isEnum=function(){return this.__enum==true};Type.prototype.get_isFlags=function(){return this.__enum==true&&this.__flags==true};Type.prototype.get_isInterface=function(){return this.__interface==true};Type.canCast=function(a,b){return Type.isInstanceOfType(a,b)};Type.safeCast=function(a,b){return Type.isInstanceOfType(a,b)?a:null};Type.cast=function(a,b){if(a===null)return null;else if(typeof a==="undefined"||Type.isInstanceOfType(a,b))return a;throw"Cannot cast object to type "+b.__typeName;};Type.getInstanceType=function(b){if(b===null)throw"Cannot get type of null";if(typeof b==="undefined")throw"Cannot get type of undefined";var a=null;try{a=b.constructor}catch(c){}if(!a||!a.__typeName)a=Object;return a};Type.getType=function(b){if(!b)return null;if(!Type.__typeCache)Type.__typeCache={};var a=Type.__typeCache[b];if(!a){for(var c=b.split(","),a=c.length>1?require(c[1].trim):global,e=c[0].trim().split("."),d=0;d<e.length;d++){a=a[e[d]];if(!a)break}Type.__typeCache[b]=a||null}return a};Type.prototype.getDefaultValue=function(){return null};Type.prototype.createInstance=function(){return new this};Type.parse=function(a){return Type.getType(a)};Object.__typeName="Object";Object.__baseType=null;Object.__class=true;Object.clearKeys=function(a){for(var b in a)if(a.hasOwnProperty(b))delete a[b]};Object.keyExists=function(b,a){return b[a]!==undefined};if(!Object.keys){Object.keys=function(b){var a=[];for(var c in b)b.hasOwnProperty(c)&&a.push(c);return a};Object.getKeyCount=function(b){var a=0;for(var c in b)if(b.hasOwnProperty(c))a++;return a}}else Object.getKeyCount=function(a){return Object.keys(a).length};Object.getObjectEnumerator=function(a){return new ss_ObjectEnumerator(a)};Boolean.__typeName="Boolean";Boolean.getDefaultValue=Boolean.createInstance=function(){return false};Boolean.parse=function(a){return a.toLowerCase()=="true"};Number.__typeName="Number";Number.getDefaultValue=Number.createInstance=function(){return 0};Number.parse=function(a){return!a||!a.length?0:a.indexOf(".")>=0||a.indexOf("e")>=0||a.endsWith("f")||a.endsWith("F")?parseFloat(a):parseInt(a,10)};Number.prototype.format=function(a){return ss.isNullOrUndefined(a)||a.length==0||a=="i"?this.toString():this._netFormat(a,false)};Number.prototype.localeFormat=function(a){return ss.isNullOrUndefined(a)||a.length==0||a=="i"?this.toLocaleString():this._netFormat(a,true)};Number._commaFormat=function(a,i,n,o){var c=null,h=a.indexOf(n);if(h>0){c=a.substr(h);a=a.substr(0,h)}var j=a.startsWith("-");if(j)a=a.substr(1);var f=0,g=i[f];if(a.length<g)return c?a+c:a;var k=a.length,b="",l=false;while(!l){var e=g,d=k-e;if(d<0){g+=d;e+=d;d=0;l=true}if(!e)break;var m=a.substr(d,e);if(b.length)b=m+o+b;else b=m;k-=e;if(f<i.length-1){f++;g=i[f]}}if(j)b="-"+b;return c?b+c:b};Number.prototype._netFormat=function(f,g){var b=g?ss_CultureInfo.CurrentCulture.numberFormat:ss_CultureInfo.InvariantCulture.numberFormat,a="",c=-1;if(f.length>1)c=parseInt(f.substr(1));var e=f.charAt(0);switch(e){case"d":case"D":a=parseInt(Math.abs(this)).toString();if(c!=-1)a=a.padLeft(c,48);if(this<0)a="-"+a;break;case"x":case"X":a=parseInt(Math.abs(this)).toString(16);if(e=="X")a=a.toUpperCase();if(c!=-1)a=a.padLeft(c,48);break;case"e":case"E":if(c==-1)a=this.toExponential();else a=this.toExponential(c);if(e=="E")a=a.toUpperCase();break;case"f":case"F":case"n":case"N":if(c==-1)c=b.numberDecimalDigits;a=this.toFixed(c).toString();if(c&&b.numberDecimalSeparator!="."){var d=a.indexOf(".");a=a.substr(0,d)+b.numberDecimalSeparator+a.substr(d+1)}if(e=="n"||e=="N")a=Number._commaFormat(a,b.numberGroupSizes,b.numberDecimalSeparator,b.numberGroupSeparator);break;case"c":case"C":if(c==-1)c=b.currencyDecimalDigits;a=Math.abs(this).toFixed(c).toString();if(c&&b.currencyDecimalSeparator!="."){var d=a.indexOf(".");a=a.substr(0,d)+b.currencyDecimalSeparator+a.substr(d+1)}a=Number._commaFormat(a,b.currencyGroupSizes,b.currencyDecimalSeparator,b.currencyGroupSeparator);if(this<0)a=String.format(b.currencyNegativePattern,a);else a=String.format(b.currencyPositivePattern,a);break;case"p":case"P":if(c==-1)c=b.percentDecimalDigits;a=(Math.abs(this)*100).toFixed(c).toString();if(c&&b.percentDecimalSeparator!="."){var d=a.indexOf(".");a=a.substr(0,d)+b.percentDecimalSeparator+a.substr(d+1)}a=Number._commaFormat(a,b.percentGroupSizes,b.percentDecimalSeparator,b.percentGroupSeparator);if(this<0)a=String.format(b.percentNegativePattern,a);else a=String.format(b.percentPositivePattern,a)}return a};String.__typeName="String";String.__baseType="Object";String.__class=true;String.empty="";String.compare=function(a,b,c){if(c){if(a)a=a.toUpperCase();if(b)b=b.toUpperCase()}a=a||"";b=b||"";return a==b?0:a<b?-1:1};String.prototype.compareTo=function(b,a){return String.compare(this,b,a)};String.concat=function(){return Array.prototype.join.call(arguments,"")};String.prototype.endsWith=function(a){return!a.length?true:a.length>this.length?false:this.substr(this.length-a.length)==a};String.equals=function(b,c,a){return String.compare(b,c,a)==0};String._format=function(b,c,a){if(!String._formatRE)String._formatRE=/(\{[^\}^\{]+\})/g;return b.replace(String._formatRE,function(h,d){var g=parseInt(d.substr(1)),b=c[g+1];if(ss.isNullOrUndefined(b))return"";if(b.format){var e=null,f=d.indexOf(":");if(f>0)e=d.substring(f+1,d.length-1);return a?b.localeFormat(e):b.format(e)}else return a?b.toLocaleString():b.toString()})};String.format=function(a){return String._format(a,arguments,false)};String.fromChar=function(a,d){for(var c=a,b=1;b<d;b++)c+=a;return c};String.prototype.htmlDecode=function(){var a=document.createElement("div");a.innerHTML=this;return a.textContent||a.innerText};String.prototype.htmlEncode=function(){var a=document.createElement("div");a.appendChild(document.createTextNode(this));return a.innerHTML.replace(/\"/g,"&quot;")};String.prototype.indexOfAny=function(e,a,f){var b=this.length;if(!b)return-1;e=String.fromCharCode.apply(null,e);a=a||0;f=f||b;var d=a+f-1;if(d>=b)d=b-1;for(var c=a;c<=d;c++)if(e.indexOf(this.charAt(c))>=0)return c;return-1};String.prototype.insert=function(a,b){if(!b)return this.valueOf();if(!a)return b+this;var c=this.substr(0,a),d=this.substr(a);return c+b+d};String.isNullOrEmpty=function(a){return!a||!a.length};String.prototype.lastIndexOfAny=function(e,a,f){var d=this.length;if(!d)return-1;e=String.fromCharCode.apply(null,e);a=a||d-1;f=f||d;var c=a-f+1;if(c<0)c=0;for(var b=a;b>=c;b--)if(e.indexOf(this.charAt(b))>=0)return b;return-1};String.localeFormat=function(a){return String._format(a,arguments,true)};String.prototype.padLeft=function(b,a){if(this.length<b){a=String.fromCharCode(a||32);return String.fromChar(a,b-this.length)+this}return this.valueOf()};String.prototype.padRight=function(b,a){if(this.length<b){a=String.fromCharCode(a||32);return this+String.fromChar(a,b-this.length)}return this.valueOf()};String.prototype.remove=function(a,b){return!b||a+b>this.length?this.substr(0,a):this.substr(0,a)+this.substr(a+b)};String.prototype.replaceAll=function(b,a){a=a||"";return this.split(b).join(a)};String.prototype.startsWith=function(a){return!a.length?true:a.length>this.length?false:this.substr(0,a.length)==a};if(!String.prototype.trim)String.prototype.trim=function(){return this.trimEnd().trimStart()};String.prototype.trimEnd=function(){return this.replace(/\s*$/,"")};String.prototype.trimStart=function(){return this.replace(/^\s*/,"")};Array.__typeName="Array";Array.__baseType=Object;Array.__interfaces=[ss_IEnumerable,ss_ICollection,ss_IList];Array.__class=true;Array.prototype.get_item=function(a){return this[a]};Array.prototype.set_item=function(a,b){this[a]=b};Array.prototype.get_count=function(){return this.length};Array.prototype.getValue=function(b){if(b.length!=(this._sizes?this._sizes.length:1))throw"Invalid number of indices";var c=b[0];if(this._sizes)for(var a=1;a<this._sizes.length;a++)c=c*this._sizes[a]+b[a];var d=this[c];return typeof d!=="undefined"?d:this._defvalue};Array.prototype.get=function(){return this.getValue(arguments)};Array.prototype.setValue=function(d,b){if(b.length!=(this._sizes?this._sizes.length:1))throw"Invalid number of indices";var c=b[0];if(this._sizes)for(var a=1;a<this._sizes.length;a++)c=c*this._sizes[a]+b[a];this[c]=d};Array.prototype.set=function(){return this.setValue(arguments[arguments.length-1],Array.prototype.slice.call(arguments,0,arguments.length-1))};Array.prototype.get_rank=function(){return this._sizes?this._sizes.length:1};Array.prototype.getLength=function(a){if(a>=(this._sizes?this._sizes.length:1))throw"Invalid dimension";return this._sizes?this._sizes[a]:this.length};Array.prototype.extract=function(a,b){return!ss.isValue(b)?this.slice(a):this.slice(a,a+b)};Array.prototype.add=function(a){this[this.length]=a};Array.prototype.addRange=function(b){if(b instanceof Array)this.push.apply(this,b);else{var a=b.getEnumerator();try{while(a.moveNext())this.add(a.get_current())}finally{ss_IDisposable.isInstanceOfType(a)&&Type.cast(a,ss_IDisposable).dispose()}}};Array.prototype.clear=function(){this.length=0};Array.prototype.clone=function(){return this.length===1?[this[0]]:Array.apply(null,this)};Array.prototype.contains=function(b){var a=this.indexOf(b);return a>=0};Array.prototype.peekFront=function(){if(this.length)return this[0];throw"Array is empty";};Array.prototype.peekBack=function(){if(this.length)return this[this.length-1];throw"Array is empty";};if(!Array.prototype.every)Array.prototype.every=function(b,c){for(var d=this.length,a=0;a<d;a++)if(a in this&&!b.call(c,this[a],a,this))return false;return true};if(!Array.prototype.filter)Array.prototype.filter=function(d,e){for(var f=this.length,b=[],a=0;a<f;a++)if(a in this){var c=this[a];d.call(e,c,a,this)&&b.push(c)}return b};if(!Array.prototype.forEach)Array.prototype.forEach=function(b,c){for(var d=this.length,a=0;a<d;a++)a in this&&b.call(c,this[a],a,this)};Array.prototype.getEnumerator=function(){return new ss_ArrayEnumerator(this)};if(!Array.prototype.indexOf)Array.prototype.indexOf=function(d,b){b=b||0;var c=this.length;if(c)for(var a=b;a<c;a++)if(this[a]===d)return a;return-1};Array.prototype.insert=function(a,b){this.splice(a,0,b)};Array.prototype.insertRange=function(b,a){if(a instanceof Array)if(b===0)this.unshift.apply(this,a);else for(var d=0;d<a.length;d++)this.splice(b+d,0,a[d]);else{var c=a.getEnumerator();try{while(c.moveNext()){this.insert(b,c.get_current());b++}}finally{ss_IDisposable.isInstanceOfType(c)&&Type.cast(c,ss_IDisposable).dispose()}}};if(!Array.prototype.map)Array.prototype.map=function(d,e){for(var b=this.length,c=new Array(b),a=0;a<b;a++)if(a in this)c[a]=d.call(e,this[a],a,this);return c};Array.parse=function(a){return eval("("+a+")")};Array.prototype.remove=function(b){var a=this.indexOf(b);if(a>=0){this.splice(a,1);return true}return false};Array.prototype.removeAt=function(a){this.splice(a,1)};Array.prototype.removeRange=function(b,a){this.splice(b,a)};if(!Array.prototype.some)Array.prototype.some=function(b,c){for(var d=this.length,a=0;a<d;a++)if(a in this&&b.call(c,this[a],a,this))return true;return false};Array.toArray=function(a){return Array.prototype.slice.call(a)};Array.fromEnumerable=function(c){var a=c.getEnumerator(),b=[];try{while(a.moveNext())b.push(a.get_current())}finally{a.dispose()}return b};Array.multidim=function(d){var a=[];a._defvalue=d;a._sizes=[arguments[1]];for(var c=arguments[1],b=2;b<arguments.length;b++){c*=arguments[b];a._sizes[b-1]=arguments[b]}a.length=c;return a};RegExp.__typeName="RegExp";RegExp.__baseType=Object;RegExp.__class=true;Date.__typeName="Date";Date.__baseType="Object";Date.getDefaultValue=Date.createInstance=function(){return new Date(0)};Date.get_now=function(){return new Date};Date.get_today=function(){var a=new Date;return new Date(a.getFullYear(),a.getMonth(),a.getDate())};Date.areEqual=function(b,a){return!ss.isValue(b)?!ss.isValue(a):!ss.isValue(a)?false:b.valueOf()===a.valueOf()};Date.areNotEqual=function(a,b){return!Date.areEqual(a,b)};Date.prototype.format=function(a){return ss.isNullOrUndefined(a)||a.length==0||a=="i"?this.toString():a=="id"?this.toDateString():a=="it"?this.toTimeString():this._netFormat(a,false)};Date.prototype.localeFormat=function(a){return ss.isNullOrUndefined(a)||a.length==0||a=="i"?this.toLocaleString():a=="id"?this.toLocaleDateString():a=="it"?this.toLocaleTimeString():this._netFormat(a,true)};Date.prototype._netFormat=function(d,i){var b=this,c=i?ss_CultureInfo.CurrentCulture.dateFormat:ss_CultureInfo.InvariantCulture.dateFormat;if(d.length==1)switch(d){case"f":d=c.longDatePattern+" "+c.shortTimePattern;break;case"F":d=c.dateTimePattern;break;case"d":d=c.shortDatePattern;break;case"D":d=c.longDatePattern;break;case"t":d=c.shortTimePattern;break;case"T":d=c.longTimePattern;break;case"g":d=c.shortDatePattern+" "+c.shortTimePattern;break;case"G":d=c.shortDatePattern+" "+c.longTimePattern;break;case"R":case"r":c=ss_CultureInfo.InvariantCulture.dateFormat;d=c.gmtDateTimePattern;break;case"u":d=c.universalDateTimePattern;break;case"U":d=c.dateTimePattern;b=new Date(b.getUTCFullYear(),b.getUTCMonth(),b.getUTCDate(),b.getUTCHours(),b.getUTCMinutes(),b.getUTCSeconds(),b.getUTCMilliseconds());break;case"s":d=c.sortableDateTimePattern}if(d.charAt(0)=="%")d=d.substr(1);if(!Date._formatRE)Date._formatRE=/'.*?[^\\]'|dddd|ddd|dd|d|MMMM|MMM|MM|M|yyyy|yy|y|hh|h|HH|H|mm|m|ss|s|tt|t|fff|ff|f|zzz|zz|z/g;var g=Date._formatRE,h=new ss_StringBuilder;g.lastIndex=0;while(true){var j=g.lastIndex,f=g.exec(d);h.append(d.slice(j,f?f.index:d.length));if(!f)break;var e=f[0],a=e;switch(e){case"dddd":a=c.dayNames[b.getDay()];break;case"ddd":a=c.shortDayNames[b.getDay()];break;case"dd":a=b.getDate().toString().padLeft(2,48);break;case"d":a=b.getDate();break;case"MMMM":a=c.monthNames[b.getMonth()];break;case"MMM":a=c.shortMonthNames[b.getMonth()];break;case"MM":a=(b.getMonth()+1).toString().padLeft(2,48);break;case"M":a=b.getMonth()+1;break;case"yyyy":a=b.getFullYear();break;case"yy":a=(b.getFullYear()%100).toString().padLeft(2,48);break;case"y":a=b.getFullYear()%100;break;case"h":case"hh":a=b.getHours()%12;if(!a)a="12";else if(e=="hh")a=a.toString().padLeft(2,48);break;case"HH":a=b.getHours().toString().padLeft(2,48);break;case"H":a=b.getHours();break;case"mm":a=b.getMinutes().toString().padLeft(2,48);break;case"m":a=b.getMinutes();break;case"ss":a=b.getSeconds().toString().padLeft(2,48);break;case"s":a=b.getSeconds();break;case"t":case"tt":a=b.getHours()<12?c.amDesignator:c.pmDesignator;if(e=="t")a=a.charAt(0);break;case"fff":a=b.getMilliseconds().toString().padLeft(3,48);break;case"ff":a=b.getMilliseconds().toString().padLeft(3).substr(0,2);break;case"f":a=b.getMilliseconds().toString().padLeft(3).charAt(0);break;case"z":a=b.getTimezoneOffset()/60;a=(a>=0?"-":"+")+Math.floor(Math.abs(a));break;case"zz":case"zzz":a=b.getTimezoneOffset()/60;a=(a>=0?"-":"+")+Math.floor(Math.abs(a)).toString().padLeft(2,48);if(e=="zzz")a+=c.timeSeparator+Math.abs(b.getTimezoneOffset()%60).toString().padLeft(2,48);break;default:if(a.charAt(0)=="'")a=a.substr(1,a.length-2).replace(/\\'/g,"'")}h.append(a)}return h.toString()};Date.parseDate=function(a){return new Date(Date.parse(a))};Date._parseExact=function(c,i,p,s){p=p||ss_CultureInfo.CurrentCulture;var n=p.amDesignator,o=p.pmDesignator,r=function(b){for(var c="1234567890",a=0;a<b.length;a++)if(c.indexOf(b.charAt(a))==-1)return false;return true},h=function(f,d,c,e){for(var b=e;b>=c;b--){var a=f.substring(d,d+b);if(a.length<c)return null;if(r(a))return a}return null};c=c+"";i=i+"";var b=0,m=0,q="",a="",e=0,f=1,g=1,d=0,k=0,j=0,l="";while(m<i.length){q=i.charAt(m);a="";while(i.charAt(m)==q&&m<i.length)a+=i.charAt(m++);if(a=="yyyy"||a=="yy"||a=="y"){if(a=="yyyy")e=h(c,b,4,4);if(a=="yy")e=h(c,b,2,2);if(a=="y")e=h(c,b,2,4);if(e==null)return null;b+=e.length;if(e.length==2)if(e>30)e=1900+(e-0);else e=2e3+(e-0)}else if(a=="MM"||a=="M"){f=h(c,b,a.length,2);if(f==null||f<1||f>12)return null;b+=f.length}else if(a=="dd"||a=="d"){g=h(c,b,a.length,2);if(g==null||g<1||g>31)return null;b+=g.length}else if(a=="hh"||a=="h"){d=h(c,b,a.length,2);if(d==null||d<1||d>12)return null;b+=d.length}else if(a=="HH"||a=="H"){d=h(c,b,a.length,2);if(d==null||d<0||d>23)return null;b+=d.length}else if(a=="mm"||a=="m"){k=h(c,b,a.length,2);if(k==null||k<0||k>59)return null;b+=k.length}else if(a=="ss"||a=="s"){j=h(c,b,a.length,2);if(j==null||j<0||j>59)return null;b+=j.length}else if(a=="t"){if(c.substring(b,b+1).toLowerCase()==n.charAt(0).toLowerCase())l=n;else if(c.substring(b,b+1).toLowerCase()==o.charAt(0).toLowerCase())l=o;else return null;b+=1}else if(a=="tt"){if(c.substring(b,b+2).toLowerCase()==n.toLowerCase())l=n;else if(c.substring(b,b+2).toLowerCase()==o.toLowerCase())l=o;else return null;b+=2}else if(c.substring(b,b+a.length)!=a)return null;else b+=a.length}if(b!=c.length)return null;if(f==2)if(e%4==0&&e%100!=0||e%400==0){if(g>29)return null}else if(g>28)return null;if(f==4||f==6||f==9||f==11)if(g>30)return null;if(d<12&&l==o)d=d-0+12;else if(d>11&&l==n)d-=12;return s?new Date(Date.UTC(e,f-1,g,d,k,j)):new Date(e,f-1,g,d,k,j)};Date.parseExact=function(c,b,a){return Date._parseExact(c,b,a,false)};Date.parseExactUTC=function(c,b,a){return Date._parseExact(c,b,a,true)};Error.__typeName="Error";Error.__baseType=Object;Error.prototype.popStackFrame=function(){if(ss.isNullOrUndefined(this.stack)||ss.isNullOrUndefined(this.fileName)||ss.isNullOrUndefined(this.lineNumber))return;var a=this.stack.split("\n"),c=a[0],e=this.fileName+":"+this.lineNumber;while(!ss.isNullOrUndefined(c)&&c.indexOf(e)===-1){a.shift();c=a[0]}var d=a[1];if(isNullOrUndefined(d))return;var b=d.match(/@(.*):(\d+)$/);if(ss.isNullOrUndefined(b))return;a.shift();this.stack=a.join("\n");this.fileName=b[1];this.lineNumber=parseInt(b[2])};Error.createError=function(e,b,c){var a=new Error(e);if(b)for(var d in b)a[d]=b[d];if(c)a.innerException=c;a.popStackFrame();return a};Function.__typeName="Function";Function.__baseType=Object;Function.__class=true;Function.empty=function(){};Function._contains=function(b,d,c){for(var a=0;a<b.length;a+=2)if(b[a]===d&&b[a+1]===c)return true;return false};Function._mkdel=function(a){var b=function(){if(a.length==2)return a[1].apply(a[0],arguments);else{for(var c=a.clone(),b=0;b<c.length;b+=2)Function._contains(a,c[b],c[b+1])&&c[b+1].apply(c[b],arguments);return null}};b._targets=a;return b};Function.mkdel=function(b,a){return!b?a:Function._mkdel([b,a])};Function.combine=function(a,b){if(!a)return!b._targets?Function.mkdel(null,b):b;if(!b)return!a._targets?Function.mkdel(null,a):a;var c=a._targets?a._targets:[null,a],d=b._targets?b._targets:[null,b];return Function._mkdel(c.concat(d))};Function.remove=function(c,a){if(!c||c===a)return null;if(!a)return c;var b=c._targets,f=null,e;if(a._targets){f=a._targets[0];e=a._targets[1]}else e=a;for(var d=0;d<b.length;d+=2)if(b[d]===f&&b[d+1]===e){if(b.length==2)return null;b.splice(d,2);return Function._mkdel(b)}return c};Function.clone=function(a){return a._targets?Function._mkdel(a._targets):function(){return a.apply(this,arguments)}};Function.thisFix=function(a){return function(){for(var c=[this],b=0;b<arguments.length;b++)c.push(arguments[b]);return a.apply(a,c)}};ss.Debug=global.Debug||function(){};ss.Debug.__typeName="Debug";if(!ss.Debug.writeln)ss.Debug.writeln=function(a){if(global.console){if(global.console.debug){global.console.debug(a);return}else if(global.console.log){global.console.log(a);return}}else if(global.opera&&global.opera.postError){global.opera.postError(a);return}};ss.Debug._fail=function(a){ss.Debug.writeln(a);eval("debugger;")};ss.Debug.assert=function(b,a){if(!b){a="Assert failed: "+a;confirm(a+"\r\n\r\nBreak into debugger?")&&ss.Debug._fail(a)}};ss.Debug.fail=function(a){ss.Debug._fail(a)};var ss_Enum=function(){};Type.registerClass(global,"ss.Enum",ss_Enum);ss_Enum.parse=function(d,i){var a=d.prototype;if(!d.__flags){for(var b in a)if(b===i)return a[b]}else{for(var g=i.split("|"),h=0,e=true,c=g.length-1;c>=0;c--){var j=g[c].trim(),f=false;for(var b in a)if(b===j){h|=a[b];f=true;break}if(!f){e=false;break}}if(e)return h}throw"Invalid Enumeration Value";};ss_Enum.toString=function(e,d){var a=e.prototype;if(!e.__flags||d===0){for(var b in a)if(a[b]===d)return b;throw"Invalid Enumeration Value";}else{var c=[];for(var b in a)a[b]&d&&c.add(b);if(!c.length)throw"Invalid Enumeration Value";return c.join(" | ")}};var ss_CultureInfo=function(c,a,b){this.name=c;this.numberFormat=a;this.dateFormat=b};Type.registerClass(global,"ss.CultureInfo",ss_CultureInfo);ss_CultureInfo.InvariantCulture=new ss_CultureInfo("en-US",{naNSymbol:"NaN",negativeSign:"-",positiveSign:"+",negativeInfinityText:"-Infinity",positiveInfinityText:"Infinity",percentSymbol:"%",percentGroupSizes:[3],percentDecimalDigits:2,percentDecimalSeparator:".",percentGroupSeparator:",",percentPositivePattern:"{0} %",percentNegativePattern:"-{0} %",currencySymbol:"$",currencyGroupSizes:[3],currencyDecimalDigits:2,currencyDecimalSeparator:".",currencyGroupSeparator:",",currencyNegativePattern:"(${0})",currencyPositivePattern:"${0}",numberGroupSizes:[3],numberDecimalDigits:2,numberDecimalSeparator:".",numberGroupSeparator:","},{amDesignator:"AM",pmDesignator:"PM",dateSeparator:"/",timeSeparator:":",gmtDateTimePattern:"ddd, dd MMM yyyy HH:mm:ss 'GMT'",universalDateTimePattern:"yyyy-MM-dd HH:mm:ssZ",sortableDateTimePattern:"yyyy-MM-ddTHH:mm:ss",dateTimePattern:"dddd, MMMM dd, yyyy h:mm:ss tt",longDatePattern:"dddd, MMMM dd, yyyy",shortDatePattern:"M/d/yyyy",longTimePattern:"h:mm:ss tt",shortTimePattern:"h:mm tt",firstDayOfWeek:0,dayNames:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],shortDayNames:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],minimizedDayNames:["Su","Mo","Tu","We","Th","Fr","Sa"],monthNames:["January","February","March","April","May","June","July","August","September","October","November","December",""],shortMonthNames:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec",""]});ss_CultureInfo.CurrentCulture=ss_CultureInfo.InvariantCulture;var ss_IEnumerator=function(){};ss_IEnumerator.prototype={get_current:null,moveNext:null,reset:null};Type.registerInterface(global,"ss.IEnumerator",ss_IEnumerator,ss_IDisposable);var ss_IEnumerable=function(){};ss_IEnumerable.prototype={getEnumerator:null};ss_IEnumerable.isAssignableFrom=function(a){return a==Array?true:Type.prototype.isAssignableFrom.call(this,a)};Type.registerInterface(global,"ss.IEnumerable",ss_IEnumerable);var ss_ICollection=function(){};ss_ICollection.prototype={get_count:null,add:null,clear:null,contains:null,remove:null};ss_ICollection.isAssignableFrom=function(a){return a==Array?true:Type.prototype.isAssignableFrom.call(this,a)};Type.registerInterface(global,"ss.ICollection",ss_IEnumerable);var ss_Nullable=function(){};Type.registerClass(global,"ss.Nullable",ss_Nullable);ss_Nullable.unbox=function(a){if(!ss.isValue(a))throw"Instance is null";return a};ss_Nullable.eq=function(a,b){return!ss.isValue(a)?!ss.isValue(b):a===b};ss_Nullable.ne=function(a,b){return!ss.isValue(a)?ss.isValue(b):a!==b};ss_Nullable.le=function(a,b){return ss.isValue(a)&&ss.isValue(b)&&a<=b};ss_Nullable.ge=function(a,b){return ss.isValue(a)&&ss.isValue(b)&&a>=b};ss_Nullable.lt=function(a,b){return ss.isValue(a)&&ss.isValue(b)&&a<b};ss_Nullable.gt=function(a,b){return ss.isValue(a)&&ss.isValue(b)&&a>b};ss_Nullable.sub=function(a,b){return ss.isValue(a)&&ss.isValue(b)?a-b:null};ss_Nullable.add=function(a,b){return ss.isValue(a)&&ss.isValue(b)?a+b:null};ss_Nullable.mod=function(a,b){return ss.isValue(a)&&ss.isValue(b)?a%b:null};ss_Nullable.div=function(a,b){return ss.isValue(a)&&ss.isValue(b)?a/b:null};ss_Nullable.mul=function(a,b){return ss.isValue(a)&&ss.isValue(b)?a*b:null};ss_Nullable.band=function(a,b){return ss.isValue(a)&&ss.isValue(b)?a&b:null};ss_Nullable.bor=function(a,b){return ss.isValue(a)&&ss.isValue(b)?a|b:null};ss_Nullable.xor=function(a,b){return ss.isValue(a)&&ss.isValue(b)?a^b:null};ss_Nullable.shl=function(a,b){return ss.isValue(a)&&ss.isValue(b)?a<<b:null};ss_Nullable.srs=function(a,b){return ss.isValue(a)&&ss.isValue(b)?a>>b:null};ss_Nullable.sru=function(a,b){return ss.isValue(a)&&ss.isValue(b)?a>>>b:null};ss_Nullable.and=function(a,b){return a===true&&b===true?true:a===false||b===false?false:null};ss_Nullable.or=function(a,b){return a===true||b===true?true:a===false&&b===false?false:null};ss_Nullable.not=function(a){return ss.isValue(a)?!a:null};ss_Nullable.neg=function(a){return ss.isValue(a)?-a:null};ss_Nullable.pos=function(a){return ss.isValue(a)?+a:null};ss_Nullable.cpl=function(a){return ss.isValue(a)?~a:null};var ss_IList=function(){};ss_IList.prototype={get_item:null,set_item:null,indexOf:null,insert:null,removeAt:null};ss_IList.isAssignableFrom=function(a){return a==Array?true:Type.prototype.isAssignableFrom.call(this,a)};Type.registerInterface(global,"ss.IList",ss_IList,ss_ICollection,ss_IEnumerable);var ss_IDictionary=function(){};ss_IDictionary.prototype={get_item:null,set_item:null,get_keys:null,get_values:null,containsKey:null,add:null,remove:null,tryGetValue:null};Type.registerInterface(global,"ss.IDictionary",ss_IDictionary,[ss_IEnumerable]);var ss_Int32=function(){};Type.registerClass(global,"ss.Int32",ss_Int32);ss_Int32.__class=false;ss_Int32.isInstanceOfType=function(a){return typeof a==="number"&&isFinite(a)&&Math.round(a,0)==a};ss_Int32.getDefaultValue=ss_Int32.createInstance=function(){return 0};ss_Int32.div=function(a,b){return ss.isValue(a)&&ss.isValue(b)?a/b|0:null};ss_Int32.trunc=function(a){return ss.isValue(a)?a|0:null};var ss_JsDate=function(){};Type.registerClass(global,"ss.JsDate",ss_JsDate);ss_JsDate.createInstance=function(){return new Date};ss_JsDate.isInstanceOfType=function(a){return a instanceof Date};var ss_ArrayEnumerator=function(a){this._array=a;this._index=-1};ss_ArrayEnumerator.prototype={moveNext:function(){this._index++;return this._index<this._array.length},reset:function(){this._index=-1},get_current:function(){if(this._index<0||this._index>=this._array.length)throw"Invalid operation";return this._array[this._index]},dispose:function(){}};Type.registerClass(global,"ss.ArrayEnumerator",ss_ArrayEnumerator,null,[ss_IEnumerator,ss_IDisposable]);var ss_ObjectEnumerator=function(a){this._keys=Object.keys(a);this._index=-1;this._object=a};ss_ObjectEnumerator.prototype={moveNext:function(){this._index++;return this._index<this._keys.length},reset:function(){this._index=-1},get_current:function(){if(this._index<0||this._index>=this._keys.length)throw"Invalid operation";var a=this._keys[this._index];return{key:a,value:this._object[a]}},dispose:function(){}};Type.registerClass(global,"ss.ObjectEnumerator",ss_ObjectEnumerator,null,[ss_IEnumerator,ss_IDisposable]);var ss_Dictionary$2=function(c,b){var a=function(a){this._o={};if(ss_IDictionary.isInstanceOfType(a)){var b=Type.cast(a,ss_IDictionary).getEnumerator();try{while(b.moveNext()){var e=b.get_current();this._o[e.key]=e.value}}finally{ss_IDisposable.isInstanceOfType(b)&&Type.cast(b,ss_IDisposable).dispose()}}else if(a)for(var d=Object.keys(a),c=0;c<d.length;c++)this._o[d[c]]=a[d[c]]};a.prototype={get_count:function(){return Object.getKeyCount(this._o)},get_keys:function(){return Object.keys(this._o)},get_values:function(){for(var b=[],c=Object.keys(this._o),a=0;a<c.length;a++)b.push(this._o[c[a]]);return b},get_item:function(a){if(!Object.keyExists(this._o,a))throw"Key "+a+" does not exist.";return this._o[a]},set_item:function(b,a){this._o[b]=a},add:function(a,b){if(Object.keyExists(this._o,a))throw"Key "+a+" already exists.";this._o[a]=b},getEnumerator:function(){return new ss_ObjectEnumerator(this._o)},remove:function(a){var b=Object.keyExists(this._o,a);delete this._o[a];return b},containsKey:function(a){return Object.keyExists(this._o,a)},tryGetValue:function(c,a){if(Object.keyExists(this._o,c)){a.$=this._o[c];return true}else{a.$=b.getDefaultValue();return false}},clear:function(){Object.clearKeys(this._o)}};a.registerGenericClassInstance(a,ss_Dictionary$2,[c,b],function(){return null},function(){return[ss_IDictionary,ss_IEnumerable]});return a};Type.registerGenericClass(global,"ss.Dictionary$2",ss_Dictionary$2,2);var ss_IDisposable=function(){};ss_IDisposable.prototype={dispose:null};Type.registerInterface(global,"ss.IDisposable",ss_IDisposable);var ss_StringBuilder=function(a){this._parts=ss.isNullOrUndefined(a)||a===""?[]:[a];this.isEmpty=this._parts.length==0};ss_StringBuilder.prototype={append:function(a){if(!ss.isNullOrUndefined(a)&&a!==""){this._parts.add(a);this.isEmpty=false}return this},appendChar:function(a){return this.append(String.fromCharCode(a))},appendLine:function(a){this.append(a);this.append("\r\n");this.isEmpty=false;return this},appendLineChar:function(a){return this.appendLine(String.fromCharCode(a))},clear:function(){this._parts=[];this.isEmpty=true},toString:function(){return this._parts.join("")}};Type.registerClass(global,"ss.StringBuilder",ss_StringBuilder);var ss_EventArgs=function(){};Type.registerClass(global,"ss.EventArgs",ss_EventArgs);ss_EventArgs.Empty=new ss_EventArgs;var ss_Exception=function(b,a){this._message=b||null;this._innerException=a||null};Type.registerClass(global,"ss.Exception",ss_Exception);ss_Exception.prototype={get_message:function(){return this._message},get_innerException:function(){return this._innerException}};ss_Exception.wrap=function(a){return ss_Exception.isInstanceOfType(a)?a:a instanceof Error?new ss_JsErrorException(a):new ss_Exception(a.toString())};var ss_NotSupportedException=function(b,a){ss_Exception.call(this,b,a)};Type.registerClass(global,"ss.NotSupportedException",ss_NotSupportedException,ss_Exception);var ss_AggregateException=function(b,a){if(typeof b!=="string"){a=b;b="One or more errors occurred."}a=ss.isValue(a)?Array.fromEnumerable(a):null;ss_Exception.call(this,b,a&&a.length?a[0]:null);this._innerExceptions=a};ss_AggregateException.prototype={get_innerExceptions:function(){return this._innerExceptions}};Type.registerClass(global,"ss.AggregateException",ss_AggregateException,ss_Exception);var ss_PromiseException=function(a){ss_Exception.call(this,a[0]?a[0].toString():"An error occurred");this._arguments=a.clone()};ss_PromiseException.prototype={get_arguments:function(){return this._arguments}};Type.registerClass(global,"ss.PromiseException",ss_PromiseException,ss_Exception);var ss_JsErrorException=function(a){ss_Exception.call(this,a.message);this._error=a};ss_JsErrorException.prototype={get_error:function(){return this._error}};Type.registerClass(global,"ss.JsErrorException",ss_JsErrorException,ss_Exception);var ss_IteratorBlockEnumerable=function(a,b){this._getEnumerator=a;this._this=b};ss_IteratorBlockEnumerable.prototype={getEnumerator:function(){return this._getEnumerator.call(this._this)}};Type.registerClass(global,"ss.IteratorBlockEnumerable",ss_IteratorBlockEnumerable,null,ss_IEnumerable);var ss_IteratorBlockEnumerator=function(b,a,c,d){this._moveNext=b;this._getCurrent=a;this._dispose=c;this._this=d};ss_IteratorBlockEnumerator.prototype={moveNext:function(){try{return this._moveNext.call(this._this)}catch(a){this._dispose&&this._dispose.call(this._this);throw a;}},get_current:function(){return this._getCurrent.call(this._this)},reset:function(){throw new ss_NotSupportedException("Reset is not supported.");},dispose:function(){this._dispose&&this._dispose.call(this._this)}};Type.registerClass(global,"ss.IteratorBlockEnumerator",ss_IteratorBlockEnumerator,null,[ss_IEnumerator,ss_IDisposable]);var ss_Task=function(a,b){this._action=a;this._state=b;this.exception=null;this.status=0;this._thens=[];this._result=null};ss_Task.prototype={continueWith:function(c){var a=new ss_TaskCompletionSource,d=this,b=function(){try{a.setResult(c(d))}catch(b){a.setException(ss_Exception.wrap(b))}};if(this.isCompleted())setTimeout(b,0);else this._thens.push(b);return a.task},start:function(){if(this.status!==0)throw"Task was already started.";var a=this;this.status=3;setTimeout(function(){try{var b=a._action(a._state);delete a._action;delete a._state;a._complete(b)}catch(c){a._fail(new ss_AggregateException([ss_Exception.wrap(c)]))}},0)},_runCallbacks:function(){for(var a=0;a<this._thens.length;a++)this._thens[a](this);delete this._thens},_complete:function(a){if(this.isCompleted())return false;this._result=a;this.status=5;this._runCallbacks();return true},_fail:function(a){if(this.isCompleted())return false;this.exception=a;this.status=7;this._runCallbacks();return true},_cancel:function(){if(this.isCompleted())return false;this.status=6;this._runCallbacks();return true},isCanceled:function(){return this.status===6},isCompleted:function(){return this.status>=5},isFaulted:function(){return this.status===7},getResult:function(){switch(this.status){case 5:return this._result;case 6:throw"Task was cancelled.";case 7:throw this.exception;default:throw"Task is not yet completed.";}},dispose:function(){}};ss_Task.delay=function(b){var a=new ss_TaskCompletionSource;setTimeout(function(){a.setResult(0)},b);return a.task};ss_Task.fromResult=function(b){var a=new ss_Task;a.status=5;a._result=b;return a};ss_Task.run=function(b){var a=new ss_TaskCompletionSource;setTimeout(function(){try{a.setResult(b())}catch(c){a.setException(ss_Exception.wrap(c))}},0);return a.task};ss_Task.whenAll=function(a){var b=new ss_TaskCompletionSource;if(a.length===0)b.setResult([]);else for(var f=new Array(a.length),g=a.length,e=false,c=[],d=0;d<a.length;d++)(function(d){a[d].continueWith(function(a){switch(a.status){case 5:f[d]=a.getResult();break;case 6:e=true;break;case 7:c.addRange(a.exception.get_innerExceptions());break;default:throw"Invalid task status "+a.status;}if(--g===0)if(c.length>0)b.setException(c);else if(e)b.setCanceled();else b.setResult(f)})})(d);return b.task};ss_Task.whenAny=function(b){if(!b.length)throw"Must wait for at least one task";for(var a=new ss_TaskCompletionSource,c=0;c<b.length;c++)b[c].continueWith(function(b){switch(b.status){case 5:a.trySetResult(b);break;case 6:a.trySetCanceled();break;case 7:a.trySetException(b.exception.get_innerExceptions());break;default:throw"Invalid task status "+b.status;}});return a.task};ss_Task.fromDoneCallback=function(e,b,d){var c=new ss_TaskCompletionSource,a;if(typeof b==="number"){a=Array.prototype.slice.call(arguments,3);if(b<0)b+=a.length+1}else{a=Array.prototype.slice.call(arguments,2);d=b;b=a.length}var f=function(a){c.setResult(a)};a=a.slice(0,b).concat(f,a.slice(b));e[d].apply(e,a);return c.task};ss_Task.fromPromise=function(c,a){var b=new ss_TaskCompletionSource;if(typeof a==="number")a=function(a){return function(){return arguments[a>=0?a:arguments.length+a]}}(a);else if(typeof a!=="function")a=function(){return Array.prototype.slice.call(arguments,0)};c.then(function(){b.setResult(typeof a==="function"?a.apply(null,arguments):null)},function(){b.setException(new ss_PromiseException(Array.prototype.slice.call(arguments,0)))});return b.task};ss_Task.fromNode=function(e,b,d){var c=new ss_TaskCompletionSource,a;if(typeof b==="function")a=Array.prototype.slice.call(arguments,3);else{a=Array.prototype.slice.call(arguments,2);d=b;b=function(){return arguments[0]}}var f=function(a){if(a)c.setException(ss_Exception.wrap(a));else c.setResult(b.apply(null,Array.prototype.slice.call(arguments,1)))};a.push(f);e[d].apply(e,a);return c.task};Type.registerClass(global,"ss.Task",ss_Task,null,ss_IDisposable);var ss_TaskStatus=function(){};ss_TaskStatus.prototype={created:0,running:3,ranToCompletion:5,canceled:6,faulted:7};Type.registerEnum(global,"ss.TaskStatus",ss_TaskStatus,false);var ss_TaskCompletionSource=function(){this.task=new ss_Task;this.task.status=3};ss_TaskCompletionSource.prototype={setCanceled:function(){if(!this.task._cancel())throw"Task was already completed.";},setResult:function(a){if(!this.task._complete(a))throw"Task was already completed.";},setException:function(a){if(!this.trySetException(a))throw"Task was already completed.";},trySetCanceled:function(){return this.task._cancel()},trySetResult:function(a){return this.task._complete(a)},trySetException:function(a){if(!Type.canCast(a,ss_AggregateException)){if(Type.canCast(a,ss_Exception))a=[a];a=new ss_AggregateException(a)}return this.task._fail(a)}};Type.registerClass(global,"ss.TaskCompletionSource",ss_TaskCompletionSource);var ss_CancelEventArgs=function(){ss_CancelEventArgs.call(this);this.cancel=false};Type.registerClass(global,"ss.CancelEventArgs",ss_CancelEventArgs,ss_EventArgs);var ss_IApplication=function(){};Type.registerInterface(global,"ss.IApplication",ss_IApplication);var ss_IContainer=function(){};Type.registerInterface(global,"ss.IContainer",ss_IContainer);var ss_IObjectFactory=function(){};Type.registerInterface(global,"ss.IObjectFactory",ss_IObjectFactory);var ss_IEventManager=function(){};Type.registerInterface(global,"ss.IEventManager",ss_IEventManager);var ss_IInitializable=function(){};Type.registerInterface(global,"ss.IInitializable",ss_IInitializable);if(global.ss){for(var n in ss)if(ss.hasOwnProperty(n))global.ss[n]=ss[n]}else global.ss=ss
+//! Script# Core Runtime
+//! More information at http://projects.nikhilk.net/ScriptSharp
+//!
+if (typeof(global) === "undefined")
+	global = window;
+
+var ss = {};
+
+ss.isUndefined = function (o) {
+	return (o === undefined);
+};
+
+ss.isNull = function (o) {
+	return (o === null);
+};
+
+ss.isNullOrUndefined = function (o) {
+	return (o === null) || (o === undefined);
+};
+
+ss.isValue = function (o) {
+	return (o !== null) && (o !== undefined);
+};
+
+ss.referenceEquals = function (a, b) {
+	return ss.isValue(a) ? a === b : !ss.isValue(b);
+};
+
+ss.mkdict = function (a) {
+	a = (arguments.length != 1 ? arguments : arguments[0]);
+	var r = {};
+	for (var i = 0; i < a.length; i += 2) {
+		r[a[i]] = a[i + 1];
+	}
+	return r;
+};
+
+ss.coalesce = function (a, b) {
+	return ss.isValue(a) ? a : b;
+};
+
+ss.isDate = function(obj) {
+	return Object.prototype.toString.call(obj) === '[object Date]';
+};
+
+ss.isArray = function(obj) {
+	return Object.prototype.toString.call(obj) === '[object Array]';
+};
+
+ss.getHashCode = function(obj) {
+	if (!ss.isValue(obj))
+		throw 'Cannot get hash code of null';
+	else if (typeof(obj.getHashCode) === 'function')
+		return obj.getHashCode();
+	else if (typeof(obj) === 'boolean') {
+		return obj ? 1 : 0;
+	}
+	else if (typeof(obj) === 'number') {
+		var s = obj.toExponential();
+		s = s.substr(0, s.indexOf('e'));
+		return parseInt(s.replace('.', ''), 10) & 0xffffffff;
+	}
+	else if (typeof(obj) === 'string') {
+		var res = 0;
+		for (var i = 0; i < obj.length; i++)
+			res = (res * 31 + obj.charCodeAt(i)) & 0xffffffff;
+		return res;
+	}
+	else if (ss.isDate(obj)) {
+		return obj.valueOf() & 0xffffffff;
+	}
+	else {
+		return ss.defaultHashCode(obj);
+	}
+};
+
+ss.defaultHashCode = function(obj) {
+	return obj.$__hashCode__ || (obj.$__hashCode__ = (Math.random() * 0xffffffff) | 0);
+};
+
+ss.equals = function(a, b) {
+	if (!ss.isValue(a))
+		throw 'Object is null';
+	else if (typeof(a.equals) === 'function')
+		return a.equals(b);
+	if (ss.isDate(a) && ss.isDate(b))
+		return a.valueOf() === b.valueOf();
+	else if (typeof(a) === 'function' && typeof(b) === 'function')
+		return ss.delegateEquals(a, b);
+	else if (ss.isNullOrUndefined(a) && ss.isNullOrUndefined(b))
+		return true;
+	else
+		return a === b;
+};
+
+ss.compare = function(a, b) {
+	if (!ss.isValue(a))
+		throw 'Object is null';
+	else if (typeof(a) === 'number' || typeof(a) === 'string' || typeof(a) === 'boolean')
+		return a < b ? -1 : (a > b ? 1 : 0);
+	else if (ss.isDate(a))
+		return ss.compare(a.valueOf(), b.valueOf());
+	else
+		return a.compareTo(b);
+};
+
+ss.equalsT = function(a, b) {
+	if (!ss.isValue(a))
+		throw 'Object is null';
+	else if (typeof(a) === 'number' || typeof(a) === 'string' || typeof(a) === 'boolean')
+		return a === b;
+	else if (ss.isDate(a))
+		return a.valueOf() === b.valueOf();
+	else
+		return a.equalsT(b);
+};
+
+ss.staticEquals = function(a, b) {
+	if (!ss.isValue(a))
+		return !ss.isValue(b);
+	else
+		return ss.isValue(b) ? ss.equals(a, b) : false;
+};
+
+if (typeof(window) == 'object') {
+	// Browser-specific stuff that could go into the Web assembly, but that assembly does not have an associated JS file.
+	if (!window.Element) {
+		// IE does not have an Element constructor. This implementation should make casting to elements work.
+		window.Element = function() {};
+		window.Element.isInstanceOfType = function(instance) { return instance && typeof instance.constructor === 'undefined' && typeof instance.tagName === 'string'; };
+	}
+	window.Element.__typeName = 'Element';
+	window.Element.__baseType = Object;
+	
+	if (!window.XMLHttpRequest) {
+		window.XMLHttpRequest = function() {
+			var progIDs = [ 'Msxml2.XMLHTTP', 'Microsoft.XMLHTTP' ];
+	
+			for (var i = 0; i < progIDs.length; i++) {
+				try {
+					var xmlHttp = new ActiveXObject(progIDs[i]);
+					return xmlHttp;
+				}
+				catch (ex) {
+				}
+			}
+	
+			return null;
+		};
+	}
+
+	ss.parseXml = function(markup) {
+		try {
+			if (DOMParser) {
+				var domParser = new DOMParser();
+				return domParser.parseFromString(markup, 'text/xml');
+			}
+			else {
+				var progIDs = [ 'Msxml2.DOMDocument.3.0', 'Msxml2.DOMDocument' ];
+
+				for (var i = 0; i < progIDs.length; i++) {
+					var xmlDOM = new ActiveXObject(progIDs[i]);
+					xmlDOM.async = false;
+					xmlDOM.loadXML(markup);
+					xmlDOM.setProperty('SelectionLanguage', 'XPath');
+					return xmlDOM;
+				}
+			}
+		}
+		catch (ex) {
+		}
+
+		return null;
+	};
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Type System Implementation
+
+ss.registerType = function Type$registerType(root, typeName, type) {
+	var ns = root;
+	var nameParts = typeName.split('.');
+
+	for (var i = 0; i < nameParts.length - 1; i++) {
+		var part = nameParts[i];
+		var nso = ns[part];
+		if (!nso) {
+			ns[part] = nso = {};
+		}
+		ns = nso;
+	}
+	ns[nameParts[nameParts.length - 1]] = type;
+};
+
+ss.__genericCache = {};
+
+ss._makeGenericTypeName = function ss$_makeGenericTypeName(genericType, typeArguments) {
+	var result = genericType.__typeName;
+	for (var i = 0; i < typeArguments.length; i++)
+		result += (i === 0 ? '[' : ',') + ss.getTypeFullName(typeArguments[i]);
+	result += ']';
+	return result;
+};
+
+ss.makeGenericType = function ss$makeGenericType(genericType, typeArguments) {
+	var name = ss._makeGenericTypeName(genericType, typeArguments);
+	return ss.__genericCache[name] || genericType.apply(null, typeArguments);
+};
+
+ss.registerGenericClassInstance = function ss$registerGenericInstance(instance, genericType, typeArguments, baseType, interfaceTypes) {
+	var name = ss._makeGenericTypeName(genericType, typeArguments);
+	ss.__genericCache[name] = instance;
+	instance.__genericTypeDefinition = genericType;
+	instance.__typeArguments = typeArguments;
+	ss.registerClass(null, name, instance, baseType(), interfaceTypes());
+};
+
+ss.registerGenericInterfaceInstance = function ss$registerGenericInstance(instance, genericType, typeArguments, baseInterfaces) {
+	var name = ss._makeGenericTypeName(genericType, typeArguments);
+	ss.__genericCache[name] = instance;
+	instance.__genericTypeDefinition = genericType;
+	instance.__typeArguments = typeArguments;
+	ss.registerInterface(null, name, instance, baseInterfaces());
+};
+
+ss.isGenericTypeDefinition = function ss$isGenericTypeDefinition(type) {
+	return type.__isGenericTypeDefinition || false;
+};
+
+ss.getGenericTypeDefinition = function ss$getGenericTypeDefinition(type) {
+	return type.__genericTypeDefinition || null;
+};
+
+ss.getGenericParameterCount = function ss$getGenericParameterCount(type) {
+	return type.__typeArgumentCount || 0;
+};
+
+ss.getGenericArguments = function ss$getGenericArguments(type) {
+	return type.__typeArguments || null;
+};
+
+ss.registerClass = function ss$registerClass(root, name, ctor, baseType, interfaceType) {
+	if (root)
+		ss.registerType(root, name, ctor);
+
+	ctor.prototype.constructor = ctor;
+	ctor.__typeName = name;
+	ctor.__class = true;
+	ctor.__baseType = baseType || Object;
+	if (baseType) {
+		ss.setupBase(ctor);
+	}
+
+	if (interfaceType instanceof Array) {
+		ctor.__interfaces = interfaceType;
+	}
+	else if (interfaceType) {
+		ctor.__interfaces = [];
+		for (var i = 4; i < arguments.length; i++) {
+			interfaceType = arguments[i];
+			ctor.__interfaces.push(interfaceType);
+		}
+	}
+};
+
+ss.registerGenericClass = function ss$registerGenericClass(root, name, ctor, typeArgumentCount) {
+	if (root)
+		ss.registerType(root, name, ctor);
+
+	ctor.prototype.constructor = ctor;
+	ctor.__typeName = name;
+	ctor.__class = true;
+	ctor.__typeArgumentCount = typeArgumentCount;
+	ctor.__isGenericTypeDefinition = true;
+	ctor.__baseType = Object;
+};
+
+ss.registerInterface = function ss$createInterface(root, name, ctor, baseInterface) {
+	if (root)
+		ss.registerType(root, name, ctor);
+
+	ctor.__typeName = name;
+	ctor.__interface = true;
+	if (baseInterface instanceof Array) {
+		ctor.__interfaces = baseInterface;
+	}
+	else if (baseInterface) {
+		ctor.__interfaces = [];
+		for (var i = 3; i < arguments.length; i++) {
+			ctor.__interfaces.push(arguments[i]);
+		}
+	}
+};
+
+ss.registerGenericInterface = function ss$registerGenericClass(root, name, ctor, typeArgumentCount) {
+	if (root)
+		ss.registerType(root, name, ctor);
+
+	ctor.prototype.constructor = ctor;
+	ctor.__typeName = name;
+	ctor.__interface = true;;
+	ctor.__typeArgumentCount = typeArgumentCount;
+	ctor.__isGenericTypeDefinition = true;
+};
+
+ss.registerEnum = function ss$registerEnum(root, name, ctor, flags) {
+	if (root)
+		ss.registerType(root, name, ctor);
+
+	for (var field in ctor.prototype) {
+		ctor[field] = ctor.prototype[field];
+	}
+
+	ctor.__typeName = name;
+	ctor.__enum = true;
+	if (flags) {
+		ctor.__flags = true;
+	}
+	ctor.getDefaultValue = ctor.createInstance = function() { return 0; };
+	ctor.isInstanceOfType = function(instance) { return typeof(instance) == 'number'; };
+};
+
+ss.setupBase = function Type$setupBase(type) {
+	var baseType = type.__baseType;
+
+	for (var memberName in baseType.prototype) {
+		var memberValue = baseType.prototype[memberName];
+		if (!type.prototype[memberName]) {
+			type.prototype[memberName] = memberValue;
+		}
+	}
+};
+
+ss.getBaseType = function ss$getBaseType(type) {
+	return type.__baseType || (type === Object ? null : Object);
+};
+
+ss.getTypeFullName = function ss$getTypeFullName(type) {
+	if (type === Array) return 'Array';
+	if (type === Boolean) return 'Boolean';
+	if (type === Date) return 'Date';
+	if (type === Error) return 'Error';
+	if (type === Function) return 'Function';
+	if (type === Number) return 'Number';
+	if (type === Object) return 'Object';
+	if (type === RegExp) return 'RegExp';
+	if (type === String) return 'String';
+	return type.__typeName || 'Object';
+};
+
+ss.getTypeName = function ss$getTypeName(type) {
+	var fullName = ss.getTypeFullName(type);
+	var bIndex = fullName.indexOf('[');
+	var nsIndex = fullName.lastIndexOf('.', bIndex >= 0 ? bIndex : fullName.length);
+	return nsIndex > 0 ? fullName.substr(nsIndex + 1) : fullName;
+};
+
+ss.getInterfaces = function ss$getInterfaces(type) {
+	if (type === Array)
+		return [ ss_IEnumerable, ss_ICollection, ss_IList ];
+	else if (type === Date || type === Number)
+		return [ ss_IEquatable, ss_IComparable, ss_IFormattable ];
+	else if (type === Boolean || type === String)
+		return [ ss_IEquatable, ss_IComparable ];
+	else
+		return type.__interfaces || [];
+};
+
+ss.isInstanceOfType = function ss$isInstanceOfType(instance, type) {
+	if (ss.isNullOrUndefined(instance))
+		return false;
+
+	if (typeof(type.isInstanceOfType) === 'function')
+		return type.isInstanceOfType(instance);
+
+	if ((type == Object) || (instance instanceof type)) {
+		return true;
+	}
+
+	return ss.isAssignableFrom(type, ss.getInstanceType(instance));
+};
+
+ss.isAssignableFrom = function ss$isAssignableFrom(target, type) {
+	if ((target == Object) || (target == type)) {
+		return true;
+	}
+	if (target.__class) {
+		var baseType = type.__baseType;
+		while (baseType) {
+			if (target == baseType) {
+				return true;
+			}
+			baseType = baseType.__baseType;
+		}
+	}
+	else if (target.__interface) {
+		var interfaces = ss.getInterfaces(type);
+		if (interfaces && ss.contains(interfaces, target)) {
+			return true;
+		}
+
+		var baseType = ss.getBaseType(type);
+		while (baseType) {
+			interfaces = ss.getInterfaces(baseType);
+			if (interfaces && ss.contains(interfaces, target)) {
+				return true;
+			}
+			baseType = ss.getBaseType(baseType);
+		}
+	}
+	return false;
+};
+
+ss.hasProperty = function ss$hasProperty(instance, name) {
+	return typeof(instance['get_' + name]) === 'function' || typeof(instance['set_' + name]) === 'function';
+};
+
+ss.isClass = function Type$isClass(type) {
+	return (type.__class == true || type === Array || type === Function || type === RegExp || type === String || type === Error || type === Object);
+};
+
+ss.isEnum = function Type$isEnum(type) {
+	return (type.__enum == true);
+};
+
+ss.isFlags = function Type$isFlags(type) {
+	return ((type.__enum == true) && (type.__flags == true));
+};
+
+ss.isInterface = function Type$isInterface(type) {
+	return (type.__interface == true);
+};
+
+ss.safeCast = function ss$safeCast(instance, type) {
+	return ss.isInstanceOfType(instance, type) ? instance : null;
+};
+
+ss.cast = function ss$cast(instance, type) {
+	if (instance === null)
+		return null;
+	else if (typeof(instance) === "undefined" || ss.isInstanceOfType(instance, type)) {
+		return instance;
+	}
+	throw 'Cannot cast object to type ' + ss.getTypeFullName(type);
+};
+
+ss.getInstanceType = function ss$getInstanceType(instance) {
+	if (instance === null)
+		throw 'Cannot get type of null';
+	if (typeof(instance) === "undefined")
+		throw 'Cannot get type of undefined';
+
+	var ctor = null;
+
+	// NOTE: We have to catch exceptions because the constructor
+	//       cannot be looked up on native COM objects
+	try {
+		ctor = instance.constructor;
+	}
+	catch (ex) {
+	}
+	return ctor || Object;
+};
+
+ss.getType = function ss$getType(typeName) {
+	if (!typeName) {
+		return null;
+	}
+
+	if (!ss.__typeCache) {
+		ss.__typeCache = {};
+	}
+
+	var type = ss.__typeCache[typeName];
+	if (!type) {
+		var arr = typeName.split(',');
+		var type = (arr.length > 1 ? require(arr[1].trim) : global);
+
+		var parts = arr[0].trim().split('.');
+		for (var i = 0; i < parts.length; i++) {
+			type = type[parts[i]];
+			if (!type)
+				break;
+		}
+
+		ss.__typeCache[typeName] = type || null;
+	}
+	return type;
+};
+
+ss.getDefaultValue = function ss$getDefaultValue(type) {
+	if (typeof(type.getDefaultValue) === 'function')
+		return type.getDefaultValue();
+	else if (type === Boolean)
+		return false;
+	else if (type === Date)
+		return new Date(0);
+	else if (type === Number)
+		return 0;
+	return null;
+};
+
+ss.createInstance = function ss$createInstance(type) {
+	if (typeof(type.createInstance) === 'function')
+		return type.createInstance();
+	else if (type === Boolean)
+		return false;
+	else if (type === Date)
+		return new Date(0);
+	else if (type === Number)
+		return 0;
+	else if (type === String)
+		return '';
+	else
+		return new type();
+};
+
+ss.applyConstructor = function ss$applyConstructor(constructor, args) {
+    var f = function() {
+        return constructor.apply(this, args);
+    };
+    f.prototype = constructor.prototype;
+    return new f();
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// IFormattable
+
+var ss_IFormattable = function IFormattable$() { };
+ss_IFormattable.prototype = {
+	format: null
+};
+
+ss.registerInterface(global, 'ss.IFormattable', ss_IFormattable);
+
+ss.format = function ss$format(obj, fmt) {
+	if (typeof(obj) === 'number')
+		return ss.formatNumber(obj, fmt);
+	else if (ss.isDate(obj))
+		return ss.formatDate(obj, fmt);
+	else
+		return obj.format(fmt);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// IComparable
+
+var ss_IComparable = function IComparable$() { };
+ss_IComparable.prototype = {
+	compareTo: null
+};
+
+ss.registerInterface(global, 'ss.IComparable', ss_IComparable);
+
+///////////////////////////////////////////////////////////////////////////////
+// IEquatable
+
+var ss_IEquatable = function IEquatable$() { };
+ss_IEquatable.prototype = {
+	equalsT: null
+};
+
+ss.registerInterface(global, 'ss.IEquatable', ss_IEquatable);
+
+///////////////////////////////////////////////////////////////////////////////
+// Object Extensions
+
+ss.clearKeys = function ss$clearKeys(d) {
+	for (var n in d) {
+		if (d.hasOwnProperty(n))
+			delete d[n];
+	}
+};
+
+ss.keyExists = function ss$keyExists(d, key) {
+	return d[key] !== undefined;
+};
+
+if (!Object.keys) {
+	Object.keys = function Object$keys(d) {
+		var keys = [];
+		for (var n in d) {
+			if (d.hasOwnProperty(n))
+				keys.push(n);
+		}
+		return keys;
+	};
+
+	ss.getKeyCount = function ss$getKeyCount(d) {
+		var count = 0;
+		for (var n in d) {
+			if (d.hasOwnProperty(n))
+				count++;
+		}
+		return count;
+	};
+}
+else {
+	ss.getKeyCount = function ss$getKeyCount2(d) {
+		return Object.keys(d).length;
+	};
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Number Extensions
+
+ss.formatNumber = function ss$formatNumber(num, format) {
+	if (ss.isNullOrUndefined(format) || (format.length == 0) || (format == 'i')) {
+		return num.toString();
+	}
+	return ss._netFormatNumber(num, format, false);
+};
+
+ss.localeFormatNumber = function ss$localeFormatNumber(num, format) {
+	if (ss.isNullOrUndefined(format) || (format.length == 0) || (format == 'i')) {
+		return num.toLocaleString();
+	}
+	return ss._netFormatNumber(num, format, true);
+};
+
+ss._commaFormatNumber = function ss$_commaFormat(number, groups, decimal, comma) {
+	var decimalPart = null;
+	var decimalIndex = number.indexOf(decimal);
+	if (decimalIndex > 0) {
+		decimalPart = number.substr(decimalIndex);
+		number = number.substr(0, decimalIndex);
+	}
+
+	var negative = ss.startsWithString(number, '-');
+	if (negative) {
+		number = number.substr(1);
+	}
+
+	var groupIndex = 0;
+	var groupSize = groups[groupIndex];
+	if (number.length < groupSize) {
+		return (negative ? '-' : '') + (decimalPart ? number + decimalPart : number);
+	}
+
+	var index = number.length;
+	var s = '';
+	var done = false;
+	while (!done) {
+		var length = groupSize;
+		var startIndex = index - length;
+		if (startIndex < 0) {
+			groupSize += startIndex;
+			length += startIndex;
+			startIndex = 0;
+			done = true;
+		}
+		if (!length) {
+			break;
+		}
+		
+		var part = number.substr(startIndex, length);
+		if (s.length) {
+			s = part + comma + s;
+		}
+		else {
+			s = part;
+		}
+		index -= length;
+
+		if (groupIndex < groups.length - 1) {
+			groupIndex++;
+			groupSize = groups[groupIndex];
+		}
+	}
+
+	if (negative) {
+		s = '-' + s;
+	}    
+	return decimalPart ? s + decimalPart : s;
+};
+
+ss._netFormatNumber = function ss$_netFormatNumber(num, format, useLocale) {
+	var nf = useLocale ? ss_CultureInfo.CurrentCulture.numberFormat : ss_CultureInfo.InvariantCulture.numberFormat;
+
+	var s = '';    
+	var precision = -1;
+	
+	if (format.length > 1) {
+		precision = parseInt(format.substr(1));
+	}
+
+	var fs = format.charAt(0);
+	switch (fs) {
+		case 'd': case 'D':
+			s = parseInt(Math.abs(num)).toString();
+			if (precision != -1) {
+				s = ss.padLeftString(s, precision, 0x30);
+			}
+			if (num < 0) {
+				s = '-' + s;
+			}
+			break;
+		case 'x': case 'X':
+			s = parseInt(Math.abs(num)).toString(16);
+			if (fs == 'X') {
+				s = s.toUpperCase();
+			}
+			if (precision != -1) {
+				s = ss.padLeftString(s, precision, 0x30);
+			}
+			break;
+		case 'e': case 'E':
+			if (precision == -1) {
+				s = num.toExponential();
+			}
+			else {
+				s = num.toExponential(precision);
+			}
+			if (fs == 'E') {
+				s = s.toUpperCase();
+			}
+			break;
+		case 'f': case 'F':
+		case 'n': case 'N':
+			if (precision == -1) {
+				precision = nf.numberDecimalDigits;
+			}
+			s = num.toFixed(precision).toString();
+			if (precision && (nf.numberDecimalSeparator != '.')) {
+				var index = s.indexOf('.');
+				s = s.substr(0, index) + nf.numberDecimalSeparator + s.substr(index + 1);
+			}
+			if ((fs == 'n') || (fs == 'N')) {
+				s = ss._commaFormatNumber(s, nf.numberGroupSizes, nf.numberDecimalSeparator, nf.numberGroupSeparator);
+			}
+			break;
+		case 'c': case 'C':
+			if (precision == -1) {
+				precision = nf.currencyDecimalDigits;
+			}
+			s = Math.abs(num).toFixed(precision).toString();
+			if (precision && (nf.currencyDecimalSeparator != '.')) {
+				var index = s.indexOf('.');
+				s = s.substr(0, index) + nf.currencyDecimalSeparator + s.substr(index + 1);
+			}
+			s = ss._commaFormatnumber(s, nf.currencyGroupSizes, nf.currencyDecimalSeparator, nf.currencyGroupSeparator);
+			if (num < 0) {
+				s = ss.formatString(nf.currencyNegativePattern, s);
+			}
+			else {
+				s = ss.formatString(nf.currencyPositivePattern, s);
+			}
+			break;
+		case 'p': case 'P':
+			if (precision == -1) {
+				precision = nf.percentDecimalDigits;
+			}
+			s = (Math.abs(num) * 100.0).toFixed(precision).toString();
+			if (precision && (nf.percentDecimalSeparator != '.')) {
+				var index = s.indexOf('.');
+				s = s.substr(0, index) + nf.percentDecimalSeparator + s.substr(index + 1);
+			}
+			s = ss._commaFormatNumber(s, nf.percentGroupSizes, nf.percentDecimalSeparator, nf.percentGroupSeparator);
+			if (num < 0) {
+				s = ss.formatString(nf.percentNegativePattern, s);
+			}
+			else {
+				s = ss.formatString(nf.percentPositivePattern, s);
+			}
+			break;
+	}
+
+	return s;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// String Extensions
+
+ss.compareStrings = function ss$compareStrings(s1, s2, ignoreCase) {
+	if (ignoreCase) {
+		if (s1) {
+			s1 = s1.toUpperCase();
+		}
+		if (s2) {
+			s2 = s2.toUpperCase();
+		}
+	}
+	s1 = s1 || '';
+	s2 = s2 || '';
+
+	if (s1 == s2) {
+		return 0;
+	}
+	if (s1 < s2) {
+		return -1;
+	}
+	return 1;
+};
+
+ss.concatStrings = function ss$concatStrings() {
+	return Array.prototype.join.call(arguments, '');
+};
+
+ss.endsWithString = function ss$endsWithString(s, suffix) {
+	if (!suffix.length) {
+		return true;
+	}
+	if (suffix.length > s.length) {
+		return false;
+	}
+	return (s.substr(s.length - suffix.length) == suffix);
+};
+
+ss._formatString = function ss$_formatString(format, values, useLocale) {
+	if (!ss._formatRE) {
+		ss._formatRE = /(\{[^\}^\{]+\})/g;
+	}
+
+	return format.replace(ss._formatRE,
+						  function(str, m) {
+							  var index = parseInt(m.substr(1));
+							  var value = values[index + 1];
+							  if (ss.isNullOrUndefined(value)) {
+								  return '';
+							  }
+							  if (ss.isInstanceOfType(value, ss_IFormattable)) {
+								  var formatSpec = null;
+								  var formatIndex = m.indexOf(':');
+								  if (formatIndex > 0) {
+									  formatSpec = m.substring(formatIndex + 1, m.length - 1);
+								  }
+								  return ss.format(value, formatSpec);
+							  }
+							  else {
+								  return useLocale ? value.toLocaleString() : value.toString();
+							  }
+						  });
+};
+
+ss.formatString = function String$format(format) {
+	return ss._formatString(format, arguments, /* useLocale */ false);
+};
+
+ss.stringFromChar = function ss$stringFromChar(ch, count) {
+	var s = ch;
+	for (var i = 1; i < count; i++) {
+		s += ch;
+	}
+	return s;
+};
+
+ss.htmlDecode = function ss$htmlDecode(s) {
+	var div = document.createElement('div');
+	div.innerHTML = s;
+	return div.textContent || div.innerText;
+};
+
+ss.htmlEncode = function ss$htmlEncode(s) {
+	var div = document.createElement('div');
+	div.appendChild(document.createTextNode(s));
+	return div.innerHTML.replace(/\"/g, '&quot;');
+};
+
+ss.indexOfAnyString = function ss$indexOfAnyString(s, chars, startIndex, count) {
+	var length = s.length;
+	if (!length) {
+		return -1;
+	}
+
+	chars = String.fromCharCode.apply(null, chars);
+	startIndex = startIndex || 0;
+	count = count || length;
+
+	var endIndex = startIndex + count - 1;
+	if (endIndex >= length) {
+		endIndex = length - 1;
+	}
+
+	for (var i = startIndex; i <= endIndex; i++) {
+		if (chars.indexOf(s.charAt(i)) >= 0) {
+			return i;
+		}
+	}
+	return -1;
+};
+
+ss.insertString = function ss$insertString(s, index, value) {
+	if (!value) {
+		return s;
+	}
+	if (!index) {
+		return value + s;
+	}
+	var s1 = s.substr(0, index);
+	var s2 = s.substr(index);
+	return s1 + value + s2;
+};
+
+ss.isNullOrEmptyString = function ss$isNullOrEmptyString(s) {
+	return !s || !s.length;
+};
+
+ss.lastIndexOfAnyString = function ss$lastIndexOfAnyString(s, chars, startIndex, count) {
+	var length = s.length;
+	if (!length) {
+		return -1;
+	}
+
+	chars = String.fromCharCode.apply(null, chars);
+	startIndex = startIndex || length - 1;
+	count = count || length;
+
+	var endIndex = startIndex - count + 1;
+	if (endIndex < 0) {
+		endIndex = 0;
+	}
+
+	for (var i = startIndex; i >= endIndex; i--) {
+		if (chars.indexOf(s.charAt(i)) >= 0) {
+			return i;
+		}
+	}
+	return -1;
+};
+
+ss.localeFormatString = function ss$localeFormatString(format) {
+	return ss._formatString(format, arguments, /* useLocale */ true);
+};
+
+ss.padLeftString = function ss$padLeftString(s, totalWidth, ch) {
+	if (s.length < totalWidth) {
+		ch = String.fromCharCode(ch || 0x20);
+		return ss.stringFromChar(ch, totalWidth - s.length) + s;
+	}
+	return s;
+};
+
+ss.padRightString = function ss$padRightString(s, totalWidth, ch) {
+	if (s.length < totalWidth) {
+		ch = String.fromCharCode(ch || 0x20);
+		return s + ss.stringFromChar(ch, totalWidth - s.length);
+	}
+	return s;
+};
+
+ss.removeString = function ss$removeString(s, index, count) {
+	if (!count || ((index + count) > this.length)) {
+		return s.substr(0, index);
+	}
+	return s.substr(0, index) + s.substr(index + count);
+};
+
+ss.replaceAllString = function ss$replaceAllString(s, oldValue, newValue) {
+	newValue = newValue || '';
+	return s.split(oldValue).join(newValue);
+};
+
+ss.startsWithString = function ss$startsWithString(s, prefix) {
+	if (!prefix.length) {
+		return true;
+	}
+	if (prefix.length > s.length) {
+		return false;
+	}
+	return (s.substr(0, prefix.length) == prefix);
+};
+
+if (!String.prototype.trim) {
+	String.prototype.trim = function String$trim() {
+		return ss.trimStartString(ss.trimEndString(this));
+	};
+}
+
+ss.trimEndString = function ss$trimEndString(s) {
+	return s.replace(/\s*$/, '');
+};
+
+ss.trimStartString = function ss$trimStartString(s) {
+	return s.replace(/^\s*/, '');
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// Array Extensions
+
+ss.arrayGet2 = function ss$arrayGet2(arr, indices) {
+	if (indices.length != (arr._sizes ? arr._sizes.length : 1))
+		throw 'Invalid number of indices';
+
+	if (indices[0] < 0 || indices[0] >= (arr._sizes ? arr._sizes[0] : arr.length))
+		throw 'Index 0 out of range';
+
+	var idx = indices[0];
+	if (arr._sizes) {
+		for (var i = 1; i < arr._sizes.length; i++) {
+			if (indices[i] < 0 || indices[i] >= arr._sizes[i])
+				throw 'Index ' + i + ' out of range';
+			idx = idx * arr._sizes[i] + indices[i];
+		}
+	}
+	var r = arr[idx];
+	return typeof r !== 'undefined' ? r : arr._defvalue;
+};
+
+ss.arrayGet = function ss$arrayGet(arr) {
+	return ss.arrayGet2(arr, Array.prototype.slice.call(arguments, 1));
+}
+
+ss.arraySet2 = function ss$arraySet2(arr, value, indices) {
+	if (indices.length != (arr._sizes ? arr._sizes.length : 1))
+		throw 'Invalid number of indices';
+
+	if (indices[0] < 0 || indices[0] >= (arr._sizes ? arr._sizes[0] : arr.length))
+		throw 'Index 0 out of range';
+
+	var idx = indices[0];
+	if (arr._sizes) {
+		for (var i = 1; i < arr._sizes.length; i++) {
+			if (indices[i] < 0 || indices[i] >= arr._sizes[i])
+				throw 'Index ' + i + ' out of range';
+			idx = idx * arr._sizes[i] + indices[i];
+		}
+	}
+	arr[idx] = value;
+};
+
+ss.arraySet = function ss$arraySet() {
+	return ss.arraySet2(arguments[0], arguments[arguments.length - 1], Array.prototype.slice.call(arguments, 1, arguments.length - 1));
+};
+
+ss.arrayRank = function ss$arrayRank(arr) {
+	return arr._sizes ? arr._sizes.length : 1;
+};
+
+ss.arrayLength = function ss$arrayLength(arr, dimension) {
+	if (dimension >= (arr._sizes ? arr._sizes.length : 1))
+		throw 'Invalid dimension';
+	return arr._sizes ? arr._sizes[dimension] : arr.length;
+};
+
+ss.arrayExtract = function ss$arrayExtract(arr, start, count) {
+	if (!ss.isValue(count)) {
+		return arr.slice(start);
+	}
+	return arr.slice(start, start + count);
+};
+
+ss.arrayAddRange = function ss$arrayAddRange(arr, items) {
+	if (items instanceof Array) {
+		arr.push.apply(arr, items);
+	}
+	else {
+		var e = ss.getEnumerator(items);
+		try {
+			while (e.moveNext()) {
+				ss.add(arr, e.current());
+			}
+		}
+		finally {
+			if (ss.isInstanceOfType(e, ss_IDisposable)) {
+				ss.cast(e, ss_IDisposable).dispose();
+			}
+		}
+	}
+};
+
+ss.arrayClone = function ss$arrayClone(arr) {
+	if (arr.length === 1) {
+		return [arr[0]];
+	}
+	else {
+		return Array.apply(null, arr);
+	}
+};
+
+ss.arrayPeekFront = function ss$arrayPeekFront(arr) {
+	if (arr.length)
+		return arr[0];
+	throw 'Array is empty';
+};
+
+ss.arrayPeekBack = function ss$arrayPeekBack(arr) {
+	if (arr.length)
+		return arr[arr.length - 1];
+	throw 'Array is empty';
+};
+
+if (!Array.prototype.every) {
+	Array.prototype.every = function Array$every(callback, instance) {
+		var length = this.length;
+		for (var i = 0; i < length; i++) {
+			if (i in this && !callback.call(instance, this[i], i, this)) {
+				return false;
+			}
+		}
+		return true;
+	};
+}
+
+if (!Array.prototype.filter) {
+	Array.prototype.filter = function Array$filter(callback, instance) {
+		var length = this.length;    
+		var filtered = [];
+		for (var i = 0; i < length; i++) {
+			if (i in this) {
+				var val = this[i];
+				if (callback.call(instance, val, i, this)) {
+					filtered.push(val);
+				}
+			}
+		}
+		return filtered;
+	};
+}
+
+if (!Array.prototype.forEach) {
+	Array.prototype.forEach = function Array$forEach(callback, instance) {
+		var length = this.length;
+		for (var i = 0; i < length; i++) {
+			if (i in this) {
+				callback.call(instance, this[i], i, this);
+			}
+		}
+	};
+}
+
+ss.indexOfArray = function ss$indexOfArray(arr, item, startIndex) {
+	startIndex = startIndex || 0;
+	for (var i = startIndex; i < arr.length; i++) {
+		if (ss.staticEquals(arr[i], item)) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+ss.arrayInsertRange = function ss$arrayInsertRange(arr, index, items) {
+	if (items instanceof Array) {
+		if (index === 0) {
+			arr.unshift.apply(arr, items);
+		}
+		else {
+			for (var i = 0; i < items.length; i++) {
+				arr.splice(index + i, 0, items[i]);
+			}
+		}
+	}
+	else {
+		var e = ss.getEnumerator(items);
+		try {
+			while (e.moveNext()) {
+				arr.insert(index, e.current());
+				index++;
+			}
+		}
+		finally {
+			if (ss.isInstanceOfType(e, ss_IDisposable)) {
+				ss.cast(e, ss_IDisposable).dispose();
+			}
+		}
+	}
+};
+
+if (!Array.prototype.map) {
+	Array.prototype.map = function Array$map(callback, instance) {
+		var length = this.length;
+		var mapped = new Array(length);
+		for (var i = 0; i < length; i++) {
+			if (i in this) {
+				mapped[i] = callback.call(instance, this[i], i, this);
+			}
+		}
+		return mapped;
+	};
+}
+
+ss.arrayRemoveRange = function ss$arrayRemoveRange(arr, index, count) {
+	arr.splice(index, count);
+};
+
+if (!Array.prototype.some) {
+	Array.prototype.some = function Array$some(callback, instance) {
+		var length = this.length;
+		for (var i = 0; i < length; i++) {
+			if (i in this && callback.call(instance, this[i], i, this)) {
+				return true;
+			}
+		}
+		return false;
+	};
+}
+
+ss.arrayFromEnumerable = function ss$arrayFromEnumerable(enm) {
+	var e = ss.getEnumerator(enm), r = [];
+	try {
+		while (e.moveNext())
+			r.push(e.current());
+	}
+	finally {
+		e.dispose();
+	}
+	return r;
+};
+
+ss.multidimArray = function ss$multidimArray(defvalue, sizes) {
+	var arr = [];
+	arr._defvalue = defvalue;
+	arr._sizes = [arguments[1]];
+	var length = arguments[1];
+	for (var i = 2; i < arguments.length; i++) {
+		length *= arguments[i];
+		arr._sizes[i - 1] = arguments[i];
+	}
+	arr.length = length;
+	return arr;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// Date Extensions
+
+ss.utcNow = function ss$utcNow() {
+	var d = new Date();
+	return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds(), d.getMilliseconds()));
+};
+
+ss.today = function ss$today() {
+	var d = new Date();
+	return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+ss.formatDate = function ss$formatDate(date, format) {
+	if (ss.isNullOrUndefined(format) || (format.length == 0) || (format == 'i')) {
+		return date.toString();
+	}
+	if (format == 'id') {
+		return date.toDateString();
+	}
+	if (format == 'it') {
+		return date.toTimeString();
+	}
+
+	return ss._netFormatDate(date, format, false);
+};
+
+ss.localeFormatDate = function ss$localeFormatDate(date, format) {
+	if (ss.isNullOrUndefined(format) || (format.length == 0) || (format == 'i')) {
+		return date.toLocaleString();
+	}
+	if (format == 'id') {
+		return date.toLocaleDateString();
+	}
+	if (format == 'it') {
+		return date.toLocaleTimeString();
+	}
+
+	return ss._netFormatDate(date, format, true);
+};
+
+ss._netFormatDate = function ss$_netFormatDate(dt, format, useLocale) {
+	var dtf = useLocale ? ss_CultureInfo.CurrentCulture.dateFormat : ss_CultureInfo.InvariantCulture.dateFormat;
+
+	if (format.length == 1) {
+		switch (format) {
+			case 'f': format = dtf.longDatePattern + ' ' + dtf.shortTimePattern; break;
+			case 'F': format = dtf.dateTimePattern; break;
+
+			case 'd': format = dtf.shortDatePattern; break;
+			case 'D': format = dtf.longDatePattern; break;
+
+			case 't': format = dtf.shortTimePattern; break;
+			case 'T': format = dtf.longTimePattern; break;
+
+			case 'g': format = dtf.shortDatePattern + ' ' + dtf.shortTimePattern; break;
+			case 'G': format = dtf.shortDatePattern + ' ' + dtf.longTimePattern; break;
+
+			case 'R': case 'r':
+				dtf = ss_CultureInfo.InvariantCulture.dateFormat;
+				format = dtf.gmtDateTimePattern;
+				break;
+			case 'u': format = dtf.universalDateTimePattern; break;
+			case 'U':
+				format = dtf.dateTimePattern;
+				dt = new Date(dt.getUTCFullYear(), dt.getUTCMonth(), dt.getUTCDate(),
+							  dt.getUTCHours(), dt.getUTCMinutes(), dt.getUTCSeconds(), dt.getUTCMilliseconds());
+				break;
+
+			case 's': format = dtf.sortableDateTimePattern; break;
+		}
+	}
+
+	if (format.charAt(0) == '%') {
+		format = format.substr(1);
+	}
+
+	if (!Date._formatRE) {
+		Date._formatRE = /'.*?[^\\]'|dddd|ddd|dd|d|MMMM|MMM|MM|M|yyyy|yy|y|hh|h|HH|H|mm|m|ss|s|tt|t|fff|ff|f|zzz|zz|z/g;
+	}
+
+	var re = Date._formatRE;
+	var sb = new ss_StringBuilder();
+
+	re.lastIndex = 0;
+	while (true) {
+		var index = re.lastIndex;
+		var match = re.exec(format);
+
+		sb.append(format.slice(index, match ? match.index : format.length));
+		if (!match) {
+			break;
+		}
+
+		var fs = match[0];
+		var part = fs;
+		switch (fs) {
+			case 'dddd':
+				part = dtf.dayNames[dt.getDay()];
+				break;
+			case 'ddd':
+				part = dtf.shortDayNames[dt.getDay()];
+				break;
+			case 'dd':
+				part = ss.padLeftString(dt.getDate().toString(), 2, 0x30);
+				break;
+			case 'd':
+				part = dt.getDate();
+				break;
+			case 'MMMM':
+				part = dtf.monthNames[dt.getMonth()];
+				break;
+			case 'MMM':
+				part = dtf.shortMonthNames[dt.getMonth()];
+				break;
+			case 'MM':
+				part = ss.padLeftString((dt.getMonth() + 1).toString(), 2, 0x30);
+				break;
+			case 'M':
+				part = (dt.getMonth() + 1);
+				break;
+			case 'yyyy':
+				part = dt.getFullYear();
+				break;
+			case 'yy':
+				part = ss.padLeftString((dt.getFullYear() % 100).toString(), 2, 0x30);
+				break;
+			case 'y':
+				part = (dt.getFullYear() % 100);
+				break;
+			case 'h': case 'hh':
+				part = dt.getHours() % 12;
+				if (!part) {
+					part = '12';
+				}
+				else if (fs == 'hh') {
+					part = ss.padLeftString(part.toString(), 2, 0x30);
+				}
+				break;
+			case 'HH':
+				part = ss.padLeftString(dt.getHours().toString(), 2, 0x30);
+				break;
+			case 'H':
+				part = dt.getHours();
+				break;
+			case 'mm':
+				part = ss.padLeftString(dt.getMinutes().toString(), 2, 0x30);
+				break;
+			case 'm':
+				part = dt.getMinutes();
+				break;
+			case 'ss':
+				part = ss.padLeftString(dt.getSeconds().toString(), 2, 0x30);
+				break;
+			case 's':
+				part = dt.getSeconds();
+				break;
+			case 't': case 'tt':
+				part = (dt.getHours() < 12) ? dtf.amDesignator : dtf.pmDesignator;
+				if (fs == 't') {
+					part = part.charAt(0);
+				}
+				break;
+			case 'fff':
+				part = ss.padLeftString(dt.getMilliseconds().toString(), 3, 0x30);
+				break;
+			case 'ff':
+				part = ss.padLeftString(dt.getMilliseconds().toString(), 3).substr(0, 2);
+				break;
+			case 'f':
+				part = ss.padLeftString(dt.getMilliseconds().toString(), 3).charAt(0);
+				break;
+			case 'z':
+				part = dt.getTimezoneOffset() / 60;
+				part = ((part >= 0) ? '-' : '+') + Math.floor(Math.abs(part));
+				break;
+			case 'zz': case 'zzz':
+				part = dt.getTimezoneOffset() / 60;
+				part = ((part >= 0) ? '-' : '+') + Math.floor(ss.padLeftString(Math.abs(part)).toString(), 2, 0x30);
+				if (fs == 'zzz') {
+					part += dtf.timeSeparator + Math.abs(ss.padLeftString(dt.getTimezoneOffset() % 60).toString(), 2, 0x30);
+				}
+				break;
+			default:
+				if (part.charAt(0) == '\'') {
+					part = part.substr(1, part.length - 2).replace(/\\'/g, '\'');
+				}
+				break;
+		}
+		sb.append(part);
+	}
+
+	return sb.toString();
+};
+
+ss._parseExactDate = function ss$_parseExactDate(val, format, culture, utc) {
+	culture = culture || ss_CultureInfo.CurrentCulture;
+	var AM = culture.amDesignator, PM = culture.pmDesignator;
+
+	var _isInteger = function(val) {
+		var digits="1234567890";
+		for (var i=0; i < val.length; i++) {
+			if (digits.indexOf(val.charAt(i))==-1) {
+				return false;
+			}
+		}
+		return true;
+	};
+
+	var _getInt = function(str,i,minlength,maxlength) {
+		for (var x=maxlength; x>=minlength; x--) {
+			var token=str.substring(i,i+x);
+			if (token.length < minlength) {
+				return null;
+			}
+			if (_isInteger(token)) {
+				return token;
+			}
+		}
+		return null;
+	};
+
+	val = val + "";
+	format = format + "";
+	var i_val = 0;
+	var i_format = 0;
+	var c = "";
+	var token = "";
+
+	var year = 0, month = 1, date = 1, hh = 0, mm = 0, _ss = 0, ampm = "";
+		
+	while (i_format < format.length) {
+		// Get next token from format string
+		c = format.charAt(i_format);
+		token = "";
+		while ((format.charAt(i_format) == c) && (i_format < format.length)) {
+			token += format.charAt(i_format++);
+		}
+		// Extract contents of value based on format token
+		if (token=="yyyy" || token=="yy" || token=="y") {
+			if (token == "yyyy")
+				year = _getInt(val, i_val, 4, 4);
+			if (token == "yy")
+				year = _getInt(val, i_val, 2, 2);
+			if (token == "y")
+				year = _getInt(val, i_val, 2, 4);
+
+			if (year == null)
+				return null;
+
+			i_val += year.length;
+			if (year.length == 2) {
+				if (year > 30) {
+					year = 1900 + (year-0);
+				}
+				else {
+					year = 2000 + (year-0);
+				}
+			}
+		}
+		else if (token == "MM" || token == "M") {
+			month = _getInt(val, i_val, token.length, 2);
+			if (month == null || (month < 1) || (month > 12))
+				return null;
+			i_val += month.length;
+		}
+		else if (token=="dd"||token=="d") {
+			date = _getInt(val, i_val, token.length, 2);
+			if (date == null || (date < 1) || (date > 31))
+				return null;
+			i_val += date.length;
+		}
+		else if (token=="hh"||token=="h") {
+			hh = _getInt(val, i_val, token.length, 2);
+			if (hh == null || (hh < 1) || (hh > 12))
+				return null;
+			i_val += hh.length;
+		}
+		else if (token=="HH"||token=="H") {
+			hh = _getInt(val, i_val, token.length, 2);
+			if (hh == null || (hh < 0) || (hh > 23))
+				return null;
+			i_val += hh.length;
+		}
+		else if (token == "mm" || token == "m") {
+			mm = _getInt(val, i_val, token.length, 2);
+			if (mm == null || (mm < 0) || (mm > 59))
+				return null;
+			i_val += mm.length;
+		}
+		else if (token == "ss" || token == "s") {
+			_ss = _getInt(val, i_val, token.length, 2);
+			if (_ss == null || (_ss < 0) || (_ss > 59))
+				return null;
+			i_val += _ss.length;
+		}
+		else if (token == "t") {
+			if (val.substring(i_val, i_val + 1).toLowerCase() == AM.charAt(0).toLowerCase())
+				ampm = AM;
+			else if (val.substring(i_val, i_val + 1).toLowerCase() == PM.charAt(0).toLowerCase())
+				ampm = PM;
+			else
+				return null;
+			i_val += 1;
+		}
+		else if (token == "tt") {
+			if (val.substring(i_val, i_val + 2).toLowerCase() == AM.toLowerCase())
+				ampm = AM;
+			else if (val.substring(i_val,i_val+2).toLowerCase() == PM.toLowerCase())
+				ampm = PM;
+			else
+				return null;
+			i_val += 2;
+		}
+		else {
+			if (val.substring(i_val, i_val + token.length) != token)
+				return null;
+			else
+				i_val += token.length;
+		}
+	}
+	// If there are any trailing characters left in the value, it doesn't match
+	if (i_val != val.length)
+		return null;
+
+	// Is date valid for month?
+	if (month == 2) {
+		// Check for leap year
+		if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) { // leap year
+			if (date > 29)
+				return null;
+		}
+		else if (date > 28)
+			return null;
+	}
+	if ((month == 4) || (month == 6) || (month == 9) || (month == 11)) {
+		if (date > 30) {
+			return null;
+		}
+	}
+	// Correct hours value
+	if (hh < 12 && ampm == PM) {
+		hh = hh - 0 + 12;
+	}
+	else if (hh > 11 && ampm == AM) {
+		hh -= 12;
+	}
+
+	if (utc)
+		return new Date(Date.UTC(year, month - 1, date, hh, mm, _ss));
+	else
+		return new Date(year, month - 1, date, hh, mm, _ss);
+};
+
+ss.parseExactDate = function ss$parseExactDate(val, format, culture) {
+	return ss._parseExactDate(val, format, culture, false);
+};
+
+ss.parseExactDateUTC = function ss$parseExactDateUTC(val, format, culture) {
+	return ss._parseExactDate(val, format, culture, true);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// Function Extensions
+
+ss._delegateContains = function ss$_delegateContains(targets, object, method) {
+	for (var i = 0; i < targets.length; i += 2) {
+		if (targets[i] === object && targets[i + 1] === method) {
+			return true;
+		}
+	}
+	return false;
+};
+
+ss._mkdel = function ss$_mkdel(targets) {
+	var delegate = function() {
+		if (targets.length == 2) {
+			return targets[1].apply(targets[0], arguments);
+		}
+		else {
+			var clone = ss.arrayClone(targets);
+			for (var i = 0; i < clone.length; i += 2) {
+				if (ss._delegateContains(targets, clone[i], clone[i + 1])) {
+					clone[i + 1].apply(clone[i], arguments);
+				}
+			}
+			return null;
+		}
+	};
+	delegate._targets = targets;
+
+	return delegate;
+};
+
+ss.mkdel = function ss$mkdel(object, method) {
+	if (!object) {
+		return method;
+	}
+	return ss._mkdel([object, method]);
+};
+
+ss.delegateCombine = function ss$delegateCombine(delegate1, delegate2) {
+	if (!delegate1) {
+		if (!delegate2._targets) {
+			return ss.mkdel(null, delegate2);
+		}
+		return delegate2;
+	}
+	if (!delegate2) {
+		if (!delegate1._targets) {
+			return ss.mkdel(null, delegate1);
+		}
+		return delegate1;
+	}
+
+	var targets1 = delegate1._targets ? delegate1._targets : [null, delegate1];
+	var targets2 = delegate2._targets ? delegate2._targets : [null, delegate2];
+
+	return ss._mkdel(targets1.concat(targets2));
+};
+
+ss.delegateRemove = function ss$delegateRemove(delegate1, delegate2) {
+	if (!delegate1 || (delegate1 === delegate2)) {
+		return null;
+	}
+	if (!delegate2) {
+		return delegate1;
+	}
+
+	var targets = delegate1._targets;
+	var object = null;
+	var method;
+	if (delegate2._targets) {
+		object = delegate2._targets[0];
+		method = delegate2._targets[1];
+	}
+	else {
+		method = delegate2;
+	}
+
+	for (var i = 0; i < targets.length; i += 2) {
+		if ((targets[i] === object) && (targets[i + 1] === method)) {
+			if (targets.length == 2) {
+				return null;
+			}
+			var t = ss.arrayClone(targets);
+			t.splice(i, 2);
+			return ss._mkdel(t);
+		}
+	}
+
+	return delegate1;
+};
+
+ss.delegateEquals = function ss$delegateEquals(a, b) {
+	if (a === b)
+		return true;
+	if (!a._targets && !b._targets)
+		return false;
+	var ta = a._targets || [null, a], tb = b._targets || [null, b];
+	if (ta.length != tb.length)
+		return false;
+	for (var i = 0; i < ta.length; i++) {
+		if (ta[i] !== tb[i])
+			return false;
+	}
+	return true;
+};
+
+ss.delegateClone = function ss$delegateClone(source) {
+	return source._targets ? ss._mkdel(source._targets) : function() { return source.apply(this, arguments); };
+};
+
+ss.thisFix = function ss$thisFix(source) {
+	return function() {
+		var x = [this];
+		for(var i = 0; i < arguments.length; i++)
+			x.push(arguments[i]);
+		return source.apply(source, x);
+	};
+};
+
+ss.getInvocationList = function ss$getInvocationList(delegate) {
+	if (!delegate._targets)
+		return [delegate];
+	var result = [];
+	for (var i = 0; i < delegate._targets.length; i += 2)
+		result.push(ss.mkdel(delegate._targets[i], delegate._targets[i + 1]));
+	return result;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// Debug Extensions
+
+ss.Debug = global.Debug || function() {};
+ss.Debug.__typeName = 'Debug';
+
+if (!ss.Debug.writeln) {
+	ss.Debug.writeln = function Debug$writeln(text) {
+		if (global.console) {
+			if (global.console.debug) {
+				global.console.debug(text);
+				return;
+			}
+			else if (global.console.log) {
+				global.console.log(text);
+				return;
+			}
+		}
+		else if (global.opera &&
+			global.opera.postError) {
+			global.opera.postError(text);
+			return;
+		}
+	}
+};
+
+ss.Debug._fail = function Debug$_fail(message) {
+	ss.Debug.writeln(message);
+	eval('debugger;');
+};
+
+ss.Debug.assert = function Debug$assert(condition, message) {
+	if (!condition) {
+		message = 'Assert failed: ' + message;
+		if (confirm(message + '\r\n\r\nBreak into debugger?')) {
+			ss.Debug._fail(message);
+		}
+	}
+};
+
+ss.Debug.fail = function Debug$fail(message) {
+	ss.Debug._fail(message);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// Enum
+
+var ss_Enum = function Enum$() {
+};
+ss.registerClass(global, 'ss.Enum', ss_Enum);
+
+ss_Enum.parse = function Enum$parse(enumType, s) {
+	var values = enumType.prototype;
+	if (!enumType.__flags) {
+		for (var f in values) {
+			if (f === s) {
+				return values[f];
+			}
+		}
+	}
+	else {
+		var parts = s.split('|');
+		var value = 0;
+		var parsed = true;
+
+		for (var i = parts.length - 1; i >= 0; i--) {
+			var part = parts[i].trim();
+			var found = false;
+
+			for (var f in values) {
+				if (f === part) {
+					value |= values[f];
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				parsed = false;
+				break;
+			}
+		}
+
+		if (parsed) {
+			return value;
+		}
+	}
+	throw 'Invalid Enumeration Value';
+};
+
+ss_Enum.toString = function  Enum$toString(enumType, value) {
+	var values = enumType.prototype;
+	if (!enumType.__flags || (value === 0)) {
+		for (var i in values) {
+			if (values[i] === value) {
+				return i;
+			}
+		}
+		throw 'Invalid Enumeration Value';
+	}
+	else {
+		var parts = [];
+		for (var i in values) {
+			if (values[i] & value) {
+				ss.add(parts, i);
+			}
+		}
+		if (!parts.length) {
+			throw 'Invalid Enumeration Value';
+		}
+		return parts.join(' | ');
+	}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// CultureInfo
+
+var ss_CultureInfo = function CultureInfo$(name, numberFormat, dateFormat) {
+	this.name = name;
+	this.numberFormat = numberFormat;
+	this.dateFormat = dateFormat;
+};
+ss.registerClass(global, 'ss.CultureInfo', ss_CultureInfo);
+
+ss_CultureInfo.InvariantCulture = new ss_CultureInfo('en-US',
+	{
+		naNSymbol: 'NaN',
+		negativeSign: '-',
+		positiveSign: '+',
+		negativeInfinityText: '-Infinity',
+		positiveInfinityText: 'Infinity',
+		
+		percentSymbol: '%',
+		percentGroupSizes: [3],
+		percentDecimalDigits: 2,
+		percentDecimalSeparator: '.',
+		percentGroupSeparator: ',',
+		percentPositivePattern: '{0} %',
+		percentNegativePattern: '-{0} %',
+
+		currencySymbol:'$',
+		currencyGroupSizes: [3],
+		currencyDecimalDigits: 2,
+		currencyDecimalSeparator: '.',
+		currencyGroupSeparator: ',',
+		currencyNegativePattern: '(${0})',
+		currencyPositivePattern: '${0}',
+
+		numberGroupSizes: [3],
+		numberDecimalDigits: 2,
+		numberDecimalSeparator: '.',
+		numberGroupSeparator: ','
+	},
+	{
+		amDesignator: 'AM',
+		pmDesignator: 'PM',
+
+		dateSeparator: '/',
+		timeSeparator: ':',
+
+		gmtDateTimePattern: 'ddd, dd MMM yyyy HH:mm:ss \'GMT\'',
+		universalDateTimePattern: 'yyyy-MM-dd HH:mm:ssZ',
+		sortableDateTimePattern: 'yyyy-MM-ddTHH:mm:ss',
+		dateTimePattern: 'dddd, MMMM dd, yyyy h:mm:ss tt',
+
+		longDatePattern: 'dddd, MMMM dd, yyyy',
+		shortDatePattern: 'M/d/yyyy',
+
+		longTimePattern: 'h:mm:ss tt',
+		shortTimePattern: 'h:mm tt',
+
+		firstDayOfWeek: 0,
+		dayNames: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+		shortDayNames: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+		minimizedDayNames: ['Su','Mo','Tu','We','Th','Fr','Sa'],
+
+		monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December',''],
+		shortMonthNames: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','']
+	});
+ss_CultureInfo.CurrentCulture = ss_CultureInfo.InvariantCulture;
+
+///////////////////////////////////////////////////////////////////////////////
+// IEnumerator
+
+var ss_IEnumerator = function IEnumerator$() { };
+ss_IEnumerator.prototype = {
+	current: null,
+	moveNext: null,
+	reset: null
+};
+
+ss.registerInterface(global, 'ss.IEnumerator', ss_IEnumerator, ss_IDisposable);
+
+///////////////////////////////////////////////////////////////////////////////
+// IEnumerable
+
+var ss_IEnumerable = function IEnumerable$() { };
+ss_IEnumerable.prototype = {
+	getEnumerator: null
+};
+
+ss.registerInterface(global, 'ss.IEnumerable', ss_IEnumerable);
+
+ss.getEnumerator = function ss$getEnumerator(obj) {
+	return ss.isArray(obj) ? new ss_ArrayEnumerator(obj) : obj.getEnumerator();
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// ICollection
+
+var ss_ICollection = function ICollection$() { };
+ss_ICollection.prototype = {
+	get_count: null,
+	add: null,
+	clear: null,
+	contains: null,
+	remove: null
+};
+
+ss.registerInterface(global, 'ss.ICollection', ss_IEnumerable);
+
+ss.count = function ss$count(obj) {
+	return ss.isArray(obj) ? obj.length : obj.get_count();
+};
+
+ss.add = function ss$add(obj, item) {
+	ss.isArray(obj) ? obj.push(item) : obj.add(item);
+};
+
+ss.clear = function ss$clear(obj, item) {
+	ss.isArray(obj) ? (obj.length = 0) : obj.clear();
+};
+
+ss.remove = function ss$remove(obj, item) {
+	if (ss.isArray(obj)) {
+		var index = ss.indexOf(obj, item);
+		if (index >= 0) {
+			obj.splice(index, 1);
+			return true;
+		}
+		return false;
+	}
+	else
+		return obj.remove(item);
+};
+
+ss.contains = function ss$contains(obj, item) {
+	return ss.isArray(obj) ? (ss.indexOf(obj, item) >= 0) : obj.contains(item);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// IEqualityComparer
+
+var ss_IEqualityComparer = function IEqualityComparer$() { };
+ss_IEqualityComparer.prototype = {
+	areEqual: null,
+	getObjectHashCode: null
+};
+
+ss.registerInterface(global, 'ss.IEqualityComparer', ss_IEqualityComparer);
+
+///////////////////////////////////////////////////////////////////////////////
+// IComparer
+
+var ss_IComparer = function IComparer$() { };
+ss_IComparer.prototype = {
+	compare: null
+};
+
+ss.registerInterface(global, 'ss.IComparer', ss_IComparer);
+
+///////////////////////////////////////////////////////////////////////////////
+// Nullable
+
+var ss_Nullable = function Nullable$() {
+};
+
+ss.registerClass(global, 'ss.Nullable', ss_Nullable);
+
+ss_Nullable.unbox = function Nullable$unbox(instance) {
+	if (!ss.isValue(instance))
+		throw 'Instance is null';
+	return instance;
+};
+
+ss_Nullable.eq = function Nullable$eq(a, b) {
+	return !ss.isValue(a) ? !ss.isValue(b) : (a === b);
+};
+
+ss_Nullable.ne = function Nullable$eq(a, b) {
+	return !ss.isValue(a) ? ss.isValue(b) : (a !== b);
+};
+
+ss_Nullable.le = function Nullable$le(a, b) {
+	return ss.isValue(a) && ss.isValue(b) && a <= b;
+};
+
+ss_Nullable.ge = function Nullable$ge(a, b) {
+	return ss.isValue(a) && ss.isValue(b) && a >= b;
+};
+
+ss_Nullable.lt = function Nullable$lt(a, b) {
+	return ss.isValue(a) && ss.isValue(b) && a < b;
+};
+
+ss_Nullable.gt = function Nullable$gt(a, b) {
+	return ss.isValue(a) && ss.isValue(b) && a > b;
+};
+
+ss_Nullable.sub = function Nullable$sub(a, b) {
+	return ss.isValue(a) && ss.isValue(b) ? a - b : null;
+};
+
+ss_Nullable.add = function Nullable$add(a, b) {
+	return ss.isValue(a) && ss.isValue(b) ? a + b : null;
+};
+
+ss_Nullable.mod = function Nullable$mod(a, b) {
+	return ss.isValue(a) && ss.isValue(b) ? a % b : null;
+};
+
+ss_Nullable.div = function Nullable$divf(a, b) {
+	return ss.isValue(a) && ss.isValue(b) ? a / b : null;
+};
+
+ss_Nullable.mul = function Nullable$mul(a, b) {
+	return ss.isValue(a) && ss.isValue(b) ? a * b : null;
+};
+
+ss_Nullable.band = function Nullable$band(a, b) {
+	return ss.isValue(a) && ss.isValue(b) ? a & b : null;
+};
+
+ss_Nullable.bor = function Nullable$bor(a, b) {
+	return ss.isValue(a) && ss.isValue(b) ? a | b : null;
+};
+
+ss_Nullable.xor = function Nullable$xor(a, b) {
+	return ss.isValue(a) && ss.isValue(b) ? a ^ b : null;
+};
+
+ss_Nullable.shl = function Nullable$shl(a, b) {
+	return ss.isValue(a) && ss.isValue(b) ? a << b : null;
+};
+
+ss_Nullable.srs = function Nullable$srs(a, b) {
+	return ss.isValue(a) && ss.isValue(b) ? a >> b : null;
+};
+
+ss_Nullable.sru = function Nullable$sru(a, b) {
+	return ss.isValue(a) && ss.isValue(b) ? a >>> b : null;
+};
+
+ss_Nullable.and = function Nullable$and(a, b) {
+	if (a === true && b === true)
+		return true;
+	else if (a === false || b === false)
+		return false;
+	else
+		return null;
+};
+
+ss_Nullable.or = function Nullable$or(a, b) {
+	if (a === true || b === true)
+		return true;
+	else if (a === false && b === false)
+		return false;
+	else
+		return null;
+};
+
+ss_Nullable.not = function Nullable$not(a) {
+	return ss.isValue(a) ? !a : null;
+};
+
+ss_Nullable.neg = function Nullable$neg(a) {
+	return ss.isValue(a) ? -a : null;
+};
+
+ss_Nullable.pos = function Nullable$pos(a) {
+	return ss.isValue(a) ? +a : null;
+};
+
+ss_Nullable.cpl = function Nullable$cpl(a) {
+	return ss.isValue(a) ? ~a : null;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// IList
+
+var ss_IList = function IList$() { };
+ss_IList.prototype = {
+	get_item: null,
+	set_item: null,
+	indexOf: null,
+	insert: null,
+	removeAt: null
+};
+
+ss.registerInterface(global, 'ss.IList', ss_IList, ss_ICollection, ss_IEnumerable);
+
+ss.getItem = function ss$getItem(obj, index) {
+	return ss.isArray(obj) ? obj[index] : obj.get_item(index);
+}
+
+ss.setItem = function ss$setItem(obj, index, value) {
+	ss.isArray(obj) ? (obj[index] = value) : obj.set_item(index, value);
+}
+
+ss.indexOf = function ss$indexOf(obj, item) {
+	if (ss.isArray(obj)) {
+		for (var i = 0; i < obj.length; i++) {
+			if (ss.staticEquals(obj[i], item)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	else
+		return obj.indexOf(item);
+};
+
+ss.insert = function ss$insert(obj, index, item) {
+	ss.isArray(obj) ? obj.splice(index, 0, item) : obj.insert(index, item);
+};
+
+ss.removeAt = function ss$removeAt(obj, index) {
+	ss.isArray(obj) ? obj.splice(index, 1) : obj.removeAt(index);
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// IDictionary
+
+var ss_IDictionary = function IDictionary$() { };
+ss_IDictionary.prototype = {
+	get_item: null,
+	set_item: null,
+	get_keys: null,
+	get_values: null,
+	containsKey: null,
+	add: null,
+	remove: null,
+	tryGetValue: null
+};
+
+ss.registerInterface(global, 'ss.IDictionary', ss_IDictionary, [ss_IEnumerable]);
+
+///////////////////////////////////////////////////////////////////////////////
+// Int32
+
+var ss_Int32 = function Int32$() { };
+
+ss.registerClass(global, 'ss.Int32', ss_Int32, Object, [ ss_IEquatable, ss_IComparable, ss_IFormattable ]);
+ss_Int32.__class = false;
+
+ss_Int32.isInstanceOfType = function Int32$isInstanceOfType(instance) {
+	return typeof(instance) === 'number' && isFinite(instance) && Math.round(instance, 0) == instance;
+};
+
+ss_Int32.getDefaultValue = ss_Int32.createInstance = function Int32$getDefaultValue() {
+	return 0;
+};
+
+ss_Int32.div = function Int32$div(a, b) {
+	return ss.isValue(a) && ss.isValue(b) ? (a / b) | 0 : null;
+};
+
+ss_Int32.trunc = function Int32$trunc(n) {
+	return ss.isValue(n) ? n | 0 : null;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// MutableDateTime
+
+var ss_JsDate = function JsDate$() { };
+
+ss.registerClass(global, 'ss.JsDate', ss_JsDate, Object, [ ss_IEquatable, ss_IComparable ]);
+
+ss_JsDate.createInstance = function JsDate$createInstance() {
+	return new Date();
+};
+
+ss_JsDate.isInstanceOfType = function JsDate$isInstanceOfType(instance) {
+	return instance instanceof Date;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// ArrayEnumerator
+
+var ss_ArrayEnumerator = function ArrayEnumerator$(array) {
+	this._array = array;
+	this._index = -1;
+};
+ss_ArrayEnumerator.prototype = {
+	moveNext: function ArrayEnumerator$moveNext() {
+		this._index++;
+		return (this._index < this._array.length);
+	},
+	reset: function ArrayEnumerator$reset() {
+		this._index = -1;
+	},
+	current: function ArrayEnumerator$current() {
+		if (this._index < 0 || this._index >= this._array.length)
+			throw 'Invalid operation';
+		return this._array[this._index];
+	},
+	dispose: function ArrayEnumerator$dispose() {
+	}
+};
+
+ss.registerClass(global, 'ss.ArrayEnumerator', ss_ArrayEnumerator, null, [ss_IEnumerator, ss_IDisposable]);
+
+///////////////////////////////////////////////////////////////////////////////
+// ObjectEnumerator
+
+var ss_ObjectEnumerator = function ObjectEnumerator$(o) {
+	this._keys = Object.keys(o);
+	this._index = -1;
+	this._object = o;
+};
+ss_ObjectEnumerator.prototype = {
+	moveNext: function ObjectEnumerator$moveNext() {
+		this._index++;
+		return (this._index < this._keys.length);
+	},
+	reset: function ObjectEnumerator$reset() {
+		this._index = -1;
+	},
+	current: function ObjectEnumerator$current() {
+		if (this._index < 0 || this._index >= this._keys.length)
+			throw 'Invalid operation';
+		var k = this._keys[this._index];
+		return { key: k, value: this._object[k] };
+	},
+	dispose: function ObjectEnumerator$dispose() {
+	}
+};
+
+ss.registerClass(global, 'ss.ObjectEnumerator', ss_ObjectEnumerator, null, [ss_IEnumerator, ss_IDisposable]);
+
+///////////////////////////////////////////////////////////////////////////////
+// EqualityComparer
+
+var ss_EqualityComparer = function EqualityComparer$() {
+};
+ss_EqualityComparer.prototype.areEqual = function EqualityComparer$areEqual(x, y) {
+	return ss.staticEquals(x, y);
+};
+ss_EqualityComparer.prototype.getObjectHashCode = function EqualityComparer$getObjectHashCode(obj) {
+	return ss.isValue(obj) ? ss.getHashCode(obj) : 0;
+};
+ss.registerClass(global, 'ss.EqualityComparer', ss_EqualityComparer, null, ss_IEqualityComparer);
+ss_EqualityComparer.def = new ss_EqualityComparer();
+
+///////////////////////////////////////////////////////////////////////////////
+// Comparer
+
+var ss_Comparer = function Comparer$(f) {
+	this.f = f;
+};
+ss_Comparer.prototype.compare = function Comparer$compare(x, y) {
+	return this.f(x, y);
+};
+ss_Comparer.create = function Comparer$create(f) {
+	return new ss_Comparer(f);
+};
+ss.registerClass(global, 'ss.Comparer', ss_Comparer, null, ss_IComparer);
+ss_Comparer.def = new ss_Comparer(ss.compare);
+
+///////////////////////////////////////////////////////////////////////////////
+// Dictionary
+var ss_$DictionaryCollection = function $DictionaryCollection$(dict, isKeys) {
+	this._dict = dict;
+	this._isKeys = isKeys;
+};
+ss_$DictionaryCollection.prototype = {
+	get_count: function $DictionaryCollection$get_count() {
+		return this._dict.get_count();
+	},
+	contains: function $DictionaryCollection$contains(v) {
+		if (this._isKeys) {
+			return this._dict.containsKey(v);
+		}
+		else {
+			for (var e in this._dict.buckets) {
+				if (this._dict.buckets.hasOwnProperty(e)) {
+					var bucket = this._dict.buckets[e];
+					for (var i = 0; i < bucket.length; i++) {
+						if (this._dict.comparer.areEqual(bucket[i].value, v))
+							return true;
+					}
+				}
+			}
+			return false;
+		}
+	},
+	getEnumerator: function $DictionaryCollection$getEnumerator(v) {
+		return this._dict._getEnumerator(this._isKeys ? function(e) { return e.key; } : function(e) { return e.value; });
+	},
+	add: function $DictionaryCollection$add(v) {
+		throw 'Collection is read-only';
+	},
+	clear: function $DictionaryCollection$clear() {
+		throw 'Collection is read-only';
+	},
+	remove: function $DictionaryCollection$remove() {
+		throw 'Collection is read-only';
+	}
+};
+
+var ss_Dictionary$2 = function Dictionary$2$(TKey, TValue) {
+	var $type = function(o, cmp) {
+		this.countField = 0;
+		this.buckets = {};
+
+		this.comparer = cmp || ss_EqualityComparer.def;
+
+		if (ss.isInstanceOfType(o, ss_IDictionary)) {
+			var e = ss.getEnumerator(o);
+			try {
+				while (e.moveNext()) {
+					var c = e.current();
+					this.add(c.key, c.value);
+				}
+			}
+			finally {
+				if (ss.isInstanceOfType(e, ss_IDisposable)) {
+					ss.cast(e, ss_IDisposable).dispose();
+				}
+			}
+		}
+		else if (o) {
+			var keys = Object.keys(o);
+			for (var i = 0; i < keys.length; i++) {
+				this.add(keys[i], o[keys[i]]);
+			}
+		}
+	};
+
+	$type.prototype = {
+		_setOrAdd: function(key, value, add) {
+			var hash = this.comparer.getObjectHashCode(key);
+			var entry = { key: key, value: value };
+			if (this.buckets.hasOwnProperty(hash)) {
+				var array = this.buckets[hash];
+				for (var i = 0; i < array.length; i++) {
+					if (this.comparer.areEqual(array[i].key, key)) {
+						if (add)
+							throw 'Key ' + key + ' already exists.';
+						array[i] = entry;
+						return;
+					}
+				}
+				array.push(entry);
+			} else {
+				this.buckets[hash] = [entry];
+			}
+			this.countField++;
+		},
+
+		add: function(key, value) {
+			this._setOrAdd(key, value, true);
+		},
+
+		set_item: function(key, value) {
+			this._setOrAdd(key, value, false);
+		},
+
+		_get: function(key) {
+			var hash = this.comparer.getObjectHashCode(key);
+			if (this.buckets.hasOwnProperty(hash)) {
+				var array = this.buckets[hash];
+				for (var i = 0; i < array.length; i++) {
+					var entry = array[i];
+					if (this.comparer.areEqual(entry.key, key))
+						return entry.value !== undefined ? entry.value : null;
+				}
+			}
+			return undefined;
+		},
+
+		get_item: function(key) {
+			var v = this._get(key);
+			if (v === undefined)
+				throw 'Key ' + key + ' does not exist.';
+			return v;
+		},
+
+		tryGetValue: function(key, value) {
+			var v = this._get(key);
+			if (v !== undefined) {
+				value.$ = v;
+				return true;
+			}
+			else {
+				value.$ = ss.getDefaultValue(TValue);
+				return false;
+			}
+		},
+
+		containsKey: function(key) {
+			var hash = this.comparer.getObjectHashCode(key);
+			if (!this.buckets.hasOwnProperty(hash))
+				return false;
+
+			var array = this.buckets[hash];
+			for (var i = 0; i < array.length; i++) {
+				if (this.comparer.areEqual(array[i].key, key))
+					return true;
+			}
+			return false;
+		},
+
+		clear: function() {
+			this.countField = 0;
+			this.buckets = {};
+		},
+
+		remove: function(key) {
+			var hash = this.comparer.getObjectHashCode(key);
+			if (!this.buckets.hasOwnProperty(hash))
+				return false;
+
+			var array = this.buckets[hash];
+			for (var i = 0; i < array.length; i++) {
+				if (this.comparer.areEqual(array[i].key, key)) {
+					array.splice(i, 1);
+					if (array.length == 0) delete this.buckets[hash];
+					this.countField--;
+					return true;
+				}
+			}
+			return false;
+		},
+
+		get_count: function() {
+			return this.countField;
+		},
+
+		_getEnumerator: function(projector) {
+			var bucketKeys = Object.keys(this.buckets), bucketIndex = -1, arrayIndex;
+			return new ss_IteratorBlockEnumerator(function() {
+				if (bucketIndex < 0 || arrayIndex >= (this.buckets[bucketKeys[bucketIndex]].length - 1)) {
+					arrayIndex = -1;
+					bucketIndex++;
+				}
+				if (bucketIndex >= bucketKeys.length)
+					return false;
+				arrayIndex++;
+				return true;
+			}, function() { return projector(this.buckets[bucketKeys[bucketIndex]][arrayIndex]); }, null, this);
+		},
+
+		get_keys: function() {
+			return new ss_$DictionaryCollection(this, true);
+		},
+
+		get_values: function() {
+			return new ss_$DictionaryCollection(this, false);
+		},
+
+		getEnumerator: function() {
+			return this._getEnumerator(function(e) { return e; });
+		}
+	};
+
+	ss.registerGenericClassInstance($type, ss_Dictionary$2, [TKey, TValue], function() { return null; }, function() { return [ ss_IDictionary, ss_IEnumerable ]; });
+	return $type;
+};
+
+ss.registerGenericClass(global, 'ss.Dictionary$2', ss_Dictionary$2, 2);
+ss.registerClass(global, 'ss.$DictionaryCollection', ss_$DictionaryCollection, null, [ss_IEnumerable, ss_ICollection]);
+
+///////////////////////////////////////////////////////////////////////////////
+// IDisposable
+
+var ss_IDisposable = function IDisposable$() { };
+ss_IDisposable.prototype = {
+	dispose: null
+};
+ss.registerInterface(global, 'ss.IDisposable', ss_IDisposable);
+
+///////////////////////////////////////////////////////////////////////////////
+// StringBuilder
+
+var ss_StringBuilder = function StringBuilder$(s) {
+	this._parts = ss.isNullOrUndefined(s) || s === '' ? [] : [s];
+	this.isEmpty = this._parts.length == 0;
+}
+ss_StringBuilder.prototype = {
+	append: function StringBuilder$append(s) {
+		if (!ss.isNullOrUndefined(s) && s !== '') {
+			ss.add(this._parts, s);
+			this.isEmpty = false;
+		}
+		return this;
+	},
+
+	appendChar: function StringBuilder$appendChar(c) {
+		return this.append(String.fromCharCode(c));
+	},
+
+	appendLine: function StringBuilder$appendLine(s) {
+		this.append(s);
+		this.append('\r\n');
+		this.isEmpty = false;
+		return this;
+	},
+
+	appendLineChar: function StringBuilder$appendLineChar(c) {
+		return this.appendLine(String.fromCharCode(c));
+	},
+
+	clear: function StringBuilder$clear() {
+		this._parts = [];
+		this.isEmpty = true;
+	},
+
+	toString: function StringBuilder$toString() {
+		return this._parts.join('');
+	}
+};
+
+ss.registerClass(global, 'ss.StringBuilder', ss_StringBuilder);
+
+///////////////////////////////////////////////////////////////////////////////
+// EventArgs
+
+var ss_EventArgs = function EventArgs$() {
+}
+ss.registerClass(global, 'ss.EventArgs', ss_EventArgs);
+
+ss_EventArgs.Empty = new ss_EventArgs();
+
+///////////////////////////////////////////////////////////////////////////////
+// Exception
+
+var ss_Exception = function Exception$(message, innerException) {
+	this._message = message || null;
+	this._innerException = innerException || null;
+}
+ss.registerClass(global, 'ss.Exception', ss_Exception);
+
+ss_Exception.prototype = {
+	get_message: function Exception$get_message() {
+		return this._message;
+	},
+	get_innerException: function Exception$get_innerException() {
+		return this._innerException;
+	}
+};
+
+ss_Exception.wrap = function Exception$wrap(o) {
+	if (ss.isInstanceOfType(o, ss_Exception)) {
+		return o;
+	}
+	else if (o instanceof Error) {
+		return new ss_JsErrorException(o);
+	}
+	else {
+		return new ss_Exception(o.toString());
+	}
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// NotSupportedException
+
+var ss_NotSupportedException = function NotSupportedException$(message, innerException) {
+	ss_Exception.call(this, message, innerException);
+};
+ss.registerClass(global, 'ss.NotSupportedException', ss_NotSupportedException, ss_Exception);
+
+////////////////////////////////////////////////////////////////////////////////
+// AggregateException
+
+var ss_AggregateException = function AggregateException$(message, innerExceptions) {
+	if (typeof(message) !== 'string') {
+		innerExceptions = message;
+		message = 'One or more errors occurred.';
+	}
+	innerExceptions = ss.isValue(innerExceptions) ? ss.arrayFromEnumerable(innerExceptions) : null;
+
+	ss_Exception.call(this, message, innerExceptions && innerExceptions.length ? innerExceptions[0] : null);
+	this._innerExceptions = innerExceptions;
+};
+ss_AggregateException.prototype = {
+	get_innerExceptions: function AggregateException$get_innerExceptions() {
+		return this._innerExceptions;
+	}
+};
+ss.registerClass(global, 'ss.AggregateException', ss_AggregateException, ss_Exception);
+
+////////////////////////////////////////////////////////////////////////////////
+// PromiseException
+
+var ss_PromiseException = function PromiseException(args) {
+	ss_Exception.call(this, args[0] ? args[0].toString() : 'An error occurred');
+	this._arguments = ss.arrayClone(args);
+};
+ss_PromiseException.prototype = {
+	get_arguments: function PromiseException$get_arguments() {
+		return this._arguments;
+	}
+};
+ss.registerClass(global, 'ss.PromiseException', ss_PromiseException, ss_Exception);
+
+////////////////////////////////////////////////////////////////////////////////
+// JsErrorException
+
+var ss_JsErrorException = function JsErrorException$(error) {
+	ss_Exception.call(this, error.message);
+	this._error = error;
+};
+ss_JsErrorException.prototype = {
+	get_error: function JsErrorException$get_error() {
+		return this._error;
+	}
+};
+ss.registerClass(global, 'ss.JsErrorException', ss_JsErrorException, ss_Exception);
+
+///////////////////////////////////////////////////////////////////////////////
+// IteratorBlockEnumerable
+
+var ss_IteratorBlockEnumerable = function IteratorBlockEnumerable$(getEnumerator, $this) {
+	this._getEnumerator = getEnumerator;
+	this._this = $this;
+};
+
+ss_IteratorBlockEnumerable.prototype = {
+	getEnumerator: function IteratorBlockEnumerable$getEnumerator() {
+		return this._getEnumerator.call(this._this);
+	}
+};
+
+ss.registerClass(global, 'ss.IteratorBlockEnumerable', ss_IteratorBlockEnumerable, null, ss_IEnumerable);
+
+///////////////////////////////////////////////////////////////////////////////
+// IteratorBlockEnumerator
+
+var ss_IteratorBlockEnumerator = function IteratorBlockEnumerator$(moveNext, getCurrent, dispose, $this) {
+	this._moveNext = moveNext;
+	this._getCurrent = getCurrent;
+	this._dispose = dispose;
+	this._this = $this;
+};
+
+ss_IteratorBlockEnumerator.prototype = {
+	moveNext: function IteratorBlockEnumerator$moveNext() {
+		try {
+			return this._moveNext.call(this._this);
+		}
+		catch (ex) {
+			if (this._dispose)
+				this._dispose.call(this._this);
+			throw ex;
+		}
+	},
+	current: function IteratorBlockEnumerator$current() {
+		return this._getCurrent.call(this._this);
+	},
+	reset: function IteratorBlockEnumerator$reset() {
+		throw new ss_NotSupportedException('Reset is not supported.');
+	},
+	dispose: function IteratorBlockEnumerator$dispose() {
+		if (this._dispose)
+			this._dispose.call(this._this);
+	}
+};
+
+ss.registerClass(global, 'ss.IteratorBlockEnumerator', ss_IteratorBlockEnumerator, null, [ss_IEnumerator, ss_IDisposable]);
+
+///////////////////////////////////////////////////////////////////////////////
+// Lazy
+
+var ss_Lazy = function Lazy$(valueFactory) {
+	this._valueFactory = valueFactory;
+	this.isValueCreated = false;
+};
+ss_Lazy.prototype.value = function Lazy$value() {
+	if (!this.isValueCreated) {
+		this._value = this._valueFactory();
+		delete this._valueFactory;
+		this.isValueCreated = true;
+	}
+	return this._value;
+};
+ss.registerClass(global, 'ss.Lazy', ss_Lazy);
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Task
+
+var ss_Task = function Task$(action, state) {
+	this._action = action;
+	this._state = state;
+	this.exception = null;
+	this.status = 0;
+	this._thens = [];
+	this._result = null;
+};
+
+ss_Task.prototype = {
+	continueWith: function Task$continueWith(continuation) {
+		var tcs = new ss_TaskCompletionSource();
+		var _this = this;
+		var fn = function() {
+			try {
+				tcs.setResult(continuation(_this));
+			}
+			catch (e) {
+				tcs.setException(ss_Exception.wrap(e));
+			}
+		};
+		if (this.isCompleted()) {
+			setTimeout(fn, 0);
+		}
+		else {
+			this._thens.push(fn);
+		}
+		return tcs.task;
+	},
+	start: function Task$start() {
+		if (this.status !== 0)
+			throw 'Task was already started.';
+		var _this = this;
+		this.status = 3;
+		setTimeout(function() {
+			try {
+				var result = _this._action(_this._state);
+				delete _this._action;
+				delete _this._state;
+				_this._complete(result);
+			}
+			catch (e) {
+				_this._fail(new ss_AggregateException([ss_Exception.wrap(e)]));
+			}
+		}, 0);
+	},
+	_runCallbacks: function Task$_runCallbacks() {
+		for (var i = 0; i < this._thens.length; i++)
+			this._thens[i](this);
+		delete this._thens;
+	},
+	_complete: function Task$_complete(result) {
+		if (this.isCompleted())
+			return false;
+		this._result = result;
+		this.status = 5;
+		this._runCallbacks();
+		return true;
+	},
+	_fail: function Task$_fail(exception) {
+		if (this.isCompleted())
+			return false;
+		this.exception = exception;
+		this.status = 7;
+		this._runCallbacks();
+		return true;
+	},
+	_cancel: function Task$_cancel() {
+		if (this.isCompleted())
+			return false;
+		this.status = 6;
+		this._runCallbacks();
+		return true;
+	},
+	isCanceled: function Task$isCanceled() {
+		return this.status === 6;
+	},
+	isCompleted: function Task$isCompleted() {
+		return this.status >= 5;
+	},
+	isFaulted: function Task$isFaulted() {
+		return this.status === 7;
+	},
+	getResult: function Task$getResult() {
+		switch (this.status) {
+			case 5:
+				return this._result;
+			case 6:
+				throw 'Task was cancelled.';
+			case 7:
+				throw this.exception;
+			default:
+				throw 'Task is not yet completed.';
+		}
+	},
+	dispose: function Task$dispose() {
+	}
+};
+
+ss_Task.delay = function Task$delay(delay) {
+	var tcs = new ss_TaskCompletionSource();
+	setTimeout(function() {
+		tcs.setResult(0);
+	}, delay);
+	return tcs.task;
+};
+
+ss_Task.fromResult = function Task$fromResult(result) {
+	var t = new ss_Task();
+	t.status = 5;
+	t._result = result;
+	return t;
+};
+
+ss_Task.run = function Task$fromResult(f) {
+	var tcs = new ss_TaskCompletionSource();
+	setTimeout(function() {
+		try {
+			tcs.setResult(f());
+		}
+		catch (e) {
+			tcs.setException(ss_Exception.wrap(e));
+		}
+	}, 0);
+	return tcs.task;
+};
+
+ss_Task.whenAll = function Task$whenAll(tasks) {
+	var tcs = new ss_TaskCompletionSource();
+	if (tasks.length === 0) {
+		tcs.setResult([]);
+	}
+	else {
+		var result = new Array(tasks.length), remaining = tasks.length, cancelled = false, exceptions = [];
+		for (var i = 0; i < tasks.length; i++) {
+			(function(i) {
+				tasks[i].continueWith(function(t) {
+					switch (t.status) {
+						case 5:
+							result[i] = t.getResult();
+							break;
+						case 6:
+							cancelled = true;
+							break;
+						case 7:
+							ss.arrayAddRange(exceptions, t.exception.get_innerExceptions());
+							break;
+						default:
+							throw 'Invalid task status ' + t.status;
+					}
+					if (--remaining === 0) {
+						if (exceptions.length > 0)
+							tcs.setException(exceptions);
+						else if (cancelled)
+							tcs.setCanceled();
+						else
+							tcs.setResult(result);
+					}
+				});
+			})(i);
+		}
+	}
+	return tcs.task;
+};
+
+ss_Task.whenAny = function Task$whenAny(tasks) {
+	if (!tasks.length)
+		throw 'Must wait for at least one task';
+
+	var tcs = new ss_TaskCompletionSource();
+	for (var i = 0; i < tasks.length; i++) {
+		tasks[i].continueWith(function(t) {
+			switch (t.status) {
+				case 5:
+					tcs.trySetResult(t);
+					break;
+				case 6:
+					tcs.trySetCanceled();
+					break;
+				case 7:
+					tcs.trySetException(t.exception.get_innerExceptions());
+					break;
+				default:
+					throw 'Invalid task status ' + t.status;
+			}
+		});
+	}
+	return tcs.task;
+};
+
+ss_Task.fromDoneCallback = function Task$fromDoneCallback(t, i, m) {
+	var tcs = new ss_TaskCompletionSource(), args;
+    if (typeof(i) === 'number') {
+        args = Array.prototype.slice.call(arguments, 3);
+        if (i < 0)
+            i += args.length + 1;
+    }
+    else {
+        args = Array.prototype.slice.call(arguments, 2);
+        m = i;
+        i = args.length;
+    }
+
+	var cb = function(v) {
+		tcs.setResult(v);
+	};
+	
+    args = args.slice(0, i).concat(cb, args.slice(i));
+
+	t[m].apply(t, args);
+	return tcs.task;
+};
+
+ss_Task.fromPromise = function Task$fromPromise(p, f) {
+	var tcs = new ss_TaskCompletionSource();
+	if (typeof(f) === 'number')
+		f = (function(i) { return function() { return arguments[i >= 0 ? i : (arguments.length + i)]; }; })(f);
+    else if (typeof(f) !== 'function')
+        f = function() { return Array.prototype.slice.call(arguments, 0); };
+
+	p.then(function() {
+		tcs.setResult(typeof(f) === 'function' ? f.apply(null, arguments) : null);
+	}, function() {
+		tcs.setException(new ss_PromiseException(Array.prototype.slice.call(arguments, 0)));
+	});
+	return tcs.task;
+};
+
+ss_Task.fromNode = function  Task$fromNode(t, f, m) {
+	var tcs = new ss_TaskCompletionSource(), args;
+    if (typeof(f) === 'function') {
+        args = Array.prototype.slice.call(arguments, 3);
+    }
+    else {
+        args = Array.prototype.slice.call(arguments, 2);
+        m = f;
+		f = function() { return arguments[0]; };
+    }
+
+	var cb = function(e) {
+		if (e)
+			tcs.setException(ss_Exception.wrap(e));
+		else
+			tcs.setResult(f.apply(null, Array.prototype.slice.call(arguments, 1)));
+	};
+	
+	args.push(cb);
+
+	t[m].apply(t, args);
+	return tcs.task;
+};
+
+ss.registerClass(global, 'ss.Task', ss_Task, null, ss_IDisposable);
+
+////////////////////////////////////////////////////////////////////////////////
+// TaskStatus
+var ss_TaskStatus = function() {
+};
+ss_TaskStatus.prototype = { created: 0, running: 3, ranToCompletion: 5, canceled: 6, faulted: 7 };
+ss.registerEnum(global, 'ss.TaskStatus', ss_TaskStatus, false);
+
+///////////////////////////////////////////////////////////////////////////////
+// TaskCompletionSource
+
+var ss_TaskCompletionSource = function TaskCompletionSource$() {
+	this.task = new ss_Task();
+	this.task.status = 3;
+};
+ss_TaskCompletionSource.prototype = {
+	setCanceled: function TaskCompletionSource$setCanceled() {
+		if (!this.task._cancel())
+			throw 'Task was already completed.';
+	},
+	setResult: function TaskCompletionSource$setResult(result) {
+		if (!this.task._complete(result))
+			throw 'Task was already completed.';
+	},
+	setException: function TaskCompletionSource$setException(exception) {
+		if (!this.trySetException(exception))
+			throw 'Task was already completed.';
+	},
+	trySetCanceled: function TaskCompletionSource$trySetCanceled() {
+		return this.task._cancel();
+	},
+	trySetResult: function TaskCompletionSource$setResult(result) {
+		return this.task._complete(result);
+	},
+	trySetException: function TaskCompletionSource$setException(exception) {
+		if (!ss.isInstanceOfType(exception, ss_AggregateException)) {
+			if (ss.isInstanceOfType(exception, ss_Exception))
+				exception = [exception];
+			exception = new ss_AggregateException(exception);
+		}
+		return this.task._fail(exception);
+	}
+};
+
+ss.registerClass(global, 'ss.TaskCompletionSource', ss_TaskCompletionSource);
+
+///////////////////////////////////////////////////////////////////////////////
+// CancelEventArgs
+
+var ss_CancelEventArgs = function CancelEventArgs$() {
+	ss_CancelEventArgs.call(this);
+	this.cancel = false;
+}
+ss.registerClass(global, 'ss.CancelEventArgs', ss_CancelEventArgs, ss_EventArgs);
+
+if (global.ss) {
+	for (var n in ss) {
+		if (ss.hasOwnProperty(n))
+			global.ss[n] = ss[n];
+	}
+}
+else {
+	global.ss = ss;
+}

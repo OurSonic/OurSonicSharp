@@ -2,15 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using OurSonic.Level.Objects;
+using OurSonic.UIManager;
 using OurSonic.Utility;
 using OurSonicModels;
 using OurSonicModels.Common;
 using jQueryApi;
-namespace OurSonic.UIManager.Areas
+namespace OurSonic.Areas
 {
     public class ObjectFrameworkListArea
     {
-        public ObjectFrameworkListArea(UIManager uiManager)
+        public ObjectFrameworkListArea(UIManager.UIManager uiManager)
         {
             Action<string> loadObject = null;
 
@@ -49,8 +50,8 @@ namespace OurSonic.UIManager.Areas
             objectFrameworkListArea.AddControl(new Button(200, 50, 160, 25, "Save Framework") {
                                                                                                       Color = "rgb(50,150,50)",
                                                                                                       Click = (p) => {
-                                                                                                                  var oldTitle = UIManager.CurLevelName;
-                                                                                                                  UIManager.UpdateTitle("Saving Object");
+                                                                                                                  var oldTitle = UIManager.UIManager.CurLevelName;
+                                                                                                                  UIManager.UIManager.UpdateTitle("Saving Object");
 
                                                                                                                   var k = uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Key;
                                                                                                                   var o = uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.oldKey ??
@@ -58,7 +59,7 @@ namespace OurSonic.UIManager.Areas
                                                                                                                   var v = Help.Stringify(uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework);
 
                                                                                                                   SonicEngine.Instance.client.Emit("SaveObject", new SaveObjectModel {Key = k, OldKey = o, Data = v});
-                                                                                                                  SonicEngine.Instance.client.On<bool>("SaveObject.Response", (data) => { UIManager.UpdateTitle(oldTitle); });
+                                                                                                                  SonicEngine.Instance.client.On<bool>("SaveObject.Response", (data) => { UIManager.UIManager.UpdateTitle(oldTitle); });
 
                                                                                                                   getObjects();
                                                                                                               }
@@ -75,14 +76,14 @@ namespace OurSonic.UIManager.Areas
                                  }
                              }
 
-                             var oldTitle = UIManager.CurLevelName;
+                             var oldTitle = UIManager.UIManager.CurLevelName;
 
-                             UIManager.UpdateTitle("Downloading Object:" + name);
+                             UIManager.UIManager.UpdateTitle("Downloading Object:" + name);
 
                              SonicEngine.Instance.client.Emit("GetObject", new DataObject<string>(name));
                              SonicEngine.Instance.client.On<DataObject<string>>("GetObject.Response",
                                                                                 (lvl) => {
-                                                                                    UIManager.UpdateTitle(oldTitle);
+                                                                                    UIManager.UIManager.UpdateTitle(oldTitle);
                                                                                     var d = ObjectManager.ExtendObject(jQuery.ParseJsonData<LevelObjectData>(lvl.Data));
                                                                                     uiManager.UIManagerAreas.ObjectFrameworkArea.Populate(d);
                                                                                     uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Visible = true;

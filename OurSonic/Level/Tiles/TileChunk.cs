@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
+using OurSonic.Areas;
 using OurSonic.Level.Animations;
 using OurSonic.UIManager;
 using OurSonic.Utility;
@@ -38,9 +39,9 @@ namespace OurSonic.Level.Tiles
         private bool? myNeverAnimate;
         private CanvasInformation[] neverAnimateCache;
         [IntrinsicProperty]
-        private bool? IsOnlyBackground { get; set; }
+        public bool? IsOnlyBackground { get; set; }
         [IntrinsicProperty]
-        private bool? IsOnlyForeground { get; set; }
+        public bool? IsOnlyForeground { get; set; }
         [IntrinsicProperty]
         private bool? Empty { get; set; }
         [IntrinsicProperty]
@@ -78,8 +79,8 @@ namespace OurSonic.Level.Tiles
 
         public void SetBlockAt(int x, int y, TilePiece tp)
         {
-            TilePieces[x / 16][y / 16].SetTilePiece(tp);
-            ClearCache();
+            if (TilePieces[x / 16][y / 16].SetTilePiece(tp))
+                ClearCache();
         }
 
         public TilePieceInfo GetTilePiece(int x, int y)
@@ -164,12 +165,12 @@ namespace OurSonic.Level.Tiles
             return myNeverAnimate.Value;
         }
 
-        public void Draw(CanvasContext2D canvas, Point position, int layer, IntersectingRectangle bounds)
+        public void Draw(CanvasContext2D canvas, Point position, int layer)
         {
             bool neverAnimates = NeverAnimates();
 
             if (layerCacheBlocks[layer] == null)
-                layerCacheBlocks[layer] = BuildCacheBlock(layer, bounds);
+                layerCacheBlocks[layer] = BuildCacheBlock(layer);
 
             using (new CanvasHandler(canvas)) {
                 if (neverAnimateCache[layer] != null) {
@@ -248,12 +249,11 @@ namespace OurSonic.Level.Tiles
             */
         }
 
-        private   void drawBlock(CanvasContext2D canvas, Point position, TileCacheBlock tileCacheBlock)
+        private void drawBlock(CanvasContext2D canvas, Point position, TileCacheBlock tileCacheBlock)
         {
             canvas.DrawImage(tileCacheBlock.Block.Canvas, position.X /*tileCacheBlock.X * pieceWidth*/, position.Y /*tileCacheBlock.Y * pieceHeight*/);
             UIManagerAreas areas = SonicManager.Instance.UIManager.UIManagerAreas;
-            if (areas.TileChunkArea != null && areas.TileChunkArea.Data != null && areas.TileChunkArea.Data.Index == this.Index)
-            {
+            if (areas.TileChunkArea != null && areas.TileChunkArea.Data != null && areas.TileChunkArea.Data.Index == Index) {
                 canvas.Save();
                 canvas.StrokeStyle = "yellow";
                 canvas.LineWidth = 2;
@@ -266,10 +266,8 @@ namespace OurSonic.Level.Tiles
         {
             canvas.DrawImage(neverAnimateCache[layer].Canvas, position.X, position.Y);
 
-
             UIManagerAreas areas = SonicManager.Instance.UIManager.UIManagerAreas;
-            if (areas.TileChunkArea != null && areas.TileChunkArea.Data != null && areas.TileChunkArea.Data.Index == this.Index)
-            {
+            if (areas.TileChunkArea != null && areas.TileChunkArea.Data != null && areas.TileChunkArea.Data.Index == Index) {
                 canvas.Save();
                 canvas.StrokeStyle = "yellow";
                 canvas.LineWidth = 2;
@@ -311,7 +309,7 @@ namespace OurSonic.Level.Tiles
             //canvas.StrokeRect(position.X + pieceX * 16 * scale.X, position.Y + pieceY * 16 * scale.Y, scale.X * 16, scale.Y * 16);
         }
 
-        public List<TileCacheBlock> BuildCacheBlock(int layer, IntersectingRectangle bounds)
+        public List<TileCacheBlock> BuildCacheBlock(int layer)
         {
             List<TileCacheBlock> tilePieces = new List<TileCacheBlock>();
             TileCacheBlock block = null;

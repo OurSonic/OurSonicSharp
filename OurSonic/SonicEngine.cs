@@ -33,7 +33,7 @@ namespace OurSonic
         {
             Instance = this;
             /*var pl = @"";
-            Window.Instance.Me().console.log(new Compressor().CompressText(pl));*/
+            Window.Instance.Me().Global.Console.Log(new Compressor().CompressText(pl));*/
 
             gameCanvas = CanvasInformation.Create((CanvasElement) Document.GetElementById(gameCanvasName), 0, 0);
             uiCanvas = CanvasInformation.Create((CanvasElement) Document.GetElementById(uiCanvasName), 0, 0);
@@ -118,14 +118,21 @@ namespace OurSonic
                                            () => { });
 
             KeyboardJS.Instance().Bind.Key("o",
-                                           () => {
+                                           () =>
+                                           {
                                                if (dontPress) return;
                                                if (sonicManager.CurrentGameState == GameState.Playing)
                                                    sonicManager.InHaltMode = !sonicManager.InHaltMode;
                                            },
                                            () => { });
-            client = SocketIOClient.Connect("50.116.22.241:8998");
+            KeyboardJS.Instance().Bind.Key("j",
+                                           () => {
+                                               sonicManager.ReplaceMagic();
+                                           },
+                                           () => { });
 
+            client = SocketIOClient.Connect("50.116.22.241:8998");
+            
             client.On<DataObject<string>>("SonicLevel",
                                           data => { Help.DecodeString<SLData>(data.Data, RunSonic); });
             client.On<DataObject<KeyValuePair<string, string>[]>>("GetObjects.Response", data => { sonicManager.loadObjects(data.Data); }
@@ -147,9 +154,15 @@ namespace OurSonic
                                            () => { });
 
             KeyboardJS.Instance().Bind.Key("q",
-                                           () => {
-                                               if (dontPress) return;
+                                           () =>
+                                           {
                                                runGame();
+                                           },
+                                           () => { });
+            KeyboardJS.Instance().Bind.Key("z",
+                                           () =>
+                                           {
+                                               Extensions.DOES ++;
                                            },
                                            () => { });
 
@@ -161,6 +174,12 @@ namespace OurSonic
                                            },
                                            () => { });
 
+
+
+
+
+
+
             KeyboardJS.Instance().Bind.Key("h",
                                            () => {
                                                if (dontPress) return;
@@ -169,7 +188,8 @@ namespace OurSonic
                                            },
                                            () => { });
             KeyboardJS.Instance().Bind.Key("u",
-                                           () => { WideScreen = !WideScreen;
+                                           () => {
+                                               WideScreen = !WideScreen;
                                                resizeCanvas(true);
                                            },
                                            () => { });
@@ -333,11 +353,13 @@ namespace OurSonic
             switch (sonicManager.CurrentGameState) {
                 case GameState.Playing:
                     sonicManager.CurrentGameState = GameState.Editing;
+                    sonicManager.Scale = new Point(2,2);
                     sonicManager.WindowLocation = Constants.DefaultWindowLocation(sonicManager.CurrentGameState, Instance.gameCanvas, sonicManager.Scale);
                     sonicManager.SonicToon = null;
                     break;
                 case GameState.Editing:
                     sonicManager.CurrentGameState = GameState.Playing;
+                    sonicManager.Scale = new Point(2, 2);
                     sonicManager.WindowLocation = Constants.DefaultWindowLocation(sonicManager.CurrentGameState, Instance.gameCanvas, sonicManager.Scale);
                     sonicManager.SonicToon = new Sonic.Sonic();
                     break;
@@ -416,7 +438,8 @@ namespace OurSonic
                                                        ? sonicManager.Scale.X * sonicManager.RealScale.X
                                                        : 1 ) ).ToString());
             gameCanvas.DomCanvas.Attribute("height",
-                                           ( sonicManager.WindowLocation.Height *
+                                           ( sonicManager.WindowLocation.Height 
+*
                                              ( sonicManager.CurrentGameState == GameState.Playing
                                                        ? sonicManager.Scale.Y * sonicManager.RealScale.Y
                                                        : 1 ) ).ToString());
@@ -442,8 +465,12 @@ namespace OurSonic
             if (canv == gameCanvas)
                 w = gameGoodWidth;
             else
-                w = uiGoodWidth;
+                w = uiGoodWidth; 
             canv.DomCanvas[0].Me().width = w;
+
+            gameCanvas.Context.Me().webkitImageSmoothingEnabled = false;
+            gameCanvas.Context.Me().mozImageSmoothingEnabled = false;
+            gameCanvas.Context.Me().imageSmoothingEnabled = false;
         }
 
         public void GameDraw()
@@ -451,9 +478,6 @@ namespace OurSonic
             if (!sonicManager.InHaltMode)
                 Clear(gameCanvas);
 
-            gameCanvas.Context.Me().webkitImageSmoothingEnabled = false;
-            gameCanvas.Context.Me().mozImageSmoothingEnabled = false;
-            gameCanvas.Context.Me().imageSmoothingEnabled = false;
 
             sonicManager.MainDraw(gameCanvas.Context);
         }

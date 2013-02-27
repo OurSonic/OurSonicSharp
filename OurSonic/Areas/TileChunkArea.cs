@@ -1,15 +1,16 @@
 using System;
 using OurSonic.Level;
 using OurSonic.Level.Tiles;
+using OurSonic.UIManager;
 using OurSonic.Utility;
-namespace OurSonic.UIManager.Areas
+namespace OurSonic.Areas
 {
     public class TileChunkArea
     {
         private ScrollBox chunkPieceList;
         private ScrollBox tilePieceList;
 
-        public TileChunkArea(UIManager uiManager)
+        public TileChunkArea(UIManager.UIManager uiManager)
         {
             var tileChunkArea = uiManager.UIManagerAreas.TileChunkArea = new UIArea<TileChunk>(null, 700, 500, 390, 390) {Closable = true};
             tileChunkArea.Visible = false;
@@ -27,7 +28,7 @@ namespace OurSonic.UIManager.Areas
                                          chunkButton.Data.DrawUI(cnv, new Point(x, y), new DoublePoint(0.5d, 0.5d), 0);
                                          chunkButton.Data.DrawUI(cnv, new Point(x, y), new DoublePoint(0.5d, 0.5d), 1);
                                      };
-                chunkButton.Font = UIManager.SmallTextFont;
+                chunkButton.Font = UIManager.UIManager.SmallTextFont;
                 chunkButton.Text = "Chunk #" + index;
                 chunkButton.Click = (e) => { tileChunkArea.Data = tileChunk; };
                 chunkPieceList.AddControl(chunkButton);
@@ -70,7 +71,7 @@ namespace OurSonic.UIManager.Areas
                         cell.AddControl(new Button(0, 50, 100, 50, "Text2"));*/
         }
 
-        private void buildTilePiece(UIManager uiManager)
+        private void buildTilePiece(UIManager.UIManager uiManager)
         {
             var tilePieceArea = uiManager.UIManagerAreas.TilePieceArea = new UIArea<TilePiece>(null, 1100, 400, 390, 390) {Closable = true};
             tilePieceArea.Visible = false;
@@ -80,11 +81,11 @@ namespace OurSonic.UIManager.Areas
 
             bool showHeightMap = false;
             tilePieceArea.AddControl(new Button(100, 50, 125, 25, (Func<string>) ( () => showHeightMap ? "Hide Height Map" : "Show Height Map" )) {
-                                                                                                                                                         Click = (e) => {
-                                                                                                                                                                     if (tilePieceArea.Data == null) return;
-                                                                                                                                                                     showHeightMap = !showHeightMap;
-                                                                                                                                                                 }
-                                                                                                                                                 });
+                                                                                                                                                          Click = (e) => {
+                                                                                                                                                                      if (tilePieceArea.Data == null) return;
+                                                                                                                                                                      showHeightMap = !showHeightMap;
+                                                                                                                                                                  }
+                                                                                                                                                  });
 
             tilePieceList = new ScrollBox(10, 35, 96 - 16, 4, 64) {BackColor = "rgb(50,60,127)"};
             tilePieceArea.AddControl(tilePieceList);
@@ -112,7 +113,7 @@ namespace OurSonic.UIManager.Areas
 
                                              cnv.Restore();
                                          };
-                tilePieceButton.Font = UIManager.SmallTextFont;
+                tilePieceButton.Font = UIManager.UIManager.SmallTextFont;
                 tilePieceButton.Text = "Tile Piece #" + index;
                 tilePieceButton.Click = (e) => { tilePieceArea.Data = tilePiece; };
                 tilePieceList.AddControl(tilePieceButton);

@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace OurSonic.Utility
 {
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     [ScriptName("Compressor")]
     public class Compressor
     {
@@ -21,7 +21,7 @@ namespace OurSonic.Utility
         }
     }
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     [ScriptName("xStats")]
     public class XStats
     {
@@ -29,13 +29,13 @@ namespace OurSonic.Utility
         public Element Element { get; set; }
     }
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     [ScriptName("FunctionWorker")]
     public class FunctionWorker
     {
         public FunctionWorker(string scriptName) {}
 
-        [IgnoreGenericArguments]
+        
         public void ThreadedFunction<T, T2>(Action<ExtraEvent<T, T2>> func, Action<ExtraData<T, T2>> onComplete, Action<ExtraData<T, T2>> callback, T data) {}
 
         [ScriptAlias("self.importScripts")]
@@ -48,8 +48,8 @@ namespace OurSonic.Utility
         }
     }
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
-    [IgnoreGenericArguments]
+    [Imported()]
+    
     public class ExtraEvent<T, T2> : ExtraData<T, T2>
     {
         [IntrinsicProperty]

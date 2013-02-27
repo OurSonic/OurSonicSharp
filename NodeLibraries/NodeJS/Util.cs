@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 namespace NodeJSLibrary
 {
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     [ScriptName("util")]
     public class Util : NodeModule
     {

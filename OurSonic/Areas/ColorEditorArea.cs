@@ -1,11 +1,12 @@
 using System;
 using OurSonic.Level.Objects;
+using OurSonic.UIManager;
 using OurSonic.Utility;
-namespace OurSonic.UIManager.Areas
+namespace OurSonic.Areas
 {
     public class ColorEditorArea
     {
-        public ColorEditorArea(UIManager uiManager)
+        public ColorEditorArea(UIManager.UIManager uiManager)
         {
             var colorEditorArea = uiManager.UIManagerAreas.ColorEditorArea = new UIArea<ColorEditorAreaData>(new ColorEditorAreaData(), 650, 30, 960, 800) {Closable = true};
 

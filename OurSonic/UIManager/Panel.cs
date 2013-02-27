@@ -40,7 +40,7 @@ namespace OurSonic.UIManager
         public bool ChildrenAreEditing()
         {
             var ch = Controls;
-            
+
             foreach (Element t in ch) {
                 if (t.EditorEngine.Dragging.Truthy() || t.EditorEngine.Editing)
                     return true;

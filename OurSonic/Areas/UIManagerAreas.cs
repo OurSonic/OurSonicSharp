@@ -1,11 +1,10 @@
 using System.Runtime.CompilerServices;
 using OurSonic.Level.Tiles;
-using OurSonic.UIManager.Areas;
-namespace OurSonic.UIManager
+using OurSonic.UIManager;
+namespace OurSonic.Areas
 {
     public class UIManagerAreas
     {
-        
         [IntrinsicProperty]
         public UIArea<TileChunk> TileChunkArea { get; set; }
         [IntrinsicProperty]

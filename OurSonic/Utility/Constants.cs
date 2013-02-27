@@ -1,3 +1,4 @@
+using System.Html;
 namespace OurSonic.Utility
 {
     public class Constants
@@ -15,7 +16,7 @@ namespace OurSonic.Utility
                         x = SonicManager.Instance.SonicLevel.StartPositions[0].X - 128 * scale.X;
                         y = SonicManager.Instance.SonicLevel.StartPositions[0].Y - 128 * scale.Y;
                     }
-                    return new IntersectingRectangle(x, y, canvas.DomCanvas.GetWidth(), canvas.DomCanvas.GetHeight());
+                    return new IntersectingRectangle(x, y, Window.InnerWidth , Window.InnerHeight);
             }
             return null;
         }

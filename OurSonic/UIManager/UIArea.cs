@@ -109,7 +109,6 @@ namespace OurSonic.UIManager
             if (CachedDrawing.Canvas.Width != Width + 20 || CachedDrawing.Canvas.Height != Height + 20)
                 CachedDrawing = null;
 
-            
             foreach (Element t in Controls) {
                 var good = t.ForceDrawing();
                 if (!good.Redraw)

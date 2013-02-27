@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Html;
 using CodeMirrorLibrary;
 using OurSonic.Level.Objects;
+using OurSonic.UIManager;
 using OurSonic.Utility;
 using jQueryApi;
-namespace OurSonic.UIManager.Areas
+using Element = OurSonic.UIManager.Element;
+namespace OurSonic.Areas
 {
     public class ObjectFrameworkArea
     {
         public UIArea<ObjectFrameworkData> objectFrameworkArea;
 
-        public ObjectFrameworkArea(UIManager manager)
+        public ObjectFrameworkArea(UIManager.UIManager manager)
         {
             var size = 40 * 4;
 
@@ -95,12 +97,12 @@ namespace OurSonic.UIManager.Areas
                     objectFrameworkArea.Data.Projectiles =
                     new ScrollBox(30, 60 + 10 + ( size * 3 ), 25, 4, 250) {BackColor = "rgb(50, 60, 127)",});
 
-            objectFrameworkArea.AddControl(new TextArea(320, 80 - 20, "Key: ") {Font = UIManager.SmallTextFont, Color = "black"});
+            objectFrameworkArea.AddControl(new TextArea(320, 80 - 20, "Key: ") {Font = UIManager.UIManager.SmallTextFont, Color = "black"});
             objectFrameworkArea.AddControl(
                     objectFrameworkArea.Data.Key =
                     new TextBox(370, 60 - 20, 150, 25, "") {Color = "rgb(50,150,50)", Click = (p) => { objectFrameworkArea.Data.ObjectFramework.Key = objectFrameworkArea.Data.Key.Text; }});
 
-            objectFrameworkArea.AddControl(new TextArea(320 + 205, 80 - 24, "Description: ") {Font = UIManager.SmallTextFont, Color = "black"});
+            objectFrameworkArea.AddControl(new TextArea(320 + 205, 80 - 24, "Description: ") {Font = UIManager.UIManager.SmallTextFont, Color = "black"});
             objectFrameworkArea.AddControl(
                     objectFrameworkArea.Data.Description =
                     new TextBox(370 + 240, 60 - 20, 220, 25, "") {Color = "rgb(50,150,50)", Click = (p) => { objectFrameworkArea.Data.ObjectFramework.Description = objectFrameworkArea.Data.Description.Text; }});
@@ -647,10 +649,22 @@ namespace OurSonic.UIManager.Areas
                                                                     //var ce;
                                                                     objectFrameworkArea.Data.MainPanel.Data.FrameArea.AddControl(new TextArea(15, 21, "Name: ") {Color = "black"});
                                                                     TextBox textBox = null;
-                                                                    objectFrameworkArea.Data.MainPanel.Data.FrameArea.AddControl(new TextBox(90, 0, 395, 25, frame.Name) {
+                                                                    objectFrameworkArea.Data.MainPanel.Data.FrameArea.AddControl(textBox=new TextBox(90, 0, 395, 25, frame.Name??"") {
                                                                                                                                                                                  Color = "rgb(50,150,50)",
                                                                                                                                                                                  Click = (p) => { frame.Name = textBox.Text; }
                                                                                                                                                                          });
+
+
+                                                                    objectFrameworkArea.Data.MainPanel.Data.FrameArea.AddControl(new TextArea(15, 100, "Transparent Color: ") { Color = "black" });
+                                                                    TextBox tb2=null;
+                                                                    objectFrameworkArea.Data.MainPanel.Data.FrameArea.AddControl(tb2 = new TextBox(15, 120, 395, 25, frame.TransparentColor ?? "")
+                                                                    {
+                                                                        Color = "rgb(50,150,50)",
+                                                                        TextChanged = () => { frame.TransparentColor = tb2.Text;
+                                                                        
+                                                                        frame.ClearCache();
+                                                                        }
+                                                                    });
 
                                                                     objectFrameworkArea.Data.MainPanel.Data.FrameArea.AddControl(new TextArea(0, 275, (Func<string>) ( () => { return "Width:  " + frame.Width; } )) {Color = "Black"});
 

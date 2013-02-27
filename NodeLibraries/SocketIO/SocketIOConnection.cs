@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
-using NodeJS.EventsModule;
+using NodeJSLibrary;
 namespace SocketIOLibrary
 {
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     public class SocketIOConnection : EventEmitter {}
 }

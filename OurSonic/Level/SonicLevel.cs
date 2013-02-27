@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Html;
 using System.Runtime.CompilerServices;
 using OurSonic.Level.Animations;
 using OurSonic.Level.Objects;
@@ -33,7 +34,7 @@ namespace OurSonic.Level
         [IntrinsicProperty]
         public List<List<PaletteItem>> PaletteItems { get; set; }
         [IntrinsicProperty]
-        public string[][] Palette { get; set; }
+        public CanvasElement[][] Palette { get; set; }
         [IntrinsicProperty]
         public List<int> PaletteAnimationIndexes { get; set; }
         [IntrinsicProperty]
@@ -107,7 +108,7 @@ namespace OurSonic.Level
     public class PaletteItem
     {
         [IntrinsicProperty]
-        public string[] Palette { get; set; }
+        public CanvasElement[] Palette { get; set; }
         [IntrinsicProperty]
         public int SkipIndex { get; set; }
         [IntrinsicProperty]

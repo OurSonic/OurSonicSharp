@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Html;
 using OurSonic.Level.Objects;
+using OurSonic.UIManager;
 using jQueryApi;
-namespace OurSonic.UIManager.Areas
+using Element = OurSonic.UIManager.Element;
+namespace OurSonic.Areas
 {
     public class LiveObjectsArea
     {
-        public LiveObjectsArea(UIManager uiManager)
+        public LiveObjectsArea(UIManager.UIManager uiManager)
         {
             var liveObjectsArea = uiManager.UIManagerAreas.LiveObjectsArea = new UIArea<LiveObjectsAreaData>(new LiveObjectsAreaData(), 947, 95, 770, 700) {Closable = true};
             liveObjectsArea.Visible = true;

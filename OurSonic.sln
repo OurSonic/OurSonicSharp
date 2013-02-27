@@ -22,7 +22,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Output", "Output\", "{50600
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "49247"
+		VWDPort = "49609"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OurSonicNode", "OurSonicNode\OurSonicNode.csproj", "{1F57228D-11FC-49D8-AB36-7B026D5FE5DF}"
@@ -49,6 +49,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketIOWebLibrary", "WebLi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeJS", "NodeLibraries\NodeJS\NodeJS.csproj", "{79800429-B885-4F5E-9A3B-48E50390214A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{CB171A82-8E3D-427F-A8A1-25702A5093E1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,15 +66,12 @@ Global
 		{3222B6FB-15F6-4217-8ECD-193BCFCE7D60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3222B6FB-15F6-4217-8ECD-193BCFCE7D60}.Release|Any CPU.Build.0 = Release|Any CPU
 		{50600C4F-4CCD-4AE7-A1EF-C3D183ED232E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{50600C4F-4CCD-4AE7-A1EF-C3D183ED232E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50600C4F-4CCD-4AE7-A1EF-C3D183ED232E}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{50600C4F-4CCD-4AE7-A1EF-C3D183ED232E}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{1F57228D-11FC-49D8-AB36-7B026D5FE5DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1F57228D-11FC-49D8-AB36-7B026D5FE5DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F57228D-11FC-49D8-AB36-7B026D5FE5DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F57228D-11FC-49D8-AB36-7B026D5FE5DF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D16CB407-F890-4670-8DB6-37DF76880297}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D16CB407-F890-4670-8DB6-37DF76880297}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D16CB407-F890-4670-8DB6-37DF76880297}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D16CB407-F890-4670-8DB6-37DF76880297}.Release|Any CPU.Build.0 = Release|Any CPU
 		{48C25DF7-AFC5-4AC0-B11A-535DEF87076D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -84,19 +83,15 @@ Global
 		{BD7C6F4F-3798-4C32-9EE1-306CF197F81E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BD7C6F4F-3798-4C32-9EE1-306CF197F81E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BBF1829B-3446-4C0D-A75A-9BC713D2A6A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BBF1829B-3446-4C0D-A75A-9BC713D2A6A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBF1829B-3446-4C0D-A75A-9BC713D2A6A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BBF1829B-3446-4C0D-A75A-9BC713D2A6A1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6DA30112-FDBD-4E48-9F52-7268FCE19D25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6DA30112-FDBD-4E48-9F52-7268FCE19D25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6DA30112-FDBD-4E48-9F52-7268FCE19D25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6DA30112-FDBD-4E48-9F52-7268FCE19D25}.Release|Any CPU.Build.0 = Release|Any CPU
 		{108D8A37-0782-4FFA-9A53-934E07B9B28A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{108D8A37-0782-4FFA-9A53-934E07B9B28A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{108D8A37-0782-4FFA-9A53-934E07B9B28A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{108D8A37-0782-4FFA-9A53-934E07B9B28A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{79800429-B885-4F5E-9A3B-48E50390214A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{79800429-B885-4F5E-9A3B-48E50390214A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79800429-B885-4F5E-9A3B-48E50390214A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79800429-B885-4F5E-9A3B-48E50390214A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

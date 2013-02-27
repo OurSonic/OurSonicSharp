@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 namespace CodeMirrorLibrary
 {
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     [ScriptName("CodeMirror")]
     public class CodeMirror
     {
@@ -83,7 +83,7 @@ namespace CodeMirrorLibrary
         }
     }
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     public class CodeMirrorLine
     {
         [IntrinsicProperty]
@@ -91,7 +91,7 @@ namespace CodeMirrorLibrary
         public bool MarkerText { get; set; }
     }
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     public class CodeEditorCursor
     {
         [IntrinsicProperty]

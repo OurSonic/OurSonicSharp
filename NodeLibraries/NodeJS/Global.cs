@@ -3,8 +3,7 @@ using System.Runtime.CompilerServices;
 namespace NodeJSLibrary
 {
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
-    [IgnoreGenericArguments]
+    [Imported()]
     public static class Global
     {
         [IntrinsicProperty]
@@ -14,7 +13,7 @@ namespace NodeJSLibrary
         [IntrinsicProperty]
         public static Console Console { get; set; }
 
-        [IgnoreGenericArguments]
+        
         [ScriptAlias("require")]
         public static TModule Require<TModule>(string name) where TModule : NodeModule
         {
@@ -31,8 +30,8 @@ namespace NodeJSLibrary
         public static void SetTimeout(Action pollGateways, int poll) {}
     }
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
-    [IgnoreGenericArguments]
+    [Imported()]
+    
     public class Console
     {
         public void Log(string log) {}

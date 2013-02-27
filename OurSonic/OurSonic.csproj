@@ -35,6 +35,19 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Areas\ColorEditingArea.cs" />
+    <Compile Include="Areas\ColorEditorArea.cs" />
+    <Compile Include="Areas\Editor.cs" />
+    <Compile Include="Areas\LevelManagerArea.cs" />
+    <Compile Include="Areas\LevelSelectorArea.cs" />
+    <Compile Include="Areas\LiveObjectsArea.cs" />
+    <Compile Include="Areas\ObjectFrameworkArea.cs" />
+    <Compile Include="Areas\ObjectFrameworkListArea.cs" />
+    <Compile Include="Areas\PaletteArea.cs" />
+    <Compile Include="Areas\PieceLayoutEditor.cs" />
+    <Compile Include="Areas\PieceLayoutMaker.cs" />
+    <Compile Include="Areas\TileChunkArea.cs" />
+    <Compile Include="Areas\UIManagerAreas.cs" />
     <Compile Include="Level\Animations\Animation.cs" />
     <Compile Include="Level\Animations\AnimationInstance.cs" />
     <Compile Include="Level\Events\LevelEvent.cs" />
@@ -62,12 +75,9 @@
     <Compile Include="Sonic\SensorManager.cs" />
     <Compile Include="Sonic\Sonic.cs" />
     <Compile Include="Sonic\SonicConstants.cs" />
-    <Compile Include="UIManager\Areas\LevelManagerArea.cs" />
-    <Compile Include="UIManager\Areas\TileChunkArea.cs" />
     <Compile Include="UIManager\Image.cs" />
     <Compile Include="UIManager\Table.cs" />
     <Compile Include="UIManager\LayoutPanel.cs" />
-    <Compile Include="UIManager\UIManagerAreas.cs" />
     <Compile Include="Utility\CanvasInformation.cs" />
     <Compile Include="Utility\ClickState.cs" />
     <Compile Include="Utility\Color.cs" />
@@ -86,22 +96,12 @@
     <Compile Include="SonicEngine.cs" />
     <Compile Include="SonicManager.cs" />
     <Compile Include="SonicManager.load.cs" />
-    <Compile Include="UIManager\Areas\ColorEditingArea.cs" />
-    <Compile Include="UIManager\Areas\ColorEditorArea.cs" />
-    <Compile Include="UIManager\Areas\LiveObjectsArea.cs" />
-    <Compile Include="UIManager\Areas\ObjectFrameworkListArea.cs" />
-    <Compile Include="UIManager\Areas\Editor.cs" />
-    <Compile Include="UIManager\Areas\LevelSelectorArea.cs" />
-    <Compile Include="UIManager\Areas\PieceLayoutEditor.cs" />
-    <Compile Include="UIManager\Areas\PieceLayoutMaker.cs" />
     <Compile Include="UIManager\Button.cs" />
     <Compile Include="UIManager\EditorEngine.cs" />
     <Compile Include="UIManager\Element.cs" />
     <Compile Include="UIManager\HScrollBox.cs" />
     <Compile Include="UIManager\HtmlBox.cs" />
     <Compile Include="UIManager\ImageButton.cs" />
-    <Compile Include="UIManager\Areas\ObjectFrameworkArea.cs" />
-    <Compile Include="UIManager\Areas\PaletteArea.cs" />
     <Compile Include="UIManager\Panel.cs" />
     <Compile Include="UIManager\Pointer.cs" />
     <Compile Include="UIManager\PropertyButton.cs" />
@@ -145,25 +145,23 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib">
-      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.1.4.0.18\tools\Assemblies\mscorlib.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.2.0.4\tools\Assemblies\mscorlib.dll</HintPath>
     </Reference>
-    <Reference Include="Script.jQuery, Version=1.4.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Saltarelle.jQuery.1.4.0\lib\Script.jQuery.dll</HintPath>
+    <Reference Include="Saltarelle.jQuery">
+      <HintPath>..\packages\Saltarelle.jQuery.1.9.0\lib\Saltarelle.jQuery.dll</HintPath>
     </Reference>
-    <Reference Include="Script.jQuery.UI, Version=1.4.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Saltarelle.jQuery.UI.1.4.0\lib\Script.jQuery.UI.dll</HintPath>
+    <Reference Include="Saltarelle.jQuery.UI">
+      <HintPath>..\packages\Saltarelle.jQuery.UI.1.9.2\lib\Saltarelle.jQuery.UI.dll</HintPath>
     </Reference>
-    <Reference Include="Script.Linq, Version=1.4.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Saltarelle.Linq.1.4.0.1\lib\Script.Linq.dll</HintPath>
+    <Reference Include="Saltarelle.Linq">
+      <HintPath>..\packages\Saltarelle.Linq.2.0.1\lib\Saltarelle.Linq.dll</HintPath>
     </Reference>
-    <Reference Include="Script.Web, Version=1.4.0.0, Culture=neutral, PublicKeyToken=8fc0e3af5abcb6c4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Saltarelle.Web.1.4.0.1\lib\Script.Web.dll</HintPath>
+    <Reference Include="Saltarelle.Web">
+      <HintPath>..\packages\Saltarelle.Web.2.0.0\lib\Saltarelle.Web.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.4.0.28\tools\Saltarelle.Compiler.targets')" />
-  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.1.4.0.28\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.1.4.0.28\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.0.4\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.0.4\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.0.4\tools\Saltarelle.Compiler.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

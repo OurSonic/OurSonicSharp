@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 namespace NodeJSLibrary
 {
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     [ScriptName("process")]
     public class Process : EventEmitter
     {
@@ -21,7 +21,7 @@ namespace NodeJSLibrary
         public void Exit() {}
     }
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     public class STDIn : EventEmitter
     {
         [ScriptName("resume")]
@@ -31,14 +31,14 @@ namespace NodeJSLibrary
         public void Once(string data, Action<string> function) {}
     }
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     public class STDOut : EventEmitter
     {
         [ScriptName("write")]
         public void Write(string question) {}
     }
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     [ScriptName("STDErr")]
     public class STDError : EventEmitter
     {
