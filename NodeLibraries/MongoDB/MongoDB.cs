@@ -3,7 +3,7 @@ using NodeJSLibrary;
 namespace MongoDB
 {
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     [ScriptName("mongo")]
     public class MongoModule : NodeModule
     {

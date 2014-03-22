@@ -34,19 +34,11 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EcmaScript.NET">
-      <HintPath>..\packages\EcmaScript.Net.1.0.1.0\lib\net20\EcmaScript.NET.dll</HintPath>
+    <Reference Include="Ftp">
+      <HintPath>..\packages\Ftp.dll.2.0.14078.1617\lib\Ftp.dll</HintPath>
     </Reference>
-    <Reference Include="Ftp, Version=2.0.13041.1517, Culture=neutral, PublicKeyToken=6dc438ab78a525b3, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Ftp.dll.2.0.13041.1517\lib\Ftp.dll</HintPath>
-    </Reference>
-    <Reference Include="Iesi.Collections">
-      <HintPath>..\packages\Iesi.Collections.3.2.0.4000\lib\Net35\Iesi.Collections.dll</HintPath>
-    </Reference>
-    <Reference Include="Renci.SshNet, Version=2013.1.27.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\SSH.NET.2013.1.27\lib\net40\Renci.SshNet.dll</HintPath>
+    <Reference Include="Renci.SshNet">
+      <HintPath>..\packages\SSH.NET.2013.4.7\lib\net40\Renci.SshNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -56,10 +48,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Yahoo.Yui.Compressor, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\YUICompressor.NET.2.2.0.0\lib\NET20\Yahoo.Yui.Compressor.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />

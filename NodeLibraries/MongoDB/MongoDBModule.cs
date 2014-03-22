@@ -4,7 +4,7 @@ using NodeJSLibrary;
 namespace MongoDB
 {
     [IgnoreNamespace]
-    [Imported(IsRealType = true)]
+    [Imported()]
     public class MongoDB : NodeModule
     {
         [ScriptName("open")]

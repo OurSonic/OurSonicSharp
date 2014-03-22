@@ -1,0 +1,13 @@
+2.3.0
+Use assembly version x.0.0.0 in order to get less dependency versioning problems.
+Works with compiler/runtime 2.3.0
+
+2.2.0
+Web audio API (thanks to Timothy Fries)
+
+2.1.0
+WebGL support (thanks to Marcel F and Delta Engine)
+Updated custom event signatures to match DOM specification (thanks to Michael Busby)
+
+2.0.0
+Initial version

@@ -4,8 +4,6 @@ namespace FibersLibrary
 {
     [Imported()]
     [ModuleName("Fiber")]
-    
-    [Imported]
     public class FiberModule<T>
     {
         public FiberModule(Func<T, bool> action) {}

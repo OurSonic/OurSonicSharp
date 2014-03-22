@@ -75,7 +75,7 @@ namespace OurSonic.Areas
             canv.StrokeStyle = "#000";
             canv.LineWidth = 2;
             var pos = new Point(TotalX, TotalY);
-            var f = Math.Round(Palette.Length / 2.0);
+            var f = (int)Math.Round(Palette.Length / 2.0);
 
             if (Wide) {
                 for (var h = 0; h < 2; h++) {

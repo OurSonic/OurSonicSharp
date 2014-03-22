@@ -52,22 +52,19 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="please-uninstall.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib">
-      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.2.0.4\tools\Assemblies\mscorlib.dll</HintPath>
-    </Reference>
-    <Reference Include="Saltarelle.Linq">
-      <HintPath>..\..\packages\Saltarelle.Linq.2.0.1\lib\Saltarelle.Linq.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\NodeJS\NodeJS.csproj">
       <Project>{79800429-B885-4F5E-9A3B-48E50390214A}</Project>
       <Name>NodeJS</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.0.4\tools\Saltarelle.Compiler.targets')" />
-  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.0.4\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.0.4\tools\Saltarelle.Compiler.targets')" />
+  <ItemGroup>
+    <Reference Include="mscorlib">
+      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.2.4.0\tools\Assemblies\mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="Saltarelle.Linq">
+      <HintPath>..\..\packages\Saltarelle.Linq.2.4.0\lib\Saltarelle.Linq.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.4.0\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.4.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.4.0\tools\Saltarelle.Compiler.targets')" />
 </Project>

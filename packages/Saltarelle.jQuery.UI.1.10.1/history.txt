@@ -1,0 +1,19 @@
+1.10.1
+Fixed return type of ProgressBar.Value() (#6)
+
+1.10.0
+Updated jQueryUI to 1.10.3
+Use assembly version x.0.0.0 in order to get less dependency versioning problems.
+Updated Saltarelle dependencies
+
+1.9.3
+Fixed event names (thanks to Pete Davis)
+
+1.9.2
+Fixed issues with @-signs in the metadata.
+
+1.9.1
+Fixed build issue that caused package built on CI server (eg. NuGet download) to always be empty.
+
+1.9.0
+Initial version with jQuery.UI 1.9.2

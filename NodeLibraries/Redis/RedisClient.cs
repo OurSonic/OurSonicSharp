@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using NodeJSLibrary;
+
 namespace Redis
 {
     public class RedisClient : EventEmitter
