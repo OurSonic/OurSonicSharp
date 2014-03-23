@@ -9,7 +9,6 @@ namespace OurSonic.Level.Tiles
         public TileCacheBlockType Type { get; set; }
         public TilePieceInfo TilePieceInfo { get; set; }
         public CanvasInformation Block { get; set; }
-        public string Color { get; set; }
         public int XPos { get; set; }
         public int YPos { get; set; }
 

@@ -131,7 +131,7 @@ namespace OurSonic
                                            },
                                            () => { });
 
-            client = SocketIOClient.Connect("50.116.22.241:8998");
+            client = SocketIOClient.Connect("127.0.0.1:8998");
             
             client.On<DataObject<string>>("SonicLevel",
                                           data => { Help.DecodeString<SLData>(data.Data, RunSonic); });

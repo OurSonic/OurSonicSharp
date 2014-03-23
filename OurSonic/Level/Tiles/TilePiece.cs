@@ -10,8 +10,8 @@ namespace OurSonic.Level.Tiles
 {
     public class TilePiece
     {
-        private static readonly int[][] DrawInfo = new[] {new[] {0, 0}, new[] {1, 0}, new[] {0, 1}, new[] {1, 1}};
-        private static readonly int[][] DrawOrder = new[] {new[] {3, 2, 1, 0}, new[] {1, 0, 3, 2}, new[] {2, 3, 0, 1}, new[] {0, 1, 2, 3}};
+        private static readonly int[][] DrawInfo = { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 0, 1 }, new[] { 1, 1 } };
+        private static readonly int[][] DrawOrder = { new[] { 3, 2, 1, 0 }, new[] { 1, 0, 3, 2 }, new[] { 2, 3, 0, 1 }, new[] { 0, 1, 2, 3 } };
         private bool onlyBackground;
         private bool onlyBackgroundSet;
         private bool onlyForeground;
@@ -45,32 +45,38 @@ namespace OurSonic.Level.Tiles
         {
             if (onlyBackgroundSet) return onlyBackground;
 
-            foreach (var mj in Tiles) {
-                if (mj.Truthy()) {
-                    if (mj.Priority) {
+            foreach (var mj in Tiles)
+            {
+                if (mj.Truthy())
+                {
+                    if (mj.Priority)
+                    {
                         onlyBackgroundSet = true;
-                        return ( onlyBackground = false );
+                        return (onlyBackground = false);
                     }
                 }
             }
             onlyBackgroundSet = true;
-            return ( onlyBackground = true );
+            return (onlyBackground = true);
         }
 
         public bool OnlyForeground()
         {
             if (onlyForegroundSet) return onlyForeground;
 
-            foreach (var mj in Tiles) {
-                if (mj.Truthy()) {
-                    if (!mj.Priority) {
+            foreach (var mj in Tiles)
+            {
+                if (mj.Truthy())
+                {
+                    if (!mj.Priority)
+                    {
                         onlyForegroundSet = true;
-                        return ( onlyForeground = false );
+                        return (onlyForeground = false);
                     }
                 }
             }
             onlyForegroundSet = true;
-            return ( onlyForeground = true );
+            return (onlyForeground = true);
         }
 
         public bool Draw(CanvasContext2D canvas,
@@ -81,7 +87,7 @@ namespace OurSonic.Level.Tiles
                          int animatedIndex)
         {
             var drawOrderIndex = 0;
-            drawOrderIndex = xFlip ? ( yFlip ? 0 : 1 ) : ( yFlip ? 2 : 3 );
+            drawOrderIndex = xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3);
 
             /*
 
@@ -126,17 +132,20 @@ namespace OurSonic.Level.Tiles
 
         public bool ShouldAnimate()
         {
-            if (shouldAnimate == null) {
-                foreach (TileItem t in Tiles) {
+            if (shouldAnimate == null)
+            {
+                foreach (TileItem t in Tiles)
+                {
                     var mj = t.GetTile();
-                    if (mj.Truthy()) {
+                    if (mj.Truthy())
+                    {
                         if (mj.ShouldAnimate())
-                            return ( shouldAnimate = true ).Value;
+                            return (shouldAnimate = true).Value;
                     }
                 }
                 shouldAnimate = false;
             }
-            return ( shouldAnimate ).Value;
+            return (shouldAnimate).Value;
         }
 
         private CanvasElement buildCache(int layer, bool xFlip, bool yFlip, int animatedIndex, int drawOrderIndex)
@@ -148,11 +157,14 @@ namespace OurSonic.Level.Tiles
             var i = 0;
 
             var localPoint = new Point(0, 0);
-            foreach (TileItem t in Tiles.Array()) {
+            foreach (TileItem t in Tiles.Array())
+            {
                 var mj = t;
                 var tile = t.GetTile();
-                if (tile.Truthy()) {
-                    if (mj.Priority == ( layer == 1 )) {
+                if (tile.Truthy())
+                {
+                    if (mj.Priority == (layer == 1))
+                    {
                         var _xf = xFlip ^ mj.XFlip;
                         var _yf = yFlip ^ mj.YFlip;
                         var df = DrawInfo[DrawOrder[drawOrderIndex][i]];
@@ -175,13 +187,15 @@ namespace OurSonic.Level.Tiles
         private void SetCache(int layer,
                               int drawOrder,
                               int animationFrame,
-                              
+
                               CanvasElement image)
         {
             List<int> palAn = SonicManager.Instance.SonicLevel.PaletteAnimationIndexes;
-            dynamic val = ( ( drawOrder << 8 ) + ( animationFrame << 20 ) + ( ( layer + 1 ) << 24 ) ); //okay
-            if (AnimatedFrames.Count > 0) {
-                for (int index = 0; index < AnimatedFrames.Count; index++) {
+            dynamic val = ((drawOrder << 8) + (animationFrame << 20) + ((layer + 1) << 24)); //okay
+            if (AnimatedFrames.Count > 0)
+            {
+                for (int index = 0; index < AnimatedFrames.Count; index++)
+                {
                     var animatedFrame = AnimatedFrames[index];
                     val += palAn[animatedFrame] + " ";
                 }
@@ -192,9 +206,11 @@ namespace OurSonic.Level.Tiles
         private CanvasElement GetCache(int layer, int drawOrder, int animationFrame)
         {
             List<int> palAn = SonicManager.Instance.SonicLevel.PaletteAnimationIndexes;
-            dynamic val = ( ( drawOrder << 8 ) + ( animationFrame << 20 ) + ( ( layer + 1 ) << 24 ) ); //okay
-            if (AnimatedFrames.Count > 0) {
-                foreach (var animatedFrame in AnimatedFrames) {
+            dynamic val = ((drawOrder << 8) + (animationFrame << 20) + ((layer + 1) << 24)); //okay
+            if (AnimatedFrames.Count > 0)
+            {
+                foreach (var animatedFrame in AnimatedFrames)
+                {
                     val += palAn[animatedFrame] + " ";
                 }
             }
@@ -207,7 +223,8 @@ namespace OurSonic.Level.Tiles
             canvas.DrawImage(fd, position.X, position.Y);
 
             UIManagerAreas areas = SonicManager.Instance.UIManager.UIManagerAreas;
-            if (areas.TilePieceArea != null && areas.TilePieceArea.Data != null && areas.TilePieceArea.Data.Index == Index) {
+            if (areas.TilePieceArea != null && areas.TilePieceArea.Data != null && areas.TilePieceArea.Data.Index == Index)
+            {
                 canvas.Save();
                 canvas.StrokeStyle = "light green";
                 canvas.LineWidth = 2;

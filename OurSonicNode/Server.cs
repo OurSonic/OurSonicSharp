@@ -9,7 +9,7 @@ namespace OurSonicNode
 {
     public   class Server
     { 
-        private string objDirectory = "/usr/local/src/sonic/ObjectData/";
+        private string objDirectory = "ObjectData/";
         private FS fs;
 
         public Server()
@@ -26,7 +26,7 @@ namespace OurSonicNode
 
             string[] fileData = new string[0];
             string[] fileNames = new string[0];
-            string levelsDir = "/usr/local/src/sonic/LevelData/";
+            string levelsDir = "LevelData/";
             fs.Readdir(levelsDir,
                        (err, files) => {
                            for (int i = 0; i < files.Length; i++) {
@@ -86,8 +86,7 @@ namespace OurSonicNode
                                                                                                             new {
                                                                                                                         Data =
                                                                                                                     _getObjects(_objects).Select(
-                                                                                                                            a => new {key = _objects[ind++], value = a}).
-                                                                                                                                          ToArray()
+                                                                                                                            a => new {key = _objects[ind++], value = a})
                                                                                                                 });
                                                                                             }));
 
@@ -97,7 +96,7 @@ namespace OurSonicNode
                                                                                                             new {
                                                                                                                         Data =
                                                                                                                     fs.ReaddirSync(objDirectory).Where(a => a.EndsWith(( ".js" ))).Select(
-                                                                                                                            a => a.Replace(".js", "")).ToArray()
+                                                                                                                            a => a.Replace(".js", ""))
                                                                                                                 });
                                                                                             }));
                                                          }));
@@ -105,7 +104,7 @@ namespace OurSonicNode
 
         public static void Main()
         {
-         new Compress();
+     //    new Compress();
             new Server();
         }
 
@@ -116,6 +115,59 @@ namespace OurSonicNode
                 else
                     yield return fs.ReadFileSync(objDirectory + _object + ".js", "utf8");
             }
+        }
+    }
+
+    public static class EnumerableExtensions
+    {
+        public static T[] Where<T>(this T[] items, Func<T, bool> clause)
+        {
+            List<T> items2 = new List<T>();
+
+            foreach (var item in items)
+            {
+                if (clause(item))
+                {
+                    items2.Add(item);
+                }
+            }
+            return items2.ToArray();
+        }
+        public static T2[] Select<T, T2>(this T[] items, Func<T, T2> clause)
+        {
+            List<T2> items2 = new List<T2>();
+
+            foreach (var item in items)
+            {
+                items2.Add(clause(item));
+            }
+            return items2.ToArray();
+        }
+
+
+
+        public static T[] Where<T>(this IEnumerable<T> items, Func<T, bool> clause)
+        {
+            List<T> items2 = new List<T>();
+
+            foreach (var item in items)
+            {
+                if (clause(item))
+                {
+                    items2.Add(item);
+                }
+            }
+            return items2.ToArray();
+        }
+        public static T2[] Select<T, T2>(this IEnumerable<T> items, Func<T, T2> clause)
+        {
+            List<T2> items2 = new List<T2>();
+
+            foreach (var item in items)
+            {
+                items2.Add(clause(item));
+            }
+            return items2.ToArray();
         }
     }
 }

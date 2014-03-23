@@ -1,6 +1,10 @@
-require('./mscorlib.js');Enumerable=require('./linq.js');require('./lib/RawDeflate.js');require('./OurSonicModels.js');
+require('./mscorlib.js');require('./lib/RawDeflate.js');require('./OurSonicModels.js');
+'use strict';
 require('mscorlib');
 var socketio = require('socket.io');
+var $asm = {};
+global.OurSonicNode = global.OurSonicNode || {};
+ss.initAssembly($asm, 'OurSonicNode');
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicNode.Compress
 var $OurSonicNode_Compress = function() {
@@ -33,10 +37,74 @@ var $OurSonicNode_Compress = function() {
 		}
 	});
 };
+$OurSonicNode_Compress.__typeName = 'OurSonicNode.Compress';
+global.OurSonicNode.Compress = $OurSonicNode_Compress;
+////////////////////////////////////////////////////////////////////////////////
+// OurSonicNode.EnumerableExtensions
+var $OurSonicNode_EnumerableExtensions = function() {
+};
+$OurSonicNode_EnumerableExtensions.__typeName = 'OurSonicNode.EnumerableExtensions';
+$OurSonicNode_EnumerableExtensions.where$1 = function(T) {
+	return function(items, clause) {
+		var items2 = [];
+		for (var $t1 = 0; $t1 < items.length; $t1++) {
+			var item = items[$t1];
+			if (clause(item)) {
+				ss.add(items2, item);
+			}
+		}
+		return Array.prototype.slice.call(items2);
+	};
+};
+$OurSonicNode_EnumerableExtensions.select$1 = function(T, T2) {
+	return function(items, clause) {
+		var items2 = [];
+		for (var $t1 = 0; $t1 < items.length; $t1++) {
+			var item = items[$t1];
+			ss.add(items2, clause(item));
+		}
+		return Array.prototype.slice.call(items2);
+	};
+};
+$OurSonicNode_EnumerableExtensions.where = function(T) {
+	return function(items, clause) {
+		var items2 = [];
+		var $t1 = ss.getEnumerator(items);
+		try {
+			while ($t1.moveNext()) {
+				var item = $t1.current();
+				if (clause(item)) {
+					ss.add(items2, item);
+				}
+			}
+		}
+		finally {
+			$t1.dispose();
+		}
+		return Array.prototype.slice.call(items2);
+	};
+};
+$OurSonicNode_EnumerableExtensions.select = function(T, T2) {
+	return function(items, clause) {
+		var items2 = [];
+		var $t1 = ss.getEnumerator(items);
+		try {
+			while ($t1.moveNext()) {
+				var item = $t1.current();
+				ss.add(items2, clause(item));
+			}
+		}
+		finally {
+			$t1.dispose();
+		}
+		return Array.prototype.slice.call(items2);
+	};
+};
+global.OurSonicNode.EnumerableExtensions = $OurSonicNode_EnumerableExtensions;
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicNode.Server
 var $OurSonicNode_Server = function() {
-	this.$objDirectory = '/usr/local/src/sonic/ObjectData/';
+	this.$objDirectory = 'ObjectData/';
 	this.$fs = null;
 	this.$fs = require('fs');
 	var http = require('http');
@@ -50,7 +118,7 @@ var $OurSonicNode_Server = function() {
 	var io = socketio.listen(app);
 	var fileData = [];
 	var fileNames = [];
-	var levelsDir = '/usr/local/src/sonic/LevelData/';
+	var levelsDir = 'LevelData/';
 	this.$fs.readdir(levelsDir, ss.mkdel(this, function(err, files) {
 		for (var i = 0; i < files.length; i++) {
 			var i1 = { $: i };
@@ -95,20 +163,28 @@ var $OurSonicNode_Server = function() {
 		}));
 		socket.on('GetObjects', ss.mkdel(this, function(_objects) {
 			var ind = 0;
-			socket.emit('GetObjects.Response', { Data: Enumerable.from(this.$_getObjects(_objects)).select(function(a) {
+			socket.emit('GetObjects.Response', { Data: $OurSonicNode_EnumerableExtensions.select(String, Object).call(null, this.$_getObjects(_objects), function(a) {
 				return { key: _objects[ind++], value: a };
-			}).toArray() });
+			}) });
 		}));
 		socket.on('GetAllObjects', ss.mkdel(this, function(_objects1) {
-			socket.emit('GetAllObjects.Response', { Data: Enumerable.from(this.$fs.readdirSync(this.$objDirectory)).where(function(a1) {
+			socket.emit('GetAllObjects.Response', { Data: $OurSonicNode_EnumerableExtensions.select$1(String, String).call(null, $OurSonicNode_EnumerableExtensions.where$1(String).call(null, this.$fs.readdirSync(this.$objDirectory), function(a1) {
 				return ss.endsWithString(a1, '.js');
-			}).select(function(a2) {
+			}), function(a2) {
 				return ss.replaceAllString(a2, '.js', '');
-			}).toArray() });
+			}) });
 		}));
 	}));
 };
-$OurSonicNode_Server.prototype = {
+$OurSonicNode_Server.__typeName = 'OurSonicNode.Server';
+$OurSonicNode_Server.main = function() {
+	//    new Compress();
+	new $OurSonicNode_Server();
+};
+global.OurSonicNode.Server = $OurSonicNode_Server;
+ss.initClass($OurSonicNode_Compress, $asm, {});
+ss.initClass($OurSonicNode_EnumerableExtensions, $asm, {});
+ss.initClass($OurSonicNode_Server, $asm, {
 	$_getObjects: function(_objects) {
 		return new ss.IteratorBlockEnumerable(function() {
 			return (function(_objects) {
@@ -159,11 +235,5 @@ $OurSonicNode_Server.prototype = {
 			}).call(this, _objects);
 		}, this);
 	}
-};
-$OurSonicNode_Server.main = function() {
-	new $OurSonicNode_Compress();
-	new $OurSonicNode_Server();
-};
-ss.registerClass(global, 'OurSonicNode.Compress', $OurSonicNode_Compress);
-ss.registerClass(global, 'OurSonicNode.Server', $OurSonicNode_Server);
+});
 $OurSonicNode_Server.main();

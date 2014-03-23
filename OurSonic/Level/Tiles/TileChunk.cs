@@ -379,7 +379,6 @@ namespace OurSonic.Level.Tiles
                 if (oldCacheBlock == null) {
                     oldCacheBlock = new TileCacheBlock(TileCacheBlockType.Block);
                     oldCacheBlock.Block = CanvasInformation.Create(pieceWidth * 8, pieceHeight * 8);
-                    oldCacheBlock.Color = string.Format("rgba({0},{1},{2},0.2);", (int) ( Math.Random() * 150 ), (int) ( Math.Random() * 255 ), (int) ( Math.Random() * 255 ));
                 }
 
                 oldCacheBlock.Block.Context.Save();

@@ -176,6 +176,8 @@ namespace OurSonic
 
         private bool effectClick(jQueryEvent elementEvent)
         {
+            if (CurrentGameState == GameState.Playing) return false;
+
             var e = new Point((int)((double)elementEvent.ClientX / Scale.X / RealScale.X + WindowLocation.X),
                               (int)((double)elementEvent.ClientY / Scale.Y / RealScale.Y + WindowLocation.Y));
 
@@ -855,8 +857,8 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
 
         public void ReplaceMagic()
         {
-            //   Replace(new Rectangle(0, 0, 15, 30), new Point(712, 40)); level 1 act 1
-            Replace(new Rectangle(312, 15, 55, 70), new Point(1032, 0)); // laucnh base 1 :-/
+            Replace(new Rectangle(0, 0, 15, 30), new Point(712, 40)); //level 1 act 1
+           // Replace(new Rectangle(312, 15, 55, 70), new Point(1032, 0)); // laucnh base 1 :-/
         }
 
         public void Replace(Rectangle from, Point to)

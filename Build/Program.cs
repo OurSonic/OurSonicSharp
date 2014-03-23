@@ -1,4 +1,4 @@
-﻿#define FTP
+﻿//#define FTP
 //#define COMPRESS
 using System;
 using System.Collections.Generic;
@@ -96,7 +96,7 @@ namespace Build
 
                 if (depend.Value.Node) {
                     output += "require('./mscorlib.js');";
-                    output += "Enumerable=require('./linq.js');";
+//                    output += "Enumerable=require('./linq.js');";
                 } else {
                     //output += "require('./mscorlib.debug.js');";
                 }
@@ -121,12 +121,12 @@ namespace Build
                 Console.WriteLine("writing " + to);
 
                 var name = to.Split(new char[] {'\\'}, StringSplitOptions.RemoveEmptyEntries).Last();
-                File.WriteAllText(@"C:\inetpub\wwwroot\" + name, text);
+                File.WriteAllText(@"C:\inetpub\wwwroot\sonic\" + name, text);
 
 #if FTP
                 Console.WriteLine("ftp start " + text.Length.ToString("N0"));
                 //webFTP.Upload("/httpdocs/nsonic/" + name, to);
-                client.UploadFile(File.OpenRead(@"C:\inetpub\wwwroot\" + name), "/var/www/sonic/" + name);
+                client.UploadFile(File.OpenRead(@"C:\inetpub\wwwroot\sonic\" + name), "/var/www/sonic/" + name);
                 Console.WriteLine("ftp complete " + to);
 #endif
 

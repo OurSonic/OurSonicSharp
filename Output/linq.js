@@ -1,6 +1,6 @@
 /*--------------------------------------------------------------------------
  * linq.js - LINQ for JavaScript
- * ver 3.0.0 Beta (July. 19th, 2012)
+ * ver 3.0.3-Beta4 (Oct. 9th, 2012)
  *
  * created and maintained by neuecc <ils@neue.cc>
  * licensed under MIT License
@@ -80,21 +80,18 @@
         },
 
         // IE8's defineProperty is defined but cannot use, therefore check defineProperties
-        isSupportDefineProperty: (Object.defineProperties != null),
-
-        defineProperty: function (target, methodName, value) {
-            if (Utils.isSupportDefineProperty) {
+        defineProperty: (Object.defineProperties != null)
+            ? function (target, methodName, value) {
                 Object.defineProperty(target, methodName, {
                     enumerable: false,
                     configurable: true,
                     writable: true,
                     value: value
-                });
+                })
             }
-            else {
+            : function (target, methodName, value) {
                 target[methodName] = value;
-            }
-        },
+            },
 
         compare: function (a, b) {
             return (a === b) ? 0
@@ -116,6 +113,7 @@
         var state = State.Before;
 
         this.current = yielder.current;
+        this.reset = function () { throw new Error('Reset is not supported'); };
 
         this.moveNext = function () {
             try {
@@ -153,6 +151,9 @@
             }
         };
     };
+    var $asm = {};
+    ss.initAssembly($asm, 'linq');
+    ss.initClass(IEnumerator, $asm, {}, null, [ss.IDisposable]);
 
     // for tryGetNext
     var Yielder = function () {
@@ -171,6 +172,7 @@
     var Enumerable = function (getEnumerator) {
         this.getEnumerator = getEnumerator;
     };
+    ss.initClass(Enumerable, $asm, {}, null, [ss.IEnumerable]);
 
     // Utility
 
@@ -192,7 +194,7 @@
         var typeProto = type.prototype;
         var enumerableProto;
 
-        if (type instanceof Array) {
+        if (type === Array) {
             enumerableProto = ArrayEnumerable.prototype;
             Utils.defineProperty(typeProto, "getSource", function () {
                 return this;
@@ -225,13 +227,17 @@
 
     // Generator
 
-    Enumerable.choice = function (elements) // variable argument
+    Enumerable.choice = function () // variable argument
     {
-        var args = (arguments[0] instanceof Array) ? arguments[0] : arguments;
+        var args = arguments;
 
         return new Enumerable(function () {
             return new IEnumerator(
-                Functions.Blank,
+                function () {
+                    args = (args[0] instanceof Array) ? args[0]
+                        : (args[0].getEnumerator != null) ? args[0].toArray()
+                        : args;
+                },
                 function () {
                     return this.yieldReturn(args[Math.floor(Math.random() * args.length)]);
                 },
@@ -239,14 +245,18 @@
         });
     };
 
-    Enumerable.cycle = function (elements) // variable argument
+    Enumerable.cycle = function () // variable argument
     {
-        var args = (arguments[0] instanceof Array) ? arguments[0] : arguments;
+        var args = arguments;
 
         return new Enumerable(function () {
             var index = 0;
             return new IEnumerator(
-                Functions.Blank,
+                function () {
+                    args = (args[0] instanceof Array) ? args[0]
+                        : (args[0].getEnumerator != null) ? args[0].toArray()
+                        : args;
+                },
                 function () {
                     if (index >= args.length) index = 0;
                     return this.yieldReturn(args[index++]);
@@ -285,6 +295,26 @@
                     Functions.Blank);
             });
         }
+        var ienum = ss.safeCast(obj, ss.IEnumerable);
+        if (ienum) {
+            var enumerator;
+            return new Enumerable(function () {
+                return new IEnumerator(
+                    function () { enumerator = ss.getEnumerator(ienum); },
+                    function () {
+                        var ok = enumerator.moveNext();
+                        return ok ? this.yieldReturn(enumerator.current()) : false;
+                    },
+                    function () {
+                        var disposable = ss.safeCast(enumerator, ss.IDisposable);
+                        if (disposable) {
+                            disposable.dispose();
+                        }
+                    }
+                );
+            });
+        }
+
         if (typeof obj != Types.Function) {
             // array or array like object
             if (typeof obj.length == Types.Number) {
@@ -307,6 +337,23 @@
                         Functions.Blank);
                 });
             }
+
+            // WinMD IIterable<T>
+            if (typeof Windows === Types.Object && typeof obj.first === Types.Function) {
+                return new Enumerable(function () {
+                    var isFirst = true;
+                    var enumerator;
+                    return new IEnumerator(
+                        function () { enumerator = obj.first(); },
+                        function () {
+                            if (isFirst) isFirst = false;
+                            else enumerator.moveNext();
+
+                            return (enumerator.hasCurrent) ? this.yieldReturn(enumerator.current) : this.yieldBreak();
+                        },
+                        Functions.Blank);
+                });
+            }
         }
 
         // case function/object : Create keyValuePair[]
@@ -317,8 +364,9 @@
             return new IEnumerator(
                 function () {
                     for (var key in obj) {
-                        if (!(obj[key] instanceof Function)) {
-                            array.push({ key: key, value: obj[key] });
+                        var value = obj[key];
+                        if (!(value instanceof Function) && Object.prototype.hasOwnProperty.call(obj, key)) {
+                            array.push({ key: key, value: value });
                         }
                     }
                 },
@@ -435,15 +483,15 @@
         }
     };
 
-    // Overload:function(obj)
-    // Overload:function(obj, num)
-    Enumerable.repeat = function (obj, num) {
-        if (num != null) return Enumerable.repeat(obj).take(num);
+    // Overload:function(element)
+    // Overload:function(element, count)
+    Enumerable.repeat = function (element, count) {
+        if (count != null) return Enumerable.repeat(element).take(count);
 
         return new Enumerable(function () {
             return new IEnumerator(
                 Functions.Blank,
-                function () { return this.yieldReturn(obj); },
+                function () { return this.yieldReturn(element); },
                 Functions.Blank);
         });
     };
@@ -536,7 +584,7 @@
     Enumerable.defer = function (enumerableFactory) {
 
         return new Enumerable(function () {
-            var enuerator;
+            var enumerator;
 
             return new IEnumerator(
                 function () { enumerator = Enumerable.from(enumerableFactory()).getEnumerator(); },
@@ -704,10 +752,7 @@
 
     // Overload:function(func)
     // Overload:function(seed,func<value,element>)
-    // Overload:function(seed,func<value,element>,resultSelector)
-    Enumerable.prototype.scan = function (seed, func, resultSelector) {
-        if (resultSelector != null) return this.scan(seed, func).select(resultSelector);
-
+    Enumerable.prototype.scan = function (seed, func) {
         var isUseSeed;
         if (func == null) {
             func = Utils.createLambda(seed); // arguments[0]
@@ -875,27 +920,24 @@
     };
 
     Enumerable.prototype.ofType = function (type) {
-        var typeName;
-        switch (type) {
-            case Number:
-                typeName = Types.Number;
-                break;
-            case String:
-                typeName = Types.String;
-                break;
-            case Boolean:
-                typeName = Types.Boolean;
-                break;
-            case Function:
-                typeName = Types.Function;
-                break;
-            default:
-                typeName = null;
-                break;
-        }
-        return (typeName === null)
-            ? this.where(function (x) { return x instanceof type; })
-            : this.where(function (x) { return typeof x === typeName; });
+        var source = this;
+
+        return new Enumerable(function () {
+            var enumerator;
+
+            return new IEnumerator(
+                function () { enumerator = ss.getEnumerator(source); },
+                function () {
+                    while (enumerator.moveNext()) {
+                        var v = ss.safeCast(enumerator.current(), type);
+                        if (ss.isValue(v)) {
+                            return this.yieldReturn(v);
+                        }
+                    }
+                    return false;
+                },
+                function () { Utils.dispose(enumerator); });
+        });
     };
 
     // mutiple arguments, last one is selector, others are enumerable
@@ -1005,12 +1047,11 @@
     /* Join Methods */
 
     // Overload:function (inner, outerKeySelector, innerKeySelector, resultSelector)
-    // Overload:function (inner, outerKeySelector, innerKeySelector, resultSelector, compareSelector)
-    Enumerable.prototype.join = function (inner, outerKeySelector, innerKeySelector, resultSelector, compareSelector) {
+    // Overload:function (inner, outerKeySelector, innerKeySelector, resultSelector, comparer)
+    Enumerable.prototype.join = function (inner, outerKeySelector, innerKeySelector, resultSelector, comparer) {
         outerKeySelector = Utils.createLambda(outerKeySelector);
         innerKeySelector = Utils.createLambda(innerKeySelector);
         resultSelector = Utils.createLambda(resultSelector);
-        compareSelector = Utils.createLambda(compareSelector);
         var source = this;
 
         return new Enumerable(function () {
@@ -1022,7 +1063,7 @@
             return new IEnumerator(
                 function () {
                     outerEnumerator = source.getEnumerator();
-                    lookup = Enumerable.from(inner).toLookup(innerKeySelector, Functions.Identity, compareSelector);
+                    lookup = Enumerable.from(inner).toLookup(innerKeySelector, Functions.Identity, comparer);
                 },
                 function () {
                     while (true) {
@@ -1049,12 +1090,11 @@
     };
 
     // Overload:function (inner, outerKeySelector, innerKeySelector, resultSelector)
-    // Overload:function (inner, outerKeySelector, innerKeySelector, resultSelector, compareSelector)
-    Enumerable.prototype.groupJoin = function (inner, outerKeySelector, innerKeySelector, resultSelector, compareSelector) {
+    // Overload:function (inner, outerKeySelector, innerKeySelector, resultSelector, comparer)
+    Enumerable.prototype.groupJoin = function (inner, outerKeySelector, innerKeySelector, resultSelector, comparer) {
         outerKeySelector = Utils.createLambda(outerKeySelector);
         innerKeySelector = Utils.createLambda(innerKeySelector);
         resultSelector = Utils.createLambda(resultSelector);
-        compareSelector = Utils.createLambda(compareSelector);
         var source = this;
 
         return new Enumerable(function () {
@@ -1064,7 +1104,7 @@
             return new IEnumerator(
                 function () {
                     enumerator = source.getEnumerator();
-                    lookup = Enumerable.from(inner).toLookup(innerKeySelector, Functions.Identity, compareSelector);
+                    lookup = Enumerable.from(inner).toLookup(innerKeySelector, Functions.Identity, comparer);
                 },
                 function () {
                     if (enumerator.moveNext()) {
@@ -1220,21 +1260,70 @@
         });
     };
 
-    Enumerable.prototype.alternate = function (value) {
-        value = Enumerable.make(value);
-        return this.selectMany(function (elem) {
-            return Enumerable.make(elem).concat(value);
-        }).takeExceptLast();
+    Enumerable.prototype.alternate = function (alternateValueOrSequence) {
+        var source = this;
+
+        return new Enumerable(function () {
+            var buffer;
+            var enumerator;
+            var alternateSequence;
+            var alternateEnumerator;
+
+            return new IEnumerator(
+                function () {
+                    if (alternateValueOrSequence instanceof Array || alternateValueOrSequence.getEnumerator != null) {
+                        alternateSequence = Enumerable.from(Enumerable.from(alternateValueOrSequence).toArray()); // freeze
+                    }
+                    else {
+                        alternateSequence = Enumerable.make(alternateValueOrSequence);
+                    }
+                    enumerator = source.getEnumerator();
+                    if (enumerator.moveNext()) buffer = enumerator.current();
+                },
+                function () {
+                    while (true) {
+                        if (alternateEnumerator != null) {
+                            if (alternateEnumerator.moveNext()) {
+                                return this.yieldReturn(alternateEnumerator.current());
+                            }
+                            else {
+                                alternateEnumerator = null;
+                            }
+                        }
+
+                        if (buffer == null && enumerator.moveNext()) {
+                            buffer = enumerator.current(); // hasNext
+                            alternateEnumerator = alternateSequence.getEnumerator();
+                            continue; // GOTO
+                        }
+                        else if (buffer != null) {
+                            var retVal = buffer;
+                            buffer = null;
+                            return this.yieldReturn(retVal);
+                        }
+
+                        return this.yieldBreak();
+                    }
+                },
+                function () {
+                    try {
+                        Utils.dispose(enumerator);
+                    }
+                    finally {
+                        Utils.dispose(alternateEnumerator);
+                    }
+                });
+        });
     };
 
     // Overload:function(value)
-    // Overload:function(value, compareSelector)
-    Enumerable.prototype.contains = function (value, compareSelector) {
-        compareSelector = Utils.createLambda(compareSelector);
+    // Overload:function(value, comparer)
+    Enumerable.prototype.contains = function (value, comparer) {
+        comparer = comparer || ss.EqualityComparer.def;
         var enumerator = this.getEnumerator();
         try {
             while (enumerator.moveNext()) {
-                if (compareSelector(enumerator.current()) === value) return true;
+                if (comparer.areEqual(enumerator.current(), value)) return true;
             }
             return false;
         }
@@ -1245,6 +1334,7 @@
 
     Enumerable.prototype.defaultIfEmpty = function (defaultValue) {
         var source = this;
+        if (defaultValue === undefined) defaultValue = null;
 
         return new Enumerable(function () {
             var enumerator;
@@ -1256,7 +1346,8 @@
                     if (enumerator.moveNext()) {
                         isFirst = false;
                         return this.yieldReturn(enumerator.current());
-                    } else if (isFirst) {
+                    }
+                    else if (isFirst) {
                         isFirst = false;
                         return this.yieldReturn(defaultValue);
                     }
@@ -1267,9 +1358,9 @@
     };
 
     // Overload:function()
-    // Overload:function(compareSelector)
-    Enumerable.prototype.distinct = function (compareSelector) {
-        return this.except(Enumerable.empty(), compareSelector);
+    // Overload:function(comparer)
+    Enumerable.prototype.distinct = function (comparer) {
+        return this.except(Enumerable.empty(), comparer);
     };
 
     Enumerable.prototype.distinctUntilChanged = function (compareSelector) {
@@ -1309,9 +1400,8 @@
     };
 
     // Overload:function(second)
-    // Overload:function(second, compareSelector)
-    Enumerable.prototype.except = function (second, compareSelector) {
-        compareSelector = Utils.createLambda(compareSelector);
+    // Overload:function(second, comparer)
+    Enumerable.prototype.except = function (second, comparer) {
         var source = this;
 
         return new Enumerable(function () {
@@ -1321,13 +1411,13 @@
             return new IEnumerator(
                 function () {
                     enumerator = source.getEnumerator();
-                    keys = new Dictionary(compareSelector);
+                    keys = new (ss.makeGenericType(ss.Dictionary$2, [Object, Object]))(null, comparer);
                     Enumerable.from(second).forEach(function (key) { keys.add(key); });
                 },
                 function () {
                     while (enumerator.moveNext()) {
                         var current = enumerator.current();
-                        if (!keys.contains(current)) {
+                        if (!keys.containsKey(current)) {
                             keys.add(current);
                             return this.yieldReturn(current);
                         }
@@ -1339,9 +1429,8 @@
     };
 
     // Overload:function(second)
-    // Overload:function(second, compareSelector)
-    Enumerable.prototype.intersect = function (second, compareSelector) {
-        compareSelector = Utils.createLambda(compareSelector);
+    // Overload:function(second, comparer)
+    Enumerable.prototype.intersect = function (second, comparer) {
         var source = this;
 
         return new Enumerable(function () {
@@ -1353,14 +1442,14 @@
                 function () {
                     enumerator = source.getEnumerator();
 
-                    keys = new Dictionary(compareSelector);
+                    keys = new (ss.makeGenericType(ss.Dictionary$2, [Object, Object]))(null, comparer);
                     Enumerable.from(second).forEach(function (key) { keys.add(key); });
-                    outs = new Dictionary(compareSelector);
+                    outs = new (ss.makeGenericType(ss.Dictionary$2, [Object, Object]))(null, comparer);
                 },
                 function () {
                     while (enumerator.moveNext()) {
                         var current = enumerator.current();
-                        if (!outs.contains(current) && keys.contains(current)) {
+                        if (!outs.containsKey(current) && keys.containsKey(current)) {
                             outs.add(current);
                             return this.yieldReturn(current);
                         }
@@ -1372,9 +1461,9 @@
     };
 
     // Overload:function(second)
-    // Overload:function(second, compareSelector)
-    Enumerable.prototype.sequenceEqual = function (second, compareSelector) {
-        compareSelector = Utils.createLambda(compareSelector);
+    // Overload:function(second, comparer)
+    Enumerable.prototype.sequenceEqual = function (second, comparer) {
+        comparer = comparer || ss.EqualityComparer.def;
 
         var firstEnumerator = this.getEnumerator();
         try {
@@ -1382,7 +1471,7 @@
             try {
                 while (firstEnumerator.moveNext()) {
                     if (!secondEnumerator.moveNext()
-                    || compareSelector(firstEnumerator.current()) !== compareSelector(secondEnumerator.current())) {
+                    || !comparer.areEqual(firstEnumerator.current(), secondEnumerator.current())) {
                         return false;
                     }
                 }
@@ -1399,8 +1488,7 @@
         }
     };
 
-    Enumerable.prototype.union = function (second, compareSelector) {
-        compareSelector = Utils.createLambda(compareSelector);
+    Enumerable.prototype.union = function (second, comparer) {
         var source = this;
 
         return new Enumerable(function () {
@@ -1411,14 +1499,14 @@
             return new IEnumerator(
                 function () {
                     firstEnumerator = source.getEnumerator();
-                    keys = new Dictionary(compareSelector);
+                    keys = new (ss.makeGenericType(ss.Dictionary$2, [Object, Object]))(null, comparer);
                 },
                 function () {
                     var current;
                     if (secondEnumerator === undefined) {
                         while (firstEnumerator.moveNext()) {
                             current = firstEnumerator.current();
-                            if (!keys.contains(current)) {
+                            if (!keys.containsKey(current)) {
                                 keys.add(current);
                                 return this.yieldReturn(current);
                             }
@@ -1427,7 +1515,7 @@
                     }
                     while (secondEnumerator.moveNext()) {
                         current = secondEnumerator.current();
-                        if (!keys.contains(current)) {
+                        if (!keys.containsKey(current)) {
                             keys.add(current);
                             return this.yieldReturn(current);
                         }
@@ -1447,12 +1535,18 @@
 
     /* Ordering Methods */
 
-    Enumerable.prototype.orderBy = function (keySelector) {
-        return new OrderedEnumerable(this, keySelector, false);
+    // Overload:function()
+    // Overload:function(keySelector)
+    // Overload:function(keySelector, comparer)
+    Enumerable.prototype.orderBy = function (keySelector, comparer) {
+        return new OrderedEnumerable(this, keySelector, comparer, false);
     };
 
-    Enumerable.prototype.orderByDescending = function (keySelector) {
-        return new OrderedEnumerable(this, keySelector, true);
+    // Overload:function()
+    // Overload:function(keySelector)
+    // Overload:function(keySelector, comparer)
+    Enumerable.prototype.orderByDescending = function (keySelector, comparer) {
+        return new OrderedEnumerable(this, keySelector, comparer, true);
     };
 
     Enumerable.prototype.reverse = function () {
@@ -1545,20 +1639,19 @@
     // Overload:function(keySelector)
     // Overload:function(keySelector,elementSelector)
     // Overload:function(keySelector,elementSelector,resultSelector)
-    // Overload:function(keySelector,elementSelector,resultSelector,compareSelector)
-    Enumerable.prototype.groupBy = function (keySelector, elementSelector, resultSelector, compareSelector) {
+    // Overload:function(keySelector,elementSelector,resultSelector,comparer)
+    Enumerable.prototype.groupBy = function (keySelector, elementSelector, resultSelector, comparer) {
         var source = this;
         keySelector = Utils.createLambda(keySelector);
         elementSelector = Utils.createLambda(elementSelector);
         if (resultSelector != null) resultSelector = Utils.createLambda(resultSelector);
-        compareSelector = Utils.createLambda(compareSelector);
 
         return new Enumerable(function () {
             var enumerator;
 
             return new IEnumerator(
                 function () {
-                    enumerator = source.toLookup(keySelector, elementSelector, compareSelector)
+                    enumerator = source.toLookup(keySelector, elementSelector, comparer)
                         .toEnumerable()
                         .getEnumerator();
                 },
@@ -1577,13 +1670,12 @@
     // Overload:function(keySelector)
     // Overload:function(keySelector,elementSelector)
     // Overload:function(keySelector,elementSelector,resultSelector)
-    // Overload:function(keySelector,elementSelector,resultSelector,compareSelector)
-    Enumerable.prototype.partitionBy = function (keySelector, elementSelector, resultSelector, compareSelector) {
-
+    // Overload:function(keySelector,elementSelector,resultSelector,comperer)
+    Enumerable.prototype.partitionBy = function (keySelector, elementSelector, resultSelector, comparer) {
         var source = this;
         keySelector = Utils.createLambda(keySelector);
         elementSelector = Utils.createLambda(elementSelector);
-        compareSelector = Utils.createLambda(compareSelector);
+        comparer = comparer || ss.EqualityComparer.def;
         var hasResultSelector;
         if (resultSelector == null) {
             hasResultSelector = false;
@@ -1597,7 +1689,6 @@
         return new Enumerable(function () {
             var enumerator;
             var key;
-            var compareKey;
             var group = [];
 
             return new IEnumerator(
@@ -1605,14 +1696,13 @@
                     enumerator = source.getEnumerator();
                     if (enumerator.moveNext()) {
                         key = keySelector(enumerator.current());
-                        compareKey = compareSelector(key);
                         group.push(elementSelector(enumerator.current()));
                     }
                 },
                 function () {
                     var hasNext;
                     while ((hasNext = enumerator.moveNext()) == true) {
-                        if (compareKey === compareSelector(keySelector(enumerator.current()))) {
+                        if (comparer.areEqual(key, keySelector(enumerator.current()))) {
                             group.push(elementSelector(enumerator.current()));
                         }
                         else break;
@@ -1624,7 +1714,6 @@
                             : resultSelector(key, group);
                         if (hasNext) {
                             key = keySelector(enumerator.current());
-                            compareKey = compareSelector(key);
                             group = [elementSelector(enumerator.current())];
                         }
                         else group = [];
@@ -1666,7 +1755,8 @@
     // Overload:function(seed,func)
     // Overload:function(seed,func,resultSelector)
     Enumerable.prototype.aggregate = function (seed, func, resultSelector) {
-        return this.scan(seed, func, resultSelector).last();
+        resultSelector = Utils.createLambda(resultSelector);
+        return resultSelector(this.scan(seed, func, resultSelector).last());
     };
 
     // Overload:function()
@@ -1745,6 +1835,7 @@
     };
 
     Enumerable.prototype.elementAtOrDefault = function (index, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
         var value;
         var found = false;
         this.forEach(function (x, i) {
@@ -1775,10 +1866,9 @@
         return value;
     };
 
-    // Overload:function(defaultValue)
-    // Overload:function(defaultValue,predicate)
-    Enumerable.prototype.firstOrDefault = function (defaultValue, predicate) {
-        if (predicate != null) return this.where(predicate).firstOrDefault(defaultValue);
+    Enumerable.prototype.firstOrDefault = function (predicate, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
+        if (predicate != null) return this.where(predicate).firstOrDefault(null, defaultValue);
 
         var value;
         var found = false;
@@ -1808,8 +1898,9 @@
 
     // Overload:function(defaultValue)
     // Overload:function(defaultValue,predicate)
-    Enumerable.prototype.lastOrDefault = function (defaultValue, predicate) {
-        if (predicate != null) return this.where(predicate).lastOrDefault(defaultValue);
+    Enumerable.prototype.lastOrDefault = function (predicate, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
+        if (predicate != null) return this.where(predicate).lastOrDefault(null, defaultValue);
 
         var value;
         var found = false;
@@ -1840,8 +1931,9 @@
 
     // Overload:function(defaultValue)
     // Overload:function(defaultValue,predicate)
-    Enumerable.prototype.singleOrDefault = function (defaultValue, predicate) {
-        if (predicate != null) return this.where(predicate).singleOrDefault(defaultValue);
+    Enumerable.prototype.singleOrDefault = function (predicate, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
+        if (predicate != null) return this.where(predicate).singleOrDefault(null, defaultValue);
 
         var value;
         var found = false;
@@ -2006,23 +2098,52 @@
         });
     };
 
-    Enumerable.prototype.indexOf = function (item) {
+    // Overload:function(item)
+    // Overload:function(item, comparer)
+    // Overload:function(predicate)
+    Enumerable.prototype.indexOf = function (item, comparer) {
         var found = null;
-        this.forEach(function (x, i) {
-            if (x === item) {
-                found = i;
-                return false;
-            }
-        });
+
+        // item as predicate
+        if (typeof (item) === Types.Function) {
+            this.forEach(function (x, i) {
+                if (item(x, i)) {
+                    found = i;
+                    return false;
+                }
+            });
+        }
+        else {
+            comparer = comparer || ss.EqualityComparer.def;
+            this.forEach(function (x, i) {
+                if (comparer.areEqual(x, item)) {
+                    found = i;
+                    return false;
+                }
+            });
+        }
 
         return (found !== null) ? found : -1;
     };
 
-    Enumerable.prototype.lastIndexOf = function (item) {
+    // Overload:function(item)
+    // Overload:function(item, comparer)
+    // Overload:function(predicate)
+    Enumerable.prototype.lastIndexOf = function (item, comparer) {
         var result = -1;
-        this.forEach(function (x, i) {
-            if (x === item) result = i;
-        });
+
+        // item as predicate
+        if (typeof (item) === Types.Function) {
+            this.forEach(function (x, i) {
+                if (item(x, i)) result = i;
+            });
+        }
+        else {
+            comparer = comparer || ss.EqualityComparer.def;
+            this.forEach(function (x, i) {
+                if (comparer.areEqual(x, item)) result = i;
+            });
+        }
 
         return result;
     };
@@ -2041,22 +2162,27 @@
 
     // Overload:function(keySelector)
     // Overload:function(keySelector, elementSelector)
-    // Overload:function(keySelector, elementSelector, compareSelector)
-    Enumerable.prototype.toLookup = function (keySelector, elementSelector, compareSelector) {
+    // Overload:function(keySelector, elementSelector, comparer)
+    Enumerable.prototype.toLookup = function (keySelector, elementSelector, comparer) {
         keySelector = Utils.createLambda(keySelector);
         elementSelector = Utils.createLambda(elementSelector);
-        compareSelector = Utils.createLambda(compareSelector);
 
-        var dict = new Dictionary(compareSelector);
+        var dict = new (ss.makeGenericType(ss.Dictionary$2, [Object, Object]))(null, comparer);
+        var order = [];
         this.forEach(function (x) {
             var key = keySelector(x);
             var element = elementSelector(x);
 
-            var array = dict.get(key);
-            if (array !== undefined) array.push(element);
-            else dict.add(key, [element]);
+            var array = { $: null };
+            if (dict.tryGetValue(key, array)) {
+                array.$.push(element);
+            }
+            else {
+                order.push(key);
+                dict.add(key, [element]);
+            }
         });
-        return new Lookup(dict);
+        return new Lookup(dict, order);
     };
 
     Enumerable.prototype.toObject = function (keySelector, elementSelector) {
@@ -2070,14 +2196,13 @@
         return obj;
     };
 
-    // Overload:function(keySelector, elementSelector)
-    // Overload:function(keySelector, elementSelector, compareSelector)
-    Enumerable.prototype.toDictionary = function (keySelector, elementSelector, compareSelector) {
+    // Overload:function(keySelector, elementSelector, keyType, valueType)
+    // Overload:function(keySelector, elementSelector, keyType, valueType, comparer)
+    Enumerable.prototype.toDictionary = function (keySelector, elementSelector, keyType, valueType, comparer) {
         keySelector = Utils.createLambda(keySelector);
         elementSelector = Utils.createLambda(elementSelector);
-        compareSelector = Utils.createLambda(compareSelector);
 
-        var dict = new Dictionary(compareSelector);
+        var dict = new (ss.makeGenericType(ss.Dictionary$2, [keyType, valueType]))(null, comparer);
         this.forEach(function (x) {
             dict.add(keySelector(x), elementSelector(x));
         });
@@ -2164,17 +2289,12 @@
     };
 
     // Overload:function()
-    // Overload:function(separator)
-    // Overload:function(separator,selector)
-    Enumerable.prototype.writeLine = function (separator, selector) {
-        if (separator == null) separator = "";
+    // Overload:function(selector)
+    Enumerable.prototype.writeLine = function (selector) {
         selector = Utils.createLambda(selector);
 
-        var isFirst = true;
         this.forEach(function (item) {
-            if (isFirst) isFirst = false;
-            else document.writeln(separator);
-            document.writeln(selector(item));
+            document.writeln(selector(item) + "<br />");
         });
     };
 
@@ -2337,7 +2457,7 @@
                 console.log(selector(item));
             }
         });
-    }
+    };
 
     // Overload:function()
     // Overload:function(message)
@@ -2351,26 +2471,27 @@
                 console.log(message, selector(item));
             }
         });
-    }
+    };
 
     // private
 
-    var OrderedEnumerable = function (source, keySelector, descending, parent) {
+    var OrderedEnumerable = function (source, keySelector, comparer, descending, parent) {
         this.source = source;
         this.keySelector = Utils.createLambda(keySelector);
+        this.comparer = comparer || ss.Comparer.def;
         this.descending = descending;
         this.parent = parent;
     };
     OrderedEnumerable.prototype = new Enumerable();
 
-    OrderedEnumerable.prototype.createOrderedEnumerable = function (keySelector, descending) {
-        return new OrderedEnumerable(this.source, keySelector, descending, this);
+    OrderedEnumerable.prototype.createOrderedEnumerable = function (keySelector, comparer, descending) {
+        return new OrderedEnumerable(this.source, keySelector, comparer, descending, this);
     };
-    OrderedEnumerable.prototype.thenBy = function (keySelector) {
-        return this.createOrderedEnumerable(keySelector, false);
+    OrderedEnumerable.prototype.thenBy = function (keySelector, comparer) {
+        return this.createOrderedEnumerable(keySelector, comparer, false);
     };
-    OrderedEnumerable.prototype.thenByDescending = function (keySelector) {
-        return this.createOrderedEnumerable(keySelector, true);
+    OrderedEnumerable.prototype.thenByDescending = function (keySelector, comparer) {
+        return this.createOrderedEnumerable(keySelector, comparer, true);
     };
     OrderedEnumerable.prototype.getEnumerator = function () {
         var self = this;
@@ -2400,14 +2521,15 @@
         );
     };
 
-    var SortContext = function (keySelector, descending, child) {
+    var SortContext = function (keySelector, comparer, descending, child) {
         this.keySelector = keySelector;
+        this.comparer = comparer;
         this.descending = descending;
         this.child = child;
         this.keys = null;
     };
     SortContext.create = function (orderedEnumerable, currentContext) {
-        var context = new SortContext(orderedEnumerable.keySelector, orderedEnumerable.descending, currentContext);
+        var context = new SortContext(orderedEnumerable.keySelector, orderedEnumerable.comparer, orderedEnumerable.descending, currentContext);
         if (orderedEnumerable.parent != null) return SortContext.create(orderedEnumerable.parent, context);
         return context;
     };
@@ -2421,11 +2543,11 @@
         if (this.child != null) this.child.GenerateKeys(source);
     };
     SortContext.prototype.compare = function (index1, index2) {
-        var comparison = Utils.compare(this.keys[index1], this.keys[index2]);
+        var comparison = this.comparer.compare(this.keys[index1], this.keys[index2]);
 
         if (comparison == 0) {
             if (this.child != null) return this.child.compare(index1, index2);
-            comparison = Utils.compare(index1, index2);
+            return Utils.compare(index1, index2);
         }
 
         return (this.descending) ? -comparison : comparison;
@@ -2464,6 +2586,7 @@
     };
 
     ArrayEnumerable.prototype.elementAtOrDefault = function (index, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
         var source = this.getSource();
         return (0 <= index && index < source.length)
             ? source[index]
@@ -2477,7 +2600,8 @@
             : Enumerable.prototype.first.apply(this, arguments);
     };
 
-    ArrayEnumerable.prototype.firstOrDefault = function (defaultValue, predicate) {
+    ArrayEnumerable.prototype.firstOrDefault = function (predicate, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
         if (predicate != null) {
             return Enumerable.prototype.firstOrDefault.apply(this, arguments);
         }
@@ -2493,7 +2617,8 @@
             : Enumerable.prototype.last.apply(this, arguments);
     };
 
-    ArrayEnumerable.prototype.lastOrDefault = function (defaultValue, predicate) {
+    ArrayEnumerable.prototype.lastOrDefault = function (predicate, defaultValue) {
+        if (defaultValue === undefined) defaultValue = null;
         if (predicate != null) {
             return Enumerable.prototype.lastOrDefault.apply(this, arguments);
         }
@@ -2547,12 +2672,12 @@
         });
     };
 
-    ArrayEnumerable.prototype.sequenceEqual = function (second, compareSelector) {
+    ArrayEnumerable.prototype.sequenceEqual = function (second, comparer) {
         if ((second instanceof ArrayEnumerable || second instanceof Array)
-            && compareSelector == null
+            && comparer == null
             && Enumerable.from(second).count() != this.count()) {
-                return false;
-            }
+            return false;
+        }
 
         return Enumerable.prototype.sequenceEqual.apply(this, arguments);
     };
@@ -2568,17 +2693,7 @@
     };
 
     ArrayEnumerable.prototype.getEnumerator = function () {
-        var source = this.getSource();
-        var index = -1;
-
-        // fast and simple enumerator
-        return {
-            current: function () { return source[index]; },
-            moveNext: function () {
-                return ++index < source.length;
-            },
-            dispose: Functions.Blank
-        };
+        return new ss.ArrayEnumerator(this.getSource());
     };
 
     // optimization for multiple where and multiple select and whereselect
@@ -2679,205 +2794,29 @@
 
     // Collections
 
-    var Dictionary = (function () {
-        // static utility methods
-        var callHasOwnProperty = function (target, key) {
-            return Object.prototype.hasOwnProperty.call(target, key);
-        };
-
-        var computeHashCode = function (obj) {
-            if (obj === null) return "null";
-            if (obj === undefined) return "undefined";
-
-            return (typeof obj.toString === Types.Function)
-                ? obj.toString()
-                : Object.prototype.toString.call(obj);
-        };
-
-        // LinkedList for Dictionary
-        var HashEntry = function (key, value) {
-            this.key = key;
-            this.value = value;
-            this.prev = null;
-            this.next = null;
-        };
-
-        var EntryList = function () {
-            this.first = null;
-            this.last = null;
-        };
-        EntryList.prototype =
-        {
-            addLast: function (entry) {
-                if (this.last != null) {
-                    this.last.next = entry;
-                    entry.prev = this.last;
-                    this.last = entry;
-                } else this.first = this.last = entry;
-            },
-
-            replace: function (entry, newEntry) {
-                if (entry.prev != null) {
-                    entry.prev.next = newEntry;
-                    newEntry.prev = entry.prev;
-                } else this.first = newEntry;
-
-                if (entry.next != null) {
-                    entry.next.prev = newEntry;
-                    newEntry.next = entry.next;
-                } else this.last = newEntry;
-
-            },
-
-            remove: function (entry) {
-                if (entry.prev != null) entry.prev.next = entry.next;
-                else this.first = entry.next;
-
-                if (entry.next != null) entry.next.prev = entry.prev;
-                else this.last = entry.prev;
-            }
-        };
-
-        // Overload:function()
-        // Overload:function(compareSelector)
-        var Dictionary = function (compareSelector) {
-            this.countField = 0;
-            this.entryList = new EntryList();
-            this.buckets = {}; // as Dictionary<string,List<object>>
-            this.compareSelector = (compareSelector == null) ? Functions.Identity : compareSelector;
-        };
-        Dictionary.prototype =
-        {
-            add: function (key, value) {
-                var compareKey = this.compareSelector(key);
-                var hash = computeHashCode(compareKey);
-                var entry = new HashEntry(key, value);
-                if (callHasOwnProperty(this.buckets, hash)) {
-                    var array = this.buckets[hash];
-                    for (var i = 0; i < array.length; i++) {
-                        if (this.compareSelector(array[i].key) === compareKey) {
-                            this.entryList.replace(array[i], entry);
-                            array[i] = entry;
-                            return;
-                        }
-                    }
-                    array.push(entry);
-                } else {
-                    this.buckets[hash] = [entry];
-                }
-                this.countField++;
-                this.entryList.addLast(entry);
-            },
-
-            get: function (key) {
-                var compareKey = this.compareSelector(key);
-                var hash = computeHashCode(compareKey);
-                if (!callHasOwnProperty(this.buckets, hash)) return undefined;
-
-                var array = this.buckets[hash];
-                for (var i = 0; i < array.length; i++) {
-                    var entry = array[i];
-                    if (this.compareSelector(entry.key) === compareKey) return entry.value;
-                }
-                return undefined;
-            },
-
-            set: function (key, value) {
-                var compareKey = this.compareSelector(key);
-                var hash = computeHashCode(compareKey);
-                if (callHasOwnProperty(this.buckets, hash)) {
-                    var array = this.buckets[hash];
-                    for (var i = 0; i < array.length; i++) {
-                        if (this.compareSelector(array[i].key) === compareKey) {
-                            var newEntry = new HashEntry(key, value);
-                            this.entryList.replace(array[i], newEntry);
-                            array[i] = newEntry;
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            },
-
-            contains: function (key) {
-                var compareKey = this.compareSelector(key);
-                var hash = computeHashCode(compareKey);
-                if (!callHasOwnProperty(this.buckets, hash)) return false;
-
-                var array = this.buckets[hash];
-                for (var i = 0; i < array.length; i++) {
-                    if (this.compareSelector(array[i].key) === compareKey) return true;
-                }
-                return false;
-            },
-
-            clear: function () {
-                this.countField = 0;
-                this.buckets = {};
-                this.entryList = new EntryList();
-            },
-
-            remove: function (key) {
-                var compareKey = this.compareSelector(key);
-                var hash = computeHashCode(compareKey);
-                if (!callHasOwnProperty(this.buckets, hash)) return;
-
-                var array = this.buckets[hash];
-                for (var i = 0; i < array.length; i++) {
-                    if (this.compareSelector(array[i].key) === compareKey) {
-                        this.entryList.remove(array[i]);
-                        array.splice(i, 1);
-                        if (array.length == 0) delete this.buckets[hash];
-                        this.countField--;
-                        return;
-                    }
-                }
-            },
-
-            count: function () {
-                return this.countField;
-            },
-
-            toEnumerable: function () {
-                var self = this;
-                return new Enumerable(function () {
-                    var currentEntry;
-
-                    return new IEnumerator(
-                        function () { currentEntry = self.entryList.first; },
-                        function () {
-                            if (currentEntry != null) {
-                                var result = { key: currentEntry.key, value: currentEntry.value };
-                                currentEntry = currentEntry.next;
-                                return this.yieldReturn(result);
-                            }
-                            return false;
-                        },
-                        Functions.Blank);
-                });
-            }
-        };
-
-        return Dictionary;
-    })();
-
     // dictionary = Dictionary<TKey, TValue[]>
-    var Lookup = function (dictionary) {
+    var Lookup = function (dictionary, order) {
         this.count = function () {
-            return dictionary.count();
+            return dictionary.get_count();
         };
         this.get = function (key) {
-            return Enumerable.from(dictionary.get(key));
+            var value = { $: null };
+            var success = dictionary.tryGetValue(key, value);
+            return Enumerable.from(success ? value.$ : []);
         };
         this.contains = function (key) {
-            return dictionary.contains(key);
+            return dictionary.containsKey(key);
         };
         this.toEnumerable = function () {
-            return dictionary.toEnumerable().select(function (kvp) {
-                return new Grouping(kvp.key, kvp.value);
+            return Enumerable.from(order).select(function (key) {
+                return new Grouping(key, dictionary.get_item(key));
             });
         };
+        this.getEnumerator = function () {
+            return this.toEnumerable().getEnumerator();
+        };
     };
+    ss.initClass(Lookup, $asm, {}, null, [ss.IEnumerable]);
 
     var Grouping = function (groupKey, elements) {
         this.key = function () {
@@ -2887,100 +2826,14 @@
     };
     Grouping.prototype = new ArrayEnumerable();
 
-    if (typeof(global) === "undefined")
-      global = window;
-
-    Enumerable.from = (function(old) {
-        return function(obj) {
-            var ienum = Type.safeCast(obj, ss.IEnumerable);
-            if (ienum) {
-                var enumerator;
-                return new Enumerable(function () {
-                    return new IEnumerator(
-                        function () { enumerator = ienum.getEnumerator(); },
-                        function () {
-                            var ok = enumerator.moveNext();
-                            return ok ? this.yieldReturn(enumerator.get_current()) : false;
-                        },
-                        function () {
-                            var disposable = Type.safeCast(enumerator, ss.IDisposable);
-                            if (disposable) {
-                                disposable.dispose();
-                            }
-                        }
-                    );
-                });
-            }
-            else {
-                return old(obj);
-            }
-        };
-    })(Enumerable.from);
-
-    Enumerable.prototype.toDictionary = (function (old) {
-        return function (defaultValue, keySelector, elementSelector, compareSelector) {
-            var d = old.call(this, keySelector, elementSelector, compareSelector);
-            d.defaultValue = defaultValue;
-            return d;
-        };
-    })(Enumerable.prototype.toDictionary);
-
-    Enumerable.prototype.ofType = function (type) {
-        var source = this;
-
-        return new Enumerable(function () {
-            var enumerator;
-
-            return new IEnumerator(
-                function () { enumerator = source.getEnumerator(); },
-                function () {
-                    while (enumerator.moveNext()) {
-                        var v = Type.safeCast(enumerator.current(), type);
-                        if (ss.isValue(v)) {
-                            return this.yieldReturn(v);
-                        }
-                    }
-                    return false;
-                },
-                function () { Utils.dispose(enumerator); });
-        });
-    };
-
-    ArrayEnumerable.prototype.getEnumerator = (function (old) {
-        return function () {
-            var result = old.apply(this);
-            result.get_current = result.current;
-            return result;
-        };
-    })(ArrayEnumerable.prototype.getEnumerator);
-
-    Type.registerClass(global, 'Enumerable', Enumerable, null, ss.IEnumerable);
-
-    Grouping.prototype.get_current = function () { return this.current(); };
-    Type.registerClass(null, '$Grouping', Grouping, null, ss.IEnumerable);
-
-    IEnumerator.prototype.get_current = function () { return this.current(); };
-    IEnumerator.prototype.reset = function () { throw new Error('Reset is not supported'); };
-    Type.registerClass(null, '$IEnumerator', IEnumerator, null, ss.IDisposable);
-
-    Lookup.prototype.getEnumerator = function () { return this.toEnumerable().getEnumerator(); };
-    Type.registerClass(null, '$Lookup', Lookup, null, ss.IEnumerable);
-
-    Dictionary.prototype.get_item = function (key) { if (!this.contains(key)) throw new Error('Key ' + key + ' does not exist.'); return this.get(key); };
-    Dictionary.prototype.set_item = (function (add) { return function (key, value) { add.call(this, key, value); }; })(Dictionary.prototype.add);
-    Dictionary.prototype.add = (function (old) { return function (key, value) { if (this.contains(key)) throw new Error('Key ' + key + ' already exists.'); old.call(this, key, value); }; })(Dictionary.prototype.add);
-    Dictionary.prototype.remove = (function (old) { return function (key) { var r = this.contains(key); old.call(this, key); return r; }; })(Dictionary.prototype.remove);
-    Dictionary.prototype.get_count = function () { return this.count(); };
-    Dictionary.prototype.containsKey = function (key) { return this.contains(key); };
-    Dictionary.prototype.get_keys = function () { return this.toEnumerable().select(function (x) { return x.key; }); };
-    Dictionary.prototype.get_values = function () { return this.toEnumerable().select(function (x) { return x.value; }); };
-    Dictionary.prototype.getEnumerator = function () { return this.toEnumerable().getEnumerator(); };
-    Dictionary.prototype.tryGetValue = function (key, value) { if (this.containsKey(key)) { value.$ = this.get(key); return true; } else { value.$ = this.defaultValue; return false; } };
-    Type.registerClass(null, '$LinqJSDictionary', Dictionary, null, ss.IEnumerable);
-
     // module export
-    if (typeof module !== Types.Undefined && module.exports) {
+    if (typeof define === Types.Function && define.amd) { // AMD
+        define("linqjs", [], function () { return Enumerable; });
+        root.Enumerable = Enumerable;
+    }
+    else if (typeof module !== Types.Undefined && module.exports) { // Node
         module.exports = Enumerable;
+        global.Enumerable = Enumerable;
     }
     else {
         root.Enumerable = Enumerable;
