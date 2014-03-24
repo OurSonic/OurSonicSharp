@@ -75,6 +75,7 @@
     <Compile Include="Sonic\SensorManager.cs" />
     <Compile Include="Sonic\Sonic.cs" />
     <Compile Include="Sonic\SonicConstants.cs" />
+    <Compile Include="TileAnimationManager.cs" />
     <Compile Include="TilePaletteAnimationManager.cs" />
     <Compile Include="UIManager\Image.cs" />
     <Compile Include="UIManager\Table.cs" />

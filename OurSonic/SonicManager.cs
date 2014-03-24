@@ -91,6 +91,7 @@ namespace OurSonic
         }
 
         public TilePaletteAnimationManager TilePaletteAnimationManager { get; set; }
+        public TileAnimationManager TileAnimationManager { get; set; }
 
       
         static SonicManager()
@@ -100,6 +101,7 @@ namespace OurSonic
         public SonicManager(SonicEngine engine, CanvasInformation gameCanvas, Action resize)
         {
             TilePaletteAnimationManager = new TilePaletteAnimationManager(this);
+            TileAnimationManager = new TileAnimationManager(this);
 
             Instance = this;
             //            SonicToon = new Sonic();
@@ -450,6 +452,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             var offs = getOffs(w1, h1);
 
             TilePaletteAnimationManager.TickAnimatedPalettes();
+            TileAnimationManager.TickAnimatedTiles();
             int fxP = (int)((WindowLocation.X) / 128.0);
             int fyP = (int)((WindowLocation.Y) / 128.0);
 

@@ -98,7 +98,7 @@ namespace OurSonic.Level.Tiles
                         var df = DrawInfo[DrawOrder[drawOrderIndex][i]];
                         localPoint.X = df[0] * tilePieceLength;
                         localPoint.Y = df[1] * tilePieceLength;
-                        tile.Draw(ac.Context, localPoint, _xf, _yf, tileItem.Palette, animatedIndex);
+                        tile.DrawAnimatedPalette(ac.Context, localPoint, _xf, _yf, tileItem.Palette, animatedIndex);
                     }
                 }
                 i++;

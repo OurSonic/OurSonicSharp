@@ -49,7 +49,7 @@ namespace OurSonic.Level.Animations
     public class TileAnimationFrame
     {
         [IntrinsicProperty]
-        public decimal Ticks { get; set; }
+        public int Ticks { get; set; }
         [IntrinsicProperty]
         public int StartingTileIndex { get; set; }
     }

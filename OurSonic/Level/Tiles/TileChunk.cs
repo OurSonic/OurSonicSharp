@@ -38,7 +38,6 @@ namespace OurSonic.Level.Tiles
 
         private List<TileCacheBlock>[] layerCacheBlocks;
         private Point myLocalPoint = new Point(0, 0);
-        private bool? myNeverAnimate;
         [IntrinsicProperty]
         public bool? IsOnlyBackground { get; set; }
         [IntrinsicProperty]
@@ -48,7 +47,7 @@ namespace OurSonic.Level.Tiles
         [IntrinsicProperty]
         public TilePieceInfo[][] TilePieces { get; set; }
         [IntrinsicProperty]
-        public JsDictionary<int, TileAnimation> Animated { get; set; }
+        public JsDictionary<int, TileAnimation> TileAnimations { get; set; }
         [IntrinsicProperty]
         public int Index { get; set; }
         [IntrinsicProperty]
@@ -176,6 +175,39 @@ namespace OurSonic.Level.Tiles
 
             }
             return hasPixelAnimations.Value;
+        } 
+        
+        private bool? hasTileAnimations;
+
+        private bool HasTileAnimations()
+        {
+            if (!hasTileAnimations.HasValue)
+            {
+                if (TileAnimations == null)
+                {
+                    hasTileAnimations = false;
+                    return false;
+                }
+
+                const int tilePieceSize = 8;
+                for (int i = 0; i < tilePieceSize; i++)
+                {
+                    for (int j = 0; j < tilePieceSize; j++)
+                    {
+                        var pm = TilePieces[i][j].GetTilePiece();
+                        if (pm == null) continue;
+                        if (TileAnimations[j * tilePieceSize + i]!=null)
+                        {
+                            hasTileAnimations = true;
+                            return true;
+                        }
+                    }
+                } 
+
+                hasTileAnimations = false;
+
+            }
+            return hasTileAnimations.Value;
         }
 
         private List<int> paletteAnimationIndexes;
@@ -211,33 +243,13 @@ namespace OurSonic.Level.Tiles
 
         public bool NeverAnimates()
         {
-            if (!myNeverAnimate.HasValue)
-            {
-                var tilePieceSize = 8;
-
-                bool nothing = true;
-                for (int i = 0; i < tilePieceSize; i++)
-                {
-                    for (int j = 0; j < tilePieceSize; j++)
-                    {
-                        var pm = TilePieces[i][j].GetTilePiece();
-                        if (pm == null) continue;
-                        if ((Animated != null && (Animated[j * tilePieceSize + i].Truthy())) || pm.AnimatedPaletteIndexes.Count > 0)
-                        {
-                            nothing = false;
-                            goto done;
-                        }
-                    }
-                }
-            done:
-                myNeverAnimate = nothing;
-            }
-            return myNeverAnimate.Value;
+            return !HasTileAnimations() || !HasPixelAnimations();
         }
 
 
         private ChunkLayer<CanvasInformation> Base = new ChunkLayer<CanvasInformation>();
         private ChunkLayer<JsDictionary<int, PaletteAnimationCanvasFrames>> PaletteAnimationCanvases = new ChunkLayer<JsDictionary<int, PaletteAnimationCanvasFrames>>();
+        private ChunkLayer<JsDictionary<int, TileAnimationCanvasFrames>> TileAnimationCanvases = new ChunkLayer<JsDictionary<int, TileAnimationCanvasFrames>>();
 
         public class PaletteAnimationCanvasFrames
         {
@@ -252,6 +264,25 @@ namespace OurSonic.Level.Tiles
             public JsDictionary<int, PaletteAnimationCanvasFrame> Frames { get; set; }
         }
         public class PaletteAnimationCanvasFrame
+        {
+            [IntrinsicProperty]
+            public CanvasInformation Canvas { get; set; }
+        }
+
+
+        public class TileAnimationCanvasFrames
+        {
+            public TileAnimationCanvasFrames(int tileAnimationIndex)
+            {
+                TileAnimationIndex = tileAnimationIndex;
+                Frames = new JsDictionary<int, TileAnimationCanvasFrame>();
+            }
+            [IntrinsicProperty]
+            public int TileAnimationIndex { get; set; }
+            [IntrinsicProperty]
+            public JsDictionary<int, TileAnimationCanvasFrame> Frames { get; set; }
+        }
+        public class TileAnimationCanvasFrame
         {
             [IntrinsicProperty]
             public CanvasInformation Canvas { get; set; }
@@ -310,6 +341,20 @@ namespace OurSonic.Level.Tiles
                         canvas.DrawImage(canvasLayerToDraw, position.X, position.Y);
                     }
                 }
+
+
+
+                if (HasTileAnimations())
+                {
+                    if (TileAnimationCanvases[layer] == null)
+                    {
+                        TileAnimationCanvases[layer] = new JsDictionary<int, TileAnimationCanvasFrames>();
+                    }
+
+                     
+
+                }
+            
             }
         }
 
@@ -361,9 +406,9 @@ namespace OurSonic.Level.Tiles
             if (layer == ChunkLayer.Low ? (piece.OnlyForeground()) : (piece.OnlyBackground())) return;
 
             int animatedIndex = 0;
-            TileAnimation tileAnimation = Animated[animatedKey];
+            TileAnimation tileAnimation = TileAnimations[animatedKey];
 
-            if (Animated.Truthy() && (tileAnimation.Truthy()))
+            if (TileAnimations.Truthy() && (tileAnimation.Truthy()))
                 animatedIndex = tileAnimation.LastAnimatedIndex;
 
             myLocalPoint.X = pointx;
@@ -384,7 +429,7 @@ namespace OurSonic.Level.Tiles
             if (layer == ChunkLayer.Low ? (piece.OnlyForeground()) : (piece.OnlyBackground())) return;
 
 
-            piece.DrawAnimatedPalette(canvas, new Point(pointx,pointy), layer, pieceInfo.XFlip, pieceInfo.YFlip, animatedPaletteIndex);
+            piece.DrawAnimatedPalette(canvas, new Point(pointx, pointy), layer, pieceInfo.XFlip, pieceInfo.YFlip, animatedPaletteIndex);
 
             //canvas.StrokeStyle = "#FFF";
             //canvas.StrokeRect(position.X + pieceX * 16 * scale.X, position.Y + pieceY * 16 * scale.Y, scale.X * 16, scale.Y * 16);
@@ -410,7 +455,7 @@ namespace OurSonic.Level.Tiles
         public void TileAnimatedTick()
         {
 
-            foreach (var an in Animated)
+            foreach (var an in TileAnimations)
             {
                 var anni = an.Value;
                 if (anni.LastAnimatedFrame == null)
