@@ -20,14 +20,10 @@ namespace OurSonic.Utility
             canvas.Save();
         }
 
-        #region IDisposable Members
-
         public void Dispose()
         {
             myCanvas.Restore();
         }
-
-        #endregion
     }
     public static class Help
     {

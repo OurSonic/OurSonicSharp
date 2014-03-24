@@ -96,6 +96,7 @@ namespace OurSonic
 
         public SonicManager(SonicEngine engine, CanvasInformation gameCanvas, Action resize)
         {
+            paletteAnimationIndexes=new List<int>();
             Instance = this;
             //            SonicToon = new Sonic();
 
@@ -176,7 +177,7 @@ namespace OurSonic
 
         private bool effectClick(jQueryEvent elementEvent)
         {
-            if (CurrentGameState == GameState.Playing) return false;
+        //    if (CurrentGameState == GameState.Playing) return false;
 
             var e = new Point((int)((double)elementEvent.ClientX / Scale.X / RealScale.X + WindowLocation.X),
                               (int)((double)elementEvent.ClientY / Scale.Y / RealScale.Y + WindowLocation.Y));
@@ -444,7 +445,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
 
             var offs = getOffs(w1, h1);
 
-            updatePalettes();
+            updateAnimatedPalettes();
             int fxP = (int)((WindowLocation.X) / 128.0);
             int fyP = (int)((WindowLocation.Y) / 128.0);
 
@@ -592,29 +593,48 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             return false;
         }
 
-        private void updatePalettes()
+
+        private List<int> paletteAnimationIndexes;
+        private void updateAnimatedPalettes()
         {
-            if (SonicLevel.PaletteItems.Count > 0)
+            if (SonicLevel.AnimatedPalettes.Count > 0)
             {
-                for (int k = 0; k < SonicLevel.PaletteItems[0].Count; k++)
+                for (int animatedPaletteIndex = 0; animatedPaletteIndex < SonicLevel.AnimatedPalettes.Count; animatedPaletteIndex++)
                 {
-                    var pal = SonicLevel.PaletteItems[0][k];
+                    var pal = SonicLevel.AnimatedPalettes[animatedPaletteIndex];
                     if (pal.SkipIndex == 0) continue;
                     if (pal.TotalLength == 0) continue;
-
+                    
+                    //when to move to the next frame
                     for (int j = 0; j <= pal.TotalLength; j += pal.SkipIndex)
                     {
                         if (DrawTickCount % (pal.TotalLength + pal.SkipIndex) == j)
-                            SonicLevel.PaletteAnimationIndexes[k] = j / pal.SkipIndex;
+                            paletteAnimationIndexes[animatedPaletteIndex] = j / pal.SkipIndex;
                     }
+                    //todo ^^^this calc is suspected to be wrong
 
-                    foreach (var mj in pal.Pieces)
+
+
+
+                    for (int index = 0; index < pal.Pieces.Count; index++)
                     {
-                        var m = pal.Palette[SonicLevel.PaletteAnimationIndexes[k] * (pal.Pieces.Count * 2) + 0 + (mj.PaletteMultiply)];
-                        if (m != null)
-                            SonicLevel.Palette[mj.PaletteIndex][(mj.PaletteOffset) / 2] = m;
-                        else
-                            SonicLevel.Palette[mj.PaletteIndex][(mj.PaletteOffset) / 2] = CanvasInformation.BlackPixel;
+                        var palettePiece = pal.Pieces[index];
+                        
+                        
+                        
+                        
+                        int colorIndex = paletteAnimationIndexes[animatedPaletteIndex] + (pal.Pieces.Count * index)/*+ 0 + (palettePiece.PaletteMultiply)*/;
+                        //todo ^^^this calc is suspected to be wrong
+                        
+                        
+                        
+                        int replaceIndex = (palettePiece.PaletteOffset) / 2;
+
+                        var color = pal.Palette[colorIndex];
+                        if (color != null)
+                            SonicLevel.Palette[palettePiece.PaletteIndex][replaceIndex] = color;
+                        else//bug, shouldnt hit
+                            SonicLevel.Palette[palettePiece.PaletteIndex][replaceIndex] = CanvasInformation.BlackPixel;
                     }
                 }
             }
@@ -633,7 +653,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 _yP = Help.Mod(_yP, SonicLevel.LevelHeight);
                 TileChunk chunk = SonicLevel.GetChunkAt(_xP, _yP);
                 if (chunk.Truthy())
-                    chunk.AnimatedTick();
+                    chunk.TileAnimatedTick();
                 localPoint.X = (_xPreal * 128) - WindowLocation.X;
                 localPoint.Y = (_yPreal * 128) - WindowLocation.Y;
 
@@ -665,58 +685,9 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 {
                     var fd = SpriteCache.HeightMapChunks[(SonicLevel.CurHeightMap ? 1 : 2) + " " + chunk.Index];
 
-                    if (fd.Falsey())
+                    if (fd==null)
                     {
-                        var md = chunk;
-                        var posj1 = new Point(0, 0);
-                        var canv = CanvasInformation.Create(128, 128);
-                        var ctx = canv.Context;
-                        myEngine.Clear(canv);
-                        for (var _y = 0; _y < 8; _y++)
-                        {
-                            for (var _x = 0; _x < 8; _x++)
-                            {
-                                var tp = md.TilePieces[_x][_y];
-                                var solid = (int)(SonicLevel.CurHeightMap ? tp.Solid1 : tp.Solid2);
-
-                                var hd = SonicLevel.CurHeightMap ? tp.GetLayer1HeightMaps() : tp.GetLayer2HeightMaps();
-
-                                var __x = _x;
-                                var __y = _y;
-                                var vangle = 0;
-                                var posm = new Point(posj1.X + (__x * 16), posj1.Y + (__y * 16));
-
-                                if (hd.Falsey()) continue;
-                                if (hd.Full == false) { }
-                                else if (hd.Full == true)
-                                {
-                                    if (solid > 0)
-                                    {
-                                        ctx.FillStyle = HeightMap.colors[solid];
-                                        ctx.FillRect(posj1.X + (__x * 16),
-                                                     posj1.Y + (__y * 16),
-                                                     16,
-                                                     16);
-                                    }
-                                }
-                                else
-                                {
-                                    vangle = SonicLevel.CurHeightMap ? tp.GetLayer1Angles() : tp.GetLayer2Angles();
-                                    hd.Draw(ctx, posm, tp.XFlip, tp.YFlip, solid, vangle);
-                                    /*   posm.x += 16 * scale.x / 2;
-                                        posm.y += 16 * scale.y / 2;
-                                        ctx.strokeStyle = "#DDD";
-                                        ctx.font = "18pt courier ";
-                                        ctx.shadowColor = "";
-                                        ctx.shadowBlur = 0;
-                                        ctx.lineWidth = 1;
-                                        ctx.strokeText(vangle.toString(16), posm.x - 12, posm.y + 7);*/
-                                }
-                            }
-                        }
-                        fd =
-                                SpriteCache.HeightMapChunks[(SonicLevel.CurHeightMap ? 1 : 2) + " " + md.Index]
-                                = canv;
+                        fd = cacheHeightMapForChunk(chunk);
                     }
                     canvas.DrawImage(fd.Canvas, localPoint.X, localPoint.Y);
                 }
@@ -727,6 +698,61 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                     canvas.StrokeRect(localPoint.X, localPoint.Y, 128, 128);
                 }
             }
+        }
+
+        private CanvasInformation cacheHeightMapForChunk(TileChunk chunk)
+        {
+            var md = chunk;
+            var posj1 = new Point(0, 0);
+            var canv = CanvasInformation.Create(128, 128);
+            var ctx = canv.Context;
+            myEngine.Clear(canv);
+            for (var _y = 0; _y < 8; _y++)
+            {
+                for (var _x = 0; _x < 8; _x++)
+                {
+                    var tp = md.TilePieces[_x][_y];
+                    var solid = (int) (SonicLevel.CurHeightMap ? tp.Solid1 : tp.Solid2);
+
+                    var hd = SonicLevel.CurHeightMap ? tp.GetLayer1HeightMaps() : tp.GetLayer2HeightMaps();
+
+                    var __x = _x;
+                    var __y = _y;
+                    var vangle = 0;
+                    var posm = new Point(posj1.X + (__x*16), posj1.Y + (__y*16));
+
+                    if (hd.Falsey()) continue;
+                    if (hd.Full == false)
+                    {
+                    }
+                    else if (hd.Full == true)
+                    {
+                        if (solid > 0)
+                        {
+                            ctx.FillStyle = HeightMap.colors[solid];
+                            ctx.FillRect(posj1.X + (__x*16),
+                                posj1.Y + (__y*16),
+                                16,
+                                16);
+                        }
+                    }
+                    else
+                    {
+                        vangle = SonicLevel.CurHeightMap ? tp.GetLayer1Angles() : tp.GetLayer2Angles();
+                        hd.Draw(ctx, posm, tp.XFlip, tp.YFlip, solid, vangle);
+                        /*   posm.x += 16 * scale.x / 2;
+                                        posm.y += 16 * scale.y / 2;
+                                        ctx.strokeStyle = "#DDD";
+                                        ctx.font = "18pt courier ";
+                                        ctx.shadowColor = "";
+                                        ctx.shadowBlur = 0;
+                                        ctx.lineWidth = 1;
+                                        ctx.strokeText(vangle.toString(16), posm.x - 12, posm.y + 7);*/
+                    }
+                }
+            }
+            return SpriteCache.HeightMapChunks[(SonicLevel.CurHeightMap ? 1 : 2) + " " + md.Index]
+                    = canv;
         }
 
         private void drawSonic(CanvasContext2D canvas)
@@ -858,47 +884,46 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
         public void ReplaceMagic()
         {
             Replace(new Rectangle(0, 0, 15, 30), new Point(712, 40)); //level 1 act 1
-           // Replace(new Rectangle(312, 15, 55, 70), new Point(1032, 0)); // laucnh base 1 :-/
+            // Replace(new Rectangle(312, 15, 55, 70), new Point(1032, 0)); // laucnh base 1 :-/
         }
 
         public void Replace(Rectangle from, Point to)
         {
-
-
-
             for (int y = from.Height; y >= 0; y--)
             {
                 int curY = y;
-                Window.SetTimeout(() =>
-                {
-                    for (int x = 0; x < from.Width; x++)
+                Window.SetTimeout(
+                    () =>
                     {
-                        var toChunkX = (to.X + x) / 8;
-                        var toChunkY = (to.Y + curY) / 8;
+                        for (int x = 0; x < from.Width; x++)
+                        {
+                            var toChunkX = (to.X + x) / 8;
+                            var toChunkY = (to.Y + curY) / 8;
 
-                        var tochunk = SonicLevel.GetChunkAt(toChunkX, toChunkY);
-                        tochunk.ClearCache();
-                        var totp = tochunk.TilePieces[(to.X + x) - toChunkX * 8][(to.Y + curY) - toChunkY * 8];
-                        tochunk.IsOnlyBackground = null;
-                        tochunk.IsOnlyForeground = null;
+                            var tochunk = SonicLevel.GetChunkAt(toChunkX, toChunkY);
+                            tochunk.ClearCache();
+                            var totp = tochunk.TilePieces[(to.X + x) - toChunkX * 8][(to.Y + curY) - toChunkY * 8];
+                            tochunk.IsOnlyBackground = null;
+                            tochunk.IsOnlyForeground = null;
 
-                        var fromChunkX = (from.X + x) / 8;
-                        var fromChunkY = (from.Y + curY) / 8;
+                            var fromChunkX = (from.X + x) / 8;
+                            var fromChunkY = (from.Y + curY) / 8;
 
-                        var fromchunk = SonicLevel.GetChunkAt(fromChunkX, fromChunkY);
-                        fromchunk.ClearCache();
-                        fromchunk.IsOnlyBackground = null;
-                        fromchunk.IsOnlyForeground = null;
-                        var fromtp = fromchunk.TilePieces[(from.X + x) - fromChunkX * 8][(from.Y + curY) - fromChunkY * 8];
+                            var fromchunk = SonicLevel.GetChunkAt(fromChunkX, fromChunkY);
+                            fromchunk.ClearCache();
+                            fromchunk.IsOnlyBackground = null;
+                            fromchunk.IsOnlyForeground = null;
+                            var fromtp = fromchunk.TilePieces[(from.X + x) - fromChunkX * 8][(from.Y + curY) - fromChunkY * 8];
 
-                        tochunk.TilePieces[(to.X + x) - toChunkX * 8][(to.Y + curY) - toChunkY * 8] = fromtp;
-                        fromchunk.TilePieces[(from.X + x) - fromChunkX * 8][(from.Y + curY) - fromChunkY * 8] = totp;
+                            tochunk.TilePieces[(to.X + x) - toChunkX * 8][(to.Y + curY) - toChunkY * 8] = fromtp;
+                            fromchunk.TilePieces[(from.X + x) - fromChunkX * 8][(from.Y + curY) - fromChunkY * 8] = totp;
 
-                    }
+                        }
 
 
-                },
-                                  (from.Height - y) * 50);
+                    },
+                    (from.Height - y) * 50
+               );
             }
         }
 

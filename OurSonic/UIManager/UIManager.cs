@@ -7,6 +7,8 @@ using System.Runtime.CompilerServices;
 using OurSonic.Areas;
 using OurSonic.Utility;
 using jQueryApi;
+using OurSonicModels.Common;
+
 namespace OurSonic.UIManager
 {
     public class UIManager
@@ -75,7 +77,7 @@ namespace OurSonic.UIManager
         public bool OnClick(Pointer cell)
         {
             UIArea goodArea = null;
-            var cl = ( UIAreas ).OrderBy((f) => -f.Depth).ToArray();
+            var cl = ( UIAreas ).OrderBy((f) => -f.Depth);
             foreach (var are in cl) {
                 if (are.Visible &&
                     ( are.IsEditMode()
@@ -123,7 +125,7 @@ namespace OurSonic.UIManager
 
         public bool OnMouseMove(Pointer cell)
         {
-            var cl = ( UIAreas ).OrderBy((f) => { return -f.Depth; }).ToArray();
+            var cl = ( UIAreas ).OrderBy((f) => { return -f.Depth; });
 
             foreach (var are in cl) {
                 if (are.Dragging.Truthy() || are.IsEditMode() || ( are.Visible && are.Y <= cell.Y &&
@@ -187,7 +189,7 @@ namespace OurSonic.UIManager
 
         public void UpdateDepth()
         {
-            canvasDepths = UIAreas.OrderBy(f => f.Depth).ToArray();
+            canvasDepths = UIAreas.OrderBy(f => f.Depth);
         }
 
         public void Draw(CanvasContext2D canvas)

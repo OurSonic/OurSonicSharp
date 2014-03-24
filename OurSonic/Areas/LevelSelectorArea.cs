@@ -67,7 +67,7 @@ setTimeout(tim, 100);*/
             Window.SetTimeout(() => {
                 if (neverGot) {
                     UIManager.UIManager.CurLevelName = "Connection Failed, static level loaded";
-                    LoadLevel(new DataObject<string>(SonicManager.STATICLEVEL));
+                    LoadLevel(new DataObject<string>(Window.Instance.Me().STATICLEVEL));
                 }
 
                   

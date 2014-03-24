@@ -1,5 +1,4 @@
-require('./mscorlib.js');require('./lib/RawDeflate.js');require('./OurSonicModels.js');
-'use strict';
+require('./mscorlib.js');require('./lib/RawDeflate.js');require('./OurSonicModels.js');;'use strict';
 require('mscorlib');
 var socketio = require('socket.io');
 var $asm = {};
@@ -39,68 +38,6 @@ var $OurSonicNode_Compress = function() {
 };
 $OurSonicNode_Compress.__typeName = 'OurSonicNode.Compress';
 global.OurSonicNode.Compress = $OurSonicNode_Compress;
-////////////////////////////////////////////////////////////////////////////////
-// OurSonicNode.EnumerableExtensions
-var $OurSonicNode_EnumerableExtensions = function() {
-};
-$OurSonicNode_EnumerableExtensions.__typeName = 'OurSonicNode.EnumerableExtensions';
-$OurSonicNode_EnumerableExtensions.where$1 = function(T) {
-	return function(items, clause) {
-		var items2 = [];
-		for (var $t1 = 0; $t1 < items.length; $t1++) {
-			var item = items[$t1];
-			if (clause(item)) {
-				ss.add(items2, item);
-			}
-		}
-		return Array.prototype.slice.call(items2);
-	};
-};
-$OurSonicNode_EnumerableExtensions.select$1 = function(T, T2) {
-	return function(items, clause) {
-		var items2 = [];
-		for (var $t1 = 0; $t1 < items.length; $t1++) {
-			var item = items[$t1];
-			ss.add(items2, clause(item));
-		}
-		return Array.prototype.slice.call(items2);
-	};
-};
-$OurSonicNode_EnumerableExtensions.where = function(T) {
-	return function(items, clause) {
-		var items2 = [];
-		var $t1 = ss.getEnumerator(items);
-		try {
-			while ($t1.moveNext()) {
-				var item = $t1.current();
-				if (clause(item)) {
-					ss.add(items2, item);
-				}
-			}
-		}
-		finally {
-			$t1.dispose();
-		}
-		return Array.prototype.slice.call(items2);
-	};
-};
-$OurSonicNode_EnumerableExtensions.select = function(T, T2) {
-	return function(items, clause) {
-		var items2 = [];
-		var $t1 = ss.getEnumerator(items);
-		try {
-			while ($t1.moveNext()) {
-				var item = $t1.current();
-				ss.add(items2, clause(item));
-			}
-		}
-		finally {
-			$t1.dispose();
-		}
-		return Array.prototype.slice.call(items2);
-	};
-};
-global.OurSonicNode.EnumerableExtensions = $OurSonicNode_EnumerableExtensions;
 ////////////////////////////////////////////////////////////////////////////////
 // OurSonicNode.Server
 var $OurSonicNode_Server = function() {
@@ -163,12 +100,12 @@ var $OurSonicNode_Server = function() {
 		}));
 		socket.on('GetObjects', ss.mkdel(this, function(_objects) {
 			var ind = 0;
-			socket.emit('GetObjects.Response', { Data: $OurSonicNode_EnumerableExtensions.select(String, Object).call(null, this.$_getObjects(_objects), function(a) {
+			socket.emit('GetObjects.Response', { Data: OurSonicModels.Common.EnumerableExtensions.select(String, Object).call(null, this.$_getObjects(_objects), function(a) {
 				return { key: _objects[ind++], value: a };
 			}) });
 		}));
 		socket.on('GetAllObjects', ss.mkdel(this, function(_objects1) {
-			socket.emit('GetAllObjects.Response', { Data: $OurSonicNode_EnumerableExtensions.select$1(String, String).call(null, $OurSonicNode_EnumerableExtensions.where$1(String).call(null, this.$fs.readdirSync(this.$objDirectory), function(a1) {
+			socket.emit('GetAllObjects.Response', { Data: OurSonicModels.Common.EnumerableExtensions.select$1(String, String).call(null, OurSonicModels.Common.EnumerableExtensions.where$1(String).call(null, this.$fs.readdirSync(this.$objDirectory), function(a1) {
 				return ss.endsWithString(a1, '.js');
 			}), function(a2) {
 				return ss.replaceAllString(a2, '.js', '');
@@ -183,57 +120,16 @@ $OurSonicNode_Server.main = function() {
 };
 global.OurSonicNode.Server = $OurSonicNode_Server;
 ss.initClass($OurSonicNode_Compress, $asm, {});
-ss.initClass($OurSonicNode_EnumerableExtensions, $asm, {});
 ss.initClass($OurSonicNode_Server, $asm, {
 	$_getObjects: function(_objects) {
-		return new ss.IteratorBlockEnumerable(function() {
-			return (function(_objects) {
-				var $result, $state = 0, $t1, _object;
-				return new ss.IteratorBlockEnumerator(function() {
-					$sm1:
-					for (;;) {
-						switch ($state) {
-							case 0: {
-								$state = -1;
-								$t1 = 0;
-								$state = 1;
-								continue $sm1;
-							}
-							case 1: {
-								$state = -1;
-								if (!($t1 < _objects.length)) {
-									$state = -1;
-									break $sm1;
-								}
-								_object = _objects[$t1];
-								if (!this.$fs.existsSync(this.$objDirectory + _object + '.js')) {
-									$result = '';
-									$state = 2;
-									return true;
-								}
-								else {
-									$result = this.$fs.readFileSync(this.$objDirectory + _object + '.js', 'utf8');
-									$state = 2;
-									return true;
-								}
-							}
-							case 2: {
-								$state = -1;
-								$t1++;
-								$state = 1;
-								continue $sm1;
-							}
-							default: {
-								break $sm1;
-							}
-						}
-					}
-					return false;
-				}, function() {
-					return $result;
-				}, null, this);
-			}).call(this, _objects);
-		}, this);
+		var strs = [];
+		for (var $t1 = 0; $t1 < _objects.length; $t1++) {
+			var _object = _objects[$t1];
+			if (this.$fs.existsSync(this.$objDirectory + _object + '.js')) {
+				ss.add(strs, this.$fs.readFileSync(this.$objDirectory + _object + '.js', 'utf8'));
+			}
+		}
+		return strs;
 	}
 });
 $OurSonicNode_Server.main();

@@ -32,11 +32,9 @@ namespace OurSonic.Level
         [IntrinsicProperty]
         public List<LevelObjectInfo> Objects { get; set; }
         [IntrinsicProperty]
-        public List<List<PaletteItem>> PaletteItems { get; set; }
+        public List<PaletteItem> AnimatedPalettes { get; set; }
         [IntrinsicProperty]
         public CanvasElement[][] Palette { get; set; }
-        [IntrinsicProperty]
-        public List<int> PaletteAnimationIndexes { get; set; }
         [IntrinsicProperty]
         public Point[] StartPositions { get; set; }
         [IntrinsicProperty]
@@ -63,7 +61,6 @@ namespace OurSonic.Level
             Rings = new List<Ring>();
             Objects = new List<LevelObjectInfo>();
             HeightMaps = new List<HeightMap>();
-            PaletteAnimationIndexes = new List<int>();
             Tiles = new List<Tile>();
             CurHeightMap = true;
             CurPaletteIndex = 0;
@@ -81,10 +78,7 @@ namespace OurSonic.Level
         {
             foreach (var tile in Tiles.Array()) {
                 tile.ClearCache();
-            }
-            foreach (var tilePiece in TilePieces.Array()) {
-                tilePiece.ClearCache();
-            }
+            } 
             foreach (var chunk in Chunks.Array()) {
                 chunk.ClearCache();
             }
