@@ -10,7 +10,7 @@ namespace OurSonic.Level
     public class SonicLevel
     {
         [IntrinsicProperty]
-        public List<TileAnimation> TileAnimations { get; set; }
+        public List<TileAnimationData> TileAnimations { get; set; }
         [IntrinsicProperty]
         public Tile[][] AnimatedTileFiles { get; set; }
         [IntrinsicProperty]

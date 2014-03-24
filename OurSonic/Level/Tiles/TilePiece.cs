@@ -25,6 +25,8 @@ namespace OurSonic.Level.Tiles
         [IntrinsicProperty]
         public List<int> AnimatedPaletteIndexes { get; set; }
 
+        public List<int> AnimatedTileIndexes { get; set; }
+
         public void Init()
         {
             OnlyBackground();
@@ -163,13 +165,45 @@ namespace OurSonic.Level.Tiles
                 if (tile.Truthy())
                 {
                     if (tileItem.Priority == ((int)layer == 1))
-                    { 
+                    {
                         var _xf = xFlip ^ tileItem.XFlip;
                         var _yf = yFlip ^ tileItem.YFlip;
                         var df = DrawInfo[DrawOrder[drawOrderIndex][i]];
                         localPoint.X = df[0] * tilePieceLength;
                         localPoint.Y = df[1] * tilePieceLength;
-                        tile.DrawBase(ac.Context, localPoint, _xf, _yf, tileItem.Palette);
+                        tile.DrawAnimatedPalette(ac.Context, localPoint, _xf, _yf, tileItem.Palette,animatedPaletteIndex);
+                    }
+                }
+                i++;
+            }
+
+            DrawIt(canvas, ac.Canvas, position);
+            return true;
+        }
+        public bool DrawAnimatedTile(CanvasContext2D canvas, Point position, ChunkLayer layer, bool xFlip, bool yFlip, int animatedTileIndex)
+        {
+            var drawOrderIndex = 0;
+            drawOrderIndex = xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3);
+
+            int tilePieceLength = 8;
+
+            var ac = CanvasInformation.Create(tilePieceLength * 2, tilePieceLength * 2);
+            var i = 0;
+
+            var localPoint = new Point(0, 0);
+            foreach (TileItem tileItem in Tiles.Array())
+            {
+                var tile = tileItem.GetTile();
+                if (tile.Truthy())
+                {
+                    if (tileItem.Priority == ((int)layer == 1))
+                    {
+                        var _xf = xFlip ^ tileItem.XFlip;
+                        var _yf = yFlip ^ tileItem.YFlip;
+                        var df = DrawInfo[DrawOrder[drawOrderIndex][i]];
+                        localPoint.X = df[0] * tilePieceLength;
+                        localPoint.Y = df[1] * tilePieceLength;
+                        tile.DrawAnimatedTile(ac.Context, localPoint, _xf, _yf, tileItem.Palette, animatedTileIndex);
                     }
                 }
                 i++;

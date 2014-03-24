@@ -48,7 +48,7 @@
     <Compile Include="Areas\PieceLayoutMaker.cs" />
     <Compile Include="Areas\TileChunkArea.cs" />
     <Compile Include="Areas\UIManagerAreas.cs" />
-    <Compile Include="Level\Animations\TileAnimation.cs" />
+    <Compile Include="Level\Animations\TileAnimationData.cs" />
     <Compile Include="Level\Animations\AnimationInstance.cs" />
     <Compile Include="Level\Events\LevelEvent.cs" />
     <Compile Include="Level\HeightMap.cs" />

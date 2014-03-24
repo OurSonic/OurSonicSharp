@@ -13,7 +13,7 @@ namespace Build
     {
         public static void Main(string[] args)
         {
-            string shufSharp = "OurSonicSharp";
+            string shufSharp = "OurSonicSharp-fast_animate";
 
             var projs = new[] {
                                       shufSharp + @"\OurSonic\",

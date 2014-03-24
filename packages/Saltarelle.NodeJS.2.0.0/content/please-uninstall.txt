@@ -1,0 +1,2 @@
+Please uninstall Saltarelle.NodeJS and install Saltarelle.Node instead.
+(This file is safe to remove)

@@ -49,7 +49,7 @@ namespace OurSonic
         [IntrinsicProperty]
         public int IndexedPalette { get; set; }
         [IntrinsicProperty]
-        public List<TileAnimation> Animations { get; set; }
+        public List<TileAnimationData> TileAnimations { get; set; }
         [IntrinsicProperty]
         public List<AnimationInstance> AnimationInstances { get; set; }
         [IntrinsicProperty]
@@ -127,7 +127,7 @@ namespace OurSonic
             BigWindowLocation.Width = (int)(BigWindowLocation.Width * 1.8);
             BigWindowLocation.Height = (int)(BigWindowLocation.Height * 1.8);
 
-            Animations = new List<TileAnimation>();
+            TileAnimations = new List<TileAnimationData>();
             AnimationInstances = new List<AnimationInstance>();
             //jQuery.GetJson("Content/sprites/explosion.js", data => Animations.Add(new Animation("explosion", data)));
 
@@ -613,8 +613,6 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 _xP = Help.Mod(_xP, SonicLevel.LevelWidth);
                 _yP = Help.Mod(_yP, SonicLevel.LevelHeight);
                 TileChunk chunk = SonicLevel.GetChunkAt(_xP, _yP);
-                if (chunk.Truthy())
-                    chunk.TileAnimatedTick();
                 localPoint.X = (_xPreal * 128) - WindowLocation.X;
                 localPoint.Y = (_yPreal * 128) - WindowLocation.Y;
 
@@ -811,7 +809,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             }
         }
 
-        private TileAnimation containsAnimatedTile(int tile, SonicLevel sonLevel)
+        private TileAnimationData containsAnimatedTile(int tile, SonicLevel sonLevel)
         {
             foreach (var an in sonLevel.TileAnimations)
             {
@@ -827,6 +825,8 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
         {
             SonicLevel.ClearCache();
             SpriteCache.ClearCache();
+            TilePaletteAnimationManager.ClearCache();
+            TileAnimationManager.ClearCache();
         }
 
         public bool MouseUp(jQueryEvent queryEvent)

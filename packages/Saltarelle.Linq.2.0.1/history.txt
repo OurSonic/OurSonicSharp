@@ -1,0 +1,5 @@
+2.0.1
+Added ordering overloads that use IComparers
+
+2.0.0
+Initial version
