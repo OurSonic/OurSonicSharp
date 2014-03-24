@@ -151,10 +151,7 @@ namespace OurSonic.Level.Tiles
             {
                 //todo throw
             }
-        }
-
-
-
+        } 
 
         public bool ShouldTileAnimate()
         {

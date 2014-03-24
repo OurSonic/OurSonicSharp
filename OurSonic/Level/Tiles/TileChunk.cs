@@ -35,8 +35,7 @@ namespace OurSonic.Level.Tiles
         }
 
         #endregion
-
-        private List<TileCacheBlock>[] layerCacheBlocks;
+         
         private Point myLocalPoint = new Point(0, 0);
         [IntrinsicProperty]
         public bool? IsOnlyBackground { get; set; }
@@ -63,12 +62,10 @@ namespace OurSonic.Level.Tiles
         public TileChunk( /*TilePiece[][] tilePieces*/)
         {
             IsOnlyBackground = null;
-            layerCacheBlocks = new List<TileCacheBlock>[2];
         }
 
         public void ClearCache()
         {
-            layerCacheBlocks = new List<TileCacheBlock>[2];
         }
 
         public TilePiece GetBlockAt(int x, int y)
@@ -286,43 +283,6 @@ namespace OurSonic.Level.Tiles
         private ChunkLayer<JsDictionary<int, PaletteAnimationCanvasFrames>> PaletteAnimationCanvases = new ChunkLayer<JsDictionary<int, PaletteAnimationCanvasFrames>>();
         private ChunkLayer<JsDictionary<int, TileAnimationCanvasFrames>> TileAnimationCanvases = new ChunkLayer<JsDictionary<int, TileAnimationCanvasFrames>>();
 
-        public class PaletteAnimationCanvasFrames
-        {
-            public PaletteAnimationCanvasFrames(int paletteAnimationIndex)
-            {
-                PaletteAnimationIndex = paletteAnimationIndex;
-                Frames = new JsDictionary<int, PaletteAnimationCanvasFrame>();
-            }
-            [IntrinsicProperty]
-            public int PaletteAnimationIndex { get; set; }
-            [IntrinsicProperty]
-            public JsDictionary<int, PaletteAnimationCanvasFrame> Frames { get; set; }
-        }
-        public class PaletteAnimationCanvasFrame
-        {
-            [IntrinsicProperty]
-            public CanvasInformation Canvas { get; set; }
-        }
-
-
-        public class TileAnimationCanvasFrames
-        {
-            public TileAnimationCanvasFrames(int tileAnimationIndex)
-            {
-                TileAnimationIndex = tileAnimationIndex;
-                Frames = new JsDictionary<int, TileAnimationCanvasFrame>();
-            }
-            [IntrinsicProperty]
-            public int TileAnimationIndex { get; set; }
-            [IntrinsicProperty]
-            public JsDictionary<int, TileAnimationCanvasFrame> Frames { get; set; }
-        }
-        public class TileAnimationCanvasFrame
-        {
-            [IntrinsicProperty]
-            public CanvasInformation Canvas { get; set; }
-        }
-
         public void Draw(CanvasContext2D canvas, Point position, ChunkLayer layer)
         {
 
@@ -377,8 +337,6 @@ namespace OurSonic.Level.Tiles
                     }
                 }
 
-
-
                 if (HasTileAnimations())
                 {
                     if (TileAnimationCanvases[layer] == null)
@@ -418,7 +376,16 @@ namespace OurSonic.Level.Tiles
             {
                 for (int pieceX = 0; pieceX < numOfPiecesWide; pieceX++)
                 {
-                    drawTilePieceAnimatedPalette(canvas, layer, TilePieces[pieceX][pieceY], pieceX * piecesSquareSize, pieceY * piecesSquareSize, animatedPaletteIndex);
+                    var pieceInfo = TilePieces[pieceX][pieceY];
+                    var piece = pieceInfo.GetTilePiece();
+                    if (piece.AnimatedPaletteIndexes.IndexOf(animatedPaletteIndex) == -1) continue;
+
+                    if (layer == ChunkLayer.Low ? (piece.OnlyForeground()) : (piece.OnlyBackground())) continue;
+
+
+                    myLocalPoint.X = pieceX * piecesSquareSize;
+                    myLocalPoint.Y = pieceY * piecesSquareSize;
+                    piece.DrawAnimatedPalette(canvas, myLocalPoint, layer, pieceInfo.XFlip, pieceInfo.YFlip, animatedPaletteIndex);
                 }
             }
         }
@@ -429,7 +396,20 @@ namespace OurSonic.Level.Tiles
             {
                 for (int pieceX = 0; pieceX < numOfPiecesWide; pieceX++)
                 {
-                    drawTilePieceAnimatedTile(canvas, layer, TilePieces[pieceX][pieceY], pieceX * piecesSquareSize, pieceY * piecesSquareSize, animatedTileIndex);
+
+
+                    var pieceInfo = TilePieces[pieceX][pieceY];
+
+                    var piece = pieceInfo.GetTilePiece();
+                    if (piece.AnimatedTileIndexes.IndexOf(animatedTileIndex) == -1) continue;
+
+                    if (layer == ChunkLayer.Low ? (piece.OnlyForeground()) : (piece.OnlyBackground())) continue;
+
+
+                    myLocalPoint.X = pieceX * piecesSquareSize;
+                    myLocalPoint.Y = pieceY * piecesSquareSize;
+                    piece.DrawAnimatedTile(canvas, myLocalPoint, layer, pieceInfo.XFlip, pieceInfo.YFlip, animatedTileIndex);
+
                 }
             }
         }
@@ -439,89 +419,20 @@ namespace OurSonic.Level.Tiles
             {
                 for (int pieceX = 0; pieceX < numOfPiecesWide; pieceX++)
                 {
-                    drawTilePieceBase(canvas, layer, TilePieces[pieceX][pieceY], pieceX * piecesSquareSize, pieceY * piecesSquareSize);
+                    var pieceInfo = TilePieces[pieceX][pieceY];
+
+
+                    var piece = pieceInfo.GetTilePiece();
+
+                    if (layer == ChunkLayer.Low ? (piece.OnlyForeground()) : (piece.OnlyBackground())) continue;
+
+                    myLocalPoint.X = pieceX * piecesSquareSize;
+                    myLocalPoint.Y = pieceY * piecesSquareSize;
+                    piece.DrawBase(canvas, myLocalPoint, layer, pieceInfo.XFlip, pieceInfo.YFlip);
                 }
             }
         }
-
-
-
-
-
-        private void drawTilePieces(CanvasContext2D canvas, ChunkLayer layer, int piecesSquareSize)
-        {
-            int curKey = 0; //pieceY * numOfPiecesWide + pieceX              VV
-            for (int pieceY = 0; pieceY < numOfPiecesLong; pieceY++)
-            {
-                curKey = pieceY * numOfPiecesWide;
-                for (int pieceX = 0; pieceX < numOfPiecesWide; pieceX++)
-                {
-                    curKey += pieceX;
-                    drawTilePiece(canvas, layer, TilePieces[pieceX][pieceY], curKey, pieceX * piecesSquareSize, pieceY * piecesSquareSize);
-                }
-            }
-        }
-
-        private void drawTilePiece(CanvasContext2D canvas, ChunkLayer layer, TilePieceInfo pieceInfo, int animatedKey, int pointx, int pointy)
-        {
-            var piece = pieceInfo.GetTilePiece();
-
-            if (layer == ChunkLayer.Low ? (piece.OnlyForeground()) : (piece.OnlyBackground())) return;
-
-            int animatedIndex = 0;
-            TileAnimationData tileAnimationData = TileAnimations[animatedKey];
-
-            if (TileAnimations.Truthy() && (tileAnimationData.Truthy()))
-                animatedIndex = tileAnimationData.LastAnimatedIndex;
-
-            myLocalPoint.X = pointx;
-            myLocalPoint.Y = pointy;
-            piece.Draw(canvas, myLocalPoint, layer, pieceInfo.XFlip, pieceInfo.YFlip, animatedIndex);
-
-            //canvas.StrokeStyle = "#FFF";
-            //canvas.StrokeRect(position.X + pieceX * 16 * scale.X, position.Y + pieceY * 16 * scale.Y, scale.X * 16, scale.Y * 16);
-        }
-
-
-
-        private void drawTilePieceAnimatedPalette(CanvasContext2D canvas, ChunkLayer layer, TilePieceInfo pieceInfo, int pointx, int pointy, int animatedPaletteIndex)
-        {
-            var piece = pieceInfo.GetTilePiece();
-            if (piece.AnimatedPaletteIndexes.IndexOf(animatedPaletteIndex) == -1) return;
-
-            if (layer == ChunkLayer.Low ? (piece.OnlyForeground()) : (piece.OnlyBackground())) return;
-
-
-            myLocalPoint.X = pointx;
-            myLocalPoint.Y = pointy;
-            piece.DrawAnimatedPalette(canvas, myLocalPoint, layer, pieceInfo.XFlip, pieceInfo.YFlip, animatedPaletteIndex);
-
-        }
-        private void drawTilePieceAnimatedTile(CanvasContext2D canvas, ChunkLayer layer, TilePieceInfo pieceInfo, int pointx, int pointy, int animatedTileIndex)
-        {
-            var piece = pieceInfo.GetTilePiece();
-            if (piece.AnimatedTileIndexes.IndexOf(animatedTileIndex) == -1) return;
-
-            if (layer == ChunkLayer.Low ? (piece.OnlyForeground()) : (piece.OnlyBackground())) return;
-
-
-            myLocalPoint.X = pointx;
-            myLocalPoint.Y = pointy;
-            piece.DrawAnimatedTile(canvas, myLocalPoint, layer, pieceInfo.XFlip, pieceInfo.YFlip, animatedTileIndex);
-
-        }
-
-        private void drawTilePieceBase(CanvasContext2D canvas, ChunkLayer layer, TilePieceInfo pieceInfo, int pointx, int pointy)
-        {
-            var piece = pieceInfo.GetTilePiece();
-
-            if (layer == ChunkLayer.Low ? (piece.OnlyForeground()) : (piece.OnlyBackground())) return;
-
-            myLocalPoint.X = pointx;
-            myLocalPoint.Y = pointy;
-            piece.DrawBase(canvas, myLocalPoint, layer, pieceInfo.XFlip, pieceInfo.YFlip);
-
-        }
+          
     }
 
     public enum ChunkLayer
@@ -565,5 +476,44 @@ namespace OurSonic.Level.Tiles
             }
         }
     }
+
+    public class PaletteAnimationCanvasFrames
+    {
+        public PaletteAnimationCanvasFrames(int paletteAnimationIndex)
+        {
+            PaletteAnimationIndex = paletteAnimationIndex;
+            Frames = new JsDictionary<int, PaletteAnimationCanvasFrame>();
+        }
+        [IntrinsicProperty]
+        public int PaletteAnimationIndex { get; set; }
+        [IntrinsicProperty]
+        public JsDictionary<int, PaletteAnimationCanvasFrame> Frames { get; set; }
+    }
+    public class PaletteAnimationCanvasFrame
+    {
+        [IntrinsicProperty]
+        public CanvasInformation Canvas { get; set; }
+    }
+
+
+    public class TileAnimationCanvasFrames
+    {
+        public TileAnimationCanvasFrames(int tileAnimationIndex)
+        {
+            TileAnimationIndex = tileAnimationIndex;
+            Frames = new JsDictionary<int, TileAnimationCanvasFrame>();
+        }
+        [IntrinsicProperty]
+        public int TileAnimationIndex { get; set; }
+        [IntrinsicProperty]
+        public JsDictionary<int, TileAnimationCanvasFrame> Frames { get; set; }
+    }
+    public class TileAnimationCanvasFrame
+    {
+        [IntrinsicProperty]
+        public CanvasInformation Canvas { get; set; }
+    }
+
+
 }
 
