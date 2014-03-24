@@ -12,6 +12,7 @@ namespace OurSonic.Level.Tiles
     {
         private static readonly int[][] DrawInfo = { new[] { 0, 0 }, new[] { 1, 0 }, new[] { 0, 1 }, new[] { 1, 1 } };
         private static readonly int[][] DrawOrder = { new[] { 3, 2, 1, 0 }, new[] { 1, 0, 3, 2 }, new[] { 2, 3, 0, 1 }, new[] { 0, 1, 2, 3 } };
+
         private bool onlyBackground;
         private bool onlyBackgroundSet;
         private bool onlyForeground;
@@ -23,14 +24,13 @@ namespace OurSonic.Level.Tiles
         public int Index { get; set; }
         [IntrinsicProperty]
         public List<int> AnimatedPaletteIndexes { get; set; }
-         
+
         public void Init()
         {
             OnlyBackground();
             OnlyForeground();
         }
 
-     
 
         public bool OnlyBackground()
         {
@@ -72,7 +72,7 @@ namespace OurSonic.Level.Tiles
 
         public bool Draw(CanvasContext2D canvas,
                          Point position,
-                         int layer,
+                         ChunkLayer layer,
                          bool xFlip,
                          bool yFlip,
                          int animatedIndex)
@@ -91,7 +91,7 @@ namespace OurSonic.Level.Tiles
                 var tile = tileItem.GetTile();
                 if (tile.Truthy())
                 {
-                    if (tileItem.Priority == (layer == 1))
+                    if (tileItem.Priority == ((int)layer == 1))
                     {
                         var _xf = xFlip ^ tileItem.XFlip;
                         var _yf = yFlip ^ tileItem.YFlip;
@@ -102,11 +102,86 @@ namespace OurSonic.Level.Tiles
                     }
                 }
                 i++;
-            }  
+            }
 
             DrawIt(canvas, ac.Canvas, position);
             return true;
         }
+
+
+
+        public bool DrawBase(CanvasContext2D canvas,
+                 Point position,
+                 ChunkLayer layer,
+                 bool xFlip,
+                 bool yFlip)
+        {
+            var drawOrderIndex = 0;
+            drawOrderIndex = xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3);
+
+            int tilePieceLength = 8;
+
+            var ac = CanvasInformation.Create(tilePieceLength * 2, tilePieceLength * 2);
+            var i = 0;
+
+            var localPoint = new Point(0, 0);
+            foreach (TileItem tileItem in Tiles.Array())
+            {
+                var tile = tileItem.GetTile();
+                if (tile.Truthy())
+                {
+                    if (tileItem.Priority == ((int)layer == 1))
+                    {
+                        var _xf = xFlip ^ tileItem.XFlip;
+                        var _yf = yFlip ^ tileItem.YFlip;
+                        var df = DrawInfo[DrawOrder[drawOrderIndex][i]];
+                        localPoint.X = df[0] * tilePieceLength;
+                        localPoint.Y = df[1] * tilePieceLength;
+                        tile.DrawBase(ac.Context, localPoint, _xf, _yf, tileItem.Palette);
+                    }
+                }
+                i++;
+            }
+
+            DrawIt(canvas, ac.Canvas, position);
+            return true;
+        }
+        public bool DrawAnimatedPalette(CanvasContext2D canvas, Point position, ChunkLayer layer, bool xFlip, bool yFlip, int animatedPaletteIndex)
+        {
+            var drawOrderIndex = 0;
+            drawOrderIndex = xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3);
+
+            int tilePieceLength = 8;
+
+            var ac = CanvasInformation.Create(tilePieceLength * 2, tilePieceLength * 2);
+            var i = 0;
+
+            var localPoint = new Point(0, 0);
+            foreach (TileItem tileItem in Tiles.Array())
+            {
+                var tile = tileItem.GetTile();
+                if (tile.Truthy())
+                {
+                    if (tileItem.Priority == ((int)layer == 1))
+                    { 
+                        var _xf = xFlip ^ tileItem.XFlip;
+                        var _yf = yFlip ^ tileItem.YFlip;
+                        var df = DrawInfo[DrawOrder[drawOrderIndex][i]];
+                        localPoint.X = df[0] * tilePieceLength;
+                        localPoint.Y = df[1] * tilePieceLength;
+                        tile.DrawBase(ac.Context, localPoint, _xf, _yf, tileItem.Palette);
+                    }
+                }
+                i++;
+            }
+
+            DrawIt(canvas, ac.Canvas, position);
+            return true;
+        }
+
+
+
+
 
         public bool ShouldAnimate()
         {
@@ -117,7 +192,7 @@ namespace OurSonic.Level.Tiles
                     var tile = t.GetTile();
                     if (tile.Truthy())
                     {
-                        if (tile.ShouldAnimate())
+                        if (tile.ShouldTileAnimate())
                             return (shouldAnimate = true).Value;
                     }
                 }
@@ -125,7 +200,7 @@ namespace OurSonic.Level.Tiles
             }
             return (shouldAnimate).Value;
         }
-         
+
 
         private void DrawIt(CanvasContext2D canvas, CanvasElement fd, Point position)
         {

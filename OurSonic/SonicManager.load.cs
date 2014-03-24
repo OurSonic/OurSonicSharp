@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Html;
 using System.Linq;
@@ -94,7 +95,7 @@ namespace OurSonic
             Status = "Determining Level Information";
 
             SonicLevel = new SonicLevel();
-
+            this.TilePaletteAnimationManager.ClearCache();
             for (var n = 0; n < sonicLevel.Rings.Length; n++) {
                 SonicLevel.Rings[n] = new Ring(true);
 
@@ -146,10 +147,10 @@ namespace OurSonic
             var acs = SonicLevel.AnimatedChunks = new List<TileChunk>();
 
             if (sonicLevel.AnimatedFiles.Truthy()) {
-                SonicLevel.AnimatedFiles = new Tile[sonicLevel.AnimatedFiles.Length][];
+                SonicLevel.AnimatedTileFiles = new Tile[sonicLevel.AnimatedFiles.Length][];
                 for (var animatedFileIndex = 0; animatedFileIndex < sonicLevel.AnimatedFiles.Length; animatedFileIndex++) {
                     var animatedFile = sonicLevel.AnimatedFiles[animatedFileIndex];
-                    SonicLevel.AnimatedFiles[animatedFileIndex] = new Tile[animatedFile.Length];
+                    SonicLevel.AnimatedTileFiles[animatedFileIndex] = new Tile[animatedFile.Length];
 
                     for (int filePiece = 0; filePiece < animatedFile.Length; filePiece++) {
                         var c = animatedFile[filePiece];
@@ -169,10 +170,10 @@ namespace OurSonic
                             mfc[n % 8][n / 8] = mjc[n];
                         }
                         Tile tile = new Tile(mfc);
-                        tile.IsAnimated = true;
+                        tile.IsTileAnimated = true;
 
                         tile.Index = filePiece * 10000 + animatedFileIndex;
-                        SonicLevel.AnimatedFiles[animatedFileIndex][filePiece] = tile;
+                        SonicLevel.AnimatedTileFiles[animatedFileIndex][filePiece] = tile;
                     }
                 }
             }
@@ -198,20 +199,20 @@ namespace OurSonic
             }
 
             SonicLevel.Angles = sonicLevel.Angles;
-            SonicLevel.Animations =
-                    new List<Animation>(
+            SonicLevel.TileAnimations =
+                    new List<TileAnimation>(
                             sonicLevel.Animations.Map(
                                     a =>
-                                    new Animation() {
-                                                            AnimationFile = a.AnimationFile,
+                                    new TileAnimation() {
+                                                            AnimationTileFile = a.AnimationFile,
                                                             AnimationTileIndex = a.AnimationTileIndex,
                                                             AutomatedTiming = a.AutomatedTiming,
                                                             NumberOfTiles = a.NumberOfTiles,
                                                             Frames =
-                                                                    (AnimationFrame[])
+                                                                    (TileAnimationFrame[])
                                                                     a.Frames.Map(
                                                                             b =>
-                                                                            new AnimationFrame() {Ticks = b.Ticks, StartingTileIndex = b.StartingTileIndex}).Slice(0)
+                                                                            new TileAnimationFrame() {Ticks = b.Ticks, StartingTileIndex = b.StartingTileIndex}).Slice(0)
                                                     }));
             SonicLevel.CollisionIndexes1 = sonicLevel.CollisionIndexes1;
             SonicLevel.CollisionIndexes2 = sonicLevel.CollisionIndexes2;
@@ -254,7 +255,7 @@ namespace OurSonic
                 }
 
                 SonicLevel.Chunks[j] = mj;
-                mj.Animated = new JsDictionary<int, Animation>();
+                mj.Animated = new JsDictionary<int, TileAnimation>();
                 //Help.Debugger();
                 for (int tpX = 0; tpX < mj.TilePieces.Length; tpX++) {
                     for (int tpY = 0; tpY < mj.TilePieces[tpX].Length; tpY++) {
@@ -305,15 +306,25 @@ namespace OurSonic
                         if (tile.Truthy()) {
                             tile.AnimatedPaletteIndexes = new List<int>();
                             var pl = tile.GetAllPaletteIndexes();
+                            tile.PaletteIndexesToBeAnimated = new JsDictionary<int, List<int>>();
+                            for (int animatedPaletteIndex = 0; animatedPaletteIndex < SonicLevel.AnimatedPalettes.Count; animatedPaletteIndex++) {
+                                var pal = SonicLevel.AnimatedPalettes[animatedPaletteIndex];
+                                tile.PaletteIndexesToBeAnimated[animatedPaletteIndex] = new List<int>();
 
-                            for (int k = 0; k < SonicLevel.AnimatedPalettes.Count; k++) {
-                                var pal = SonicLevel.AnimatedPalettes[k];
-                                foreach (var mjce in pal.Pieces) {
+                                foreach (var mjce in pal.Pieces)
+                                {
                                     PaletteItemPieces mje1 = mjce;
                                     if (mj.Palette == mje1.PaletteIndex) {
                                         if (pl.Any(j => j == mje1.PaletteOffset / 2 || j == mje1.PaletteOffset / 2 + 1)) {
-                                            dj.AnimatedPaletteIndexes.Add(k);
-                                            tile.AnimatedPaletteIndexes.Add(k);
+                                            dj.AnimatedPaletteIndexes.Add(animatedPaletteIndex);
+                                            tile.AnimatedPaletteIndexes.Add(animatedPaletteIndex);
+                                            foreach (var pIndex in pl)
+                                            {
+                                                if (pIndex == mje1.PaletteOffset/2 || pIndex == mje1.PaletteOffset/2 + 1)
+                                                {
+                                                    tile.PaletteIndexesToBeAnimated[animatedPaletteIndex].Add(pIndex);
+                                                }
+                                            }
                                         }
                                     }
                                 }

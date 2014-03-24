@@ -13,7 +13,7 @@ namespace OurSonic.Areas
         public TileChunkArea(UIManager.UIManager uiManager)
         {
             var tileChunkArea = uiManager.UIManagerAreas.TileChunkArea = new UIArea<TileChunk>(null, 700, 500, 390, 390) {Closable = true};
-            tileChunkArea.Visible = true;
+            tileChunkArea.Visible = false;
 
             uiManager.AddArea(tileChunkArea);
             tileChunkArea.AddControl(new TextArea(30, 25, "Tile Chunks") {Color = "blue"});
@@ -98,8 +98,8 @@ namespace OurSonic.Areas
                                              cnv.Save();
                                              cnv.Translate(x, y);
                                              cnv.Scale(4, 4);
-                                             tilePieceButton.Data.Draw(cnv, new Point(0, 0), 0, false, false, 0);
-                                             tilePieceButton.Data.Draw(cnv, new Point(0, 0), 1, false, false, 0);
+                                             tilePieceButton.Data.Draw(cnv, new Point(0, 0), ChunkLayer.Low, false, false, 0);
+                                             tilePieceButton.Data.Draw(cnv, new Point(0, 0), ChunkLayer.High, false, false, 0);
 
                                              if (showHeightMap) {
                                                  HeightMap hmap;
@@ -125,8 +125,8 @@ namespace OurSonic.Areas
                                 context.Save();
                                 context.Translate(x, y);
                                 context.Scale(16, 16);
-                                tilePieceArea.Data.Draw(context, new Point(0, 0), 0, false, false, 0);
-                                tilePieceArea.Data.Draw(context, new Point(0, 0), 1, false, false, 0);
+                                tilePieceArea.Data.Draw(context, new Point(0, 0), ChunkLayer.Low, false, false, 0);
+                                tilePieceArea.Data.Draw(context, new Point(0, 0), ChunkLayer.High, false, false, 0);
                                 context.Restore();
                             };
 

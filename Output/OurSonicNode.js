@@ -128,6 +128,9 @@ ss.initClass($OurSonicNode_Server, $asm, {
 			if (this.$fs.existsSync(this.$objDirectory + _object + '.js')) {
 				ss.add(strs, this.$fs.readFileSync(this.$objDirectory + _object + '.js', 'utf8'));
 			}
+			else {
+				ss.add(strs, '');
+			}
 		}
 		return strs;
 	}

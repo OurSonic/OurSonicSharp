@@ -16,20 +16,20 @@ namespace OurSonic
         public static SonicManager Instance;
         private static JsDictionary<int, Point[]> _cachedOffs = new JsDictionary<int, Point[]>();
         public readonly CanvasInformation mainCanvas;
-        private readonly SonicEngine myEngine;
+        private readonly SonicEngine engine;
         public readonly ObjectManager objectManager;
         public int DrawTickCount;
         private bool clicking;
         private int imageLength;
-        private string myStatus;
+        private string status;
         public DoublePoint overrideRealScale;
         private JsDictionary<string, SonicImage> sonicSprites;
         public int tickCount;
         private bool waitingForDrawContinue;
         public bool waitingForTickContinue;
-        private CanvasInformation myAnother;
-        private CanvasInformation mySonCanvas;
-        private CanvasInformation myAnotherw;
+        private CanvasInformation lowChunkCanvas;
+        private CanvasInformation sonicCanvas;
+        private CanvasInformation highChuckCanvas;
         [IntrinsicProperty]
         public GameState CurrentGameState { get; set; }
         [IntrinsicProperty]
@@ -49,7 +49,7 @@ namespace OurSonic
         [IntrinsicProperty]
         public int IndexedPalette { get; set; }
         [IntrinsicProperty]
-        public List<Animation> Animations { get; set; }
+        public List<TileAnimation> Animations { get; set; }
         [IntrinsicProperty]
         public List<AnimationInstance> AnimationInstances { get; set; }
         [IntrinsicProperty]
@@ -82,30 +82,34 @@ namespace OurSonic
         public Action<SonicLevel> OnLevelLoad { get; set; }
         private string Status
         {
-            get { return myStatus; }
+            get { return status; }
             set
             {
                 OurSonic.UIManager.UIManager.UpdateTitle(value);
-                myStatus = value;
+                status = value;
             }
         }
 
+        public TilePaletteAnimationManager TilePaletteAnimationManager { get; set; }
+
+      
         static SonicManager()
         {
         }
 
         public SonicManager(SonicEngine engine, CanvasInformation gameCanvas, Action resize)
         {
-            paletteAnimationIndexes=new List<int>();
+            TilePaletteAnimationManager = new TilePaletteAnimationManager(this);
+
             Instance = this;
             //            SonicToon = new Sonic();
 
-            myEngine = engine;
-            myEngine.canvasWidth = jQuery.Window.GetWidth();
-            myEngine.canvasHeight = jQuery.Window.GetHeight();
+            this.engine = engine;
+            this.engine.canvasWidth = jQuery.Window.GetWidth();
+            this.engine.canvasHeight = jQuery.Window.GetHeight();
 
-            gameCanvas.DomCanvas[0].SetAttribute("width", myEngine.canvasWidth);
-            gameCanvas.DomCanvas[0].SetAttribute("height", myEngine.canvasHeight);
+            gameCanvas.DomCanvas[0].SetAttribute("width", this.engine.canvasWidth);
+            gameCanvas.DomCanvas[0].SetAttribute("height", this.engine.canvasHeight);
 
             jQuery.GetJsonData<JsDictionary<string, SonicImage>>("Content/sprites/sonic.js", data => { sonicSprites = data; });
 
@@ -121,7 +125,7 @@ namespace OurSonic
             BigWindowLocation.Width = (int)(BigWindowLocation.Width * 1.8);
             BigWindowLocation.Height = (int)(BigWindowLocation.Height * 1.8);
 
-            Animations = new List<Animation>();
+            Animations = new List<TileAnimation>();
             AnimationInstances = new List<AnimationInstance>();
             //jQuery.GetJson("Content/sprites/explosion.js", data => Animations.Add(new Animation("explosion", data)));
 
@@ -445,7 +449,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
 
             var offs = getOffs(w1, h1);
 
-            updateAnimatedPalettes();
+            TilePaletteAnimationManager.TickAnimatedPalettes();
             int fxP = (int)((WindowLocation.X) / 128.0);
             int fyP = (int)((WindowLocation.Y) / 128.0);
 
@@ -463,32 +467,32 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 localPoint.X = -WindowLocation.X + movex;
                 localPoint.Y = -WindowLocation.Y / 4;
 
-                Background.Draw(myAnother.Context, localPoint, wOffset);
+                Background.Draw(lowChunkCanvas.Context, localPoint, wOffset);
 
                 localPoint.X = -WindowLocation.X + movex + Background.Width;
                 localPoint.Y = -WindowLocation.Y / 4;
 
-                Background.Draw(myAnother.Context, localPoint, wOffset);
+                Background.Draw(lowChunkCanvas.Context, localPoint, wOffset);
             }
 
 
-            drawLowChunks(myAnother.Context, zero, offs, fyP, fxP);
+            drawLowChunks(lowChunkCanvas.Context, zero, offs, fyP, fxP);
 
-            if (ShowHeightMap) drawHighChunks(myAnother.Context, fxP, fyP, offs, zero);
+            if (ShowHeightMap) drawHighChunks(lowChunkCanvas.Context, fxP, fyP, offs, zero);
 
-            drawObjects(mySonCanvas.Context, zero);
-            drawAnimations(mySonCanvas.Context);
-            drawRings(mySonCanvas.Context, zero);
-            drawSonic(mySonCanvas.Context);
+            drawObjects(sonicCanvas.Context, zero);
+            drawAnimations(sonicCanvas.Context);
+            drawRings(sonicCanvas.Context, zero);
+            drawSonic(sonicCanvas.Context);
             //drawRings(canvas, zero);
             //editing^
 
             if (!ShowHeightMap)
-                drawHighChunks(myAnotherw.Context, fxP, fyP, offs, zero);
+                drawHighChunks(highChuckCanvas.Context, fxP, fyP, offs, zero);
 
-            myAnother.Context.OffsetStuff();
-            myAnotherw.Context.OffsetStuff();
-            drawSonic(myAnother.Context);
+            lowChunkCanvas.Context.OffsetPixelsForWater();
+            highChuckCanvas.Context.OffsetPixelsForWater();
+            drawSonic(lowChunkCanvas.Context);
 
             drawCanveses(canvas, localPoint);
 
@@ -500,19 +504,19 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
         private void drawCanveses(CanvasContext2D canvas, Point localPoint)
         {
             canvas.Scale(Scale.X, Scale.Y);
-            canvas.DrawImage(myAnother.Canvas, localPoint.X, localPoint.Y);
-            canvas.DrawImage(mySonCanvas.Canvas, localPoint.X, localPoint.Y);
-            canvas.DrawImage(myAnotherw.Canvas, localPoint.X, localPoint.Y);
+            canvas.DrawImage(lowChunkCanvas.Canvas, localPoint.X, localPoint.Y);
+            canvas.DrawImage(sonicCanvas.Canvas, localPoint.X, localPoint.Y);
+            canvas.DrawImage(highChuckCanvas.Canvas, localPoint.X, localPoint.Y);
         }
 
         private void resetCanvases()
         {
-            myAnother = myAnother ?? CanvasInformation.Create(320, 240);
-            mySonCanvas = mySonCanvas ?? CanvasInformation.Create(320, 240);
-            myAnotherw = myAnotherw ?? CanvasInformation.Create(320, 240);
-            mySonCanvas.Context.ClearRect(0, 0, 320, 240);
-            myAnotherw.Context.ClearRect(0, 0, 320, 240);
-            myAnother.Context.ClearRect(0, 0, 320, 240);
+            lowChunkCanvas = lowChunkCanvas ?? CanvasInformation.Create(320, 240);
+            sonicCanvas = sonicCanvas ?? CanvasInformation.Create(320, 240);
+            highChuckCanvas = highChuckCanvas ?? CanvasInformation.Create(320, 240);
+            sonicCanvas.Context.ClearRect(0, 0, 320, 240);
+            highChuckCanvas.Context.ClearRect(0, 0, 320, 240);
+            lowChunkCanvas.Context.ClearRect(0, 0, 320, 240);
         }
 
         private static Point[] getOffs(int w1, int h1)
@@ -594,52 +598,6 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
         }
 
 
-        private List<int> paletteAnimationIndexes;
-        private void updateAnimatedPalettes()
-        {
-            if (SonicLevel.AnimatedPalettes.Count > 0)
-            {
-                for (int animatedPaletteIndex = 0; animatedPaletteIndex < SonicLevel.AnimatedPalettes.Count; animatedPaletteIndex++)
-                {
-                    var pal = SonicLevel.AnimatedPalettes[animatedPaletteIndex];
-                    if (pal.SkipIndex == 0) continue;
-                    if (pal.TotalLength == 0) continue;
-                    
-                    //when to move to the next frame
-                    for (int j = 0; j <= pal.TotalLength; j += pal.SkipIndex)
-                    {
-                        if (DrawTickCount % (pal.TotalLength + pal.SkipIndex) == j)
-                            paletteAnimationIndexes[animatedPaletteIndex] = j / pal.SkipIndex;
-                    }
-                    //todo ^^^this calc is suspected to be wrong
-
-
-
-
-                    for (int index = 0; index < pal.Pieces.Count; index++)
-                    {
-                        var palettePiece = pal.Pieces[index];
-                        
-                        
-                        
-                        
-                        int colorIndex = paletteAnimationIndexes[animatedPaletteIndex] + (pal.Pieces.Count * index)/*+ 0 + (palettePiece.PaletteMultiply)*/;
-                        //todo ^^^this calc is suspected to be wrong
-                        
-                        
-                        
-                        int replaceIndex = (palettePiece.PaletteOffset) / 2;
-
-                        var color = pal.Palette[colorIndex];
-                        if (color != null)
-                            SonicLevel.Palette[palettePiece.PaletteIndex][replaceIndex] = color;
-                        else//bug, shouldnt hit
-                            SonicLevel.Palette[palettePiece.PaletteIndex][replaceIndex] = CanvasInformation.BlackPixel;
-                    }
-                }
-            }
-        }
-
         private void drawLowChunks(CanvasContext2D canvas, Point localPoint, Point[] offs, int fyP, int fxP)
         {
             foreach (Point off in offs)
@@ -658,7 +616,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 localPoint.Y = (_yPreal * 128) - WindowLocation.Y;
 
                 if (!chunk.IsEmpty() && !chunk.OnlyForeground())
-                    chunk.Draw(canvas, localPoint, 0);
+                    chunk.Draw(canvas, localPoint, ChunkLayer.Low);
             }
         }
 
@@ -679,7 +637,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 localPoint.Y = (_yPreal * 128) - WindowLocation.Y;
 
                 if (!chunk.IsEmpty() && !chunk.OnlyBackground())
-                    chunk.Draw(canvas, localPoint, 1);
+                    chunk.Draw(canvas, localPoint, ChunkLayer.High);
 
                 if (ShowHeightMap)
                 {
@@ -706,7 +664,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             var posj1 = new Point(0, 0);
             var canv = CanvasInformation.Create(128, 128);
             var ctx = canv.Context;
-            myEngine.Clear(canv);
+            engine.Clear(canv);
             for (var _y = 0; _y < 8; _y++)
             {
                 for (var _x = 0; _x < 8; _x++)
@@ -850,9 +808,9 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             }
         }
 
-        private Animation containsAnimatedTile(int tile, SonicLevel sonLevel)
+        private TileAnimation containsAnimatedTile(int tile, SonicLevel sonLevel)
         {
-            foreach (var an in sonLevel.Animations)
+            foreach (var an in sonLevel.TileAnimations)
             {
                 var anin = an.AnimationTileIndex;
                 var num = an.NumberOfTiles;

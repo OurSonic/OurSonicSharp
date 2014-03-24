@@ -10,9 +10,9 @@ namespace OurSonic.Level
     public class SonicLevel
     {
         [IntrinsicProperty]
-        public List<Animation> Animations { get; set; }
+        public List<TileAnimation> TileAnimations { get; set; }
         [IntrinsicProperty]
-        public Tile[][] AnimatedFiles { get; set; }
+        public Tile[][] AnimatedTileFiles { get; set; }
         [IntrinsicProperty]
         public int[][] ChunkMap { get; set; }
         [IntrinsicProperty]

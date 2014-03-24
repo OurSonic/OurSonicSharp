@@ -92,20 +92,20 @@
 	// OurSonic.SonicManager
 	var $OurSonic_SonicManager = function(engine, gameCanvas, resize) {
 		this.mainCanvas = null;
-		this.$myEngine = null;
+		this.$engine = null;
 		this.objectManager = null;
 		this.drawTickCount = 0;
 		this.$clicking = false;
 		this.$imageLength = 0;
-		this.$myStatus = null;
+		this.$status = null;
 		this.overrideRealScale = null;
 		this.$sonicSprites = null;
 		this.tickCount = 0;
 		this.$waitingForDrawContinue = false;
 		this.waitingForTickContinue = false;
-		this.$myAnother = null;
-		this.$mySonCanvas = null;
-		this.$myAnotherw = null;
+		this.$lowChunkCanvas = null;
+		this.$sonicCanvas = null;
+		this.$highChuckCanvas = null;
 		this.currentGameState = 0;
 		this.bigWindowLocation = null;
 		this.uiManager = null;
@@ -131,16 +131,16 @@
 		this.spriteLoader = null;
 		this.typingInEditor = false;
 		this.onLevelLoad = null;
-		this.$paletteAnimationIndexes = null;
+		this.$1$TilePaletteAnimationManagerField = null;
 		this.cachedObjects = null;
-		this.$paletteAnimationIndexes = [];
+		this.set_tilePaletteAnimationManager(new $OurSonic_TilePaletteAnimationManager(this));
 		$OurSonic_SonicManager.instance = this;
 		//            SonicToon = new Sonic();
-		this.$myEngine = engine;
-		this.$myEngine.canvasWidth = $(window).width();
-		this.$myEngine.canvasHeight = $(window).height();
-		gameCanvas.domCanvas[0].setAttribute('width', this.$myEngine.canvasWidth);
-		gameCanvas.domCanvas[0].setAttribute('height', this.$myEngine.canvasHeight);
+		this.$engine = engine;
+		this.$engine.canvasWidth = $(window).width();
+		this.$engine.canvasHeight = $(window).height();
+		gameCanvas.domCanvas[0].setAttribute('width', this.$engine.canvasWidth);
+		gameCanvas.domCanvas[0].setAttribute('height', this.$engine.canvasHeight);
 		$.getJSON('Content/sprites/sonic.js', ss.mkdel(this, function(data) {
 			this.$sonicSprites = data;
 		}));
@@ -219,6 +219,39 @@
 	};
 	$OurSonic_SpeedTester.__typeName = 'OurSonic.SpeedTester';
 	global.OurSonic.SpeedTester = $OurSonic_SpeedTester;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.TilePaletteAnimation
+	var $OurSonic_TilePaletteAnimation = function(manager, animatedPaletteData) {
+		this.manager = null;
+		this.animatedPaletteData = null;
+		this.currentFrame = 0;
+		this.frames = null;
+		this.manager = manager;
+		this.animatedPaletteData = animatedPaletteData;
+		this.frames = [];
+	};
+	$OurSonic_TilePaletteAnimation.__typeName = 'OurSonic.TilePaletteAnimation';
+	global.OurSonic.TilePaletteAnimation = $OurSonic_TilePaletteAnimation;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.TilePaletteAnimationFrame
+	var $OurSonic_TilePaletteAnimationFrame = function(frameIndex, animation) {
+		this.$1$AnimationField = null;
+		this.frameIndex = 0;
+		this.$tempPalette = null;
+		this.set_animation(animation);
+		this.frameIndex = frameIndex;
+	};
+	$OurSonic_TilePaletteAnimationFrame.__typeName = 'OurSonic.TilePaletteAnimationFrame';
+	global.OurSonic.TilePaletteAnimationFrame = $OurSonic_TilePaletteAnimationFrame;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.TilePaletteAnimationManager
+	var $OurSonic_TilePaletteAnimationManager = function(sonicManager) {
+		this.$1$SonicManagerField = null;
+		this.animations = null;
+		this.set_sonicManager(sonicManager);
+	};
+	$OurSonic_TilePaletteAnimationManager.__typeName = 'OurSonic.TilePaletteAnimationManager';
+	global.OurSonic.TilePaletteAnimationManager = $OurSonic_TilePaletteAnimationManager;
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Areas.ColorEditingArea
 	var $OurSonic_Areas_ColorEditingArea = function(x, y, width, height) {
@@ -475,7 +508,7 @@
 				var level = $t6[$t7];
 				if (load) {
 					//#if RELEASE
-					loadLevel(level);
+					// loadLevel(level);
 					//#endif
 					load = false;
 				}
@@ -1071,7 +1104,7 @@
 		var $t1 = new (ss.makeGenericType($OurSonic_UIManager_UIArea$1, [$OurSonic_Level_Tiles_TileChunk]))(null, 700, 500, 390, 390);
 		$t1.closable = true;
 		var tileChunkArea = $t2.tileChunkArea = $t1;
-		tileChunkArea.visible = true;
+		tileChunkArea.visible = false;
 		uiManager.addArea(tileChunkArea);
 		var $t3 = new $OurSonic_UIManager_TextArea(30, 25, ss.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Tile Chunks'));
 		$t3.color = 'blue';
@@ -1282,8 +1315,8 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Level.SonicLevel
 	var $OurSonic_Level_SonicLevel = function() {
-		this.animations = null;
-		this.animatedFiles = null;
+		this.tileAnimations = null;
+		this.animatedTileFiles = null;
 		this.chunkMap = null;
 		this.rings = null;
 		this.curHeightMap = false;
@@ -1357,9 +1390,15 @@
 	$OurSonic_Level_SpriteCacheIndexes.__typeName = 'OurSonic.Level.SpriteCacheIndexes';
 	global.OurSonic.Level.SpriteCacheIndexes = $OurSonic_Level_SpriteCacheIndexes;
 	////////////////////////////////////////////////////////////////////////////////
-	// OurSonic.Level.Animations.Animation
-	var $OurSonic_Level_Animations_Animation = function() {
-		this.animationFile = 0;
+	// OurSonic.Level.Animations.AnimationInstance
+	var $OurSonic_Level_Animations_AnimationInstance = function() {
+	};
+	$OurSonic_Level_Animations_AnimationInstance.__typeName = 'OurSonic.Level.Animations.AnimationInstance';
+	global.OurSonic.Level.Animations.AnimationInstance = $OurSonic_Level_Animations_AnimationInstance;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.Level.Animations.TileAnimation
+	var $OurSonic_Level_Animations_TileAnimation = function() {
+		this.animationTileFile = 0;
 		this.numberOfTiles = 0;
 		this.lastAnimatedIndex = 0;
 		this.lastAnimatedFrame = null;
@@ -1367,22 +1406,16 @@
 		this.frames = null;
 		this.automatedTiming = 0;
 	};
-	$OurSonic_Level_Animations_Animation.__typeName = 'OurSonic.Level.Animations.Animation';
-	global.OurSonic.Level.Animations.Animation = $OurSonic_Level_Animations_Animation;
+	$OurSonic_Level_Animations_TileAnimation.__typeName = 'OurSonic.Level.Animations.TileAnimation';
+	global.OurSonic.Level.Animations.TileAnimation = $OurSonic_Level_Animations_TileAnimation;
 	////////////////////////////////////////////////////////////////////////////////
-	// OurSonic.Level.Animations.AnimationFrame
-	var $OurSonic_Level_Animations_AnimationFrame = function() {
+	// OurSonic.Level.Animations.TileAnimationFrame
+	var $OurSonic_Level_Animations_TileAnimationFrame = function() {
 		this.ticks = 0;
 		this.startingTileIndex = 0;
 	};
-	$OurSonic_Level_Animations_AnimationFrame.__typeName = 'OurSonic.Level.Animations.AnimationFrame';
-	global.OurSonic.Level.Animations.AnimationFrame = $OurSonic_Level_Animations_AnimationFrame;
-	////////////////////////////////////////////////////////////////////////////////
-	// OurSonic.Level.Animations.AnimationInstance
-	var $OurSonic_Level_Animations_AnimationInstance = function() {
-	};
-	$OurSonic_Level_Animations_AnimationInstance.__typeName = 'OurSonic.Level.Animations.AnimationInstance';
-	global.OurSonic.Level.Animations.AnimationInstance = $OurSonic_Level_Animations_AnimationInstance;
+	$OurSonic_Level_Animations_TileAnimationFrame.__typeName = 'OurSonic.Level.Animations.TileAnimationFrame';
+	global.OurSonic.Level.Animations.TileAnimationFrame = $OurSonic_Level_Animations_TileAnimationFrame;
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Level.Events.LevelEvent
 	var $OurSonic_Level_Events_LevelEvent = function() {
@@ -1667,6 +1700,55 @@
 	};
 	global.OurSonic.Level.Objects.ObjectManager = $OurSonic_Level_Objects_ObjectManager;
 	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.Level.Tiles.ChunkLayer
+	var $OurSonic_Level_Tiles_ChunkLayer = function() {
+	};
+	$OurSonic_Level_Tiles_ChunkLayer.__typeName = 'OurSonic.Level.Tiles.ChunkLayer';
+	global.OurSonic.Level.Tiles.ChunkLayer = $OurSonic_Level_Tiles_ChunkLayer;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.Level.Tiles.ChunkLayer
+	var $OurSonic_Level_Tiles_ChunkLayer$1 = function(T) {
+		var $type = function() {
+			this.low = ss.getDefaultValue(T);
+			this.high = ss.getDefaultValue(T);
+		};
+		ss.registerGenericClassInstance($type, $OurSonic_Level_Tiles_ChunkLayer$1, [T], {
+			get_item: function(layer) {
+				switch (layer) {
+					case 0: {
+						return this.low;
+					}
+					case 1: {
+						return this.high;
+					}
+					default: {
+						return ss.getDefaultValue(T);
+					}
+				}
+			},
+			set_item: function(layer, value) {
+				switch (layer) {
+					case 0: {
+						this.low = value;
+						break;
+					}
+					case 1: {
+						this.high = value;
+						break;
+					}
+				}
+			}
+		}, function() {
+			return null;
+		}, function() {
+			return [];
+		});
+		return $type;
+	};
+	$OurSonic_Level_Tiles_ChunkLayer$1.__typeName = 'OurSonic.Level.Tiles.ChunkLayer$1';
+	ss.initGenericClass($OurSonic_Level_Tiles_ChunkLayer$1, $asm, 1);
+	global.OurSonic.Level.Tiles.ChunkLayer$1 = $OurSonic_Level_Tiles_ChunkLayer$1;
+	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Level.Tiles.RotationMode
 	var $OurSonic_Level_Tiles_RotationMode = function() {
 	};
@@ -1679,10 +1761,10 @@
 		this.$tileAnimation = null;
 		this.curPaletteIndexes = null;
 		this.colors = null;
-		this.showOutline = false;
 		this.index = 0;
-		this.isAnimated = false;
+		this.isTileAnimated = false;
 		this.animatedPaletteIndexes = null;
+		this.paletteIndexesToBeAnimated = null;
 		this.colors = colors;
 		this.curPaletteIndexes = null;
 	};
@@ -1717,7 +1799,6 @@
 		this.$layerCacheBlocks = null;
 		this.$myLocalPoint = $OurSonic_Utility_Point.$ctor1(0, 0);
 		this.$myNeverAnimate = null;
-		this.$neverAnimateCache = null;
 		this.isOnlyBackground = null;
 		this.isOnlyForeground = null;
 		this.empty = null;
@@ -1728,12 +1809,32 @@
 		this.heightBlocks2 = null;
 		this.angleMap1 = null;
 		this.angleMap2 = null;
+		this.$hasPixelAnimations$1 = null;
+		this.$paletteAnimationIndexes = null;
+		this.$base = new (ss.makeGenericType($OurSonic_Level_Tiles_ChunkLayer$1, [$OurSonic_Utility_CanvasInformation]))();
+		this.$paletteAnimationCanvases = new (ss.makeGenericType($OurSonic_Level_Tiles_ChunkLayer$1, [Object]))();
 		this.isOnlyBackground = null;
-		this.$neverAnimateCache = new Array(2);
 		this.$layerCacheBlocks = new Array(2);
 	};
 	$OurSonic_Level_Tiles_TileChunk.__typeName = 'OurSonic.Level.Tiles.TileChunk';
 	global.OurSonic.Level.Tiles.TileChunk = $OurSonic_Level_Tiles_TileChunk;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.Level.Tiles.TileChunk.PaletteAnimationCanvasFrame
+	var $OurSonic_Level_Tiles_TileChunk$PaletteAnimationCanvasFrame = function() {
+		this.canvas = null;
+	};
+	$OurSonic_Level_Tiles_TileChunk$PaletteAnimationCanvasFrame.__typeName = 'OurSonic.Level.Tiles.TileChunk$PaletteAnimationCanvasFrame';
+	global.OurSonic.Level.Tiles.TileChunk$PaletteAnimationCanvasFrame = $OurSonic_Level_Tiles_TileChunk$PaletteAnimationCanvasFrame;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.Level.Tiles.TileChunk.PaletteAnimationCanvasFrames
+	var $OurSonic_Level_Tiles_TileChunk$PaletteAnimationCanvasFrames = function(paletteAnimationIndex) {
+		this.paletteAnimationIndex = 0;
+		this.frames = null;
+		this.paletteAnimationIndex = paletteAnimationIndex;
+		this.frames = {};
+	};
+	$OurSonic_Level_Tiles_TileChunk$PaletteAnimationCanvasFrames.__typeName = 'OurSonic.Level.Tiles.TileChunk$PaletteAnimationCanvasFrames';
+	global.OurSonic.Level.Tiles.TileChunk$PaletteAnimationCanvasFrames = $OurSonic_Level_Tiles_TileChunk$PaletteAnimationCanvasFrames;
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Level.Tiles.TileItem
 	var $OurSonic_Level_Tiles_TileItem = function() {
@@ -2682,7 +2783,7 @@
 		//context.PutImageData(imaged, 0, 0);
 		$OurSonic_Utility_Extensions.$curY = cury;
 	};
-	$OurSonic_Utility_Extensions.offsetStuff = function(context) {
+	$OurSonic_Utility_Extensions.offsetPixelsForWater = function(context) {
 		return;
 		$OurSonic_Utility_Extensions.$makeOffset();
 		//    if (DOES)
@@ -3546,11 +3647,17 @@
 	});
 	ss.initClass($OurSonic_SonicManager, $asm, {
 		get_$status: function() {
-			return this.$myStatus;
+			return this.$status;
 		},
 		set_$status: function(value) {
 			$OurSonic_UIManager_UIManager.updateTitle(value);
-			this.$myStatus = value;
+			this.$status = value;
+		},
+		get_tilePaletteAnimationManager: function() {
+			return this.$1$TilePaletteAnimationManagerField;
+		},
+		set_tilePaletteAnimationManager: function(value) {
+			this.$1$TilePaletteAnimationManagerField = value;
 		},
 		onClick: function(elementEvent) {
 			//Help.Debugger();
@@ -3818,7 +3925,7 @@
 				h1 = ss.Int32.div(h1, this.scale.y);
 			}
 			var offs = $OurSonic_SonicManager.$getOffs(w1, h1);
-			this.$updateAnimatedPalettes();
+			this.get_tilePaletteAnimationManager().tickAnimatedPalettes();
 			var fxP = ss.Int32.trunc(this.windowLocation.x / 128);
 			var fyP = ss.Int32.trunc(this.windowLocation.y / 128);
 			this.$resetCanvases();
@@ -3829,27 +3936,27 @@
 				var movex = ss.Int32.div(wOffset, bw) * bw;
 				localPoint.x = -this.windowLocation.x + movex;
 				localPoint.y = ss.Int32.div(-this.windowLocation.y, 4);
-				this.background.draw(this.$myAnother.context, localPoint, wOffset);
+				this.background.draw(this.$lowChunkCanvas.context, localPoint, wOffset);
 				localPoint.x = -this.windowLocation.x + movex + this.background.width;
 				localPoint.y = ss.Int32.div(-this.windowLocation.y, 4);
-				this.background.draw(this.$myAnother.context, localPoint, wOffset);
+				this.background.draw(this.$lowChunkCanvas.context, localPoint, wOffset);
 			}
-			this.$drawLowChunks(this.$myAnother.context, zero, offs, fyP, fxP);
+			this.$drawLowChunks(this.$lowChunkCanvas.context, zero, offs, fyP, fxP);
 			if (this.showHeightMap) {
-				this.$drawHighChunks(this.$myAnother.context, fxP, fyP, offs, zero);
+				this.$drawHighChunks(this.$lowChunkCanvas.context, fxP, fyP, offs, zero);
 			}
-			this.$drawObjects(this.$mySonCanvas.context, zero);
-			this.$drawAnimations(this.$mySonCanvas.context);
-			this.$drawRings(this.$mySonCanvas.context, zero);
-			this.$drawSonic(this.$mySonCanvas.context);
+			this.$drawObjects(this.$sonicCanvas.context, zero);
+			this.$drawAnimations(this.$sonicCanvas.context);
+			this.$drawRings(this.$sonicCanvas.context, zero);
+			this.$drawSonic(this.$sonicCanvas.context);
 			//drawRings(canvas, zero);
 			//editing^
 			if (!this.showHeightMap) {
-				this.$drawHighChunks(this.$myAnotherw.context, fxP, fyP, offs, zero);
+				this.$drawHighChunks(this.$highChuckCanvas.context, fxP, fyP, offs, zero);
 			}
-			$OurSonic_Utility_Extensions.offsetStuff(this.$myAnother.context);
-			$OurSonic_Utility_Extensions.offsetStuff(this.$myAnotherw.context);
-			this.$drawSonic(this.$myAnother.context);
+			$OurSonic_Utility_Extensions.offsetPixelsForWater(this.$lowChunkCanvas.context);
+			$OurSonic_Utility_Extensions.offsetPixelsForWater(this.$highChuckCanvas.context);
+			this.$drawSonic(this.$lowChunkCanvas.context);
 			this.$drawCanveses(canvas, localPoint);
 			canvas.restore();
 			if (this.currentGameState === 0) {
@@ -3858,17 +3965,17 @@
 		},
 		$drawCanveses: function(canvas, localPoint) {
 			canvas.scale(this.scale.x, this.scale.y);
-			canvas.drawImage(this.$myAnother.canvas, localPoint.x, localPoint.y);
-			canvas.drawImage(this.$mySonCanvas.canvas, localPoint.x, localPoint.y);
-			canvas.drawImage(this.$myAnotherw.canvas, localPoint.x, localPoint.y);
+			canvas.drawImage(this.$lowChunkCanvas.canvas, localPoint.x, localPoint.y);
+			canvas.drawImage(this.$sonicCanvas.canvas, localPoint.x, localPoint.y);
+			canvas.drawImage(this.$highChuckCanvas.canvas, localPoint.x, localPoint.y);
 		},
 		$resetCanvases: function() {
-			this.$myAnother = this.$myAnother || $OurSonic_Utility_CanvasInformation.create(320, 240);
-			this.$mySonCanvas = this.$mySonCanvas || $OurSonic_Utility_CanvasInformation.create(320, 240);
-			this.$myAnotherw = this.$myAnotherw || $OurSonic_Utility_CanvasInformation.create(320, 240);
-			this.$mySonCanvas.context.clearRect(0, 0, 320, 240);
-			this.$myAnotherw.context.clearRect(0, 0, 320, 240);
-			this.$myAnother.context.clearRect(0, 0, 320, 240);
+			this.$lowChunkCanvas = this.$lowChunkCanvas || $OurSonic_Utility_CanvasInformation.create(320, 240);
+			this.$sonicCanvas = this.$sonicCanvas || $OurSonic_Utility_CanvasInformation.create(320, 240);
+			this.$highChuckCanvas = this.$highChuckCanvas || $OurSonic_Utility_CanvasInformation.create(320, 240);
+			this.$sonicCanvas.context.clearRect(0, 0, 320, 240);
+			this.$highChuckCanvas.context.clearRect(0, 0, 320, 240);
+			this.$lowChunkCanvas.context.clearRect(0, 0, 320, 240);
 		},
 		$updatePositions: function(canvas) {
 			this.screenOffset.x = 0;
@@ -3912,39 +4019,6 @@
 				this.$waitingForDrawContinue = true;
 			}
 			return false;
-		},
-		$updateAnimatedPalettes: function() {
-			if (this.sonicLevel.animatedPalettes.length > 0) {
-				for (var animatedPaletteIndex = 0; animatedPaletteIndex < this.sonicLevel.animatedPalettes.length; animatedPaletteIndex++) {
-					var pal = this.sonicLevel.animatedPalettes[animatedPaletteIndex];
-					if (pal.skipIndex === 0) {
-						continue;
-					}
-					if (pal.totalLength === 0) {
-						continue;
-					}
-					//when to move to the next frame
-					for (var j = 0; j <= pal.totalLength; j += pal.skipIndex) {
-						if (this.drawTickCount % (pal.totalLength + pal.skipIndex) === j) {
-							this.$paletteAnimationIndexes[animatedPaletteIndex] = ss.Int32.div(j, pal.skipIndex);
-						}
-					}
-					//todo ^^^this calc is suspected to be wrong
-					for (var index = 0; index < pal.pieces.length; index++) {
-						var palettePiece = pal.pieces[index];
-						var colorIndex = this.$paletteAnimationIndexes[animatedPaletteIndex] + pal.pieces.length * index;
-						//todo ^^^this calc is suspected to be wrong
-						var replaceIndex = ss.Int32.div(palettePiece.paletteOffset, 2);
-						var color = pal.palette[colorIndex];
-						if (ss.isValue(color)) {
-							this.sonicLevel.palette[palettePiece.paletteIndex][replaceIndex] = color;
-						}
-						else {
-							this.sonicLevel.palette[palettePiece.paletteIndex][replaceIndex] = $OurSonic_Utility_CanvasInformation.get_blackPixel();
-						}
-					}
-				}
-			}
 		},
 		$drawLowChunks: function(canvas, localPoint, offs, fyP, fxP) {
 			for (var $t1 = 0; $t1 < offs.length; $t1++) {
@@ -4002,7 +4076,7 @@
 			var posj1 = $OurSonic_Utility_Point.$ctor1(0, 0);
 			var canv = $OurSonic_Utility_CanvasInformation.create(128, 128);
 			var ctx = canv.context;
-			this.$myEngine.clear(canv);
+			this.$engine.clear(canv);
 			for (var _y = 0; _y < 8; _y++) {
 				for (var _x = 0; _x < 8; _x++) {
 					var tp = md.tilePieces[_x][_y];
@@ -4127,8 +4201,8 @@
 			}
 		},
 		$containsAnimatedTile: function(tile, sonLevel) {
-			for (var $t1 = 0; $t1 < sonLevel.animations.length; $t1++) {
-				var an = sonLevel.animations[$t1];
+			for (var $t1 = 0; $t1 < sonLevel.tileAnimations.length; $t1++) {
+				var an = sonLevel.tileAnimations[$t1];
 				var anin = an.animationTileIndex;
 				var num = an.numberOfTiles;
 				if (tile >= anin && tile < anin + num) {
@@ -4289,6 +4363,7 @@
 			this.set_$status('Decoding');
 			this.set_$status('Determining Level Information');
 			this.sonicLevel = new $OurSonic_Level_SonicLevel();
+			this.get_tilePaletteAnimationManager().clearCache();
 			for (var n = 0; n < sonicLevel.Rings.length; n++) {
 				this.sonicLevel.rings[n] = $OurSonic_Level_Ring.$ctor(true);
 				this.sonicLevel.rings[n].x = sonicLevel.Rings[n].X;
@@ -4334,10 +4409,10 @@
 			}
 			var acs = this.sonicLevel.animatedChunks = [];
 			if (sonicLevel.AnimatedFiles) {
-				this.sonicLevel.animatedFiles = new Array(sonicLevel.AnimatedFiles.length);
+				this.sonicLevel.animatedTileFiles = new Array(sonicLevel.AnimatedFiles.length);
 				for (var animatedFileIndex = 0; animatedFileIndex < sonicLevel.AnimatedFiles.length; animatedFileIndex++) {
 					var animatedFile = sonicLevel.AnimatedFiles[animatedFileIndex];
-					this.sonicLevel.animatedFiles[animatedFileIndex] = new Array(animatedFile.length);
+					this.sonicLevel.animatedTileFiles[animatedFileIndex] = new Array(animatedFile.length);
 					for (var filePiece = 0; filePiece < animatedFile.length; filePiece++) {
 						var c = animatedFile[filePiece];
 						var tiles1 = c;
@@ -4355,9 +4430,9 @@
 							mfc1[n2 % 8][ss.Int32.div(n2, 8)] = mjc[n2];
 						}
 						var tile = new $OurSonic_Level_Tiles_Tile(mfc1);
-						tile.isAnimated = true;
+						tile.isTileAnimated = true;
 						tile.index = filePiece * 10000 + animatedFileIndex;
-						this.sonicLevel.animatedFiles[animatedFileIndex][filePiece] = tile;
+						this.sonicLevel.animatedTileFiles[animatedFileIndex][filePiece] = tile;
 					}
 				}
 			}
@@ -4381,14 +4456,14 @@
 				this.sonicLevel.tilePieces[j1] = mj1;
 			}
 			this.sonicLevel.angles = sonicLevel.Angles;
-			this.sonicLevel.animations = ss.arrayClone(sonicLevel.Animations.map(function(a) {
-				var $t4 = new $OurSonic_Level_Animations_Animation();
-				$t4.animationFile = a.AnimationFile;
+			this.sonicLevel.tileAnimations = ss.arrayClone(sonicLevel.Animations.map(function(a) {
+				var $t4 = new $OurSonic_Level_Animations_TileAnimation();
+				$t4.animationTileFile = a.AnimationFile;
 				$t4.animationTileIndex = a.AnimationTileIndex;
 				$t4.automatedTiming = a.AutomatedTiming;
 				$t4.numberOfTiles = a.NumberOfTiles;
 				$t4.frames = a.Frames.map(function(b) {
-					var $t5 = new $OurSonic_Level_Animations_AnimationFrame();
+					var $t5 = new $OurSonic_Level_Animations_TileAnimationFrame();
 					$t5.ticks = b.Ticks;
 					$t5.startingTileIndex = b.StartingTileIndex;
 					return $t5;
@@ -4492,8 +4567,10 @@
 						if (tile1) {
 							tile1.animatedPaletteIndexes = [];
 							var pl = tile1.getAllPaletteIndexes();
-							for (var k1 = 0; k1 < this.sonicLevel.animatedPalettes.length; k1++) {
-								var pal1 = this.sonicLevel.animatedPalettes[k1];
+							tile1.paletteIndexesToBeAnimated = {};
+							for (var animatedPaletteIndex = 0; animatedPaletteIndex < this.sonicLevel.animatedPalettes.length; animatedPaletteIndex++) {
+								var pal1 = this.sonicLevel.animatedPalettes[animatedPaletteIndex];
+								tile1.paletteIndexesToBeAnimated[animatedPaletteIndex] = [];
 								for (var $t15 = 0; $t15 < pal1.pieces.length; $t15++) {
 									var mjce = pal1.pieces[$t15];
 									var mje1 = { $: mjce };
@@ -4501,8 +4578,14 @@
 										if (OurSonicModels.Common.EnumerableExtensions.any$1(ss.Int32).call(null, pl, ss.mkdel({ mje1: mje1 }, function(j3) {
 											return j3 === ss.Int32.div(this.mje1.$.paletteOffset, 2) || j3 === ss.Int32.div(this.mje1.$.paletteOffset, 2) + 1;
 										}))) {
-											ss.add(dj.animatedPaletteIndexes, k1);
-											ss.add(tile1.animatedPaletteIndexes, k1);
+											ss.add(dj.animatedPaletteIndexes, animatedPaletteIndex);
+											ss.add(tile1.animatedPaletteIndexes, animatedPaletteIndex);
+											for (var $t16 = 0; $t16 < pl.length; $t16++) {
+												var pIndex = pl[$t16];
+												if (pIndex === ss.Int32.div(mje1.$.paletteOffset, 2) || pIndex === ss.Int32.div(mje1.$.paletteOffset, 2) + 1) {
+													ss.add(tile1.paletteIndexesToBeAnimated[animatedPaletteIndex], pIndex);
+												}
+											}
 										}
 									}
 								}
@@ -4672,6 +4755,103 @@
 				}
 			}
 			mj.restore();
+		}
+	});
+	ss.initClass($OurSonic_TilePaletteAnimation, $asm, {
+		getCurrentFrame: function() {
+			return this.frames[this.currentFrame];
+		},
+		tick: function() {
+			var pal = this.animatedPaletteData;
+			if (pal.skipIndex === 0) {
+				return;
+			}
+			if (pal.totalLength === 0) {
+				return;
+			}
+			//when to move to the next frame
+			for (var j = 0; j <= pal.totalLength; j += pal.skipIndex) {
+				if (this.manager.get_sonicManager().drawTickCount % (pal.totalLength + pal.skipIndex) === j) {
+					this.currentFrame = ss.Int32.div(j, pal.skipIndex);
+				}
+				if (ss.isNullOrUndefined(this.frames[this.currentFrame])) {
+					this.frames[this.currentFrame] = new $OurSonic_TilePaletteAnimationFrame(this.currentFrame, this);
+				}
+			}
+		}
+	});
+	ss.initClass($OurSonic_TilePaletteAnimationFrame, $asm, {
+		get_animation: function() {
+			return this.$1$AnimationField;
+		},
+		set_animation: function(value) {
+			this.$1$AnimationField = value;
+		},
+		setPalette: function() {
+			var levelPalette = this.get_animation().manager.get_sonicManager().sonicLevel.palette;
+			this.$clonePalette(levelPalette);
+			var pal = this.get_animation().animatedPaletteData;
+			for (var index = 0; index < pal.pieces.length; index++) {
+				var palettePiece = pal.pieces[index];
+				var colorIndex = this.frameIndex + pal.pieces.length * index;
+				//todo ^^^this calc is suspected to be wrong
+				//could be: int colorIndex = FrameIndex * index + (pal.Pieces.Count)/*+ 0 + (palettePiece.PaletteMultiply)*/;
+				var replaceIndex = ss.Int32.div(palettePiece.paletteOffset, 2);
+				var color = pal.palette[colorIndex];
+				if (ss.isValue(color)) {
+					levelPalette[palettePiece.paletteIndex][replaceIndex] = color;
+				}
+				else {
+					levelPalette[palettePiece.paletteIndex][replaceIndex] = $OurSonic_Utility_CanvasInformation.get_blackPixel();
+				}
+			}
+		},
+		$clonePalette: function(levelPalette) {
+			this.$tempPalette = new Array(levelPalette.length);
+			for (var index = 0; index < levelPalette.length; index++) {
+				var canvasElements = levelPalette[index];
+				this.$tempPalette[index] = new Array(canvasElements.length);
+				for (var index2 = 0; index2 < canvasElements.length; index2++) {
+					this.$tempPalette[index][index2] = canvasElements[index2];
+				}
+			}
+		},
+		clearPalette: function() {
+			this.get_animation().manager.get_sonicManager().sonicLevel.palette = this.$tempPalette;
+			this.$tempPalette = null;
+		}
+	});
+	ss.initClass($OurSonic_TilePaletteAnimationManager, $asm, {
+		get_sonicManager: function() {
+			return this.$1$SonicManagerField;
+		},
+		set_sonicManager: function(value) {
+			this.$1$SonicManagerField = value;
+		},
+		clearCache: function() {
+			this.animations = null;
+		},
+		tickAnimatedPalettes: function() {
+			if (ss.isNullOrUndefined(this.animations)) {
+				this.animations = {};
+				for (var animatedPaletteIndex = 0; animatedPaletteIndex < this.get_sonicManager().sonicLevel.animatedPalettes.length; animatedPaletteIndex++) {
+					this.animations[animatedPaletteIndex] = new $OurSonic_TilePaletteAnimation(this, this.get_sonicManager().sonicLevel.animatedPalettes[animatedPaletteIndex]);
+				}
+			}
+			var $t1 = new ss.ObjectEnumerator(this.animations);
+			try {
+				while ($t1.moveNext()) {
+					var animation = $t1.current();
+					var tilePaletteAnimation = animation.value;
+					tilePaletteAnimation.tick();
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+		},
+		getCurrentFrame: function(paletteAnimationIndex) {
+			return this.animations[paletteAnimationIndex].getCurrentFrame();
 		}
 	});
 	ss.initClass($OurSonic_UIManager_Element, $asm, {
@@ -6256,18 +6436,18 @@
 		}
 	});
 	ss.initClass($OurSonic_Level_SpriteCacheIndexes, $asm, {});
-	ss.initClass($OurSonic_Level_Animations_Animation, $asm, {
-		getAnimationFile: function() {
-			return $OurSonic_SonicManager.instance.sonicLevel.animatedFiles[this.animationFile];
-		}
-	});
-	ss.initClass($OurSonic_Level_Animations_AnimationFrame, $asm, {});
 	ss.initClass($OurSonic_Level_Animations_AnimationInstance, $asm, {
 		tick: function() {
 		},
 		draw: function(canvas, i, i1) {
 		}
 	});
+	ss.initClass($OurSonic_Level_Animations_TileAnimation, $asm, {
+		getAnimationFile: function() {
+			return $OurSonic_SonicManager.instance.sonicLevel.animatedTileFiles[this.animationTileFile];
+		}
+	});
+	ss.initClass($OurSonic_Level_Animations_TileAnimationFrame, $asm, {});
 	ss.initClass($OurSonic_Level_Events_LevelEvent, $asm, {});
 	ss.initClass($OurSonic_Level_Objects_LevelObject, $asm, {
 		init: function(object, level, sonic) {
@@ -6737,20 +6917,20 @@
 		init: function() {
 		}
 	});
+	ss.initEnum($OurSonic_Level_Tiles_ChunkLayer, $asm, { low: 0, high: 1 });
 	ss.initEnum($OurSonic_Level_Tiles_RotationMode, $asm, { floor: 134, rightWall: 224, ceiling: 314, leftWall: 44 });
 	ss.initClass($OurSonic_Level_Tiles_Tile, $asm, {
 		draw: function(canvas, pos, xflip, yflip, palette, animationFrame) {
-			if (this.$drawAnimations(canvas, pos, xflip, yflip, palette, animationFrame)) {
+			//Workflow:
+			//* Tile animations are made up of actual tiles. In the event that it is noticed
+			//* this tile is part of a tile animation, it draws the appropriate animated
+			//* tile instead of the normal one.
+			if (this.$drawTileAnimations(canvas, pos, xflip, yflip, palette, animationFrame)) {
 				return;
 			}
-			this.$drawRegular(canvas, pos, xflip, yflip, palette);
-			if (this.showOutline) {
-				canvas.strokeStyle = '#DD0033';
-				canvas.lineWidth = 3;
-				canvas.strokeRect(pos.x, pos.y, 8, 8);
-			}
+			this.drawBase(canvas, pos, xflip, yflip, palette);
 		},
-		$drawRegular: function(canvas, pos, xflip, yflip, palette) {
+		drawBase: function(canvas, pos, xflip, yflip, palette) {
 			var squareSize = this.colors.length;
 			var j;
 			j = $OurSonic_Utility_CanvasInformation.create(squareSize, squareSize);
@@ -6781,55 +6961,80 @@
 			}
 			canvas.drawImage(j.canvas, pos.x, pos.y);
 		},
-		shouldAnimate: function() {
-			return this.isAnimated && this.$canAnimate;
+		drawAnimatedPalette: function(canvas, pos, xflip, yflip, palette, animatedPaletteIndex) {
+			var squareSize = this.colors.length;
+			var j;
+			j = $OurSonic_Utility_CanvasInformation.create(squareSize, squareSize);
+			if (pos.x < 0 || pos.y < 0) {
+				return;
+			}
+			var oPos = $OurSonic_Utility_Point.$ctor1(0, 0);
+			if (xflip) {
+				oPos.x = -squareSize;
+				j.context.scale(-1, 1);
+			}
+			if (yflip) {
+				oPos.y = -squareSize;
+				j.context.scale(1, -1);
+			}
+			var palette_ = $OurSonic_SonicManager.instance.sonicLevel.palette;
+			var colorPaletteIndex = (palette + $OurSonic_SonicManager.instance.indexedPalette) % palette_.length;
+			var x = oPos.x;
+			var y = oPos.y;
+			for (var _x = 0; _x < squareSize; _x++) {
+				for (var _y = 0; _y < squareSize; _y++) {
+					var colorIndex = this.colors[_x][_y];
+					if (colorIndex === 0) {
+						continue;
+					}
+					if (ss.indexOf(this.paletteIndexesToBeAnimated[animatedPaletteIndex], colorIndex) === -1) {
+						continue;
+					}
+					j.context.drawImage(palette_[colorPaletteIndex][colorIndex], x + _x, y + _y);
+				}
+			}
+			canvas.drawImage(j.canvas, pos.x, pos.y);
 		},
-		$drawAnimations: function(canvas, pos, xflip, yflip, palette, animationFrame) {
-			if (!this.isAnimated) {
+		shouldTileAnimate: function() {
+			return this.isTileAnimated && this.$canAnimate;
+		},
+		$drawTileAnimations: function(canvas, pos, xflip, yflip, palette, animationFrame) {
+			if (!this.isTileAnimated) {
 				if (!this.$canAnimate) {
 					return false;
 				}
-				var an = this.$tileAnimation;
-				if (ss.isValue(this.$tileAnimation)) {
-					var anin = an.animationTileIndex;
-					var ind = animationFrame;
-					var frame = an.frames[ind];
-					if (!frame) {
-						frame = an.frames[0];
+				if (ss.isNullOrUndefined(this.$tileAnimation)) {
+					for (var $t1 = 0; $t1 < $OurSonic_SonicManager.instance.sonicLevel.tileAnimations.length; $t1++) {
+						var acn = $OurSonic_SonicManager.instance.sonicLevel.tileAnimations[$t1];
+						var anin = acn.animationTileIndex;
+						var num = acn.numberOfTiles;
+						if (this.index >= anin && this.index < anin + num) {
+							this.$tileAnimation = acn;
+						}
 					}
-					var file = $OurSonic_SonicManager.instance.sonicLevel.animatedFiles[an.animationFile];
-					var va = file[frame.startingTileIndex + (this.index - anin)];
+				}
+				if (ss.isValue(this.$tileAnimation)) {
+					var anin1 = this.$tileAnimation.animationTileIndex;
+					var ind = animationFrame;
+					var frame = this.$tileAnimation.frames[ind];
+					if (!frame) {
+						frame = this.$tileAnimation.frames[0];
+					}
+					var file = this.$tileAnimation.getAnimationFile();
+					var va = file[frame.startingTileIndex + (this.index - anin1)];
 					if (ss.isValue(va)) {
 						va.draw(canvas, pos, xflip, yflip, palette, animationFrame);
 						return true;
 					}
 					return false;
 				}
-				for (var $t1 = 0; $t1 < $OurSonic_SonicManager.instance.sonicLevel.animations.length; $t1++) {
-					var acn = $OurSonic_SonicManager.instance.sonicLevel.animations[$t1];
-					var anin1 = acn.animationTileIndex;
-					var num = acn.numberOfTiles;
-					if (this.index >= anin1 && this.index < anin1 + num) {
-						this.$tileAnimation = acn;
-						var ind1 = animationFrame;
-						var frame1 = acn.frames[ind1];
-						if (!frame1) {
-							frame1 = acn.frames[0];
-						}
-						var file1 = acn.getAnimationFile();
-						var va1 = file1[frame1.startingTileIndex + (this.index - anin1)];
-						if (va1) {
-							va1.draw(canvas, pos, xflip, yflip, palette, animationFrame);
-							return true;
-						}
-					}
-				}
 			}
 			this.$canAnimate = false;
+			//really shouldnt hit here, means theres a bug in the data i think
 			return false;
 		},
 		getAllPaletteIndexes: function() {
-			if (!this.curPaletteIndexes) {
+			if (ss.isNullOrUndefined(this.curPaletteIndexes)) {
 				var d = [];
 				for (var _x = 0; _x < this.colors.length; _x++) {
 					var color = this.colors[_x];
@@ -6865,7 +7070,7 @@
 				var pieceHeight = 16;
 				var isBack = layer === 0;
 				//for building no aniamtion cache
-				this.$drawOld(canvas, $OurSonic_Utility_Point.$ctor1(0, 0), layer, pieceWidth, pieceHeight, isBack, false, null, null);
+				//                drawTilePieces(canvas, new Point(0, 0), layer, pieceWidth, pieceHeight, isBack, false, null, null);
 			}
 			finally {
 				if (ss.isValue($t1)) {
@@ -6875,7 +7080,6 @@
 		},
 		clearCache: function() {
 			this.$layerCacheBlocks = new Array(2);
-			this.$neverAnimateCache = new Array(2);
 		},
 		getBlockAt: function(x, y) {
 			return this.tilePieces[ss.Int32.div(x, 16)][ss.Int32.div(y, 16)].getTilePiece();
@@ -6938,6 +7142,46 @@
 			}
 			return ss.unbox(this.empty);
 		},
+		$hasPixelAnimations: function() {
+			if (!ss.isValue(this.$hasPixelAnimations$1)) {
+				var tilePieceSize = 8;
+				for (var i = 0; i < tilePieceSize; i++) {
+					for (var j = 0; j < tilePieceSize; j++) {
+						var pm = this.tilePieces[i][j].getTilePiece();
+						if (ss.isNullOrUndefined(pm)) {
+							continue;
+						}
+						if (pm.animatedPaletteIndexes.length > 0) {
+							this.$hasPixelAnimations$1 = true;
+							return true;
+						}
+					}
+				}
+				this.$hasPixelAnimations$1 = false;
+			}
+			return ss.unbox(this.$hasPixelAnimations$1);
+		},
+		$getAllPaletteAnimationIndexes: function() {
+			if (ss.isNullOrUndefined(this.$paletteAnimationIndexes)) {
+				this.$paletteAnimationIndexes = [];
+				var tilePieceSize = 8;
+				for (var i = 0; i < tilePieceSize; i++) {
+					for (var j = 0; j < tilePieceSize; j++) {
+						var piece = this.tilePieces[i][j].getTilePiece();
+						if (ss.isNullOrUndefined(piece)) {
+							continue;
+						}
+						for (var $t1 = 0; $t1 < piece.animatedPaletteIndexes.length; $t1++) {
+							var animatedPaletteIndex = piece.animatedPaletteIndexes[$t1];
+							if (ss.indexOf(this.$paletteAnimationIndexes, animatedPaletteIndex) === -1) {
+								ss.add(this.$paletteAnimationIndexes, animatedPaletteIndex);
+							}
+						}
+					}
+				}
+			}
+			return this.$paletteAnimationIndexes;
+		},
 		neverAnimates: function() {
 			var $state = 0, tilePieceSize, nothing, i, j, pm;
 			$sm1:
@@ -6981,43 +7225,39 @@
 			}
 		},
 		draw: function(canvas, position, layer) {
-			if (ss.isNullOrUndefined(this.$layerCacheBlocks[layer])) {
-				this.$layerCacheBlocks[layer] = this.buildCacheBlock(layer);
-			}
+			var piecesSquareSize = 16;
 			{
 				var $t3 = new $OurSonic_Utility_CanvasHandler(canvas);
 				try {
-					if (ss.isValue(this.$neverAnimateCache[layer])) {
-						this.$drawFullChunk(canvas, position, layer);
-						return;
+					if (ss.isNullOrUndefined(this.$base.get_item(layer))) {
+						this.$base.set_item(layer, $OurSonic_Utility_CanvasInformation.create(128, 128));
+						this.$drawTilePiecesBase(this.$base.get_item(layer).context, layer, piecesSquareSize);
 					}
-					var isBack = layer === 0;
-					if (this.neverAnimates()) {
-						var oldCanvas = null;
-						var oldPoint = null;
-						var pieceWidth = 16;
-						var pieceHeight = 16;
-						oldCanvas = canvas;
-						this.$neverAnimateCache[layer] = $OurSonic_Utility_CanvasInformation.create($OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide * pieceWidth, $OurSonic_Level_Tiles_TileChunk.$numOfPiecesLong * pieceHeight);
-						canvas = this.$neverAnimateCache[layer].context;
-						oldPoint = $OurSonic_Utility_Point.$ctor(position);
-						$OurSonic_Utility_Point.set(position, 0, 0);
-						//for building no aniamtion cache
-						this.$drawOld(canvas, position, layer, pieceWidth, pieceHeight, isBack, true, oldPoint, oldCanvas);
-						return;
-					}
-					var $t1 = this.$layerCacheBlocks[layer];
-					for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-						var tileCacheBlock = $t1[$t2];
-						switch (tileCacheBlock.type) {
-							case 0: {
-								this.$drawBlock(canvas, position, tileCacheBlock);
-								break;
+					canvas.drawImage(this.$base.get_item(layer).canvas, position.x, position.y);
+					if (this.$hasPixelAnimations()) {
+						if (ss.isNullOrUndefined(this.$paletteAnimationCanvases.get_item(layer))) {
+							this.$paletteAnimationCanvases.set_item(layer, {});
+						}
+						var paletteAnimationCanvases = this.$paletteAnimationCanvases.get_item(layer);
+						var $t1 = this.$getAllPaletteAnimationIndexes();
+						for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+							var paletteAnimationIndex = $t1[$t2];
+							var paletteAnimationCanvasFrames = paletteAnimationCanvases[paletteAnimationIndex];
+							if (ss.isNullOrUndefined(paletteAnimationCanvasFrames)) {
+								paletteAnimationCanvases[paletteAnimationIndex] = paletteAnimationCanvasFrames = new $OurSonic_Level_Tiles_TileChunk$PaletteAnimationCanvasFrames(paletteAnimationIndex);
 							}
-							case 1: {
-								this.$drawTilePiece(canvas, position, layer, tileCacheBlock, isBack);
-								break;
+							var currentFrame = $OurSonic_SonicManager.instance.get_tilePaletteAnimationManager().getCurrentFrame(paletteAnimationIndex);
+							var paletteAnimationCanvasFrame = paletteAnimationCanvasFrames.frames[currentFrame.frameIndex];
+							if (ss.isNullOrUndefined(paletteAnimationCanvasFrame)) {
+								paletteAnimationCanvasFrames.frames[currentFrame.frameIndex] = paletteAnimationCanvasFrame = new $OurSonic_Level_Tiles_TileChunk$PaletteAnimationCanvasFrame();
+								currentFrame.setPalette();
+								var tilePaletteCanvas = $OurSonic_Utility_CanvasInformation.create(128, 128);
+								paletteAnimationCanvasFrame.canvas = tilePaletteCanvas;
+								this.$drawTilePiecesAnimatedPalette(tilePaletteCanvas.context, layer, piecesSquareSize, paletteAnimationIndex);
+								currentFrame.clearPalette();
 							}
+							var canvasLayerToDraw = paletteAnimationCanvasFrame.canvas.canvas;
+							canvas.drawImage(canvasLayerToDraw, position.x, position.y);
 						}
 					}
 				}
@@ -7028,74 +7268,40 @@
 				}
 			}
 		},
-		$drawOld: function(canvas, position, layer, pieceWidth, pieceHeight, isBack, neverAnimates, oldPoint, oldCanvas) {
-			var posX = position.x;
-			var posY = position.y;
+		$drawTilePiecesAnimatedPalette: function(canvas, layer, piecesSquareSize, animatedPaletteIndex) {
+			for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$numOfPiecesLong; pieceY++) {
+				for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide; pieceX++) {
+					this.$drawTilePieceAnimatedPalette(canvas, layer, this.tilePieces[pieceX][pieceY], pieceX * piecesSquareSize, pieceY * piecesSquareSize, animatedPaletteIndex);
+				}
+			}
+		},
+		$drawTilePiecesBase: function(canvas, layer, piecesSquareSize) {
+			for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$numOfPiecesLong; pieceY++) {
+				for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide; pieceX++) {
+					this.$drawTilePieceBase(canvas, layer, this.tilePieces[pieceX][pieceY], pieceX * piecesSquareSize, pieceY * piecesSquareSize);
+				}
+			}
+		},
+		$drawTilePieces: function(canvas, layer, piecesSquareSize) {
 			var curKey = 0;
 			//pieceY * numOfPiecesWide + pieceX              VV
 			for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$numOfPiecesLong; pieceY++) {
 				curKey = pieceY * $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide;
 				for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide; pieceX++) {
 					curKey += pieceX;
-					this.$drawTilePiece$1(canvas, layer, this.tilePieces[pieceX][pieceY], isBack, curKey, posX + pieceX * pieceWidth, posY + pieceY * pieceHeight);
+					this.$drawTilePiece(canvas, layer, this.tilePieces[pieceX][pieceY], curKey, pieceX * piecesSquareSize, pieceY * piecesSquareSize);
 				}
 			}
-			if (neverAnimates) {
-				position = oldPoint;
-				canvas = oldCanvas;
-				canvas.drawImage(this.$neverAnimateCache[layer].canvas, position.x, position.y);
-			}
 		},
-		$drawTilePiece: function(canvas, position, layer, tileCacheBlock, isBack) {
-			this.$drawTilePiece$1(canvas, layer, tileCacheBlock.tilePieceInfo, isBack, tileCacheBlock.animatedKey, position.x + tileCacheBlock.xPos, position.y + tileCacheBlock.yPos);
-			//
-			//                        canvas.Save();
-			//
-			//                        canvas.StrokeStyle = "green";
-			//
-			//                        canvas.StrokeRect(position.X * scale.X * pieceWidth, position.Y * scale.Y * pieceHeight, 16 * scale.X, 16 * scale.Y);
-			//
-			//                        canvas.Restore();
-		},
-		$drawBlock: function(canvas, position, tileCacheBlock) {
-			canvas.drawImage(tileCacheBlock.block.canvas, position.x, position.y);
-			var areas = $OurSonic_SonicManager.instance.uiManager.get_uiManagerAreas();
-			if (ss.isValue(areas.tileChunkArea) && ss.isValue(areas.tileChunkArea.data) && areas.tileChunkArea.data.index === this.index) {
-				canvas.save();
-				canvas.strokeStyle = 'yellow';
-				canvas.lineWidth = 2;
-				canvas.strokeRect(position.x, position.y, tileCacheBlock.block.canvas.width, tileCacheBlock.block.canvas.height);
-				canvas.restore();
-			}
-		},
-		$drawFullChunk: function(canvas, position, layer) {
-			canvas.drawImage(this.$neverAnimateCache[layer].canvas, position.x, position.y);
-			var areas = $OurSonic_SonicManager.instance.uiManager.get_uiManagerAreas();
-			if (ss.isValue(areas.tileChunkArea) && ss.isValue(areas.tileChunkArea.data) && areas.tileChunkArea.data.index === this.index) {
-				canvas.save();
-				canvas.strokeStyle = 'yellow';
-				canvas.lineWidth = 2;
-				canvas.strokeRect(position.x, position.y, this.$neverAnimateCache[layer].canvas.width, this.$neverAnimateCache[layer].canvas.height);
-				canvas.restore();
-			}
-			//
-			//                        canvas.Save();
-			//
-			//                        canvas.StrokeStyle = "red";
-			//
-			//                        canvas.StrokeRect(position.X, position.Y, 128 , 128);
-			//
-			//                        canvas.Restore();
-		},
-		$drawTilePiece$1: function(canvas, layer, pieceInfo, isBack, animatedKey, pointx, pointy) {
+		$drawTilePiece: function(canvas, layer, pieceInfo, animatedKey, pointx, pointy) {
 			var piece = pieceInfo.getTilePiece();
-			if ((isBack ? piece.onlyForeground() : piece.onlyBackground())) {
+			if (((layer === 0) ? piece.onlyForeground() : piece.onlyBackground())) {
 				return;
 			}
 			var animatedIndex = 0;
-			var animation = this.animated[animatedKey];
-			if (this.animated && animation) {
-				animatedIndex = animation.lastAnimatedIndex;
+			var tileAnimation = this.animated[animatedKey];
+			if (this.animated && tileAnimation) {
+				animatedIndex = tileAnimation.lastAnimatedIndex;
 			}
 			this.$myLocalPoint.x = pointx;
 			this.$myLocalPoint.y = pointy;
@@ -7103,79 +7309,28 @@
 			//canvas.StrokeStyle = "#FFF";
 			//canvas.StrokeRect(position.X + pieceX * 16 * scale.X, position.Y + pieceY * 16 * scale.Y, scale.X * 16, scale.Y * 16);
 		},
-		buildCacheBlock: function(layer) {
-			var tilePieces = [];
-			var block = null;
-			if (ss.isValue(this.$neverAnimateCache[layer])) {
-				return [];
-			}
-			var pieceWidth = 16;
-			var pieceHeight = 16;
-			if (this.neverAnimates()) {
-				return [];
-			}
-			var isBack = layer === 0;
-			for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide; pieceX++) {
-				for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$numOfPiecesLong; pieceY++) {
-					var cacheBlock = this.$buildCacheBlock(layer, pieceWidth, pieceHeight, this.tilePieces[pieceX][pieceY], isBack, pieceX, pieceY, block);
-					switch (cacheBlock.type) {
-						case 0: {
-							block = cacheBlock;
-							break;
-						}
-						case 1: {
-							ss.add(tilePieces, cacheBlock);
-							break;
-						}
-					}
-				}
-			}
-			var tileCacheBlocks = ss.arrayClone(tilePieces);
-			if (ss.isValue(block)) {
-				ss.add(tileCacheBlocks, block);
-			}
-			return tileCacheBlocks;
-		},
-		$buildCacheBlock: function(layer, pieceWidth, pieceHeight, pieceInfo, isBack, pieceX, pieceY, oldCacheBlock) {
-			//if (isBack ? (piece.onlyForeground) : (piece.onlyBackground)) return null;
+		$drawTilePieceAnimatedPalette: function(canvas, layer, pieceInfo, pointx, pointy, animatedPaletteIndex) {
 			var piece = pieceInfo.getTilePiece();
-			if (ss.isNullOrUndefined(piece)) {
-				return oldCacheBlock;
+			if (ss.indexOf(piece.animatedPaletteIndexes, animatedPaletteIndex) === -1) {
+				return;
 			}
-			var animatedIndex = 0;
-			var animation = this.animated[pieceY * $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide + pieceX];
-			var cacheBlockNeeded = false;
-			var shouldAnimate = piece.shouldAnimate();
-			if (this.animated && animation) {
-				animatedIndex = animation.lastAnimatedIndex;
+			if (((layer === 0) ? piece.onlyForeground() : piece.onlyBackground())) {
+				return;
 			}
-			else if (piece.animatedPaletteIndexes.length === 0 && (!shouldAnimate || ss.unbox(this.$myNeverAnimate))) {
-				cacheBlockNeeded = true;
+			piece.drawAnimatedPalette(canvas, $OurSonic_Utility_Point.$ctor1(pointx, pointy), layer, pieceInfo.xFlip, pieceInfo.yFlip, animatedPaletteIndex);
+			//canvas.StrokeStyle = "#FFF";
+			//canvas.StrokeRect(position.X + pieceX * 16 * scale.X, position.Y + pieceY * 16 * scale.Y, scale.X * 16, scale.Y * 16);
+		},
+		$drawTilePieceBase: function(canvas, layer, pieceInfo, pointx, pointy) {
+			var piece = pieceInfo.getTilePiece();
+			if (((layer === 0) ? piece.onlyForeground() : piece.onlyBackground())) {
+				return;
 			}
-			else {
-				cacheBlockNeeded = false;
-			}
-			if (cacheBlockNeeded) {
-				var internalPoint = $OurSonic_Utility_Point.$ctor1(pieceX * pieceWidth, pieceY * pieceHeight);
-				if (ss.isNullOrUndefined(oldCacheBlock)) {
-					oldCacheBlock = $OurSonic_Level_Tiles_TileCacheBlock.$ctor(0);
-					oldCacheBlock.block = $OurSonic_Utility_CanvasInformation.create(pieceWidth * 8, pieceHeight * 8);
-				}
-				oldCacheBlock.block.context.save();
-				piece.draw(oldCacheBlock.block.context, internalPoint, layer, pieceInfo.xFlip, pieceInfo.yFlip, animatedIndex);
-				//                oldCacheBlock.Block.Context.FillStyle = oldCacheBlock.Color;
-				//                oldCacheBlock.Block.Context.FillRect(internalPoint.X, internalPoint.Y, 16 * scale.X, 16 * scale.Y);
-				oldCacheBlock.block.context.restore();
-				return oldCacheBlock;
-			}
-			else {
-				var $t1 = $OurSonic_Level_Tiles_TileCacheBlock.$ctor(1);
-				$t1.tilePieceInfo = pieceInfo;
-				$t1.xPos = pieceX * pieceWidth;
-				$t1.yPos = pieceY * pieceHeight;
-				$t1.animatedKey = pieceY * $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide + pieceX;
-				return $t1;
-			}
+			this.$myLocalPoint.x = pointx;
+			this.$myLocalPoint.y = pointy;
+			piece.drawBase(canvas, this.$myLocalPoint, layer, pieceInfo.xFlip, pieceInfo.yFlip);
+			//canvas.StrokeStyle = "#FFF";
+			//canvas.StrokeRect(position.X + pieceX * 16 * scale.X, position.Y + pieceY * 16 * scale.Y, scale.X * 16, scale.Y * 16);
 		},
 		tileAnimatedTick: function() {
 			var $t1 = new ss.ObjectEnumerator(this.animated);
@@ -7198,6 +7353,8 @@
 			}
 		}
 	});
+	ss.initClass($OurSonic_Level_Tiles_TileChunk$PaletteAnimationCanvasFrame, $asm, {});
+	ss.initClass($OurSonic_Level_Tiles_TileChunk$PaletteAnimationCanvasFrames, $asm, {});
 	ss.initClass($OurSonic_Level_Tiles_TileItem, $asm, {
 		getTile: function() {
 			return $OurSonic_SonicManager.instance.sonicLevel.getTile(this._Tile);
@@ -7265,13 +7422,63 @@
 			this.$drawIt(canvas, ac.canvas, position);
 			return true;
 		},
+		drawBase: function(canvas, position, layer, xFlip, yFlip) {
+			var drawOrderIndex = 0;
+			drawOrderIndex = (xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3));
+			var tilePieceLength = 8;
+			var ac = $OurSonic_Utility_CanvasInformation.create(tilePieceLength * 2, tilePieceLength * 2);
+			var i = 0;
+			var localPoint = $OurSonic_Utility_Point.$ctor1(0, 0);
+			for (var $t1 = 0; $t1 < this.tiles.length; $t1++) {
+				var tileItem = this.tiles[$t1];
+				var tile = tileItem.getTile();
+				if (tile) {
+					if (tileItem.priority === (layer === 1)) {
+						var _xf = xFlip ^ tileItem.xFlip;
+						var _yf = yFlip ^ tileItem.yFlip;
+						var df = $OurSonic_Level_Tiles_TilePiece.$drawInfo[$OurSonic_Level_Tiles_TilePiece.$drawOrder[drawOrderIndex][i]];
+						localPoint.x = df[0] * tilePieceLength;
+						localPoint.y = df[1] * tilePieceLength;
+						tile.drawBase(ac.context, localPoint, _xf, _yf, tileItem.palette);
+					}
+				}
+				i++;
+			}
+			this.$drawIt(canvas, ac.canvas, position);
+			return true;
+		},
+		drawAnimatedPalette: function(canvas, position, layer, xFlip, yFlip, animatedPaletteIndex) {
+			var drawOrderIndex = 0;
+			drawOrderIndex = (xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3));
+			var tilePieceLength = 8;
+			var ac = $OurSonic_Utility_CanvasInformation.create(tilePieceLength * 2, tilePieceLength * 2);
+			var i = 0;
+			var localPoint = $OurSonic_Utility_Point.$ctor1(0, 0);
+			for (var $t1 = 0; $t1 < this.tiles.length; $t1++) {
+				var tileItem = this.tiles[$t1];
+				var tile = tileItem.getTile();
+				if (tile) {
+					if (tileItem.priority === (layer === 1)) {
+						var _xf = xFlip ^ tileItem.xFlip;
+						var _yf = yFlip ^ tileItem.yFlip;
+						var df = $OurSonic_Level_Tiles_TilePiece.$drawInfo[$OurSonic_Level_Tiles_TilePiece.$drawOrder[drawOrderIndex][i]];
+						localPoint.x = df[0] * tilePieceLength;
+						localPoint.y = df[1] * tilePieceLength;
+						tile.drawBase(ac.context, localPoint, _xf, _yf, tileItem.palette);
+					}
+				}
+				i++;
+			}
+			this.$drawIt(canvas, ac.canvas, position);
+			return true;
+		},
 		shouldAnimate: function() {
 			if (ss.isNullOrUndefined(this.$shouldAnimate)) {
 				for (var $t1 = 0; $t1 < this.tiles.length; $t1++) {
 					var t = this.tiles[$t1];
 					var tile = t.getTile();
 					if (tile) {
-						if (tile.shouldAnimate()) {
+						if (tile.shouldTileAnimate()) {
 							return ss.unbox(this.$shouldAnimate = true);
 						}
 					}

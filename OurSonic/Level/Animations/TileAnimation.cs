@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using OurSonic.Level.Tiles;
 namespace OurSonic.Level.Animations
 {
-    public class Animation
+    public class TileAnimation
     {
         /*   function Animation(name, images) {
     this.images = images;
@@ -26,7 +26,7 @@ namespace OurSonic.Level.Animations
     };
 }*/
         [IntrinsicProperty]
-        public int AnimationFile { get; set; }
+        public int AnimationTileFile { get; set; }
         [IntrinsicProperty]
         public int NumberOfTiles { get; set; }
         [IntrinsicProperty]
@@ -36,17 +36,17 @@ namespace OurSonic.Level.Animations
         [IntrinsicProperty]
         public int AnimationTileIndex { get; set; }
         [IntrinsicProperty]
-        public AnimationFrame[] Frames { get; set; }
+        public TileAnimationFrame[] Frames { get; set; }
         [IntrinsicProperty]
         public int AutomatedTiming { get; set; }
-        public Animation() {}
+        public TileAnimation() {}
 
         public Tile[] GetAnimationFile()
         {
-            return SonicManager.Instance.SonicLevel.AnimatedFiles[AnimationFile];
+            return SonicManager.Instance.SonicLevel.AnimatedTileFiles[AnimationTileFile];
         }
     }
-    public class AnimationFrame
+    public class TileAnimationFrame
     {
         [IntrinsicProperty]
         public decimal Ticks { get; set; }

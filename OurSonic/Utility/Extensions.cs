@@ -103,7 +103,7 @@ namespace OurSonic.Utility
             curY = cury;
 
         }
-         public static void OffsetStuff(this CanvasContext2D context)
+         public static void OffsetPixelsForWater(this CanvasContext2D context)
          {
              return;
             MakeOffset();

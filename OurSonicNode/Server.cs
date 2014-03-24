@@ -114,8 +114,12 @@ namespace OurSonicNode
 
 
             foreach (var _object in _objects) {
-                if (fs.ExistsSync(objDirectory + _object + ".js")) 
+                if (fs.ExistsSync(objDirectory + _object + ".js"))
                     strs.Add(fs.ReadFileSync(objDirectory + _object + ".js", "utf8"));
+                else
+                {
+                    strs.Add("");
+                }
             }
             return strs;
         }

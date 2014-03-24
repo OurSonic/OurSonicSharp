@@ -11,26 +11,26 @@ namespace OurSonic.Level.Tiles
     public class Tile
     {
         private bool canAnimate = true;
-        private Animation TileAnimation;
+        private TileAnimation TileAnimation;
         [IntrinsicProperty]
         protected int[] CurPaletteIndexes { get; set; }
         [IntrinsicProperty]
         protected int[][] Colors { get; set; }
         [IntrinsicProperty]
-        protected bool ShowOutline { get; set; }
-        [IntrinsicProperty]
         public int Index { get; set; }
         [IntrinsicProperty]
-        public bool IsAnimated { get; set; }
+        public bool IsTileAnimated { get; set; }
         [IntrinsicProperty]
         public List<int> AnimatedPaletteIndexes { get; set; }
+        
+        [IntrinsicProperty]
+        public JsDictionary<int, List<int>> PaletteIndexesToBeAnimated { get; set; }
 
         public Tile(int[][] colors)
         {
             Colors = colors;
             CurPaletteIndexes = null;
         }
-
         public void Draw(CanvasContext2D canvas,
                          Point pos,
                          bool xflip,
@@ -38,20 +38,22 @@ namespace OurSonic.Level.Tiles
                          int palette,
                          int animationFrame)
         {
-            if (DrawAnimations(canvas, pos, xflip, yflip, palette, animationFrame))
+            /*Workflow:
+             * Tile animations are made up of actual tiles. In the event that it is noticed
+             * this tile is part of a tile animation, it draws the appropriate animated 
+             * tile instead of the normal one. 
+             */
+            if (DrawTileAnimations(canvas, pos, xflip, yflip, palette, animationFrame))
                 return;
 
-              drawRegular(canvas, pos, xflip, yflip, palette);
+            DrawBase(canvas, pos, xflip, yflip, palette);
 
-            if (ShowOutline)
-            {
-                canvas.StrokeStyle = "#DD0033";
-                canvas.LineWidth = 3;
-                canvas.StrokeRect(pos.X, pos.Y, 8 * 1, 8 * 1);
-            }
         }
-
-        private void drawRegular(CanvasContext2D canvas, Point pos, bool xflip, bool yflip, int palette)
+        public void DrawBase(CanvasContext2D canvas,
+                         Point pos,
+                         bool xflip,
+                         bool yflip,
+                         int palette)
         {
             var squareSize = Colors.Length;
             CanvasInformation j;
@@ -88,27 +90,89 @@ namespace OurSonic.Level.Tiles
             }
 
             canvas.DrawImage(j.Canvas, pos.X, pos.Y);
+
+
         }
 
-        public bool ShouldAnimate()
+
+        public void DrawAnimatedPalette(CanvasContext2D canvas, Point pos, bool xflip, bool yflip, int palette, int animatedPaletteIndex)
         {
-            return IsAnimated && canAnimate;
+            var squareSize = Colors.Length;
+            CanvasInformation j;
+            j = CanvasInformation.Create(squareSize, squareSize);
+
+            if (pos.X < 0 || pos.Y < 0)
+                return;
+            var oPos = new Point(0, 0);
+            if (xflip)
+            {
+                oPos.X = -squareSize;
+                j.Context.Scale(-1, 1);
+            }
+            if (yflip)
+            {
+                oPos.Y = -squareSize;
+                j.Context.Scale(1, -1);
+            }
+            var palette_ = SonicManager.Instance.SonicLevel.Palette;
+
+            int colorPaletteIndex = (palette + SonicManager.Instance.IndexedPalette) % palette_.Length;
+            var x = oPos.X;
+            var y = oPos.Y;
+
+            for (int _x = 0; _x < squareSize; _x++)
+            {
+                for (int _y = 0; _y < squareSize; _y++)
+                {
+                    var colorIndex = Colors[_x][_y];
+                    if (colorIndex == 0) continue;
+                    if (PaletteIndexesToBeAnimated[animatedPaletteIndex].IndexOf(colorIndex) == -1) continue;
+
+                    j.Context.DrawImage(palette_[colorPaletteIndex][colorIndex], x + _x, y + _y);
+                }
+            }
+
+            canvas.DrawImage(j.Canvas, pos.X, pos.Y);
+
+
         }
 
-        private bool DrawAnimations(CanvasContext2D canvas, Point pos, bool xflip, bool yflip, int palette, int animationFrame)
+
+
+
+        public bool ShouldTileAnimate()
         {
-            if (!IsAnimated)
+            return IsTileAnimated && canAnimate;
+        }
+
+        private bool DrawTileAnimations(CanvasContext2D canvas, Point pos, bool xflip, bool yflip, int palette, int animationFrame)
+        {
+            if (!IsTileAnimated)
             {
                 if (!canAnimate) return false;
-                var an = TileAnimation;
+
+                if (TileAnimation == null)
+                {
+                    foreach (var acn in SonicManager.Instance.SonicLevel.TileAnimations)
+                    {
+                        var anin = acn.AnimationTileIndex;
+                        var num = acn.NumberOfTiles;
+                        if (Index >= anin && Index < anin + num)
+                        {
+                            TileAnimation = acn;
+                        }
+                    }
+                }
+
+
                 if (TileAnimation != null)
                 {
-                    var anin = an.AnimationTileIndex;
+                    var anin = TileAnimation.AnimationTileIndex;
                     var ind = animationFrame;
-                    var frame = an.Frames[ind];
+                    var frame = TileAnimation.Frames[ind];
                     if (frame.Falsey())
-                        frame = an.Frames[0];
-                    var file = SonicManager.Instance.SonicLevel.AnimatedFiles[an.AnimationFile];
+                        frame = TileAnimation.Frames[0];
+                    var file = TileAnimation.GetAnimationFile();
                     var va = file[frame.StartingTileIndex + (Index - anin)];
                     if (va != null)
                     {
@@ -117,31 +181,9 @@ namespace OurSonic.Level.Tiles
                     }
                     return false;
                 }
-                foreach (var acn in SonicManager.Instance.SonicLevel.Animations)
-                {
-                    var anin = acn.AnimationTileIndex;
-                    var num = acn.NumberOfTiles;
-                    if (Index >= anin && Index < anin + num)
-                    {
-                        TileAnimation = acn;
-                        var ind = animationFrame;
-                        var frame = acn.Frames[ind];
-                        if (frame.Falsey())
-                            frame = acn.Frames[0];
-                        var file = acn.GetAnimationFile();
-
-                        var va = file[frame.StartingTileIndex + (Index - anin)];
-                        if (va.Truthy())
-                        {
-
-                            va.Draw(canvas, pos, xflip, yflip, palette, animationFrame);
-                            return true;
-                        }
-                    }
-                }
 
             }
-            canAnimate = false;
+            canAnimate = false;//really shouldnt hit here, means theres a bug in the data i think
 
             return false;
         }
@@ -149,7 +191,7 @@ namespace OurSonic.Level.Tiles
 
         public int[] GetAllPaletteIndexes()
         {
-            if (CurPaletteIndexes.Falsey())
+            if (CurPaletteIndexes == null)
             {
                 var d = new List<int>();
                 for (int _x = 0; _x < Colors.Length; _x++)
