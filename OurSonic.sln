@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Build", "Build\Build.csproj", "{DC50CFD9-989B-4F0F-A141-2FB783F3BD38}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OurSonic", "OurSonic\OurSonic.csproj", "{3222B6FB-15F6-4217-8ECD-193BCFCE7D60}"
@@ -32,6 +30,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeJS", "NodeLibraries\NodeJS\NodeJS.csproj", "{79800429-B885-4F5E-9A3B-48E50390214A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{CB171A82-8E3D-427F-A8A1-25702A5093E1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AngularJS", "WebLibraries\AngularJS\AngularJS.csproj", "{815CC797-F742-4C48-8C98-BD7DE050D95A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +83,10 @@ Global
 		{79800429-B885-4F5E-9A3B-48E50390214A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79800429-B885-4F5E-9A3B-48E50390214A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79800429-B885-4F5E-9A3B-48E50390214A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{815CC797-F742-4C48-8C98-BD7DE050D95A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{815CC797-F742-4C48-8C98-BD7DE050D95A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{815CC797-F742-4C48-8C98-BD7DE050D95A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{815CC797-F742-4C48-8C98-BD7DE050D95A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -96,5 +100,6 @@ Global
 		{BBF1829B-3446-4C0D-A75A-9BC713D2A6A1} = {30533F63-54AD-409A-A380-1AC0CC71BCF9}
 		{6DA30112-FDBD-4E48-9F52-7268FCE19D25} = {30533F63-54AD-409A-A380-1AC0CC71BCF9}
 		{108D8A37-0782-4FFA-9A53-934E07B9B28A} = {30533F63-54AD-409A-A380-1AC0CC71BCF9}
+		{815CC797-F742-4C48-8C98-BD7DE050D95A} = {30533F63-54AD-409A-A380-1AC0CC71BCF9}
 	EndGlobalSection
 EndGlobal
