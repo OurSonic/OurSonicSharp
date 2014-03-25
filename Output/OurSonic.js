@@ -1,5 +1,4 @@
-
-(function() {
+;(function() {
 	'use strict';
 	var $asm = {};
 	global.OurSonic = global.OurSonic || {};
@@ -16,8 +15,10 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Page
 	var $OurSonic_Page = function() {
-		var stats = new xStats();
-		document.body.appendChild(stats.element);
+		//
+		//            var stats = new XStats();
+		//
+		//            Document.Body.AppendChild(stats.Element);
 		new $OurSonic_SonicEngine();
 	};
 	$OurSonic_Page.__typeName = 'OurSonic.Page';
@@ -93,20 +94,20 @@
 	// OurSonic.SonicManager
 	var $OurSonic_SonicManager = function(engine, gameCanvas, resize) {
 		this.mainCanvas = null;
-		this.$myEngine = null;
+		this.$engine = null;
 		this.objectManager = null;
 		this.drawTickCount = 0;
 		this.$clicking = false;
 		this.$imageLength = 0;
-		this.$myStatus = null;
+		this.$status = null;
 		this.overrideRealScale = null;
 		this.$sonicSprites = null;
 		this.tickCount = 0;
 		this.$waitingForDrawContinue = false;
 		this.waitingForTickContinue = false;
-		this.$myAnother = null;
-		this.$mySonCanvas = null;
-		this.$myAnotherw = null;
+		this.$lowChunkCanvas = null;
+		this.$sonicCanvas = null;
+		this.$highChuckCanvas = null;
 		this.currentGameState = 0;
 		this.bigWindowLocation = null;
 		this.uiManager = null;
@@ -116,7 +117,7 @@
 		this.realScale = null;
 		this.inHaltMode = false;
 		this.indexedPalette = 0;
-		this.animations = null;
+		this.tileAnimations = null;
 		this.animationInstances = null;
 		this.goodRing = null;
 		this.showHeightMap = false;
@@ -132,14 +133,16 @@
 		this.spriteLoader = null;
 		this.typingInEditor = false;
 		this.onLevelLoad = null;
+		this.tilePaletteAnimationManager = null;
+		this.tileAnimationManager = null;
 		this.cachedObjects = null;
 		$OurSonic_SonicManager.instance = this;
 		//            SonicToon = new Sonic();
-		this.$myEngine = engine;
-		this.$myEngine.canvasWidth = $(window).width();
-		this.$myEngine.canvasHeight = $(window).height();
-		gameCanvas.domCanvas[0].setAttribute('width', this.$myEngine.canvasWidth);
-		gameCanvas.domCanvas[0].setAttribute('height', this.$myEngine.canvasHeight);
+		this.$engine = engine;
+		this.$engine.canvasWidth = $(window).width();
+		this.$engine.canvasHeight = $(window).height();
+		gameCanvas.domCanvas[0].setAttribute('width', this.$engine.canvasWidth);
+		gameCanvas.domCanvas[0].setAttribute('height', this.$engine.canvasHeight);
 		$.getJSON('Content/sprites/sonic.js', ss.mkdel(this, function(data) {
 			this.$sonicSprites = data;
 		}));
@@ -153,7 +156,7 @@
 		this.bigWindowLocation = $OurSonic_Utility_Constants.defaultWindowLocation(1, this.mainCanvas, this.scale);
 		this.bigWindowLocation.width = ss.Int32.trunc(this.bigWindowLocation.width * 1.8);
 		this.bigWindowLocation.height = ss.Int32.trunc(this.bigWindowLocation.height * 1.8);
-		this.animations = [];
+		this.tileAnimations = [];
 		this.animationInstances = [];
 		//jQuery.GetJson("Content/sprites/explosion.js", data => Animations.Add(new Animation("explosion", data)));
 		this.showHeightMap = false;
@@ -218,6 +221,74 @@
 	};
 	$OurSonic_SpeedTester.__typeName = 'OurSonic.SpeedTester';
 	global.OurSonic.SpeedTester = $OurSonic_SpeedTester;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.TileAnimation
+	var $OurSonic_TileAnimation = function(manager, animatedTileData) {
+		this.manager = null;
+		this.animatedTileData = null;
+		this.currentFrame = 0;
+		this.frames = null;
+		this.manager = manager;
+		this.animatedTileData = animatedTileData;
+		this.frames = [];
+		this.currentFrame = 0;
+	};
+	$OurSonic_TileAnimation.__typeName = 'OurSonic.TileAnimation';
+	global.OurSonic.TileAnimation = $OurSonic_TileAnimation;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.TileAnimationFrame
+	var $OurSonic_TileAnimationFrame = function(frameIndex, animation) {
+		this.$1$AnimationField = null;
+		this.frameIndex = 0;
+		this.set_animation(animation);
+		this.frameIndex = frameIndex;
+	};
+	$OurSonic_TileAnimationFrame.__typeName = 'OurSonic.TileAnimationFrame';
+	global.OurSonic.TileAnimationFrame = $OurSonic_TileAnimationFrame;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.TileAnimationManager
+	var $OurSonic_TileAnimationManager = function(sonicManager) {
+		this.$1$SonicManagerField = null;
+		this.animations = null;
+		this.set_sonicManager(sonicManager);
+		this.$init();
+	};
+	$OurSonic_TileAnimationManager.__typeName = 'OurSonic.TileAnimationManager';
+	global.OurSonic.TileAnimationManager = $OurSonic_TileAnimationManager;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.TilePaletteAnimation
+	var $OurSonic_TilePaletteAnimation = function(manager, animatedPaletteData) {
+		this.manager = null;
+		this.animatedPaletteData = null;
+		this.currentFrame = 0;
+		this.frames = null;
+		this.manager = manager;
+		this.animatedPaletteData = animatedPaletteData;
+		this.frames = [];
+	};
+	$OurSonic_TilePaletteAnimation.__typeName = 'OurSonic.TilePaletteAnimation';
+	global.OurSonic.TilePaletteAnimation = $OurSonic_TilePaletteAnimation;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.TilePaletteAnimationFrame
+	var $OurSonic_TilePaletteAnimationFrame = function(frameIndex, animation) {
+		this.$1$AnimationField = null;
+		this.frameIndex = 0;
+		this.$tempPalette = null;
+		this.set_animation(animation);
+		this.frameIndex = frameIndex;
+	};
+	$OurSonic_TilePaletteAnimationFrame.__typeName = 'OurSonic.TilePaletteAnimationFrame';
+	global.OurSonic.TilePaletteAnimationFrame = $OurSonic_TilePaletteAnimationFrame;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.TilePaletteAnimationManager
+	var $OurSonic_TilePaletteAnimationManager = function(sonicManager) {
+		this.$1$SonicManagerField = null;
+		this.animations = null;
+		this.set_sonicManager(sonicManager);
+		this.$init();
+	};
+	$OurSonic_TilePaletteAnimationManager.__typeName = 'OurSonic.TilePaletteAnimationManager';
+	global.OurSonic.TilePaletteAnimationManager = $OurSonic_TilePaletteAnimationManager;
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Areas.ColorEditingArea
 	var $OurSonic_Areas_ColorEditingArea = function(x, y, width, height) {
@@ -461,35 +532,30 @@
 		window.setTimeout(ss.mkdel(this, function() {
 			if (neverGot) {
 				$OurSonic_UIManager_UIManager.set_curLevelName('Connection Failed, static level loaded');
-				this.$loadLevel(new (ss.makeGenericType(OurSonicModels.Common.DataObject$1, [String]))($OurSonic_SonicManager.STATICLEVEL));
+				this.$loadLevel(new (ss.makeGenericType(OurSonicModels.Common.DataObject$1, [String]))(ss.cast(window.STATICLEVEL, String)));
 			}
 		}), 3000);
 		$OurSonic_SonicEngine.instance.client.on('GetLevels.Response', function(data) {
 			neverGot = false;
 			var load = true;
-			var $t6 = Enumerable.from(data.Data).orderBy(function(a) {
+			var $t6 = OurSonicModels.Common.EnumerableExtensions.orderBy$4(String).call(null, data.Data, function(a) {
 				return a;
-			}).getEnumerator();
-			try {
-				while ($t6.moveNext()) {
-					var level = $t6.current();
-					if (load) {
-						//#if RELEASE
-						loadLevel(level);
-						//#endif
-						load = false;
-					}
-					var area = { $: level };
-					var $t7 = new $OurSonic_UIManager_Button(0, 0, 0, 0, ss.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(level));
-					$t7.color = 'rgb(50,190,90)';
-					$t7.click = ss.mkdel({ area: area }, function(p1) {
-						loadLevel(this.area.$);
-					});
-					ctls.addControl($OurSonic_UIManager_Button).call(ctls, $t7);
+			});
+			for (var $t7 = 0; $t7 < $t6.length; $t7++) {
+				var level = $t6[$t7];
+				if (load) {
+					//#if RELEASE
+					//loadLevel(level);
+					//#endif
+					load = false;
 				}
-			}
-			finally {
-				$t6.dispose();
+				var area = { $: level };
+				var $t8 = new $OurSonic_UIManager_Button(0, 0, 0, 0, ss.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(level));
+				$t8.color = 'rgb(50,190,90)';
+				$t8.click = ss.mkdel({ area: area }, function(p1) {
+					loadLevel(this.area.$);
+				});
+				ctls.addControl($OurSonic_UIManager_Button).call(ctls, $t8);
 			}
 		});
 		$OurSonic_SonicEngine.instance.client.emit('GetLevels.Request', null);
@@ -944,51 +1010,46 @@
 			$OurSonic_SonicEngine.instance.client.on('GetAllObjects.Response', function(data) {
 				var obj = data.Data;
 				fList.controls = [];
-				var $t6 = Enumerable.from(obj).orderBy(function(a) {
+				var $t6 = OurSonicModels.Common.EnumerableExtensions.orderBy$4(String).call(null, obj, function(a) {
 					return a;
-				}).getEnumerator();
-				try {
-					while ($t6.moveNext()) {
-						var itm = $t6.current();
-						var d;
-						var name = { $: itm };
-						var $t7 = new $OurSonic_UIManager_Button(0, 0, 0, 0, ss.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(itm));
-						$t7.color = 'rgb(50,190,90)';
-						$t7.click = ss.mkdel({ name: name }, function(p1) {
-							loadObject(this.name.$);
-						});
-						fList.addControl($OurSonic_UIManager_Button).call(fList, d = $t7);
-					}
-				}
-				finally {
-					$t6.dispose();
+				});
+				for (var $t7 = 0; $t7 < $t6.length; $t7++) {
+					var itm = $t6[$t7];
+					var d;
+					var name = { $: itm };
+					var $t8 = new $OurSonic_UIManager_Button(0, 0, 0, 0, ss.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2(itm));
+					$t8.color = 'rgb(50,190,90)';
+					$t8.click = ss.mkdel({ name: name }, function(p1) {
+						loadObject(this.name.$);
+					});
+					fList.addControl($OurSonic_UIManager_Button).call(fList, d = $t8);
 				}
 			});
 		};
-		var $t8 = new $OurSonic_UIManager_Button(200, 50, 160, 25, ss.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Save Framework'));
-		$t8.color = 'rgb(50,150,50)';
-		$t8.click = function(p2) {
+		var $t9 = new $OurSonic_UIManager_Button(200, 50, 160, 25, ss.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Save Framework'));
+		$t9.color = 'rgb(50,150,50)';
+		$t9.click = function(p2) {
 			var oldTitle = $OurSonic_UIManager_UIManager.get_curLevelName();
 			$OurSonic_UIManager_UIManager.updateTitle('Saving Object');
 			var k = uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework.key;
-			var $t9 = uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework.oldKey;
-			if (ss.isNullOrUndefined($t9)) {
-				$t9 = uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework.key;
+			var $t10 = uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework.oldKey;
+			if (ss.isNullOrUndefined($t10)) {
+				$t10 = uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework.key;
 			}
-			var o = $t9;
+			var o = $t10;
 			var v = $OurSonic_Utility_Help.stringify(uiManager.get_uiManagerAreas().objectFrameworkArea.objectFrameworkArea.data.objectFramework);
-			var $t11 = $OurSonic_SonicEngine.instance.client;
-			var $t10 = OurSonicModels.SaveObjectModel.$ctor();
-			$t10.key = k;
-			$t10.oldKey = o;
-			$t10.data = v;
-			$t11.emit('SaveObject', $t10);
+			var $t12 = $OurSonic_SonicEngine.instance.client;
+			var $t11 = OurSonicModels.SaveObjectModel.$ctor();
+			$t11.key = k;
+			$t11.oldKey = o;
+			$t11.data = v;
+			$t12.emit('SaveObject', $t11);
 			$OurSonic_SonicEngine.instance.client.on('SaveObject.Response', function(data1) {
 				$OurSonic_UIManager_UIManager.updateTitle(oldTitle);
 			});
 			getObjects();
 		};
-		objectFrameworkListArea.addControl($OurSonic_UIManager_Button).call(objectFrameworkListArea, $t8);
+		objectFrameworkListArea.addControl($OurSonic_UIManager_Button).call(objectFrameworkListArea, $t9);
 		getObjects();
 		loadObject = function(name1) {
 			var objects = $OurSonic_SonicManager.instance.cachedObjects;
@@ -1088,7 +1149,7 @@
 		var $t4 = new $OurSonic_UIManager_ScrollBox(30, 70, 80, 3, 64);
 		$t4.backColor = 'rgb(50,60,127)';
 		tileChunkArea.addControl($OurSonic_UIManager_ScrollBox).call(tileChunkArea, this.$chunkPieceList = $t4);
-		var tileChunks = $OurSonic_SonicManager.instance.sonicLevel.chunks;
+		var tileChunks = $OurSonic_SonicManager.instance.sonicLevel.tileChunks;
 		for (var index = 0; index < tileChunks.length; index++) {
 			var tileChunk = { $: tileChunks[index] };
 			var chunkButton = { $: new (ss.makeGenericType($OurSonic_UIManager_ImageButton$1, [$OurSonic_Level_Tiles_TileChunk]))(tileChunk.$, 0, 0, 0, 0) };
@@ -1291,20 +1352,19 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Level.SonicLevel
 	var $OurSonic_Level_SonicLevel = function() {
-		this.animations = null;
-		this.animatedFiles = null;
+		this.tileAnimations = null;
+		this.animatedTileFiles = null;
 		this.chunkMap = null;
 		this.rings = null;
 		this.curHeightMap = false;
 		this.levelWidth = 0;
 		this.levelHeight = 0;
-		this.chunks = null;
+		this.tileChunks = null;
 		this.tiles = null;
 		this.tilePieces = null;
 		this.objects = null;
-		this.paletteItems = null;
+		this.animatedPalettes = null;
 		this.palette = null;
-		this.paletteAnimationIndexes = null;
 		this.startPositions = null;
 		this.curPaletteIndex = 0;
 		this.angles = null;
@@ -1315,12 +1375,11 @@
 		this.bgChunkMap = null;
 		this.tiles = [];
 		this.tilePieces = [];
-		this.chunks = [];
+		this.tileChunks = [];
 		this.chunkMap = [];
 		this.rings = [];
 		this.objects = [];
 		this.heightMaps = [];
-		this.paletteAnimationIndexes = [];
 		this.tiles = [];
 		this.curHeightMap = true;
 		this.curPaletteIndex = 0;
@@ -1368,32 +1427,32 @@
 	$OurSonic_Level_SpriteCacheIndexes.__typeName = 'OurSonic.Level.SpriteCacheIndexes';
 	global.OurSonic.Level.SpriteCacheIndexes = $OurSonic_Level_SpriteCacheIndexes;
 	////////////////////////////////////////////////////////////////////////////////
-	// OurSonic.Level.Animations.Animation
-	var $OurSonic_Level_Animations_Animation = function() {
-		this.animationFile = 0;
-		this.numberOfTiles = 0;
-		this.lastAnimatedIndex = 0;
-		this.lastAnimatedFrame = null;
-		this.animationTileIndex = 0;
-		this.frames = null;
-		this.automatedTiming = 0;
-	};
-	$OurSonic_Level_Animations_Animation.__typeName = 'OurSonic.Level.Animations.Animation';
-	global.OurSonic.Level.Animations.Animation = $OurSonic_Level_Animations_Animation;
-	////////////////////////////////////////////////////////////////////////////////
-	// OurSonic.Level.Animations.AnimationFrame
-	var $OurSonic_Level_Animations_AnimationFrame = function() {
-		this.ticks = 0;
-		this.startingTileIndex = 0;
-	};
-	$OurSonic_Level_Animations_AnimationFrame.__typeName = 'OurSonic.Level.Animations.AnimationFrame';
-	global.OurSonic.Level.Animations.AnimationFrame = $OurSonic_Level_Animations_AnimationFrame;
-	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Level.Animations.AnimationInstance
 	var $OurSonic_Level_Animations_AnimationInstance = function() {
 	};
 	$OurSonic_Level_Animations_AnimationInstance.__typeName = 'OurSonic.Level.Animations.AnimationInstance';
 	global.OurSonic.Level.Animations.AnimationInstance = $OurSonic_Level_Animations_AnimationInstance;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.Level.Animations.TileAnimationData
+	var $OurSonic_Level_Animations_TileAnimationData = function() {
+		this.animationTileFile = 0;
+		this.numberOfTiles = 0;
+		this.lastAnimatedIndex = 0;
+		this.lastAnimatedFrame = null;
+		this.animationTileIndex = 0;
+		this.dataFrames = null;
+		this.automatedTiming = 0;
+	};
+	$OurSonic_Level_Animations_TileAnimationData.__typeName = 'OurSonic.Level.Animations.TileAnimationData';
+	global.OurSonic.Level.Animations.TileAnimationData = $OurSonic_Level_Animations_TileAnimationData;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.Level.Animations.TileAnimationDataFrame
+	var $OurSonic_Level_Animations_TileAnimationDataFrame = function() {
+		this.ticks = 0;
+		this.startingTileIndex = 0;
+	};
+	$OurSonic_Level_Animations_TileAnimationDataFrame.__typeName = 'OurSonic.Level.Animations.TileAnimationDataFrame';
+	global.OurSonic.Level.Animations.TileAnimationDataFrame = $OurSonic_Level_Animations_TileAnimationDataFrame;
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Level.Events.LevelEvent
 	var $OurSonic_Level_Events_LevelEvent = function() {
@@ -1678,6 +1737,73 @@
 	};
 	global.OurSonic.Level.Objects.ObjectManager = $OurSonic_Level_Objects_ObjectManager;
 	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.Level.Tiles.ChunkLayer
+	var $OurSonic_Level_Tiles_ChunkLayer = function() {
+	};
+	$OurSonic_Level_Tiles_ChunkLayer.__typeName = 'OurSonic.Level.Tiles.ChunkLayer';
+	global.OurSonic.Level.Tiles.ChunkLayer = $OurSonic_Level_Tiles_ChunkLayer;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.Level.Tiles.ChunkLayer
+	var $OurSonic_Level_Tiles_ChunkLayer$1 = function(T) {
+		var $type = function() {
+			this.low = ss.getDefaultValue(T);
+			this.high = ss.getDefaultValue(T);
+		};
+		ss.registerGenericClassInstance($type, $OurSonic_Level_Tiles_ChunkLayer$1, [T], {
+			get_item: function(layer) {
+				switch (layer) {
+					case 0: {
+						return this.low;
+					}
+					case 1: {
+						return this.high;
+					}
+					default: {
+						return ss.getDefaultValue(T);
+					}
+				}
+			},
+			set_item: function(layer, value) {
+				switch (layer) {
+					case 0: {
+						this.low = value;
+						break;
+					}
+					case 1: {
+						this.high = value;
+						break;
+					}
+				}
+			}
+		}, function() {
+			return null;
+		}, function() {
+			return [];
+		});
+		return $type;
+	};
+	$OurSonic_Level_Tiles_ChunkLayer$1.__typeName = 'OurSonic.Level.Tiles.ChunkLayer$1';
+	ss.initGenericClass($OurSonic_Level_Tiles_ChunkLayer$1, $asm, 1);
+	global.OurSonic.Level.Tiles.ChunkLayer$1 = $OurSonic_Level_Tiles_ChunkLayer$1;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.Level.Tiles.PaletteAnimationCanvasFrame
+	var $OurSonic_Level_Tiles_PaletteAnimationCanvasFrame = function() {
+		this.canvas = null;
+	};
+	$OurSonic_Level_Tiles_PaletteAnimationCanvasFrame.__typeName = 'OurSonic.Level.Tiles.PaletteAnimationCanvasFrame';
+	global.OurSonic.Level.Tiles.PaletteAnimationCanvasFrame = $OurSonic_Level_Tiles_PaletteAnimationCanvasFrame;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.Level.Tiles.PaletteAnimationCanvasFrames
+	var $OurSonic_Level_Tiles_PaletteAnimationCanvasFrames = function(paletteAnimationIndex) {
+		this.paletteAnimationIndex = 0;
+		this.position = null;
+		this.frames = null;
+		this.paletteAnimationIndex = paletteAnimationIndex;
+		this.frames = {};
+	};
+	$OurSonic_Level_Tiles_PaletteAnimationCanvasFrames.__typeName = 'OurSonic.Level.Tiles.PaletteAnimationCanvasFrames';
+	global.OurSonic.Level.Tiles.PaletteAnimationCanvasFrames = $OurSonic_Level_Tiles_PaletteAnimationCanvasFrames;
+	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Level.Tiles.RotationMode
 	var $OurSonic_Level_Tiles_RotationMode = function() {
 	};
@@ -1686,27 +1812,39 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Level.Tiles.Tile
 	var $OurSonic_Level_Tiles_Tile = function(colors) {
-		this.$_caches = {};
 		this.$canAnimate = true;
-		this.$willAnimate = null;
-		this._Tile = 0;
-		this.priority = false;
-		this.xFlip = false;
-		this.yFlip = false;
-		this.palette = 0;
 		this.curPaletteIndexes = null;
-		this.sprites = null;
 		this.colors = null;
-		this.showOutline = false;
 		this.index = 0;
-		this.isAnimated = false;
-		this.animatedFrames = null;
+		this.isTileAnimated = false;
+		this.animatedPaletteIndexes = null;
+		this.animatedTileIndexes = null;
+		this.paletteIndexesToBeAnimated = null;
+		this.$baseCaches = {};
+		this.$animatedPaletteCaches = {};
 		this.colors = colors;
-		this.sprites = [];
 		this.curPaletteIndexes = null;
 	};
 	$OurSonic_Level_Tiles_Tile.__typeName = 'OurSonic.Level.Tiles.Tile';
 	global.OurSonic.Level.Tiles.Tile = $OurSonic_Level_Tiles_Tile;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.Level.Tiles.TileAnimationCanvasFrame
+	var $OurSonic_Level_Tiles_TileAnimationCanvasFrame = function() {
+		this.canvas = null;
+	};
+	$OurSonic_Level_Tiles_TileAnimationCanvasFrame.__typeName = 'OurSonic.Level.Tiles.TileAnimationCanvasFrame';
+	global.OurSonic.Level.Tiles.TileAnimationCanvasFrame = $OurSonic_Level_Tiles_TileAnimationCanvasFrame;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.Level.Tiles.TileAnimationCanvasFrames
+	var $OurSonic_Level_Tiles_TileAnimationCanvasFrames = function(tileAnimationIndex) {
+		this.tileAnimationIndex = 0;
+		this.position = null;
+		this.frames = null;
+		this.tileAnimationIndex = tileAnimationIndex;
+		this.frames = {};
+	};
+	$OurSonic_Level_Tiles_TileAnimationCanvasFrames.__typeName = 'OurSonic.Level.Tiles.TileAnimationCanvasFrames';
+	global.OurSonic.Level.Tiles.TileAnimationCanvasFrames = $OurSonic_Level_Tiles_TileAnimationCanvasFrames;
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Level.Tiles.TileCacheBlock
 	var $OurSonic_Level_Tiles_TileCacheBlock = function() {
@@ -1733,23 +1871,23 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Level.Tiles.TileChunk
 	var $OurSonic_Level_Tiles_TileChunk = function() {
-		this.$layerCacheBlocks = null;
 		this.$myLocalPoint = $OurSonic_Utility_Point.$ctor1(0, 0);
-		this.$myNeverAnimate = null;
-		this.$neverAnimateCache = null;
 		this.isOnlyBackground = null;
 		this.isOnlyForeground = null;
 		this.empty = null;
 		this.tilePieces = null;
-		this.animated = null;
+		this.tileAnimations = null;
 		this.index = 0;
 		this.heightBlocks1 = null;
 		this.heightBlocks2 = null;
 		this.angleMap1 = null;
 		this.angleMap2 = null;
+		this.$tileAnimationIndexes = null;
+		this.$paletteAnimationIndexes = null;
+		this.$baseCanvasCache = null;
+		this.$paletteAnimationCanvasesCache = null;
+		this.$tileAnimationCanvasesCache = null;
 		this.isOnlyBackground = null;
-		this.$neverAnimateCache = new Array(2);
-		this.$layerCacheBlocks = new Array(2);
 	};
 	$OurSonic_Level_Tiles_TileChunk.__typeName = 'OurSonic.Level.Tiles.TileChunk';
 	global.OurSonic.Level.Tiles.TileChunk = $OurSonic_Level_Tiles_TileChunk;
@@ -1773,11 +1911,10 @@
 		this.$onlyForeground = false;
 		this.$onlyForegroundSet = false;
 		this.$shouldAnimate = null;
-		this.image = null;
 		this.tiles = null;
 		this.index = 0;
-		this.$1$AnimatedFramesField = null;
-		this.image = {};
+		this.animatedPaletteIndexes = null;
+		this.$1$AnimatedTileIndexesField = null;
 	};
 	$OurSonic_Level_Tiles_TilePiece.__typeName = 'OurSonic.Level.Tiles.TilePiece';
 	global.OurSonic.Level.Tiles.TilePiece = $OurSonic_Level_Tiles_TilePiece;
@@ -1844,7 +1981,7 @@
 		this.$oldSign = 0;
 		this.$physicsVariables = null;
 		this.$runningTick = 0;
-		this.$sensorManager = null;
+		this.sensorManager = null;
 		this.sonicLastHitTick = 0;
 		this.$sonicLevel = null;
 		this.watcher = null;
@@ -1878,22 +2015,28 @@
 		this.spriteState = null;
 		this.haltSmoke = null;
 		this.wasJumping = false;
+		this.$halfSize = $OurSonic_Utility_Point.$ctor1(20, 20);
+		this.$offsetFromImage = $OurSonic_Utility_Point.$ctor1(0, 0);
+		this.$objectCollision = $OurSonic_Utility_Point.$ctor1(0, 0);
+		this.$ringCollisionRect = $OurSonic_Utility_Rectangle.$ctor1(0, 0, 0, 0);
 		this.watcher = new $OurSonic_Sonic_Watcher();
 		this.$physicsVariables = $OurSonic_Sonic_SonicConstants.sonic();
 		var sonicManager = $OurSonic_SonicManager.instance;
 		this.$sonicLevel = sonicManager.sonicLevel;
 		this.x = this.$sonicLevel.startPositions[0].x;
 		this.y = this.$sonicLevel.startPositions[0].y;
-		this.$sensorManager = new $OurSonic_Sonic_SensorManager();
+		this.sensorManager = new $OurSonic_Sonic_SensorManager();
 		this.haltSmoke = [];
 		this.rings = 7;
-		this.$sensorManager.createVerticalSensor('a', -9, 0, 36, '#F202F2', false);
-		this.$sensorManager.createVerticalSensor('b', 9, 0, 36, '#02C2F2', false);
-		this.$sensorManager.createVerticalSensor('c', -9, 0, -20, '#2D2C21', false);
-		this.$sensorManager.createVerticalSensor('d', 9, 0, -20, '#C24222', false);
-		this.$sensorManager.createHorizontalSensor('m1', 4, 0, -12, '#212C2E', false);
-		this.$sensorManager.createHorizontalSensor('m2', 4, 0, 13, '#22Ffc1', false);
+		this.sensorManager.createVerticalSensor('a', -9, 0, 36, '#F202F2', false);
+		this.sensorManager.createVerticalSensor('b', 9, 0, 36, '#02C2F2', false);
+		this.sensorManager.createVerticalSensor('c', -9, 0, -20, '#2D2C21', false);
+		this.sensorManager.createVerticalSensor('d', 9, 0, -20, '#C24222', false);
+		this.sensorManager.createHorizontalSensor('m1', 4, 0, -12, '#212C2E', false);
+		this.sensorManager.createHorizontalSensor('m2', 4, 0, 13, '#22Ffc1', false);
 		this.spriteState = 'normal';
+		this.myRec = $OurSonic_Utility_Rectangle.$ctor1(0, 0, 0, 0);
+		this.sonicLastHitTick = -2147483648;
 	};
 	$OurSonic_Sonic_Sonic.__typeName = 'OurSonic.Sonic.Sonic';
 	global.OurSonic.Sonic.Sonic = $OurSonic_Sonic_Sonic;
@@ -2523,15 +2666,6 @@
 	};
 	global.OurSonic.UIManager.UIManagerDataIndexes = $OurSonic_UIManager_UIManagerDataIndexes;
 	////////////////////////////////////////////////////////////////////////////////
-	// OurSonic.Utility.CanvasHandler
-	var $OurSonic_Utility_CanvasHandler = function(canvas) {
-		this.$myCanvas = null;
-		this.$myCanvas = canvas;
-		canvas.save();
-	};
-	$OurSonic_Utility_CanvasHandler.__typeName = 'OurSonic.Utility.CanvasHandler';
-	global.OurSonic.Utility.CanvasHandler = $OurSonic_Utility_CanvasHandler;
-	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Utility.CanvasInformation
 	var $OurSonic_Utility_CanvasInformation = function(context, domCanvas) {
 		this.context = null;
@@ -2703,7 +2837,7 @@
 		//context.PutImageData(imaged, 0, 0);
 		$OurSonic_Utility_Extensions.$curY = cury;
 	};
-	$OurSonic_Utility_Extensions.offsetStuff = function(context) {
+	$OurSonic_Utility_Extensions.offsetPixelsForWater = function(context) {
 		return;
 		$OurSonic_Utility_Extensions.$makeOffset();
 		//    if (DOES)
@@ -3459,6 +3593,7 @@
 			});
 		},
 		runSonic: function(level) {
+			this.sonicManager.clearCache();
 			this.sonicManager.load(level);
 			this.sonicManager.windowLocation.x = 0;
 			this.sonicManager.windowLocation.y = 0;
@@ -3466,7 +3601,6 @@
 			this.sonicManager.bigWindowLocation.y = ss.Int32.trunc(this.sonicManager.windowLocation.y - this.sonicManager.windowLocation.height * 0.2);
 			this.sonicManager.bigWindowLocation.width = ss.Int32.trunc(this.sonicManager.windowLocation.width * 1.8);
 			this.sonicManager.bigWindowLocation.height = ss.Int32.trunc(this.sonicManager.windowLocation.height * 1.8);
-			this.sonicManager.clearCache();
 			var dl = $OurSonic_Utility_Help.getQueryString();
 			if (ss.keyExists(dl, 'run')) {
 				if (this.sonicManager.currentGameState === 0) {
@@ -3474,6 +3608,7 @@
 				}
 				$OurSonic_SonicEngine.runGame();
 			}
+			this.sonicManager.cacheTiles();
 		},
 		$handleScroll: function(jQueryEvent) {
 			jQueryEvent.preventDefault();
@@ -3567,11 +3702,11 @@
 	});
 	ss.initClass($OurSonic_SonicManager, $asm, {
 		get_$status: function() {
-			return this.$myStatus;
+			return this.$status;
 		},
 		set_$status: function(value) {
 			$OurSonic_UIManager_UIManager.updateTitle(value);
-			this.$myStatus = value;
+			this.$status = value;
 		},
 		onClick: function(elementEvent) {
 			//Help.Debugger();
@@ -3614,9 +3749,7 @@
 			//                break;
 		},
 		$effectClick: function(elementEvent) {
-			if (this.currentGameState === 0) {
-				return false;
-			}
+			//    if (CurrentGameState == GameState.Playing) return false;
 			var e = $OurSonic_Utility_Point.$ctor1(ss.Int32.trunc(elementEvent.clientX / this.scale.x / this.realScale.x + this.windowLocation.x), ss.Int32.trunc(elementEvent.clientY / this.scale.y / this.realScale.y + this.windowLocation.y));
 			//if (CurrentGameState == GameState.Playing) {
 			//SonicToon.X = e.X;
@@ -3841,7 +3974,8 @@
 				h1 = ss.Int32.div(h1, this.scale.y);
 			}
 			var offs = $OurSonic_SonicManager.$getOffs(w1, h1);
-			this.$updatePalettes();
+			this.tilePaletteAnimationManager.tickAnimatedPalettes();
+			this.tileAnimationManager.tickAnimatedTiles();
 			var fxP = ss.Int32.trunc(this.windowLocation.x / 128);
 			var fyP = ss.Int32.trunc(this.windowLocation.y / 128);
 			this.$resetCanvases();
@@ -3852,27 +3986,27 @@
 				var movex = ss.Int32.div(wOffset, bw) * bw;
 				localPoint.x = -this.windowLocation.x + movex;
 				localPoint.y = ss.Int32.div(-this.windowLocation.y, 4);
-				this.background.draw(this.$myAnother.context, localPoint, wOffset);
+				this.background.draw(this.$lowChunkCanvas.context, localPoint, wOffset);
 				localPoint.x = -this.windowLocation.x + movex + this.background.width;
 				localPoint.y = ss.Int32.div(-this.windowLocation.y, 4);
-				this.background.draw(this.$myAnother.context, localPoint, wOffset);
+				this.background.draw(this.$lowChunkCanvas.context, localPoint, wOffset);
 			}
-			this.$drawLowChunks(this.$myAnother.context, zero, offs, fyP, fxP);
+			this.$drawLowChunks(this.$lowChunkCanvas.context, zero, offs, fyP, fxP);
 			if (this.showHeightMap) {
-				this.$drawHighChunks(this.$myAnother.context, fxP, fyP, offs, zero);
+				this.$drawHighChunks(this.$lowChunkCanvas.context, fxP, fyP, offs, zero);
 			}
-			this.$drawObjects(this.$mySonCanvas.context, zero);
-			this.$drawAnimations(this.$mySonCanvas.context);
-			this.$drawRings(this.$mySonCanvas.context, zero);
-			this.$drawSonic(this.$mySonCanvas.context);
+			this.$drawObjects(this.$sonicCanvas.context, zero);
+			this.$drawAnimations(this.$sonicCanvas.context);
+			this.$drawRings(this.$sonicCanvas.context, zero);
+			this.$drawSonic(this.$sonicCanvas.context);
 			//drawRings(canvas, zero);
 			//editing^
 			if (!this.showHeightMap) {
-				this.$drawHighChunks(this.$myAnotherw.context, fxP, fyP, offs, zero);
+				this.$drawHighChunks(this.$highChuckCanvas.context, fxP, fyP, offs, zero);
 			}
-			$OurSonic_Utility_Extensions.offsetStuff(this.$myAnother.context);
-			$OurSonic_Utility_Extensions.offsetStuff(this.$myAnotherw.context);
-			this.$drawSonic(this.$myAnother.context);
+			$OurSonic_Utility_Extensions.offsetPixelsForWater(this.$lowChunkCanvas.context);
+			$OurSonic_Utility_Extensions.offsetPixelsForWater(this.$highChuckCanvas.context);
+			this.$drawSonic(this.$lowChunkCanvas.context);
 			this.$drawCanveses(canvas, localPoint);
 			canvas.restore();
 			if (this.currentGameState === 0) {
@@ -3881,17 +4015,17 @@
 		},
 		$drawCanveses: function(canvas, localPoint) {
 			canvas.scale(this.scale.x, this.scale.y);
-			canvas.drawImage(this.$myAnother.canvas, localPoint.x, localPoint.y);
-			canvas.drawImage(this.$mySonCanvas.canvas, localPoint.x, localPoint.y);
-			canvas.drawImage(this.$myAnotherw.canvas, localPoint.x, localPoint.y);
+			canvas.drawImage(this.$lowChunkCanvas.canvas, localPoint.x, localPoint.y);
+			canvas.drawImage(this.$sonicCanvas.canvas, localPoint.x, localPoint.y);
+			canvas.drawImage(this.$highChuckCanvas.canvas, localPoint.x, localPoint.y);
 		},
 		$resetCanvases: function() {
-			this.$myAnother = this.$myAnother || $OurSonic_Utility_CanvasInformation.create(320, 240);
-			this.$mySonCanvas = this.$mySonCanvas || $OurSonic_Utility_CanvasInformation.create(320, 240);
-			this.$myAnotherw = this.$myAnotherw || $OurSonic_Utility_CanvasInformation.create(320, 240);
-			this.$mySonCanvas.context.clearRect(0, 0, 320, 240);
-			this.$myAnotherw.context.clearRect(0, 0, 320, 240);
-			this.$myAnother.context.clearRect(0, 0, 320, 240);
+			this.$lowChunkCanvas = this.$lowChunkCanvas || $OurSonic_Utility_CanvasInformation.create(320, 240);
+			this.$sonicCanvas = this.$sonicCanvas || $OurSonic_Utility_CanvasInformation.create(320, 240);
+			this.$highChuckCanvas = this.$highChuckCanvas || $OurSonic_Utility_CanvasInformation.create(320, 240);
+			this.$sonicCanvas.context.clearRect(0, 0, 320, 240);
+			this.$highChuckCanvas.context.clearRect(0, 0, 320, 240);
+			this.$lowChunkCanvas.context.clearRect(0, 0, 320, 240);
 		},
 		$updatePositions: function(canvas) {
 			this.screenOffset.x = 0;
@@ -3936,34 +4070,6 @@
 			}
 			return false;
 		},
-		$updatePalettes: function() {
-			if (this.sonicLevel.paletteItems.length > 0) {
-				for (var k = 0; k < this.sonicLevel.paletteItems[0].length; k++) {
-					var pal = this.sonicLevel.paletteItems[0][k];
-					if (pal.skipIndex === 0) {
-						continue;
-					}
-					if (pal.totalLength === 0) {
-						continue;
-					}
-					for (var j = 0; j <= pal.totalLength; j += pal.skipIndex) {
-						if (this.drawTickCount % (pal.totalLength + pal.skipIndex) === j) {
-							this.sonicLevel.paletteAnimationIndexes[k] = ss.Int32.div(j, pal.skipIndex);
-						}
-					}
-					for (var $t1 = 0; $t1 < pal.pieces.length; $t1++) {
-						var mj = pal.pieces[$t1];
-						var m = pal.palette[this.sonicLevel.paletteAnimationIndexes[k] * (pal.pieces.length * 2) + 0 + mj.paletteMultiply];
-						if (ss.isValue(m)) {
-							this.sonicLevel.palette[mj.paletteIndex][ss.Int32.div(mj.paletteOffset, 2)] = m;
-						}
-						else {
-							this.sonicLevel.palette[mj.paletteIndex][ss.Int32.div(mj.paletteOffset, 2)] = $OurSonic_Utility_CanvasInformation.get_blackPixel();
-						}
-					}
-				}
-			}
-		},
 		$drawLowChunks: function(canvas, localPoint, offs, fyP, fxP) {
 			for (var $t1 = 0; $t1 < offs.length; $t1++) {
 				var off = offs[$t1];
@@ -3975,8 +4081,8 @@
 				_xP = $OurSonic_Utility_Help.mod(_xP, this.sonicLevel.levelWidth);
 				_yP = $OurSonic_Utility_Help.mod(_yP, this.sonicLevel.levelHeight);
 				var chunk = this.sonicLevel.getChunkAt(_xP, _yP);
-				if (chunk) {
-					chunk.animatedTick();
+				if (ss.isNullOrUndefined(chunk)) {
+					continue;
 				}
 				localPoint.x = _xPreal * 128 - this.windowLocation.x;
 				localPoint.y = _yPreal * 128 - this.windowLocation.y;
@@ -3996,6 +4102,9 @@
 				_xP = $OurSonic_Utility_Help.mod(_xP, this.sonicLevel.levelWidth);
 				_yP = $OurSonic_Utility_Help.mod(_yP, this.sonicLevel.levelHeight);
 				var chunk = this.sonicLevel.getChunkAt(_xP, _yP);
+				if (ss.isNullOrUndefined(chunk)) {
+					continue;
+				}
 				localPoint.x = _xPreal * 128 - this.windowLocation.x;
 				localPoint.y = _yPreal * 128 - this.windowLocation.y;
 				if (!chunk.isEmpty() && !chunk.onlyBackground()) {
@@ -4003,47 +4112,8 @@
 				}
 				if (this.showHeightMap) {
 					var fd = this.spriteCache.heightMapChunks[(this.sonicLevel.curHeightMap ? 1 : 2) + ' ' + chunk.index];
-					if (!fd) {
-						var md = chunk;
-						var posj1 = $OurSonic_Utility_Point.$ctor1(0, 0);
-						var canv = $OurSonic_Utility_CanvasInformation.create(128, 128);
-						var ctx = canv.context;
-						this.$myEngine.clear(canv);
-						for (var _y = 0; _y < 8; _y++) {
-							for (var _x = 0; _x < 8; _x++) {
-								var tp = md.tilePieces[_x][_y];
-								var solid = (this.sonicLevel.curHeightMap ? tp.solid1 : tp.solid2);
-								var hd = (this.sonicLevel.curHeightMap ? tp.getLayer1HeightMaps() : tp.getLayer2HeightMaps());
-								var __x = _x;
-								var __y = _y;
-								var vangle = 0;
-								var posm = $OurSonic_Utility_Point.$ctor1(posj1.x + __x * 16, posj1.y + __y * 16);
-								if (!hd) {
-									continue;
-								}
-								if (hd.get_full() === false) {
-								}
-								else if (hd.get_full() === true) {
-									if (solid > 0) {
-										ctx.fillStyle = $OurSonic_Level_HeightMap.colors[solid];
-										ctx.fillRect(posj1.x + __x * 16, posj1.y + __y * 16, 16, 16);
-									}
-								}
-								else {
-									vangle = (this.sonicLevel.curHeightMap ? tp.getLayer1Angles() : tp.getLayer2Angles());
-									hd.draw(ctx, posm, tp.xFlip, tp.yFlip, solid, vangle);
-									//   posm.x += 16 * scale.x / 2;
-									//   posm.y += 16 * scale.y / 2;
-									//   ctx.strokeStyle = "#DDD";
-									//   ctx.font = "18pt courier ";
-									//   ctx.shadowColor = "";
-									//   ctx.shadowBlur = 0;
-									//   ctx.lineWidth = 1;
-									//   ctx.strokeText(vangle.toString(16), posm.x - 12, posm.y + 7);
-								}
-							}
-						}
-						fd = this.spriteCache.heightMapChunks[(this.sonicLevel.curHeightMap ? 1 : 2) + ' ' + md.index] = canv;
+					if (ss.isNullOrUndefined(fd)) {
+						fd = this.$cacheHeightMapForChunk(chunk);
 					}
 					canvas.drawImage(fd.canvas, localPoint.x, localPoint.y);
 				}
@@ -4053,6 +4123,48 @@
 					canvas.strokeRect(localPoint.x, localPoint.y, 128, 128);
 				}
 			}
+		},
+		$cacheHeightMapForChunk: function(chunk) {
+			var md = chunk;
+			var posj1 = $OurSonic_Utility_Point.$ctor1(0, 0);
+			var canv = $OurSonic_Utility_CanvasInformation.create(128, 128);
+			var ctx = canv.context;
+			this.$engine.clear(canv);
+			for (var _y = 0; _y < 8; _y++) {
+				for (var _x = 0; _x < 8; _x++) {
+					var tp = md.tilePieces[_x][_y];
+					var solid = (this.sonicLevel.curHeightMap ? tp.solid1 : tp.solid2);
+					var hd = (this.sonicLevel.curHeightMap ? tp.getLayer1HeightMaps() : tp.getLayer2HeightMaps());
+					var __x = _x;
+					var __y = _y;
+					var vangle = 0;
+					var posm = $OurSonic_Utility_Point.$ctor1(posj1.x + __x * 16, posj1.y + __y * 16);
+					if (!hd) {
+						continue;
+					}
+					if (hd.get_full() === false) {
+					}
+					else if (hd.get_full() === true) {
+						if (solid > 0) {
+							ctx.fillStyle = $OurSonic_Level_HeightMap.colors[solid];
+							ctx.fillRect(posj1.x + __x * 16, posj1.y + __y * 16, 16, 16);
+						}
+					}
+					else {
+						vangle = (this.sonicLevel.curHeightMap ? tp.getLayer1Angles() : tp.getLayer2Angles());
+						hd.draw(ctx, posm, tp.xFlip, tp.yFlip, solid, vangle);
+						//   posm.x += 16 * scale.x / 2;
+						//   posm.y += 16 * scale.y / 2;
+						//   ctx.strokeStyle = "#DDD";
+						//   ctx.font = "18pt courier ";
+						//   ctx.shadowColor = "";
+						//   ctx.shadowBlur = 0;
+						//   ctx.lineWidth = 1;
+						//   ctx.strokeText(vangle.toString(16), posm.x - 12, posm.y + 7);
+					}
+				}
+			}
+			return this.spriteCache.heightMapChunks[(this.sonicLevel.curHeightMap ? 1 : 2) + ' ' + md.index] = canv;
 		},
 		$drawSonic: function(canvas) {
 			if (this.currentGameState === 0) {
@@ -4142,8 +4254,8 @@
 			}
 		},
 		$containsAnimatedTile: function(tile, sonLevel) {
-			for (var $t1 = 0; $t1 < sonLevel.animations.length; $t1++) {
-				var an = sonLevel.animations[$t1];
+			for (var $t1 = 0; $t1 < sonLevel.tileAnimations.length; $t1++) {
+				var an = sonLevel.tileAnimations[$t1];
 				var anin = an.animationTileIndex;
 				var num = an.numberOfTiles;
 				if (tile >= anin && tile < anin + num) {
@@ -4153,8 +4265,18 @@
 			return null;
 		},
 		clearCache: function() {
-			this.sonicLevel.clearCache();
-			this.spriteCache.clearCache();
+			if (ss.isValue(this.spriteCache)) {
+				this.spriteCache.clearCache();
+			}
+			if (ss.isValue(this.sonicLevel)) {
+				this.sonicLevel.clearCache();
+			}
+			if (ss.isValue(this.tilePaletteAnimationManager)) {
+				this.tilePaletteAnimationManager.clearCache();
+			}
+			if (ss.isValue(this.tileAnimationManager)) {
+				this.tileAnimationManager.clearCache();
+			}
 		},
 		mouseUp: function(queryEvent) {
 			this.$clicking = false;
@@ -4198,6 +4320,24 @@
 				}), (from.height - y) * 50);
 			}
 		},
+		cacheTiles: function() {
+			console.time('tileCache');
+			this.tilePaletteAnimationManager = new $OurSonic_TilePaletteAnimationManager(this);
+			this.tileAnimationManager = new $OurSonic_TileAnimationManager(this);
+			for (var $t1 = 0; $t1 < this.sonicLevel.tileChunks.length; $t1++) {
+				var chunk = this.sonicLevel.tileChunks[$t1];
+				chunk.initCache();
+				chunk.warmCache();
+			}
+			console.timeEnd('tileCache');
+			console.time('collisionCache');
+			for (var $t2 = 0; $t2 < this.sonicLevel.tileChunks.length; $t2++) {
+				var chunk1 = this.sonicLevel.tileChunks[$t2];
+				this.sonicToon.sensorManager.buildChunk(chunk1, false);
+				this.sonicToon.sensorManager.buildChunk(chunk1, true);
+			}
+			console.timeEnd('collisionCache');
+		},
 		loadObjects: function(objects) {
 			this.cachedObjects = {};
 			for (var $t1 = 0; $t1 < this.sonicLevel.objects.length; $t1++) {
@@ -4207,7 +4347,7 @@
 					t.setObjectData(this.cachedObjects[o.$]);
 					continue;
 				}
-				var d = Enumerable.from(objects).first(ss.mkdel({ o: o }, function(p) {
+				var d = OurSonicModels.Common.EnumerableExtensions.first$1(Object).call(null, objects, ss.mkdel({ o: o }, function(p) {
 					return ss.referenceEquals(p.key, this.o.$);
 				}));
 				if (!d) {
@@ -4321,7 +4461,7 @@
 			for (var $t1 = 0; $t1 < this.sonicLevel.objects.length; $t1++) {
 				var t = this.sonicLevel.objects[$t1];
 				var o = { $: t.key };
-				if (Enumerable.from(objectKeys).all(ss.mkdel({ o: o }, function(p) {
+				if (OurSonicModels.Common.EnumerableExtensions.all(String).call(null, objectKeys, ss.mkdel({ o: o }, function(p) {
 					return !ss.referenceEquals(p, this.o.$);
 				}))) {
 					ss.add(objectKeys, o.$);
@@ -4349,10 +4489,10 @@
 			}
 			var acs = this.sonicLevel.animatedChunks = [];
 			if (sonicLevel.AnimatedFiles) {
-				this.sonicLevel.animatedFiles = new Array(sonicLevel.AnimatedFiles.length);
+				this.sonicLevel.animatedTileFiles = new Array(sonicLevel.AnimatedFiles.length);
 				for (var animatedFileIndex = 0; animatedFileIndex < sonicLevel.AnimatedFiles.length; animatedFileIndex++) {
 					var animatedFile = sonicLevel.AnimatedFiles[animatedFileIndex];
-					this.sonicLevel.animatedFiles[animatedFileIndex] = new Array(animatedFile.length);
+					this.sonicLevel.animatedTileFiles[animatedFileIndex] = new Array(animatedFile.length);
 					for (var filePiece = 0; filePiece < animatedFile.length; filePiece++) {
 						var c = animatedFile[filePiece];
 						var tiles1 = c;
@@ -4370,9 +4510,9 @@
 							mfc1[n2 % 8][ss.Int32.div(n2, 8)] = mjc[n2];
 						}
 						var tile = new $OurSonic_Level_Tiles_Tile(mfc1);
-						tile.isAnimated = true;
+						tile.isTileAnimated = true;
 						tile.index = filePiece * 10000 + animatedFileIndex;
-						this.sonicLevel.animatedFiles[animatedFileIndex][filePiece] = tile;
+						this.sonicLevel.animatedTileFiles[animatedFileIndex][filePiece] = tile;
 					}
 				}
 			}
@@ -4396,14 +4536,14 @@
 				this.sonicLevel.tilePieces[j1] = mj1;
 			}
 			this.sonicLevel.angles = sonicLevel.Angles;
-			this.sonicLevel.animations = ss.arrayClone(sonicLevel.Animations.map(function(a) {
-				var $t4 = new $OurSonic_Level_Animations_Animation();
-				$t4.animationFile = a.AnimationFile;
+			this.sonicLevel.tileAnimations = ss.arrayClone(sonicLevel.Animations.map(function(a) {
+				var $t4 = new $OurSonic_Level_Animations_TileAnimationData();
+				$t4.animationTileFile = a.AnimationFile;
 				$t4.animationTileIndex = a.AnimationTileIndex;
 				$t4.automatedTiming = a.AutomatedTiming;
 				$t4.numberOfTiles = a.NumberOfTiles;
-				$t4.frames = a.Frames.map(function(b) {
-					var $t5 = new $OurSonic_Level_Animations_AnimationFrame();
+				$t4.dataFrames = a.Frames.map(function(b) {
+					var $t5 = new $OurSonic_Level_Animations_TileAnimationDataFrame();
 					$t5.ticks = b.Ticks;
 					$t5.startingTileIndex = b.StartingTileIndex;
 					return $t5;
@@ -4453,9 +4593,8 @@
 					$t6.yFlip = fc2[p2].YFlip;
 					$t7[$t8] = $t6;
 				}
-				this.sonicLevel.chunks[j2] = mj2;
-				mj2.animated = {};
-				//Help.Debugger();
+				this.sonicLevel.tileChunks[j2] = mj2;
+				mj2.tileAnimations = {};
 				for (var tpX = 0; tpX < mj2.tilePieces.length; tpX++) {
 					for (var tpY = 0; tpY < mj2.tilePieces[tpX].length; tpY++) {
 						var pm = mj2.tilePieces[tpX][tpY].getTilePiece();
@@ -4464,7 +4603,7 @@
 								var mjc1 = pm.tiles[$t9];
 								var fa = this.$containsAnimatedTile(mjc1._Tile, this.sonicLevel);
 								if (fa) {
-									mj2.animated[tpY * 8 + tpX] = fa;
+									mj2.tileAnimations[tpY * 8 + tpX] = fa;
 									acs[j2] = mj2;
 								}
 							}
@@ -4472,20 +4611,23 @@
 					}
 				}
 			}
-			this.sonicLevel.palette = sonicLevel.Palette.map(ss.mkdel(this, function(a1) {
-				return a1.map($OurSonic_SonicManager.$paletteToCanvas);
-			}));
+			this.sonicLevel.palette = sonicLevel.Palette.map(function(a1) {
+				return a1.map(function(b3) {
+					return b3;
+				});
+			});
 			this.sonicLevel.startPositions = sonicLevel.StartPositions.map(function(a2) {
 				return $OurSonic_Utility_Point.$ctor1(a2.X, a2.Y);
 			});
-			this.sonicLevel.paletteItems = [];
+			this.sonicLevel.animatedPalettes = [];
 			if (sonicLevel.PaletteItems.length > 0) {
-				this.sonicLevel.paletteItems[0] = [];
 				for (var k = 0; k < sonicLevel.PaletteItems[0].length; k++) {
 					var pal = sonicLevel.PaletteItems[0][k];
-					var $t12 = this.sonicLevel.paletteItems[0];
+					var $t12 = this.sonicLevel.animatedPalettes;
 					var $t10 = new $OurSonic_Level_PaletteItem();
-					$t10.palette = ss.cast(eval(pal.Palette), Array).map($OurSonic_SonicManager.$paletteToCanvas);
+					$t10.palette = ss.cast(eval(pal.Palette), Array).map(function(b4) {
+						return b4;
+					});
 					$t10.skipIndex = pal.SkipIndex;
 					$t10.totalLength = pal.TotalLength;
 					$t10.pieces = pal.Pieces.map(function(a3) {
@@ -4495,30 +4637,49 @@
 						$t11.paletteOffset = a3.PaletteOffset;
 						return $t11;
 					});
-					$t12[k] = $t10;
+					ss.add($t12, $t10);
 				}
 			}
 			for (var $t13 = 0; $t13 < this.sonicLevel.tilePieces.length; $t13++) {
-				var dj = this.sonicLevel.tilePieces[$t13];
-				dj.set_animatedFrames([]);
-				if (sonicLevel.PaletteItems.length > 0) {
-					for (var $t14 = 0; $t14 < dj.tiles.length; $t14++) {
-						var mj3 = dj.tiles[$t14];
+				var tilePiece = this.sonicLevel.tilePieces[$t13];
+				tilePiece.animatedPaletteIndexes = [];
+				tilePiece.set_animatedTileIndexes([]);
+				if (this.sonicLevel.animatedPalettes.length > 0) {
+					for (var $t14 = 0; $t14 < tilePiece.tiles.length; $t14++) {
+						var mj3 = tilePiece.tiles[$t14];
 						var tile1 = mj3.getTile();
 						if (tile1) {
-							tile1.animatedFrames = [];
+							tile1.animatedPaletteIndexes = [];
 							var pl = tile1.getAllPaletteIndexes();
-							for (var k1 = 0; k1 < this.sonicLevel.paletteItems[0].length; k1++) {
-								var pal1 = this.sonicLevel.paletteItems[0][k1];
+							tile1.paletteIndexesToBeAnimated = {};
+							tile1.animatedTileIndexes = [];
+							for (var tileAnimationIndex = 0; tileAnimationIndex < this.sonicLevel.tileAnimations.length; tileAnimationIndex++) {
+								var tileAnimationData = this.sonicLevel.tileAnimations[tileAnimationIndex];
+								var anin = tileAnimationData.animationTileIndex;
+								var num = tileAnimationData.numberOfTiles;
+								if (tile1.index >= anin && tile1.index < anin + num) {
+									ss.add(tilePiece.get_animatedTileIndexes(), tileAnimationIndex);
+									ss.add(tile1.animatedTileIndexes, tileAnimationIndex);
+								}
+							}
+							for (var animatedPaletteIndex = 0; animatedPaletteIndex < this.sonicLevel.animatedPalettes.length; animatedPaletteIndex++) {
+								var pal1 = this.sonicLevel.animatedPalettes[animatedPaletteIndex];
+								tile1.paletteIndexesToBeAnimated[animatedPaletteIndex] = [];
 								for (var $t15 = 0; $t15 < pal1.pieces.length; $t15++) {
 									var mjce = pal1.pieces[$t15];
 									var mje1 = { $: mjce };
 									if (mj3.palette === mje1.$.paletteIndex) {
-										if (Enumerable.from(pl).any(ss.mkdel({ mje1: mje1 }, function(j3) {
+										if (OurSonicModels.Common.EnumerableExtensions.any$1(ss.Int32).call(null, pl, ss.mkdel({ mje1: mje1 }, function(j3) {
 											return j3 === ss.Int32.div(this.mje1.$.paletteOffset, 2) || j3 === ss.Int32.div(this.mje1.$.paletteOffset, 2) + 1;
 										}))) {
-											ss.add(dj.get_animatedFrames(), k1);
-											ss.add(tile1.animatedFrames, k1);
+											ss.add(tilePiece.animatedPaletteIndexes, animatedPaletteIndex);
+											ss.add(tile1.animatedPaletteIndexes, animatedPaletteIndex);
+											for (var $t16 = 0; $t16 < pl.length; $t16++) {
+												var pIndex = pl[$t16];
+												if (pIndex === ss.Int32.div(mje1.$.paletteOffset, 2) || pIndex === ss.Int32.div(mje1.$.paletteOffset, 2) + 1) {
+													ss.add(tile1.paletteIndexesToBeAnimated[animatedPaletteIndex], pIndex);
+												}
+											}
 										}
 									}
 								}
@@ -4556,7 +4717,7 @@
 			//
 			//               
 			//
-			//        sonicManager.uiManager.modifyTC.tileChunk = sonicManager.SonicLevel.Chunks[0];
+			//        sonicManager.uiManager.modifyTC.tileChunk = sonicManager.SonicLevel.TileChunks[0];
 			// 
 			//
 			//               
@@ -4581,7 +4742,7 @@
 			//
 			//               
 			//
-			//        //        var inds = sonicManager.inds = { r:0,t: 0, tp: 0, tc: 0, total: (sonicManager.SonicLevel.Chunks.length * 2 + sonicManager.SonicLevel.TilePieces.length * 5 + sonicManager.SonicLevel.Tiles.length), done: false };
+			//        //        var inds = sonicManager.inds = { r:0,t: 0, tp: 0, tc: 0, total: (sonicManager.SonicLevel.TileChunks.length * 2 + sonicManager.SonicLevel.TilePieces.length * 5 + sonicManager.SonicLevel.Tiles.length), done: false };
 			// 
 			//
 			//               
@@ -4688,6 +4849,200 @@
 				}
 			}
 			mj.restore();
+		}
+	});
+	ss.initClass($OurSonic_TileAnimation, $asm, {
+		getCurrentFrame: function() {
+			return this.frames[this.currentFrame];
+		},
+		tick: function() {
+			var anni = this.animatedTileData;
+			if (ss.isNullOrUndefined(anni.lastAnimatedFrame)) {
+				anni.lastAnimatedFrame = 0;
+				anni.lastAnimatedIndex = 0;
+			}
+			if (anni.dataFrames[anni.lastAnimatedIndex].ticks === 0 || ss.Nullable$1.ge(ss.Nullable$1.sub($OurSonic_SonicManager.instance.drawTickCount, anni.lastAnimatedFrame), ((anni.automatedTiming > 0) ? anni.automatedTiming : anni.dataFrames[anni.lastAnimatedIndex].ticks))) {
+				anni.lastAnimatedFrame = $OurSonic_SonicManager.instance.drawTickCount;
+				anni.lastAnimatedIndex = (anni.lastAnimatedIndex + 1) % anni.dataFrames.length;
+				this.currentFrame = anni.lastAnimatedIndex;
+			}
+		},
+		init: function() {
+			for (var index = 0; index < this.animatedTileData.dataFrames.length; index++) {
+				this.frames[index] = new $OurSonic_TileAnimationFrame(index, this);
+			}
+		}
+	});
+	ss.initClass($OurSonic_TileAnimationFrame, $asm, {
+		get_animation: function() {
+			return this.$1$AnimationField;
+		},
+		set_animation: function(value) {
+			this.$1$AnimationField = value;
+		},
+		frameData: function() {
+			return this.get_animation().animatedTileData.dataFrames[this.frameIndex];
+		}
+	});
+	ss.initClass($OurSonic_TileAnimationManager, $asm, {
+		get_sonicManager: function() {
+			return this.$1$SonicManagerField;
+		},
+		set_sonicManager: function(value) {
+			this.$1$SonicManagerField = value;
+		},
+		$init: function() {
+			this.animations = {};
+			for (var animatedTileIndex = 0; animatedTileIndex < this.get_sonicManager().sonicLevel.tileAnimations.length; animatedTileIndex++) {
+				this.animations[animatedTileIndex] = new $OurSonic_TileAnimation(this, this.get_sonicManager().sonicLevel.tileAnimations[animatedTileIndex]);
+				this.animations[animatedTileIndex].init();
+			}
+		},
+		tickAnimatedTiles: function() {
+			var $t1 = new ss.ObjectEnumerator(this.animations);
+			try {
+				while ($t1.moveNext()) {
+					var animation = $t1.current();
+					var tilePaletteAnimation = animation.value;
+					tilePaletteAnimation.tick();
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+		},
+		clearCache: function() {
+			this.animations = null;
+		},
+		tickAnimatedPalettes: function() {
+			var $t1 = new ss.ObjectEnumerator(this.animations);
+			try {
+				while ($t1.moveNext()) {
+					var animation = $t1.current();
+					var tileAnimation = animation.value;
+					tileAnimation.tick();
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+		},
+		getCurrentFrame: function(tileAnimationIndex) {
+			return this.animations[tileAnimationIndex].getCurrentFrame();
+		}
+	});
+	ss.initClass($OurSonic_TilePaletteAnimation, $asm, {
+		getCurrentFrame: function() {
+			return this.frames[this.currentFrame];
+		},
+		tick: function() {
+			var pal = this.animatedPaletteData;
+			if (pal.skipIndex === 0) {
+				return;
+			}
+			if (pal.totalLength === 0) {
+				return;
+			}
+			//when to move to the next frame
+			for (var j = 0; j <= pal.totalLength; j += pal.skipIndex) {
+				if (this.manager.get_sonicManager().drawTickCount % (pal.totalLength + pal.skipIndex) === j) {
+					this.currentFrame = ss.Int32.div(j, pal.skipIndex);
+				}
+			}
+		},
+		init: function() {
+			var pal = this.animatedPaletteData;
+			if (pal.skipIndex === 0) {
+				return;
+			}
+			if (pal.totalLength === 0) {
+				return;
+			}
+			//when to move to the next frame
+			for (var j = 0; j <= pal.totalLength; j += pal.skipIndex) {
+				var frameIndex = ss.Int32.div(j, pal.skipIndex);
+				if (ss.isNullOrUndefined(this.frames[frameIndex])) {
+					this.frames[frameIndex] = new $OurSonic_TilePaletteAnimationFrame(frameIndex, this);
+				}
+			}
+		}
+	});
+	ss.initClass($OurSonic_TilePaletteAnimationFrame, $asm, {
+		get_animation: function() {
+			return this.$1$AnimationField;
+		},
+		set_animation: function(value) {
+			this.$1$AnimationField = value;
+		},
+		setPalette: function() {
+			var levelPalette = this.get_animation().manager.get_sonicManager().sonicLevel.palette;
+			this.$clonePalette(levelPalette);
+			var pal = this.get_animation().animatedPaletteData;
+			for (var index = 0; index < pal.pieces.length; index++) {
+				var palettePiece = pal.pieces[index];
+				var colorIndex = this.frameIndex + pal.pieces.length * index;
+				//todo ^^^this calc is suspected to be wrong
+				//could be: int colorIndex = FrameIndex * index + (pal.Pieces.Count)/*+ 0 + (palettePiece.PaletteMultiply)*/;
+				var replaceIndex = ss.Int32.div(palettePiece.paletteOffset, 2);
+				var color = pal.palette[colorIndex];
+				if (ss.isValue(color)) {
+					levelPalette[palettePiece.paletteIndex][replaceIndex] = color;
+				}
+				else {
+					levelPalette[palettePiece.paletteIndex][replaceIndex] = '#000000';
+				}
+			}
+		},
+		$clonePalette: function(levelPalette) {
+			this.$tempPalette = new Array(levelPalette.length);
+			for (var index = 0; index < levelPalette.length; index++) {
+				var canvasElements = levelPalette[index];
+				this.$tempPalette[index] = new Array(canvasElements.length);
+				for (var index2 = 0; index2 < canvasElements.length; index2++) {
+					this.$tempPalette[index][index2] = canvasElements[index2];
+				}
+			}
+		},
+		clearPalette: function() {
+			this.get_animation().manager.get_sonicManager().sonicLevel.palette = this.$tempPalette;
+			this.$tempPalette = null;
+		}
+	});
+	ss.initClass($OurSonic_TilePaletteAnimationManager, $asm, {
+		get_sonicManager: function() {
+			return this.$1$SonicManagerField;
+		},
+		set_sonicManager: function(value) {
+			this.$1$SonicManagerField = value;
+		},
+		$init: function() {
+			this.animations = {};
+			for (var animatedPaletteIndex = 0; animatedPaletteIndex < this.get_sonicManager().sonicLevel.animatedPalettes.length; animatedPaletteIndex++) {
+				this.animations[animatedPaletteIndex] = new $OurSonic_TilePaletteAnimation(this, this.get_sonicManager().sonicLevel.animatedPalettes[animatedPaletteIndex]);
+				this.animations[animatedPaletteIndex].init();
+			}
+		},
+		clearCache: function() {
+			this.animations = null;
+		},
+		tickAnimatedPalettes: function() {
+			var $t1 = new ss.ObjectEnumerator(this.animations);
+			try {
+				while ($t1.moveNext()) {
+					var animation = $t1.current();
+					var tilePaletteAnimation = animation.value;
+					tilePaletteAnimation.tick();
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+		},
+		getCurrentFrame: function(paletteAnimationIndex) {
+			return this.animations[paletteAnimationIndex].getCurrentFrame();
+		},
+		getPaletteAnimation: function(paletteAnimationIndex) {
+			return this.animations[paletteAnimationIndex];
 		}
 	});
 	ss.initClass($OurSonic_UIManager_Element, $asm, {
@@ -5074,6 +5429,7 @@
 			$OurSonic_Utility_Help.decodeString$1(OurSonicModels.SLData).call(null, data.Data, function(level) {
 				$OurSonic_UIManager_UIManager.updateTitle('Loading: ');
 				var sonicManager = $OurSonic_SonicManager.instance;
+				sonicManager.clearCache();
 				sonicManager.load(level);
 				sonicManager.windowLocation.x = 0;
 				sonicManager.windowLocation.y = 0;
@@ -5081,12 +5437,12 @@
 				sonicManager.bigWindowLocation.y = ss.Int32.trunc(sonicManager.windowLocation.y - sonicManager.windowLocation.height * 0.2);
 				sonicManager.bigWindowLocation.width = ss.Int32.trunc(sonicManager.windowLocation.width * 1.8);
 				sonicManager.bigWindowLocation.height = ss.Int32.trunc(sonicManager.windowLocation.height * 1.8);
-				sonicManager.clearCache();
 				if (sonicManager.currentGameState === 0) {
 					$OurSonic_SonicEngine.runGame();
 				}
 				//#if RELEASE
 				$OurSonic_SonicEngine.runGame();
+				sonicManager.cacheTiles();
 				//#endif
 			});
 		}
@@ -6237,19 +6593,15 @@
 	ss.initClass($OurSonic_Level_SonicImage, $asm, {});
 	ss.initClass($OurSonic_Level_SonicLevel, $asm, {
 		getChunkAt: function(x, y) {
-			return this.chunks[this.chunkMap[x][y]];
+			return this.tileChunks[this.chunkMap[x][y]];
 		},
 		clearCache: function() {
 			for (var $t1 = 0; $t1 < this.tiles.length; $t1++) {
 				var tile = this.tiles[$t1];
 				tile.clearCache();
 			}
-			for (var $t2 = 0; $t2 < this.tilePieces.length; $t2++) {
-				var tilePiece = this.tilePieces[$t2];
-				tilePiece.clearCache();
-			}
-			for (var $t3 = 0; $t3 < this.chunks.length; $t3++) {
-				var chunk = this.chunks[$t3];
+			for (var $t2 = 0; $t2 < this.tileChunks.length; $t2++) {
+				var chunk = this.tileChunks[$t2];
 				chunk.clearCache();
 			}
 		},
@@ -6276,18 +6628,18 @@
 		}
 	});
 	ss.initClass($OurSonic_Level_SpriteCacheIndexes, $asm, {});
-	ss.initClass($OurSonic_Level_Animations_Animation, $asm, {
-		getAnimationFile: function() {
-			return $OurSonic_SonicManager.instance.sonicLevel.animatedFiles[this.animationFile];
-		}
-	});
-	ss.initClass($OurSonic_Level_Animations_AnimationFrame, $asm, {});
 	ss.initClass($OurSonic_Level_Animations_AnimationInstance, $asm, {
 		tick: function() {
 		},
 		draw: function(canvas, i, i1) {
 		}
 	});
+	ss.initClass($OurSonic_Level_Animations_TileAnimationData, $asm, {
+		getAnimationFile: function() {
+			return $OurSonic_SonicManager.instance.sonicLevel.animatedTileFiles[this.animationTileFile];
+		}
+	});
+	ss.initClass($OurSonic_Level_Animations_TileAnimationDataFrame, $asm, {});
 	ss.initClass($OurSonic_Level_Events_LevelEvent, $asm, {});
 	ss.initClass($OurSonic_Level_Objects_LevelObject, $asm, {
 		init: function(object, level, sonic) {
@@ -6757,130 +7109,129 @@
 		init: function() {
 		}
 	});
+	ss.initEnum($OurSonic_Level_Tiles_ChunkLayer, $asm, { low: 0, high: 1 });
+	ss.initClass($OurSonic_Level_Tiles_PaletteAnimationCanvasFrame, $asm, {});
+	ss.initClass($OurSonic_Level_Tiles_PaletteAnimationCanvasFrames, $asm, {});
 	ss.initEnum($OurSonic_Level_Tiles_RotationMode, $asm, { floor: 134, rightWall: 224, ceiling: 314, leftWall: 44 });
 	ss.initClass($OurSonic_Level_Tiles_Tile, $asm, {
-		draw: function(canvas, pos, xflip, yflip, palette, animationFrame) {
-			if (this.$checkGood(canvas, pos, xflip, yflip, palette, animationFrame)) {
+		drawBase: function(canvas, pos, xflip, yflip, palette, isAnimatedTile) {
+			//we dont predraw animated tiles
+			if (ss.isValue(this.animatedTileIndexes) && (!isAnimatedTile && this.animatedTileIndexes.length > 0)) {
 				return;
 			}
-			var j;
-			if (ss.isNullOrUndefined(j = this.$getCached(palette, animationFrame, xflip, yflip))) {
-				var cx = this.colors.length;
-				var cy = this.colors.length;
-				j = $OurSonic_Utility_CanvasInformation.create(cx, cy);
+			var baseCacheIndex = this.$getBaseCacheIndex(xflip, yflip, palette);
+			var baseCache = this.$baseCaches[baseCacheIndex];
+			if (ss.isNullOrUndefined(baseCache)) {
+				var squareSize = this.colors.length;
+				var j;
+				j = $OurSonic_Utility_CanvasInformation.create(squareSize, squareSize);
 				if (pos.x < 0 || pos.y < 0) {
 					return;
 				}
 				var oPos = $OurSonic_Utility_Point.$ctor1(0, 0);
 				if (xflip) {
-					oPos.x = -this.colors.length;
+					oPos.x = -squareSize;
 					j.context.scale(-1, 1);
 				}
 				if (yflip) {
-					oPos.y = -this.colors.length;
+					oPos.y = -squareSize;
 					j.context.scale(1, -1);
 				}
 				var palette_ = $OurSonic_SonicManager.instance.sonicLevel.palette;
-				var mx = this.colors.length;
-				var my = this.colors[0].length;
-				var index_ = (palette + $OurSonic_SonicManager.instance.indexedPalette) % palette_.length;
+				var colorPaletteIndex = (palette + $OurSonic_SonicManager.instance.indexedPalette) % palette_.length;
 				var x = oPos.x;
 				var y = oPos.y;
-				for (var _x = 0; _x < mx; _x++) {
-					for (var _y = 0; _y < my; _y++) {
+				for (var _x = 0; _x < squareSize; _x++) {
+					for (var _y = 0; _y < squareSize; _y++) {
 						var colorIndex = this.colors[_x][_y];
 						if (colorIndex === 0) {
 							continue;
 						}
-						j.context.drawImage(palette_[index_][colorIndex], x + _x, y + _y);
+						j.context.fillStyle = palette_[colorPaletteIndex][colorIndex];
+						j.context.fillRect(x + _x, y + _y, 1, 1);
 					}
 				}
-				this.$setCached(j, palette, animationFrame, xflip, yflip);
+				this.$baseCaches[baseCacheIndex] = baseCache = j;
 			}
-			canvas.drawImage(j.canvas, pos.x, pos.y);
-			if (this.showOutline) {
-				canvas.strokeStyle = '#DD0033';
-				canvas.lineWidth = 3;
-				canvas.strokeRect(pos.x, pos.y, 8, 8);
+			canvas.drawImage(baseCache.canvas, pos.x, pos.y);
+		},
+		$getBaseCacheIndex: function(xflip, yflip, palette) {
+			return (palette << 6) + ((xflip ? 1 : 0) << 5) + ((yflip ? 1 : 0) << 4);
+		},
+		$getAnimatedPaletteCacheIndex: function(xflip, yflip, palette, animatedPaletteIndex, frameIndex) {
+			return (frameIndex << 8) + (animatedPaletteIndex << 7) + (palette << 6) + ((xflip ? 1 : 0) << 5) + ((yflip ? 1 : 0) << 4);
+		},
+		drawAnimatedPalette: function(canvas, pos, xflip, yflip, palette, animatedPaletteIndex, isAnimatedTile) {
+			//we dont predraw animated tiles
+			if (ss.isValue(this.animatedTileIndexes) && (!isAnimatedTile && this.animatedTileIndexes.length > 0)) {
+				return;
 			}
-		},
-		$getCached: function(palette, animationFrame, xflip, yflip) {
-			return null;
-			var mp = palette + ' ' + animationFrame + ' ' + xflip + ' ' + yflip + ' ';
-			if (ss.isValue(this.animatedFrames) && this.animatedFrames.length > 0) {
-				var paletteAnimations = $OurSonic_SonicManager.instance.sonicLevel.paletteAnimationIndexes;
-				for (var $t1 = 0; $t1 < this.animatedFrames.length; $t1++) {
-					var animatedFrame = this.animatedFrames[$t1];
-					mp += paletteAnimations[animatedFrame] + ' ';
+			var animatedPaletteCacheIndex = this.$getAnimatedPaletteCacheIndex(xflip, yflip, palette, animatedPaletteIndex, $OurSonic_SonicManager.instance.tilePaletteAnimationManager.getPaletteAnimation(animatedPaletteIndex).currentFrame);
+			var animatedPaletteCache = this.$animatedPaletteCaches[animatedPaletteCacheIndex];
+			if (ss.isNullOrUndefined(animatedPaletteCache)) {
+				var squareSize = this.colors.length;
+				var j;
+				j = $OurSonic_Utility_CanvasInformation.create(squareSize, squareSize);
+				if (pos.x < 0 || pos.y < 0) {
+					return;
 				}
-			}
-			return this.$_caches[mp];
-		},
-		$setCached: function(canvas, palette, animationFrame, xflip, yflip) {
-			return;
-			var mp = palette + ' ' + animationFrame + ' ' + xflip + ' ' + yflip + ' ';
-			if (ss.isValue(this.animatedFrames) && this.animatedFrames.length > 0) {
-				var paletteAnimations = $OurSonic_SonicManager.instance.sonicLevel.paletteAnimationIndexes;
-				for (var $t1 = 0; $t1 < this.animatedFrames.length; $t1++) {
-					var animatedFrame = this.animatedFrames[$t1];
-					mp += paletteAnimations[animatedFrame] + ' ';
+				var oPos = $OurSonic_Utility_Point.$ctor1(0, 0);
+				if (xflip) {
+					oPos.x = -squareSize;
+					j.context.scale(-1, 1);
 				}
-			}
-			this.$_caches[mp] = canvas;
-		},
-		shouldAnimate: function() {
-			return this.isAnimated && this.$canAnimate;
-		},
-		$checkGood: function(canvas, pos, xflip, yflip, palette, animationFrame) {
-			if (!this.isAnimated) {
-				if (!this.$canAnimate) {
-					return false;
+				if (yflip) {
+					oPos.y = -squareSize;
+					j.context.scale(1, -1);
 				}
-				var an = this.$willAnimate;
-				if (this.$willAnimate) {
-					var anin = an.animationTileIndex;
-					var ind = animationFrame;
-					var frame = an.frames[ind];
-					if (!frame) {
-						frame = an.frames[0];
-					}
-					var file = $OurSonic_SonicManager.instance.sonicLevel.animatedFiles[an.animationFile];
-					var va = file[frame.startingTileIndex + (this.index - anin)];
-					if (va) {
-						va.draw(canvas, pos, xflip, yflip, palette, animationFrame);
-						return true;
-					}
-					return false;
-				}
-				for (var $t1 = 0; $t1 < $OurSonic_SonicManager.instance.sonicLevel.animations.length; $t1++) {
-					var acn = $OurSonic_SonicManager.instance.sonicLevel.animations[$t1];
-					var anin1 = acn.animationTileIndex;
-					var num = acn.numberOfTiles;
-					if (this.index >= anin1 && this.index < anin1 + num) {
-						this.$willAnimate = acn;
-						var ind1 = animationFrame;
-						var frame1 = acn.frames[ind1];
-						if (!frame1) {
-							frame1 = acn.frames[0];
+				var palette_ = $OurSonic_SonicManager.instance.sonicLevel.palette;
+				var colorPaletteIndex = (palette + $OurSonic_SonicManager.instance.indexedPalette) % palette_.length;
+				var x = oPos.x;
+				var y = oPos.y;
+				for (var _x = 0; _x < squareSize; _x++) {
+					for (var _y = 0; _y < squareSize; _y++) {
+						var colorIndex = this.colors[_x][_y];
+						if (colorIndex === 0) {
+							continue;
 						}
-						var file1 = acn.getAnimationFile();
-						var va1 = file1[frame1.startingTileIndex + (this.index - anin1)];
-						if (va1) {
-							va1.draw(canvas, pos, xflip, yflip, palette, animationFrame);
-							return true;
+						if (OurSonicModels.Common.EnumerableExtensions.indexOfFast(this.paletteIndexesToBeAnimated[animatedPaletteIndex], colorIndex) === -1) {
+							continue;
 						}
+						j.context.fillStyle = palette_[colorPaletteIndex][colorIndex];
+						j.context.fillRect(x + _x, y + _y, 1, 1);
 					}
 				}
+				this.$animatedPaletteCaches[animatedPaletteCacheIndex] = animatedPaletteCache = j;
 			}
-			this.$canAnimate = false;
-			return false;
+			canvas.drawImage(animatedPaletteCache.canvas, pos.x, pos.y);
 		},
-		$changeColor: function(x, y, color) {
-			this.colors[x][y] = color;
-			this.sprites = [];
+		drawAnimatedTile: function(canvas, pos, xflip, yflip, palette, animatedTileIndex) {
+			if (OurSonicModels.Common.EnumerableExtensions.indexOfFast(this.animatedTileIndexes, animatedTileIndex) === -1) {
+				return;
+			}
+			var tileAnimationFrame = $OurSonic_SonicManager.instance.tileAnimationManager.getCurrentFrame(animatedTileIndex);
+			var tileAnimation = tileAnimationFrame.get_animation();
+			var tileAnimationData = tileAnimation.animatedTileData;
+			var animationIndex = tileAnimationData.animationTileIndex;
+			var frame = tileAnimationFrame.frameData();
+			if (!frame) {
+				frame = tileAnimation.animatedTileData.dataFrames[0];
+				//todo throw
+			}
+			var file = tileAnimationData.getAnimationFile();
+			var va = file[frame.startingTileIndex + (this.index - animationIndex)];
+			if (ss.isValue(va)) {
+				va.drawBase(canvas, pos, xflip, yflip, palette, true);
+			}
+			else {
+				//todo throw
+			}
+		},
+		shouldTileAnimate: function() {
+			return this.isTileAnimated && this.$canAnimate;
 		},
 		getAllPaletteIndexes: function() {
-			if (!this.curPaletteIndexes) {
+			if (ss.isNullOrUndefined(this.curPaletteIndexes)) {
 				var d = [];
 				for (var _x = 0; _x < this.colors.length; _x++) {
 					var color = this.colors[_x];
@@ -6889,7 +7240,7 @@
 						if (col.$ === 0) {
 							continue;
 						}
-						if (Enumerable.from(d).all(ss.mkdel({ col: col }, function(a) {
+						if (OurSonicModels.Common.EnumerableExtensions.all(ss.Int32).call(null, d, ss.mkdel({ col: col }, function(a) {
 							return a !== this.col.$;
 						}))) {
 							ss.add(d, col.$);
@@ -6904,48 +7255,44 @@
 			this.curPaletteIndexes = null;
 		}
 	});
+	ss.initClass($OurSonic_Level_Tiles_TileAnimationCanvasFrame, $asm, {});
+	ss.initClass($OurSonic_Level_Tiles_TileAnimationCanvasFrames, $asm, {});
 	ss.initClass($OurSonic_Level_Tiles_TileCacheBlock, $asm, {});
 	ss.initEnum($OurSonic_Level_Tiles_TileCacheBlockType, $asm, { block: 0, tilePiece: 1 });
 	ss.initClass($OurSonic_Level_Tiles_TileChunk, $asm, {
 		drawUI: function(canvas, position, scale, layer) {
-			var $t1 = new $OurSonic_Utility_CanvasHandler(canvas);
-			try {
+			canvas.save();
+			{
 				canvas.translate(position.x, position.y);
 				canvas.scale(scale.x, scale.y);
 				var pieceWidth = 16;
 				var pieceHeight = 16;
 				var isBack = layer === 0;
 				//for building no aniamtion cache
-				this.$drawOld(canvas, $OurSonic_Utility_Point.$ctor1(0, 0), layer, pieceWidth, pieceHeight, isBack, false, null, null);
+				//                drawTilePieces(canvas, new Point(0, 0), layer, pieceWidth, pieceHeight, isBack, false, null, null);
 			}
-			finally {
-				if (ss.isValue($t1)) {
-					$t1.dispose();
-				}
-			}
+			canvas.restore();
 		},
 		clearCache: function() {
-			this.$layerCacheBlocks = new Array(2);
-			this.$neverAnimateCache = new Array(2);
 		},
 		getBlockAt: function(x, y) {
-			return this.tilePieces[ss.Int32.div(x, 16)][ss.Int32.div(y, 16)].getTilePiece();
+			return this.tilePieces[ss.Int32.div(x, $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize)][ss.Int32.div(y, $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize)].getTilePiece();
 		},
 		setBlockAt: function(x, y, tp) {
-			if (this.tilePieces[ss.Int32.div(x, 16)][ss.Int32.div(y, 16)].setTilePiece(tp)) {
+			if (this.getTilePiece(x, y).setTilePiece(tp)) {
 				this.clearCache();
 			}
 		},
 		getTilePiece: function(x, y) {
-			return this.tilePieces[ss.Int32.div(x, 16)][ss.Int32.div(y, 16)];
+			return this.tilePieces[ss.Int32.div(x, $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize)][ss.Int32.div(y, $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize)];
 		},
 		onlyBackground: function() {
 			if (!ss.isValue(this.isOnlyBackground)) {
 				var tpl = this.tilePieces.length;
 				var tph = this.tilePieces[0].length;
-				for (var i = 0; i < tpl; i++) {
-					for (var j = 0; j < tph; j++) {
-						var tilePiece = this.tilePieces[i][j].getTilePiece();
+				for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceY++) {
+					for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceX++) {
+						var tilePiece = this.tilePieces[pieceX][pieceY].getTilePiece();
 						if (ss.isValue(tilePiece) && !tilePiece.onlyBackground()) {
 							return ss.unbox(this.isOnlyBackground = false);
 						}
@@ -6960,9 +7307,9 @@
 			if (!ss.isValue(this.isOnlyForeground)) {
 				var tpl = this.tilePieces.length;
 				var tph = this.tilePieces[0].length;
-				for (var i = 0; i < tpl; i++) {
-					for (var j = 0; j < tph; j++) {
-						var tilePiece = this.tilePieces[i][j].getTilePiece();
+				for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceY++) {
+					for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceX++) {
+						var tilePiece = this.tilePieces[pieceX][pieceY].getTilePiece();
 						if (ss.isValue(tilePiece) && !tilePiece.onlyForeground()) {
 							return ss.unbox(this.isOnlyForeground = false);
 						}
@@ -6977,9 +7324,9 @@
 			if (!ss.isValue(this.empty)) {
 				var tpl = this.tilePieces.length;
 				var tph = this.tilePieces[0].length;
-				for (var i = 0; i < tpl; i++) {
-					for (var j = 0; j < tph; j++) {
-						var r = this.tilePieces[i][j];
+				for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceY++) {
+					for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceX++) {
+						var r = this.tilePieces[pieceX][pieceY];
 						if (ss.isValue(r) && r.block !== 0) {
 							return ss.unbox(this.empty = false);
 						}
@@ -6989,262 +7336,303 @@
 			}
 			return ss.unbox(this.empty);
 		},
-		neverAnimates: function() {
-			var $state = 0, len1, len2, nothing, i, j, pm;
-			$sm1:
-			for (;;) {
-				switch ($state) {
-					case 0: {
-						if (!ss.isValue(this.$myNeverAnimate)) {
-							len1 = this.tilePieces.length;
-							len2 = this.tilePieces[0].length;
-							nothing = true;
-							for (i = 0; i < len1; i++) {
-								for (j = 0; j < len2; j++) {
-									pm = this.tilePieces[i][j].getTilePiece();
-									if (ss.isNullOrUndefined(pm)) {
-										continue;
-									}
-									if (this.animated && this.animated[j * len1 + i] || pm.get_animatedFrames().length > 0) {
-										nothing = false;
-										$state = 2;
-										continue $sm1;
-									}
+		$hasPixelAnimations: function() {
+			return this.$getAllPaletteAnimationIndexes().length > 0;
+		},
+		$hasTileAnimations: function() {
+			return this.$getAllTileAnimationIndexes().length > 0;
+		},
+		$getAllPaletteAnimationIndexes: function() {
+			if (ss.isNullOrUndefined(this.$paletteAnimationIndexes)) {
+				this.$paletteAnimationIndexes = [];
+				for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceY++) {
+					for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceX++) {
+						var piece = this.tilePieces[pieceX][pieceY].getTilePiece();
+						if (ss.isNullOrUndefined(piece)) {
+							continue;
+						}
+						if (ss.isNullOrUndefined(piece.animatedPaletteIndexes)) {
+							continue;
+						}
+						for (var $t1 = 0; $t1 < piece.animatedPaletteIndexes.length; $t1++) {
+							var animatedPaletteIndex = piece.animatedPaletteIndexes[$t1];
+							if (OurSonicModels.Common.EnumerableExtensions.indexOfFast(this.$paletteAnimationIndexes, animatedPaletteIndex) === -1) {
+								ss.add(this.$paletteAnimationIndexes, animatedPaletteIndex);
+							}
+						}
+					}
+				}
+			}
+			return this.$paletteAnimationIndexes;
+		},
+		$getAllTileAnimationIndexes: function() {
+			if (ss.isNullOrUndefined(this.$tileAnimationIndexes)) {
+				this.$tileAnimationIndexes = [];
+				for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceY++) {
+					for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceX++) {
+						var piece = this.tilePieces[pieceX][pieceY].getTilePiece();
+						if (ss.isNullOrUndefined(piece)) {
+							continue;
+						}
+						for (var $t1 = 0; $t1 < piece.tiles.length; $t1++) {
+							var tileInfo = piece.tiles[$t1];
+							var tile = tileInfo.getTile();
+							if (ss.isNullOrUndefined(tile)) {
+								continue;
+							}
+							if (ss.isNullOrUndefined(tile.animatedTileIndexes)) {
+								continue;
+							}
+							for (var $t2 = 0; $t2 < tile.animatedTileIndexes.length; $t2++) {
+								var animatedTileIndex = tile.animatedTileIndexes[$t2];
+								if (OurSonicModels.Common.EnumerableExtensions.indexOfFast(this.$tileAnimationIndexes, animatedTileIndex) === -1) {
+									ss.add(this.$tileAnimationIndexes, animatedTileIndex);
 								}
 							}
-							$state = 2;
-							continue $sm1;
 						}
-						$state = 1;
-						continue $sm1;
-					}
-					case 2: {
-						this.$myNeverAnimate = nothing;
-						$state = 1;
-						continue $sm1;
-					}
-					case 1: {
-						return ss.unbox(this.$myNeverAnimate);
-					}
-					default: {
-						break $sm1;
 					}
 				}
 			}
+			return this.$tileAnimationIndexes;
+		},
+		neverAnimates: function() {
+			return !this.$hasTileAnimations() || !this.$hasPixelAnimations();
+		},
+		initCache: function() {
+			this.$baseCanvasCache = new (ss.makeGenericType($OurSonic_Level_Tiles_ChunkLayer$1, [$OurSonic_Utility_CanvasInformation]))();
+			this.$paletteAnimationCanvasesCache = new (ss.makeGenericType($OurSonic_Level_Tiles_ChunkLayer$1, [Object]))();
+			this.$tileAnimationCanvasesCache = new (ss.makeGenericType($OurSonic_Level_Tiles_ChunkLayer$1, [Object]))();
+			this.$tileAnimationCanvasesCache.set_item(0, {});
+			this.$tileAnimationCanvasesCache.set_item(1, {});
+			this.$paletteAnimationCanvasesCache.set_item(0, {});
+			this.$paletteAnimationCanvasesCache.set_item(1, {});
+		},
+		warmCache: function() {
+			this.cacheBase(0);
+			this.cacheBase(1);
+			if (this.$hasPixelAnimations()) {
+				this.cachePaletteAnimation(0);
+				this.cachePaletteAnimation(1);
+			}
+			if (this.$hasTileAnimations()) {
+				this.cacheTileAnimation(0);
+				this.cacheTileAnimation(1);
+			}
+		},
+		cachePaletteAnimation: function(layer) {
+			var paletteAnimationCanvases = this.$paletteAnimationCanvasesCache.get_item(layer);
+			var $t1 = this.$getAllPaletteAnimationIndexes();
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var paletteAnimationIndex = $t1[$t2];
+				var rect = this.$getAnimationPaletteSurfaceInformation(paletteAnimationIndex, layer);
+				if (ss.isNullOrUndefined(rect)) {
+					continue;
+				}
+				var paletteAnimationCanvasFrames = paletteAnimationCanvases[paletteAnimationIndex] = new $OurSonic_Level_Tiles_PaletteAnimationCanvasFrames(paletteAnimationIndex);
+				var tilePaletteAnimation = $OurSonic_SonicManager.instance.tilePaletteAnimationManager.animations[paletteAnimationIndex];
+				paletteAnimationCanvasFrames.position = $OurSonic_Utility_Point.$ctor1(rect.x * $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize, rect.y * $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize);
+				for (var $t3 = 0; $t3 < tilePaletteAnimation.frames.length; $t3++) {
+					var currentFrame = tilePaletteAnimation.frames[$t3];
+					tilePaletteAnimation.currentFrame = currentFrame.frameIndex;
+					var paletteAnimationCanvasFrame = paletteAnimationCanvasFrames.frames[currentFrame.frameIndex] = new $OurSonic_Level_Tiles_PaletteAnimationCanvasFrame();
+					currentFrame.setPalette();
+					var tilePaletteCanvas = $OurSonic_Utility_CanvasInformation.create(rect.width * $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize, rect.height * $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize);
+					paletteAnimationCanvasFrame.canvas = tilePaletteCanvas;
+					paletteAnimationCanvasFrame.canvas.context.save();
+					paletteAnimationCanvasFrame.canvas.context.translate(-rect.x * $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize, -rect.y * $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize);
+					this.$drawTilePiecesAnimatedPalette(tilePaletteCanvas.context, layer, $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize, paletteAnimationIndex);
+					paletteAnimationCanvasFrame.canvas.context.restore();
+					currentFrame.clearPalette();
+				}
+				tilePaletteAnimation.currentFrame = 0;
+			}
+		},
+		cacheTileAnimation: function(layer) {
+			var tileAnimationCanvases = this.$tileAnimationCanvasesCache.get_item(layer);
+			var $t1 = this.$getAllTileAnimationIndexes();
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var tileAnimationIndex = $t1[$t2];
+				var rect = this.$getAnimationTileSurfaceInformation(tileAnimationIndex, layer);
+				if (ss.isNullOrUndefined(rect)) {
+					continue;
+				}
+				var tileAnimationCanvasFrames = tileAnimationCanvases[tileAnimationIndex] = new $OurSonic_Level_Tiles_TileAnimationCanvasFrames(tileAnimationIndex);
+				var tileAnimation = $OurSonic_SonicManager.instance.tileAnimationManager.animations[tileAnimationIndex];
+				tileAnimationCanvasFrames.position = $OurSonic_Utility_Point.$ctor1(rect.x * $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize, rect.y * $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize);
+				for (var $t3 = 0; $t3 < tileAnimation.frames.length; $t3++) {
+					var currentFrame = tileAnimation.frames[$t3];
+					var tileAnimationCanvasFrame = tileAnimationCanvasFrames.frames[currentFrame.frameIndex] = new $OurSonic_Level_Tiles_TileAnimationCanvasFrame();
+					var tileTileCanvas = $OurSonic_Utility_CanvasInformation.create(rect.width * $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize, rect.height * $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize);
+					tileAnimationCanvasFrame.canvas = tileTileCanvas;
+					tileAnimation.currentFrame = currentFrame.frameIndex;
+					tileAnimationCanvasFrame.canvas.context.save();
+					tileAnimationCanvasFrame.canvas.context.translate(-rect.x * $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize, -rect.y * $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize);
+					this.$drawTilePiecesAnimatedTile(tileTileCanvas.context, layer, $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize, tileAnimationIndex);
+					tileAnimationCanvasFrame.canvas.context.restore();
+				}
+				tileAnimation.currentFrame = 0;
+			}
+		},
+		$getAnimationTileSurfaceInformation: function(tileAnimationIndex, layer) {
+			var lowestX = 2147483647;
+			var highestX = -2147483648;
+			var lowestY = 2147483647;
+			var highestY = -2147483648;
+			for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceY++) {
+				for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceX++) {
+					var pieceInfo = this.tilePieces[pieceX][pieceY];
+					var piece = pieceInfo.getTilePiece();
+					if (ss.isNullOrUndefined(piece)) {
+						continue;
+					}
+					if (((layer === 0) ? piece.onlyForeground() : piece.onlyBackground())) {
+						continue;
+					}
+					if (OurSonicModels.Common.EnumerableExtensions.indexOfFast(piece.get_animatedTileIndexes(), tileAnimationIndex) === -1) {
+						continue;
+					}
+					if (pieceX < lowestX) {
+						lowestX = pieceX;
+					}
+					if (pieceX > highestX) {
+						highestX = pieceX;
+					}
+					if (pieceY < lowestY) {
+						lowestY = pieceY;
+					}
+					if (pieceY > highestY) {
+						highestY = pieceY;
+					}
+				}
+			}
+			if (lowestX === 2147483647) {
+				return null;
+			}
+			return $OurSonic_Utility_Rectangle.$ctor1(lowestX, lowestY, highestX - lowestX + 1, highestY - lowestY + 1);
+		},
+		$getAnimationPaletteSurfaceInformation: function(paletteAnimationIndex, layer) {
+			var lowestX = 2147483647;
+			var highestX = -2147483648;
+			var lowestY = 2147483647;
+			var highestY = -2147483648;
+			for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceY++) {
+				for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceX++) {
+					var piece = this.tilePieces[pieceX][pieceY].getTilePiece();
+					if (ss.isNullOrUndefined(piece)) {
+						continue;
+					}
+					if (((layer === 0) ? piece.onlyForeground() : piece.onlyBackground())) {
+						continue;
+					}
+					if (OurSonicModels.Common.EnumerableExtensions.indexOfFast(piece.animatedPaletteIndexes, paletteAnimationIndex) === -1) {
+						continue;
+					}
+					if (pieceX < lowestX) {
+						lowestX = pieceX;
+					}
+					if (pieceX > highestX) {
+						highestX = pieceX;
+					}
+					if (pieceY < lowestY) {
+						lowestY = pieceY;
+					}
+					if (pieceY > highestY) {
+						highestY = pieceY;
+					}
+				}
+			}
+			if (lowestX === 2147483647) {
+				return null;
+			}
+			return $OurSonic_Utility_Rectangle.$ctor1(lowestX, lowestY, highestX - lowestX + 1, highestY - lowestY + 1);
+		},
+		cacheBase: function(layer) {
+			this.$baseCanvasCache.set_item(layer, $OurSonic_Utility_CanvasInformation.create(128, 128));
+			this.$drawTilePiecesBase(this.$baseCanvasCache.get_item(layer).context, layer, $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize);
 		},
 		draw: function(canvas, position, layer) {
-			var neverAnimates = this.neverAnimates();
-			if (ss.isNullOrUndefined(this.$layerCacheBlocks[layer])) {
-				this.$layerCacheBlocks[layer] = this.buildCacheBlock(layer);
-			}
+			canvas.save();
 			{
-				var $t3 = new $OurSonic_Utility_CanvasHandler(canvas);
-				try {
-					if (ss.isValue(this.$neverAnimateCache[layer])) {
-						this.$drawFullChunk(canvas, position, layer);
-						return;
-					}
-					var oldCanvas = null;
-					var oldPoint = null;
-					var pieceWidth = 16;
-					var pieceHeight = 16;
-					var isBack = layer === 0;
-					if (neverAnimates) {
-						oldCanvas = canvas;
-						this.$neverAnimateCache[layer] = $OurSonic_Utility_CanvasInformation.create($OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide * pieceWidth, $OurSonic_Level_Tiles_TileChunk.$numOfPiecesLong * pieceHeight);
-						canvas = this.$neverAnimateCache[layer].context;
-						oldPoint = $OurSonic_Utility_Point.$ctor(position);
-						$OurSonic_Utility_Point.set(position, 0, 0);
-						//for building no aniamtion cache
-						this.$drawOld(canvas, position, layer, pieceWidth, pieceHeight, isBack, neverAnimates, oldPoint, oldCanvas);
-						return;
-					}
-					var $t1 = this.$layerCacheBlocks[layer];
+				canvas.drawImage(this.$baseCanvasCache.get_item(layer).canvas, position.x, position.y);
+				if (this.$hasPixelAnimations()) {
+					var paletteAnimationCanvases = this.$paletteAnimationCanvasesCache.get_item(layer);
+					var $t1 = this.$getAllPaletteAnimationIndexes();
 					for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-						var tileCacheBlock = $t1[$t2];
-						switch (tileCacheBlock.type) {
-							case 0: {
-								this.$drawBlock(canvas, position, tileCacheBlock);
-								break;
-							}
-							case 1: {
-								this.$drawTilePiece(canvas, position, layer, tileCacheBlock, isBack);
-								break;
-							}
+						var paletteAnimationIndex = $t1[$t2];
+						var paletteAnimationCanvasFrames = paletteAnimationCanvases[paletteAnimationIndex];
+						if (ss.isNullOrUndefined(paletteAnimationCanvasFrames)) {
+							continue;
 						}
+						var currentFrame = $OurSonic_SonicManager.instance.tilePaletteAnimationManager.getCurrentFrame(paletteAnimationIndex);
+						var paletteAnimationCanvasFrame = paletteAnimationCanvasFrames.frames[currentFrame.frameIndex];
+						var canvasLayerToDraw = paletteAnimationCanvasFrame.canvas.canvas;
+						canvas.drawImage(canvasLayerToDraw, position.x + paletteAnimationCanvasFrames.position.x, position.y + paletteAnimationCanvasFrames.position.y);
 					}
 				}
-				finally {
-					if (ss.isValue($t3)) {
-						$t3.dispose();
-					}
-				}
-			}
-		},
-		$drawOld: function(canvas, position, layer, pieceWidth, pieceHeight, isBack, neverAnimates, oldPoint, oldCanvas) {
-			var posX = position.x;
-			var posY = position.y;
-			var curKey = 0;
-			//pieceY * numOfPiecesWide + pieceX              VV
-			for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$numOfPiecesLong; pieceY++) {
-				curKey = pieceY * $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide;
-				for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide; pieceX++) {
-					curKey += pieceX;
-					this.$drawIt(canvas, layer, this.tilePieces[pieceX][pieceY], isBack, curKey, posX + pieceX * pieceWidth, posY + pieceY * pieceHeight);
-				}
-			}
-			if (neverAnimates) {
-				position = oldPoint;
-				canvas = oldCanvas;
-				canvas.drawImage(this.$neverAnimateCache[layer].canvas, position.x, position.y);
-			}
-		},
-		$drawTilePiece: function(canvas, position, layer, tileCacheBlock, isBack) {
-			this.$drawIt(canvas, layer, tileCacheBlock.tilePieceInfo, isBack, tileCacheBlock.animatedKey, position.x + tileCacheBlock.xPos, position.y + tileCacheBlock.yPos);
-			//
-			//                        canvas.Save();
-			//
-			//                        canvas.StrokeStyle = "green";
-			//
-			//                        canvas.StrokeRect(position.X * scale.X * pieceWidth, position.Y * scale.Y * pieceHeight, 16 * scale.X, 16 * scale.Y);
-			//
-			//                        canvas.Restore();
-		},
-		$drawBlock: function(canvas, position, tileCacheBlock) {
-			canvas.drawImage(tileCacheBlock.block.canvas, position.x, position.y);
-			var areas = $OurSonic_SonicManager.instance.uiManager.get_uiManagerAreas();
-			if (ss.isValue(areas.tileChunkArea) && ss.isValue(areas.tileChunkArea.data) && areas.tileChunkArea.data.index === this.index) {
-				canvas.save();
-				canvas.strokeStyle = 'yellow';
-				canvas.lineWidth = 2;
-				canvas.strokeRect(position.x, position.y, tileCacheBlock.block.canvas.width, tileCacheBlock.block.canvas.height);
-				canvas.restore();
-			}
-		},
-		$drawFullChunk: function(canvas, position, layer) {
-			canvas.drawImage(this.$neverAnimateCache[layer].canvas, position.x, position.y);
-			var areas = $OurSonic_SonicManager.instance.uiManager.get_uiManagerAreas();
-			if (ss.isValue(areas.tileChunkArea) && ss.isValue(areas.tileChunkArea.data) && areas.tileChunkArea.data.index === this.index) {
-				canvas.save();
-				canvas.strokeStyle = 'yellow';
-				canvas.lineWidth = 2;
-				canvas.strokeRect(position.x, position.y, this.$neverAnimateCache[layer].canvas.width, this.$neverAnimateCache[layer].canvas.height);
-				canvas.restore();
-			}
-			//
-			//                        canvas.Save();
-			//
-			//                        canvas.StrokeStyle = "red";
-			//
-			//                        canvas.StrokeRect(position.X, position.Y, 128 , 128);
-			//
-			//                        canvas.Restore();
-		},
-		$drawIt: function(canvas, layer, pieceInfo, isBack, animatedKey, pointx, pointy) {
-			var piece = pieceInfo.getTilePiece();
-			if ((isBack ? piece.onlyForeground() : piece.onlyBackground())) {
-				return;
-			}
-			var animatedIndex = 0;
-			var animation = this.animated[animatedKey];
-			if (this.animated && animation) {
-				animatedIndex = animation.lastAnimatedIndex;
-			}
-			this.$myLocalPoint.x = pointx;
-			this.$myLocalPoint.y = pointy;
-			piece.draw(canvas, this.$myLocalPoint, layer, pieceInfo.xFlip, pieceInfo.yFlip, animatedIndex);
-			//canvas.StrokeStyle = "#FFF";
-			//canvas.StrokeRect(position.X + pieceX * 16 * scale.X, position.Y + pieceY * 16 * scale.Y, scale.X * 16, scale.Y * 16);
-		},
-		buildCacheBlock: function(layer) {
-			var tilePieces = [];
-			var block = null;
-			if (ss.isValue(this.$neverAnimateCache[layer])) {
-				return [];
-			}
-			var pieceWidth = 16;
-			var pieceHeight = 16;
-			if (this.neverAnimates()) {
-				return [];
-			}
-			var isBack = layer === 0;
-			for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide; pieceX++) {
-				for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$numOfPiecesLong; pieceY++) {
-					var cacheBlock = this.$buildCacheBlock(layer, pieceWidth, pieceHeight, this.tilePieces[pieceX][pieceY], isBack, pieceX, pieceY, block);
-					switch (cacheBlock.type) {
-						case 0: {
-							block = cacheBlock;
-							break;
+				if (this.$hasTileAnimations()) {
+					var tileAnimationCanvases = this.$tileAnimationCanvasesCache.get_item(layer);
+					var $t3 = this.$getAllTileAnimationIndexes();
+					for (var $t4 = 0; $t4 < $t3.length; $t4++) {
+						var tileAnimationIndex = $t3[$t4];
+						var tileAnimationCanvasFrames = tileAnimationCanvases[tileAnimationIndex];
+						if (ss.isNullOrUndefined(tileAnimationCanvasFrames)) {
+							continue;
 						}
-						case 1: {
-							ss.add(tilePieces, cacheBlock);
-							break;
-						}
+						var currentFrame1 = $OurSonic_SonicManager.instance.tileAnimationManager.getCurrentFrame(tileAnimationIndex);
+						var tileAnimationCanvasFrame = tileAnimationCanvasFrames.frames[currentFrame1.frameIndex];
+						var canvasLayerToDraw1 = tileAnimationCanvasFrame.canvas.canvas;
+						canvas.drawImage(canvasLayerToDraw1, position.x + tileAnimationCanvasFrames.position.x, position.y + tileAnimationCanvasFrames.position.y);
 					}
 				}
 			}
-			var tileCacheBlocks = ss.arrayClone(tilePieces);
-			if (ss.isValue(block)) {
-				ss.add(tileCacheBlocks, block);
-			}
-			return tileCacheBlocks;
+			canvas.restore();
 		},
-		$buildCacheBlock: function(layer, pieceWidth, pieceHeight, pieceInfo, isBack, pieceX, pieceY, oldCacheBlock) {
-			//if (isBack ? (piece.onlyForeground) : (piece.onlyBackground)) return null;
-			var piece = pieceInfo.getTilePiece();
-			if (ss.isNullOrUndefined(piece)) {
-				return oldCacheBlock;
-			}
-			var animatedIndex = 0;
-			var animation = this.animated[pieceY * $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide + pieceX];
-			var cacheBlockNeeded = false;
-			var shouldAnimate = piece.shouldAnimate();
-			if (this.animated && animation) {
-				animatedIndex = animation.lastAnimatedIndex;
-			}
-			else if (piece.get_animatedFrames().length === 0 && (!shouldAnimate || ss.unbox(this.$myNeverAnimate))) {
-				cacheBlockNeeded = true;
-			}
-			if (cacheBlockNeeded) {
-				var internalPoint = $OurSonic_Utility_Point.$ctor1(pieceX * pieceWidth, pieceY * pieceHeight);
-				if (ss.isNullOrUndefined(oldCacheBlock)) {
-					oldCacheBlock = $OurSonic_Level_Tiles_TileCacheBlock.$ctor(0);
-					oldCacheBlock.block = $OurSonic_Utility_CanvasInformation.create(pieceWidth * 8, pieceHeight * 8);
+		$drawTilePiecesAnimatedPalette: function(canvas, layer, piecesSquareSize, animatedPaletteIndex) {
+			for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceY++) {
+				for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceX++) {
+					var pieceInfo = this.tilePieces[pieceX][pieceY];
+					var piece = pieceInfo.getTilePiece();
+					if (OurSonicModels.Common.EnumerableExtensions.indexOfFast(piece.animatedPaletteIndexes, animatedPaletteIndex) === -1) {
+						continue;
+					}
+					if (((layer === 0) ? piece.onlyForeground() : piece.onlyBackground())) {
+						continue;
+					}
+					this.$myLocalPoint.x = pieceX * piecesSquareSize;
+					this.$myLocalPoint.y = pieceY * piecesSquareSize;
+					piece.drawAnimatedPalette(canvas, this.$myLocalPoint, layer, pieceInfo.xFlip, pieceInfo.yFlip, animatedPaletteIndex);
 				}
-				oldCacheBlock.block.context.save();
-				piece.draw(oldCacheBlock.block.context, internalPoint, layer, pieceInfo.xFlip, pieceInfo.yFlip, animatedIndex);
-				//                oldCacheBlock.Block.Context.FillStyle = oldCacheBlock.Color;
-				//                oldCacheBlock.Block.Context.FillRect(internalPoint.X, internalPoint.Y, 16 * scale.X, 16 * scale.Y);
-				oldCacheBlock.block.context.restore();
-				return oldCacheBlock;
-			}
-			else {
-				var $t1 = $OurSonic_Level_Tiles_TileCacheBlock.$ctor(1);
-				$t1.tilePieceInfo = pieceInfo;
-				$t1.xPos = pieceX * pieceWidth;
-				$t1.yPos = pieceY * pieceHeight;
-				$t1.animatedKey = pieceY * $OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide + pieceX;
-				return $t1;
 			}
 		},
-		animatedTick: function() {
-			var $t1 = new ss.ObjectEnumerator(this.animated);
-			try {
-				while ($t1.moveNext()) {
-					var an = $t1.current();
-					var anni = an.value;
-					if (!anni.lastAnimatedFrame) {
-						anni.lastAnimatedFrame = 0;
-						anni.lastAnimatedIndex = 0;
+		$drawTilePiecesAnimatedTile: function(canvas, layer, piecesSquareSize, animatedTileIndex) {
+			for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceY++) {
+				for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceX++) {
+					var pieceInfo = this.tilePieces[pieceX][pieceY];
+					var piece = pieceInfo.getTilePiece();
+					if (OurSonicModels.Common.EnumerableExtensions.indexOfFast(piece.get_animatedTileIndexes(), animatedTileIndex) === -1) {
+						continue;
 					}
-					if (anni.frames[anni.lastAnimatedIndex].ticks === 0 || ss.Nullable$1.ge(ss.Nullable$1.sub($OurSonic_SonicManager.instance.drawTickCount, anni.lastAnimatedFrame), ((anni.automatedTiming > 0) ? anni.automatedTiming : anni.frames[anni.lastAnimatedIndex].ticks))) {
-						anni.lastAnimatedFrame = $OurSonic_SonicManager.instance.drawTickCount;
-						anni.lastAnimatedIndex = (anni.lastAnimatedIndex + 1) % anni.frames.length;
+					if (((layer === 0) ? piece.onlyForeground() : piece.onlyBackground())) {
+						continue;
 					}
+					this.$myLocalPoint.x = pieceX * piecesSquareSize;
+					this.$myLocalPoint.y = pieceY * piecesSquareSize;
+					piece.drawAnimatedTile(canvas, this.$myLocalPoint, layer, pieceInfo.xFlip, pieceInfo.yFlip, animatedTileIndex);
 				}
 			}
-			finally {
-				$t1.dispose();
+		},
+		$drawTilePiecesBase: function(canvas, layer, piecesSquareSize) {
+			for (var pieceY = 0; pieceY < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceY++) {
+				for (var pieceX = 0; pieceX < $OurSonic_Level_Tiles_TileChunk.$tilePieceSize; pieceX++) {
+					var pieceInfo = this.tilePieces[pieceX][pieceY];
+					var piece = pieceInfo.getTilePiece();
+					if (((layer === 0) ? piece.onlyForeground() : piece.onlyBackground())) {
+						continue;
+					}
+					this.$myLocalPoint.x = pieceX * piecesSquareSize;
+					this.$myLocalPoint.y = pieceY * piecesSquareSize;
+					piece.drawBase(canvas, this.$myLocalPoint, layer, pieceInfo.xFlip, pieceInfo.yFlip);
+				}
 			}
 		}
 	});
@@ -7254,18 +7642,15 @@
 		}
 	});
 	ss.initClass($OurSonic_Level_Tiles_TilePiece, $asm, {
-		get_animatedFrames: function() {
-			return this.$1$AnimatedFramesField;
+		get_animatedTileIndexes: function() {
+			return this.$1$AnimatedTileIndexesField;
 		},
-		set_animatedFrames: function(value) {
-			this.$1$AnimatedFramesField = value;
+		set_animatedTileIndexes: function(value) {
+			this.$1$AnimatedTileIndexesField = value;
 		},
 		init: function() {
 			this.onlyBackground();
 			this.onlyForeground();
-		},
-		clearCache: function() {
-			this.image = {};
 		},
 		onlyBackground: function() {
 			if (this.$onlyBackgroundSet) {
@@ -7302,135 +7687,110 @@
 		draw: function(canvas, position, layer, xFlip, yFlip, animatedIndex) {
 			var drawOrderIndex = 0;
 			drawOrderIndex = (xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3));
-			//
-			//
-			//
-			//
-			//            var i = 0;
-			//
-			//
-			//
-			//
-			//            
-			//
-			//
-			//
-			//
-			//            var localPoint=new Point(0,0);
-			//
-			//
-			//
-			//
-			//            
-			//
-			//
-			//
-			//
-			//            
-			//
-			//
-			//
-			//
-			//            foreach (TileItem t in Tiles.Array())
-			//
-			//
-			//
-			//
-			//            {
-			//
-			//
-			//
-			//
-			//            var mj = t;
-			//
-			//
-			//
-			//
-			//            var tile = t.GetTile();
-			//
-			//
-			//
-			//
-			//            if (tile.Truthy())
-			//
-			//
-			//
-			//
-			//            {
-			//
-			//
-			//
-			//
-			//            if (mj.Priority == (layer == 1))
-			//
-			//
-			//
-			//
-			//            {
-			//
-			//
-			//
-			//
-			//            var _xf = xFlip ^ mj.XFlip;
-			//
-			//
-			//
-			//
-			//            var _yf = yFlip ^ mj.YFlip;
-			//
-			//
-			//
-			//
-			//            var df = DrawInfo[DrawOrder[drawOrderIndex][i]];
-			//
-			//
-			//
-			//
-			//            localPoint.X = position.X+ df[0] * 8;
-			//
-			//
-			//
-			//
-			//            localPoint.Y = position.Y + df[1] * 8;
-			//
-			//
-			//
-			//
-			//            tile.Draw(canvas, localPoint, _xf, _yf, mj.Palette,  animatedIndex);
-			//
-			//
-			//
-			//
-			//            }
-			//
-			//
-			//
-			//
-			//            }
-			//
-			//
-			//
-			//
-			//            i++;
-			//
-			//
-			//
-			//
-			//            }
-			var fd = this.$getCache(layer, drawOrderIndex, animatedIndex);
-			if (!fd) {
-				fd = this.$buildCache(layer, xFlip, yFlip, animatedIndex, drawOrderIndex);
+			var tilePieceLength = 8;
+			var ac = $OurSonic_Utility_CanvasInformation.create(tilePieceLength * 2, tilePieceLength * 2);
+			var i = 0;
+			var localPoint = $OurSonic_Utility_Point.$ctor1(0, 0);
+			for (var $t1 = 0; $t1 < this.tiles.length; $t1++) {
+				var tileItem = this.tiles[$t1];
+				var tile = tileItem.getTile();
+				if (tile) {
+					if (tileItem.priority === (layer === 1)) {
+						var _xf = xFlip ^ tileItem.xFlip;
+						var _yf = yFlip ^ tileItem.yFlip;
+						var df = $OurSonic_Level_Tiles_TilePiece.$drawInfo[$OurSonic_Level_Tiles_TilePiece.$drawOrder[drawOrderIndex][i]];
+						localPoint.x = df[0] * tilePieceLength;
+						localPoint.y = df[1] * tilePieceLength;
+						tile.drawAnimatedPalette(ac.context, localPoint, _xf, _yf, tileItem.palette, animatedIndex, false);
+					}
+				}
+				i++;
 			}
-			this.$drawIt(canvas, fd, position);
+			this.$drawIt(canvas, ac.canvas, position);
+			return true;
+		},
+		drawBase: function(canvas, position, layer, xFlip, yFlip) {
+			var drawOrderIndex = 0;
+			drawOrderIndex = (xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3));
+			var tilePieceLength = 8;
+			var ac = $OurSonic_Utility_CanvasInformation.create(tilePieceLength * 2, tilePieceLength * 2);
+			var i = 0;
+			var localPoint = $OurSonic_Utility_Point.$ctor1(0, 0);
+			for (var $t1 = 0; $t1 < this.tiles.length; $t1++) {
+				var tileItem = this.tiles[$t1];
+				var tile = tileItem.getTile();
+				if (tile) {
+					if (tileItem.priority === (layer === 1)) {
+						var _xf = xFlip ^ tileItem.xFlip;
+						var _yf = yFlip ^ tileItem.yFlip;
+						var df = $OurSonic_Level_Tiles_TilePiece.$drawInfo[$OurSonic_Level_Tiles_TilePiece.$drawOrder[drawOrderIndex][i]];
+						localPoint.x = df[0] * tilePieceLength;
+						localPoint.y = df[1] * tilePieceLength;
+						tile.drawBase(ac.context, localPoint, _xf, _yf, tileItem.palette, false);
+					}
+				}
+				i++;
+			}
+			this.$drawIt(canvas, ac.canvas, position);
+			return true;
+		},
+		drawAnimatedPalette: function(canvas, position, layer, xFlip, yFlip, animatedPaletteIndex) {
+			var drawOrderIndex = 0;
+			drawOrderIndex = (xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3));
+			var tilePieceLength = 8;
+			var ac = $OurSonic_Utility_CanvasInformation.create(tilePieceLength * 2, tilePieceLength * 2);
+			var i = 0;
+			var localPoint = $OurSonic_Utility_Point.$ctor1(0, 0);
+			for (var $t1 = 0; $t1 < this.tiles.length; $t1++) {
+				var tileItem = this.tiles[$t1];
+				var tile = tileItem.getTile();
+				if (tile) {
+					if (tileItem.priority === (layer === 1)) {
+						var _xf = xFlip ^ tileItem.xFlip;
+						var _yf = yFlip ^ tileItem.yFlip;
+						var df = $OurSonic_Level_Tiles_TilePiece.$drawInfo[$OurSonic_Level_Tiles_TilePiece.$drawOrder[drawOrderIndex][i]];
+						localPoint.x = df[0] * tilePieceLength;
+						localPoint.y = df[1] * tilePieceLength;
+						tile.drawAnimatedPalette(ac.context, localPoint, _xf, _yf, tileItem.palette, animatedPaletteIndex, false);
+					}
+				}
+				i++;
+			}
+			this.$drawIt(canvas, ac.canvas, position);
+			return true;
+		},
+		drawAnimatedTile: function(canvas, position, layer, xFlip, yFlip, animatedTileIndex) {
+			var drawOrderIndex = 0;
+			drawOrderIndex = (xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3));
+			var tilePieceLength = 8;
+			var ac = $OurSonic_Utility_CanvasInformation.create(tilePieceLength * 2, tilePieceLength * 2);
+			var i = 0;
+			var localPoint = $OurSonic_Utility_Point.$ctor1(0, 0);
+			for (var $t1 = 0; $t1 < this.tiles.length; $t1++) {
+				var tileItem = this.tiles[$t1];
+				var tile = tileItem.getTile();
+				if (tile) {
+					if (tileItem.priority === (layer === 1)) {
+						var _xf = xFlip ^ tileItem.xFlip;
+						var _yf = yFlip ^ tileItem.yFlip;
+						var df = $OurSonic_Level_Tiles_TilePiece.$drawInfo[$OurSonic_Level_Tiles_TilePiece.$drawOrder[drawOrderIndex][i]];
+						localPoint.x = df[0] * tilePieceLength;
+						localPoint.y = df[1] * tilePieceLength;
+						tile.drawAnimatedTile(ac.context, localPoint, _xf, _yf, tileItem.palette, animatedTileIndex);
+					}
+				}
+				i++;
+			}
+			this.$drawIt(canvas, ac.canvas, position);
 			return true;
 		},
 		shouldAnimate: function() {
 			if (ss.isNullOrUndefined(this.$shouldAnimate)) {
 				for (var $t1 = 0; $t1 < this.tiles.length; $t1++) {
 					var t = this.tiles[$t1];
-					var mj = t.getTile();
-					if (mj) {
-						if (mj.shouldAnimate()) {
+					var tile = t.getTile();
+					if (tile) {
+						if (tile.shouldTileAnimate()) {
 							return ss.unbox(this.$shouldAnimate = true);
 						}
 					}
@@ -7438,61 +7798,6 @@
 				this.$shouldAnimate = false;
 			}
 			return ss.unbox(this.$shouldAnimate);
-		},
-		$buildCache: function(layer, xFlip, yFlip, animatedIndex, drawOrderIndex) {
-			var fd;
-			var ac = $OurSonic_Utility_CanvasInformation.create(16, 16);
-			var sX = 8;
-			var sY = 8;
-			var i = 0;
-			var localPoint = $OurSonic_Utility_Point.$ctor1(0, 0);
-			for (var $t1 = 0; $t1 < this.tiles.length; $t1++) {
-				var t = this.tiles[$t1];
-				var mj = t;
-				var tile = t.getTile();
-				if (tile) {
-					if (mj.priority === (layer === 1)) {
-						var _xf = xFlip ^ mj.xFlip;
-						var _yf = yFlip ^ mj.yFlip;
-						var df = $OurSonic_Level_Tiles_TilePiece.$drawInfo[$OurSonic_Level_Tiles_TilePiece.$drawOrder[drawOrderIndex][i]];
-						localPoint.x = df[0] * sX;
-						localPoint.y = df[1] * sY;
-						tile.draw(ac.context, localPoint, _xf, _yf, mj.palette, animatedIndex);
-					}
-				}
-				i++;
-			}
-			//            ac.Context.StrokeStyle = "#FF593F";
-			//            ac.Context.LineWidth = 1;
-			//            ac.Context.StrokeRect(0, 0, 2*8 * SonicManager.Instance.Scale.X, 2*8 * SonicManager.Instance.Scale.Y);
-			fd = ac.canvas;
-			this.$setCache(layer, drawOrderIndex, animatedIndex, fd);
-			return fd;
-		},
-		$setCache: function(layer, drawOrder, animationFrame, image) {
-			var palAn = $OurSonic_SonicManager.instance.sonicLevel.paletteAnimationIndexes;
-			var val = (drawOrder << 8) + (animationFrame << 20) + (layer + 1 << 24);
-			//okay
-			if (this.get_animatedFrames().length > 0) {
-				for (var index = 0; index < this.get_animatedFrames().length; index++) {
-					var animatedFrame = this.get_animatedFrames()[index];
-					val += palAn[animatedFrame] + ' ';
-				}
-			}
-			this.image[val] = image;
-		},
-		$getCache: function(layer, drawOrder, animationFrame) {
-			var palAn = $OurSonic_SonicManager.instance.sonicLevel.paletteAnimationIndexes;
-			var val = (drawOrder << 8) + (animationFrame << 20) + (layer + 1 << 24);
-			//okay
-			if (this.get_animatedFrames().length > 0) {
-				var $t1 = this.get_animatedFrames();
-				for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-					var animatedFrame = $t1[$t2];
-					val += palAn[animatedFrame] + ' ';
-				}
-			}
-			return ss.cast(this.image[val], Element);
 		},
 		$drawIt: function(canvas, fd, position) {
 			canvas.drawImage(fd, position.x, position.y);
@@ -7548,10 +7853,11 @@
 	});
 	ss.initClass($OurSonic_Sonic_Sensor, $asm, {
 		$checkCollisionLineWrap: function(x1, x2, y1, y2, ignoreSolid) {
+			//todo: this is some of the worst code man has ever written. if youre reading this im sorry. send me an email dested@gmail for an apology.
 			var _x = ss.Int32.div(x1, 128);
 			var _y = $OurSonic_Utility_Help.mod(ss.Int32.div(y1, 128), $OurSonic_SonicManager.instance.sonicLevel.levelHeight);
 			var tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x, _y);
-			this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+			this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 			var curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 			var cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 			var __x = x1 - _x * 128;
@@ -7576,7 +7882,7 @@
 										return this.$__currentM;
 									}
 									tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x - 1, _y);
-									this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+									this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 									curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 									cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 									__x += 128;
@@ -7610,7 +7916,7 @@
 								//
 								//                                }
 								tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x + 1, _y);
-								this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+								this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 								curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 								cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 								__x -= 128;
@@ -7647,7 +7953,7 @@
 									//
 									//                                    }
 									tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x + 1, _y);
-									this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+									this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 									curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 									cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 									__x -= 128;
@@ -7674,7 +7980,7 @@
 									return this.$__currentM;
 								}
 								tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x - 1, _y);
-								this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+								this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 								curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 								cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 								__x += 128;
@@ -7702,7 +8008,7 @@
 							while (true) {
 								if (__y - i < 0) {
 									tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x, $OurSonic_Utility_Help.mod(_y - 1, $OurSonic_SonicManager.instance.sonicLevel.levelHeight));
-									this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+									this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 									curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 									cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 									__y += 128;
@@ -7730,7 +8036,7 @@
 						while (true) {
 							if (__y + i >= 128) {
 								tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x, (_y + 1) % $OurSonic_SonicManager.instance.sonicLevel.levelHeight);
-								this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+								this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 								curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 								cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 								__y -= 128;
@@ -7766,7 +8072,7 @@
 							while (true) {
 								if (__y + i >= 128) {
 									tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x, (_y + 1) % $OurSonic_SonicManager.instance.sonicLevel.levelHeight);
-									this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+									this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 									curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 									cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 									__y -= 128;
@@ -7796,7 +8102,7 @@
 						while (true) {
 							if (__y - i < 0) {
 								tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x, $OurSonic_Utility_Help.mod(_y - 1, $OurSonic_SonicManager.instance.sonicLevel.levelHeight));
-								this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+								this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 								curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 								cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 								__y += 128;
@@ -7820,7 +8126,130 @@
 			}
 			return null;
 		},
-		$buildChunk: function(chunk, isLayerOne) {
+		draw: function(canvas, character, sensorResult) {
+			var x = $OurSonic_Utility_Help.floor(character.x) - $OurSonic_SonicManager.instance.windowLocation.x;
+			var y = $OurSonic_Utility_Help.floor(character.y) - $OurSonic_SonicManager.instance.windowLocation.y;
+			canvas.beginPath();
+			if (sensorResult && sensorResult.chosen) {
+				canvas.strokeStyle = '#FFF76D';
+				canvas.lineWidth = 4;
+			}
+			else {
+				canvas.strokeStyle = this.color;
+				canvas.lineWidth = 2;
+			}
+			switch (character.mode) {
+				case 134: {
+					canvas.moveTo(x + this.x1, y + this.y1);
+					canvas.lineTo(x + this.x2, y + this.y2);
+					break;
+				}
+				case 44: {
+					canvas.moveTo(x - this.y1, y + this.x1);
+					canvas.lineTo(x - this.y2, y + this.x2);
+					break;
+				}
+				case 314: {
+					canvas.moveTo(x - this.x1, y - this.y1);
+					canvas.lineTo(x - this.x2, y - this.y2);
+					break;
+				}
+				case 224: {
+					canvas.moveTo(x + this.y1, y - this.x1);
+					canvas.lineTo(x + this.y2, y - this.x2);
+					break;
+				}
+			}
+			canvas.closePath();
+			canvas.stroke();
+		},
+		check: function(character) {
+			var _y2 = (character.inAir ? this.y2 : this.y2);
+			var m = null;
+			var x = $OurSonic_Utility_Help.floor(character.x);
+			var y = $OurSonic_Utility_Help.floor(character.y);
+			switch (character.mode) {
+				case 134: {
+					m = this.$checkCollisionLineWrap(x + this.x1, x + this.x2, y + this.y1, y + _y2, this.ignoreSolid);
+					break;
+				}
+				case 44: {
+					m = this.$checkCollisionLineWrap(x - this.y1, x - _y2, y + this.x1, y + this.x2, this.ignoreSolid);
+					break;
+				}
+				case 314: {
+					m = this.$checkCollisionLineWrap(x - this.x1, x - this.x2, y - this.y1, y - _y2, this.ignoreSolid);
+					break;
+				}
+				case 224: {
+					m = this.$checkCollisionLineWrap(x + this.y1, x + _y2, y - this.x1, y - this.x2, this.ignoreSolid);
+					break;
+				}
+			}
+			if (ss.isValue(m)) {
+				m.letter = this.letter;
+				if (m.angle === 255 || m.angle === 0 || m.angle === 1) {
+					if (character.mode === 134) {
+						m.angle = 255;
+					}
+					if (character.mode === 44) {
+						m.angle = 64;
+					}
+					if (character.mode === 314) {
+						m.angle = 128;
+					}
+					if (character.mode === 224) {
+						m.angle = 192;
+					}
+				}
+			}
+			return m;
+		}
+	});
+	ss.initClass($OurSonic_Sonic_SensorM, $asm, {});
+	ss.initClass($OurSonic_Sonic_SensorManager, $asm, {
+		addSensor: function(letter, sensor) {
+			this.sensors[letter] = sensor;
+			this.sensorResults[letter] = null;
+			return sensor;
+		},
+		createVerticalSensor: function(letter, x, y1, y2, color, ignoreSolid) {
+			return this.addSensor(letter, new $OurSonic_Sonic_Sensor(x, x, y1, y2, this, color, ignoreSolid, letter));
+		},
+		createHorizontalSensor: function(letter, y, x1, x2, color, ignoreSolid) {
+			return this.addSensor(letter, new $OurSonic_Sonic_Sensor(x1, x2, y, y, this, color, ignoreSolid, letter));
+		},
+		check: function(character) {
+			var none = false;
+			var $t1 = new ss.ObjectEnumerator(this.sensors);
+			try {
+				while ($t1.moveNext()) {
+					var i = $t1.current();
+					this.sensorResults[i.key] = i.value.check(character);
+					none = none || ss.isValue(this.sensorResults[i.key]);
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+			return none;
+		},
+		getResult: function(mn) {
+			return this.sensorResults[mn];
+		},
+		draw: function(canvas, sonic) {
+			var $t1 = new ss.ObjectEnumerator(this.sensors);
+			try {
+				while ($t1.moveNext()) {
+					var sensor = $t1.current();
+					sensor.value.draw(canvas, sonic, this.sensorResults[sensor.key]);
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+		},
+		buildChunk: function(chunk, isLayerOne) {
 			if (isLayerOne) {
 				if (chunk.heightBlocks1) {
 					return;
@@ -8008,129 +8437,6 @@
 					}
 				}
 			}
-		},
-		draw: function(canvas, character, sensorResult) {
-			var x = $OurSonic_Utility_Help.floor(character.x) - $OurSonic_SonicManager.instance.windowLocation.x;
-			var y = $OurSonic_Utility_Help.floor(character.y) - $OurSonic_SonicManager.instance.windowLocation.y;
-			canvas.beginPath();
-			if (sensorResult && sensorResult.chosen) {
-				canvas.strokeStyle = '#FFF76D';
-				canvas.lineWidth = 4;
-			}
-			else {
-				canvas.strokeStyle = this.color;
-				canvas.lineWidth = 2;
-			}
-			switch (character.mode) {
-				case 134: {
-					canvas.moveTo(x + this.x1, y + this.y1);
-					canvas.lineTo(x + this.x2, y + this.y2);
-					break;
-				}
-				case 44: {
-					canvas.moveTo(x - this.y1, y + this.x1);
-					canvas.lineTo(x - this.y2, y + this.x2);
-					break;
-				}
-				case 314: {
-					canvas.moveTo(x - this.x1, y - this.y1);
-					canvas.lineTo(x - this.x2, y - this.y2);
-					break;
-				}
-				case 224: {
-					canvas.moveTo(x + this.y1, y - this.x1);
-					canvas.lineTo(x + this.y2, y - this.x2);
-					break;
-				}
-			}
-			canvas.closePath();
-			canvas.stroke();
-		},
-		check: function(character) {
-			var _y2 = (character.inAir ? this.y2 : this.y2);
-			var m = null;
-			var x = $OurSonic_Utility_Help.floor(character.x);
-			var y = $OurSonic_Utility_Help.floor(character.y);
-			switch (character.mode) {
-				case 134: {
-					m = this.$checkCollisionLineWrap(x + this.x1, x + this.x2, y + this.y1, y + _y2, this.ignoreSolid);
-					break;
-				}
-				case 44: {
-					m = this.$checkCollisionLineWrap(x - this.y1, x - _y2, y + this.x1, y + this.x2, this.ignoreSolid);
-					break;
-				}
-				case 314: {
-					m = this.$checkCollisionLineWrap(x - this.x1, x - this.x2, y - this.y1, y - _y2, this.ignoreSolid);
-					break;
-				}
-				case 224: {
-					m = this.$checkCollisionLineWrap(x + this.y1, x + _y2, y - this.x1, y - this.x2, this.ignoreSolid);
-					break;
-				}
-			}
-			if (ss.isValue(m)) {
-				m.letter = this.letter;
-				if (m.angle === 255 || m.angle === 0 || m.angle === 1) {
-					if (character.mode === 134) {
-						m.angle = 255;
-					}
-					if (character.mode === 44) {
-						m.angle = 64;
-					}
-					if (character.mode === 314) {
-						m.angle = 128;
-					}
-					if (character.mode === 224) {
-						m.angle = 192;
-					}
-				}
-			}
-			return m;
-		}
-	});
-	ss.initClass($OurSonic_Sonic_SensorM, $asm, {});
-	ss.initClass($OurSonic_Sonic_SensorManager, $asm, {
-		addSensor: function(letter, sensor) {
-			this.sensors[letter] = sensor;
-			this.sensorResults[letter] = null;
-			return sensor;
-		},
-		createVerticalSensor: function(letter, x, y1, y2, color, ignoreSolid) {
-			return this.addSensor(letter, new $OurSonic_Sonic_Sensor(x, x, y1, y2, this, color, ignoreSolid, letter));
-		},
-		createHorizontalSensor: function(letter, y, x1, x2, color, ignoreSolid) {
-			return this.addSensor(letter, new $OurSonic_Sonic_Sensor(x1, x2, y, y, this, color, ignoreSolid, letter));
-		},
-		check: function(character) {
-			var none = false;
-			var $t1 = new ss.ObjectEnumerator(this.sensors);
-			try {
-				while ($t1.moveNext()) {
-					var i = $t1.current();
-					this.sensorResults[i.key] = i.value.check(character);
-					none = none || ss.isValue(this.sensorResults[i.key]);
-				}
-			}
-			finally {
-				$t1.dispose();
-			}
-			return none;
-		},
-		getResult: function(mn) {
-			return this.sensorResults[mn];
-		},
-		draw: function(canvas, sonic) {
-			var $t1 = new ss.ObjectEnumerator(this.sensors);
-			try {
-				while ($t1.moveNext()) {
-					var sensor = $t1.current();
-					sensor.value.draw(canvas, sonic, this.sensorResults[sensor.key]);
-				}
-			}
-			finally {
-				$t1.dispose();
-			}
 		}
 	});
 	ss.initClass($OurSonic_Sonic_Sonic, $asm, {
@@ -8149,7 +8455,10 @@
 			}
 			//        x = _H.floor(x);
 			//        y = _H.floor(y);
-			this.myRec = $OurSonic_Utility_Rectangle.$ctor1(ss.Int32.trunc(this.x - 10), ss.Int32.trunc(this.y - 20), 20, 40);
+			this.myRec.x = ss.Int32.trunc(this.x - 10);
+			this.myRec.y = ss.Int32.trunc(this.y - 20);
+			this.myRec.width = 20;
+			this.myRec.height = 40;
 			if (this.inAir) {
 				this.mode = 134;
 			}
@@ -8169,10 +8478,8 @@
 				if (this.holdingUp) {
 					this.y -= debugSpeed;
 				}
-				var offset = $OurSonic_Utility_Point.$ctor1(0, 0);
-				// getOffsetFromImage();
-				this.x = (sonicLevel.levelWidth * 128 + this.x) % (sonicLevel.levelWidth * 128) + offset.x;
-				this.y = (sonicLevel.levelHeight * 128 + this.y) % (sonicLevel.levelHeight * 128) + offset.y;
+				this.x = (sonicLevel.levelWidth * 128 + this.x) % (sonicLevel.levelWidth * 128);
+				this.y = (sonicLevel.levelHeight * 128 + this.y) % (sonicLevel.levelHeight * 128);
 				return;
 			}
 			this.updateMode();
@@ -8192,9 +8499,9 @@
 			this.$effectPhysics();
 			this.checkCollisionWithRings();
 			this.$updateSprite();
-			this.$sensorManager.check(this);
-			var sensorM1 = this.$sensorManager.getResult('m1');
-			var sensorM2 = this.$sensorManager.getResult('m2');
+			this.sensorManager.check(this);
+			var sensorM1 = this.sensorManager.getResult('m1');
+			var sensorM2 = this.sensorManager.getResult('m2');
 			var best = this.$getBestSensor(sensorM1, sensorM2, this.mode);
 			if (ss.isValue(best)) {
 				switch (this.mode) {
@@ -8231,9 +8538,9 @@
 					}
 				}
 			}
-			this.$sensorManager.check(this);
-			var sensorA = this.$sensorManager.getResult('a');
-			var sensorB = this.$sensorManager.getResult('b');
+			this.sensorManager.check(this);
+			var sensorA = this.sensorManager.getResult('a');
+			var sensorB = this.sensorManager.getResult('b');
 			var fy;
 			var fx;
 			var hSize = this.$getHalfImageSize();
@@ -8314,9 +8621,9 @@
 				this.updateMode();
 				var cur = $OurSonic_SonicManager.instance.spriteCache.sonicSprites[this.spriteState];
 				var __h = ss.Int32.div(cur.height, 2);
-				this.$sensorManager.check(this);
-				var sensorC = this.$sensorManager.getResult('c');
-				var sensorD = this.$sensorManager.getResult('d');
+				this.sensorManager.check(this);
+				var sensorC = this.sensorManager.getResult('c');
+				var sensorD = this.sensorManager.getResult('d');
 				if (ss.isNullOrUndefined(sensorC) && ss.isNullOrUndefined(sensorD)) {
 				}
 				else {
@@ -8424,7 +8731,7 @@
 			return false;
 		},
 		$getHalfImageSize: function() {
-			return $OurSonic_Utility_Point.$ctor1(20, 20);
+			return this.$halfSize;
 			//
 			//                        var scale = SonicManager.Instance.Scale;
 			//
@@ -8499,7 +8806,9 @@
 					}
 				}
 			}
-			return $OurSonic_Utility_Point.$ctor1(xOffset, yOffset);
+			this.$offsetFromImage.x = xOffset;
+			this.$offsetFromImage.y = yOffset;
+			return this.$offsetFromImage;
 		},
 		$updateSprite: function() {
 			var absgsp = Math.abs(this.gsp);
@@ -8744,7 +9053,6 @@
 					this.currentlyBall = false;
 				}
 			}
-			this.checkCollisionWithRings();
 			if (this.inAir) {
 				if (this.holdingRight && !this.holdingLeft && !this.justHit) {
 					this.facing = true;
@@ -8946,7 +9254,7 @@
 				//                canvas.strokeRect(-cur.width / 2, -cur.height / 2, cur.width, cur.height);
 				canvas.restore();
 				if ($OurSonic_SonicManager.instance.showHeightMap) {
-					this.$sensorManager.draw(canvas, this);
+					this.sensorManager.draw(canvas, this);
 				}
 				for (var i = 0; i < this.haltSmoke.length; i++) {
 					var lo = this.haltSmoke[i];
@@ -8958,8 +9266,8 @@
 			}
 		},
 		drawUI: function(canvas, pos) {
-			var $t1 = new $OurSonic_Utility_CanvasHandler(canvas);
-			try {
+			canvas.save();
+			{
 				if (canvas.font !== '13pt Arial bold') {
 					canvas.font = '13pt Arial bold';
 				}
@@ -8978,11 +9286,7 @@
 					canvas.fillText('HLock: ' + this.hLock, pos.x + 90, pos.y + 195);
 				}
 			}
-			finally {
-				if (ss.isValue($t1)) {
-					$t1.dispose();
-				}
-			}
+			canvas.restore();
 		},
 		hit: function(x, y) {
 			if ($OurSonic_SonicManager.instance.drawTickCount - this.sonicLastHitTick < 120) {
@@ -9054,7 +9358,9 @@
 			this.jumping = false;
 		},
 		checkCollisionWithObjects: function(x, y, letter) {
-			var me = $OurSonic_Utility_Point.$ctor1(x, y);
+			this.$objectCollision.x = x;
+			this.$objectCollision.y = y;
+			var me = this.$objectCollision;
 			var levelObjectInfos = $OurSonic_SonicManager.instance.inFocusObjects;
 			for (var $t1 = 0; $t1 < levelObjectInfos.length; $t1++) {
 				var ob = levelObjectInfos[$t1];
@@ -9071,7 +9377,10 @@
 		},
 		checkCollisionWithRings: function() {
 			var me = this.myRec;
-			var rectangle = $OurSonic_Utility_Rectangle.$ctor1(0, 0, 16, 16);
+			this.$ringCollisionRect.x = 0;
+			this.$ringCollisionRect.y = 0;
+			this.$ringCollisionRect.width = 16;
+			this.$ringCollisionRect.height = 16;
 			var rings = $OurSonic_SonicManager.instance.sonicLevel.rings;
 			for (var index = 0; index < rings.length; index++) {
 				var ring = rings[index];
@@ -9079,9 +9388,9 @@
 				if (this.obtainedRing[index]) {
 					continue;
 				}
-				rectangle.x = pos.x;
-				rectangle.y = pos.y;
-				if ($OurSonic_Utility_IntersectingRectangle.intersectRect(me, rectangle)) {
+				this.$ringCollisionRect.x = pos.x;
+				this.$ringCollisionRect.y = pos.y;
+				if ($OurSonic_Utility_IntersectingRectangle.intersectRect(me, this.$ringCollisionRect)) {
 					this.rings++;
 					this.obtainedRing[index] = true;
 				}
@@ -10368,9 +10677,9 @@
 		},
 		onClick: function(cell) {
 			var goodArea = null;
-			var cl = Enumerable.from(this.uiAreas).orderBy(function(f) {
+			var cl = OurSonicModels.Common.EnumerableExtensions.orderBy($OurSonic_UIManager_UIArea).call(null, this.uiAreas, function(f) {
 				return -f.get_depth();
-			}).toArray();
+			});
 			for (var $t1 = 0; $t1 < cl.length; $t1++) {
 				var are = cl[$t1];
 				if (are.visible && (are.isEditMode() ? (are.y - are.editorEngine.maxSize() <= cell.y && are.y + are.editorEngine.maxSize() + are.height > cell.y && are.x - are.editorEngine.maxSize() <= cell.x && are.x + are.editorEngine.maxSize() + are.width > cell.x) : (are.y <= cell.y && are.y + are.height > cell.y && are.x <= cell.x && are.x + are.width > cell.x))) {
@@ -10407,9 +10716,9 @@
 			return false;
 		},
 		onMouseMove: function(cell) {
-			var cl = Enumerable.from(this.uiAreas).orderBy(function(f) {
+			var cl = OurSonicModels.Common.EnumerableExtensions.orderBy($OurSonic_UIManager_UIArea).call(null, this.uiAreas, function(f) {
 				return -f.get_depth();
-			}).toArray();
+			});
 			for (var $t1 = 0; $t1 < cl.length; $t1++) {
 				var are = cl[$t1];
 				if (are.dragging || are.isEditMode() || are.visible && are.y <= cell.y && are.y + are.height > cell.y && are.x <= cell.x && are.x + are.width > cell.x) {
@@ -10459,9 +10768,9 @@
 			this.updateDepth();
 		},
 		updateDepth: function() {
-			this.canvasDepths = Enumerable.from(this.uiAreas).orderBy(function(f) {
+			this.canvasDepths = OurSonicModels.Common.EnumerableExtensions.orderBy($OurSonic_UIManager_UIArea).call(null, this.uiAreas, function(f) {
 				return f.get_depth();
-			}).toArray();
+			});
 		},
 		draw: function(canvas) {
 			this.dragger.tick();
@@ -10480,11 +10789,6 @@
 	});
 	ss.initClass($OurSonic_UIManager_UIManagerData, $asm, {});
 	ss.initClass($OurSonic_UIManager_UIManagerDataIndexes, $asm, {});
-	ss.initClass($OurSonic_Utility_CanvasHandler, $asm, {
-		dispose: function() {
-			this.$myCanvas.restore();
-		}
-	}, null, [ss.IDisposable]);
 	ss.initClass($OurSonic_Utility_CanvasInformation, $asm, {});
 	ss.initEnum($OurSonic_Utility_ClickState, $asm, { dragging: 0, placeChunk: 1, placeRing: 2, placeObject: 3 });
 	ss.initClass($OurSonic_Utility_Color, $asm, {});
@@ -10591,10 +10895,9 @@
 	$OurSonic_Utility_Help.$cos_table = [1, 0.9997, 0.9988, 0.99729, 0.99518, 0.99248, 0.98918, 0.98528, 0.98079, 0.9757, 0.97003, 0.96378, 0.95694, 0.94953, 0.94154, 0.93299, 0.92388, 0.91421, 0.90399, 0.89322, 0.88192, 0.87009, 0.85773, 0.84485, 0.83147, 0.81758, 0.80321, 0.78835, 0.77301, 0.75721, 0.74095, 0.72425, 0.70711, 0.68954, 0.67156, 0.65317, 0.63439, 0.61523, 0.5957, 0.57581, 0.55557, 0.535, 0.5141, 0.4929, 0.4714, 0.44961, 0.42755, 0.40524, 0.38268, 0.3599, 0.33689, 0.31368, 0.29028, 0.26671, 0.24298, 0.2191, 0.19509, 0.17096, 0.14673, 0.12241, 0.09802, 0.07356, 0.04907, 0.02454, 0, -0.02454, -0.04907, -0.07356, -0.09802, -0.12241, -0.14673, -0.17096, -0.19509, -0.2191, -0.24298, -0.26671, -0.29028, -0.31368, -0.33689, -0.3599, -0.38268, -0.40524, -0.42755, -0.44961, -0.4714, -0.4929, -0.5141, -0.535, -0.55557, -0.57581, -0.5957, -0.61523, -0.63439, -0.65317, -0.67156, -0.68954, -0.70711, -0.72425, -0.74095, -0.75721, -0.77301, -0.78835, -0.80321, -0.81758, -0.83147, -0.84485, -0.85773, -0.87009, -0.88192, -0.89322, -0.90399, -0.91421, -0.92388, -0.93299, -0.94154, -0.94953, -0.95694, -0.96378, -0.97003, -0.9757, -0.98079, -0.98528, -0.98918, -0.99248, -0.99518, -0.99729, -0.9988, -0.9997, -1, -0.9997, -0.9988, -0.99729, -0.99518, -0.99248, -0.98918, -0.98528, -0.98079, -0.9757, -0.97003, -0.96378, -0.95694, -0.94953, -0.94154, -0.93299, -0.92388, -0.91421, -0.90399, -0.89322, -0.88192, -0.87009, -0.85773, -0.84485, -0.83147, -0.81758, -0.80321, -0.78835, -0.77301, -0.75721, -0.74095, -0.72425, -0.70711, -0.68954, -0.67156, -0.65317, -0.63439, -0.61523, -0.5957, -0.57581, -0.55557, -0.535, -0.5141, -0.4929, -0.4714, -0.44961, -0.42756, -0.40524, -0.38268, -0.3599, -0.33689, -0.31368, -0.29028, -0.26671, -0.24298, -0.2191, -0.19509, -0.17096, -0.14673, -0.12241, -0.09802, -0.07356, -0.04907, -0.02454, 0, 0.02454, 0.04907, 0.07356, 0.09802, 0.12241, 0.14673, 0.17096, 0.19509, 0.2191, 0.24298, 0.26671, 0.29028, 0.31368, 0.33689, 0.3599, 0.38268, 0.40524, 0.42756, 0.44961, 0.4714, 0.4929, 0.5141, 0.535, 0.55557, 0.57581, 0.5957, 0.61523, 0.63439, 0.65317, 0.67156, 0.68954, 0.70711, 0.72425, 0.74095, 0.75721, 0.77301, 0.78835, 0.80321, 0.81758, 0.83147, 0.84485, 0.85773, 0.87009, 0.88192, 0.89322, 0.90399, 0.91421, 0.92388, 0.93299, 0.94154, 0.94953, 0.95694, 0.96378, 0.97003, 0.9757, 0.98079, 0.98528, 0.98918, 0.99248, 0.99518, 0.99729, 0.9988, 0.9997];
 	$OurSonic_SonicManager.instance = null;
 	$OurSonic_SonicManager.$_cachedOffs = {};
-	$OurSonic_SonicManager.STATICLEVEL = '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';
 	$OurSonic_Level_HeightMap.colors = ['', 'rgba(255,98,235,0.6)', 'rgba(24,218,235,0.6)', 'rgba(24,98,235,0.6)'];
-	$OurSonic_Level_Tiles_TileChunk.$numOfPiecesWide = 8;
-	$OurSonic_Level_Tiles_TileChunk.$numOfPiecesLong = 8;
+	$OurSonic_Level_Tiles_TileChunk.$piecesSquareSize = 16;
+	$OurSonic_Level_Tiles_TileChunk.$tilePieceSize = 8;
 	$OurSonic_Level_Tiles_TilePiece.$drawInfo = [[0, 0], [1, 0], [0, 1], [1, 1]];
 	$OurSonic_Level_Tiles_TilePiece.$drawOrder = [[3, 2, 1, 0], [1, 0, 3, 2], [2, 3, 0, 1], [0, 1, 2, 3]];
 	$OurSonic_Level_Objects_ObjectManager.broken = $OurSonic_Utility_Help.loadSprite('assets/Sprites/broken.png', function(e) {

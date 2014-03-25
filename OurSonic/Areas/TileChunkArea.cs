@@ -20,7 +20,7 @@ namespace OurSonic.Areas
 
             tileChunkArea.AddControl(chunkPieceList = new ScrollBox(30, 70, 96 - 16, 3, 64) {BackColor = "rgb(50,60,127)"});
 
-            TileChunk[] tileChunks = SonicManager.Instance.SonicLevel.Chunks.Array();
+            TileChunk[] tileChunks = SonicManager.Instance.SonicLevel.TileChunks.Array();
             for (int index = 0; index < tileChunks.Length; index++) {
                 var tileChunk = tileChunks[index];
                 ImageButton<TileChunk> chunkButton = new ImageButton<TileChunk>(tileChunk, 0, 0, 0, 0);
@@ -98,8 +98,8 @@ namespace OurSonic.Areas
                                              cnv.Save();
                                              cnv.Translate(x, y);
                                              cnv.Scale(4, 4);
-                                             tilePieceButton.Data.Draw(cnv, new Point(0, 0), 0, false, false, 0);
-                                             tilePieceButton.Data.Draw(cnv, new Point(0, 0), 1, false, false, 0);
+                                             tilePieceButton.Data.Draw(cnv, new Point(0, 0), ChunkLayer.Low, false, false, 0);
+                                             tilePieceButton.Data.Draw(cnv, new Point(0, 0), ChunkLayer.High, false, false, 0);
 
                                              if (showHeightMap) {
                                                  HeightMap hmap;
@@ -125,8 +125,8 @@ namespace OurSonic.Areas
                                 context.Save();
                                 context.Translate(x, y);
                                 context.Scale(16, 16);
-                                tilePieceArea.Data.Draw(context, new Point(0, 0), 0, false, false, 0);
-                                tilePieceArea.Data.Draw(context, new Point(0, 0), 1, false, false, 0);
+                                tilePieceArea.Data.Draw(context, new Point(0, 0), ChunkLayer.Low, false, false, 0);
+                                tilePieceArea.Data.Draw(context, new Point(0, 0), ChunkLayer.High, false, false, 0);
                                 context.Restore();
                             };
 

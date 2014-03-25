@@ -10,26 +10,7 @@ using OurSonic.UIManager;
 using jQueryApi;
 namespace OurSonic.Utility
 {
-    public class CanvasHandler : IDisposable
-    {
-        private readonly CanvasContext2D myCanvas;
-
-        public CanvasHandler(CanvasContext2D canvas)
-        {
-            myCanvas = canvas;
-            canvas.Save();
-        }
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            myCanvas.Restore();
-        }
-
-        #endregion
-    }
-    public static class Help
+     public static class Help
     {
         private static double[] cos_table = new[] {
                                                          1.00000, 0.99970, 0.99880, 0.99729, 0.99518, 0.99248, 0.98918, 0.98528,

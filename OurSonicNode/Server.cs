@@ -108,66 +108,21 @@ namespace OurSonicNode
             new Server();
         }
 
-        private IEnumerable<string> _getObjects(string[] _objects)
+        private List<string> _getObjects(string[] _objects)
         {
+            List<string> strs = new List<string>();
+
+
             foreach (var _object in _objects) {
-                if (!fs.ExistsSync(objDirectory + _object + ".js")) yield return "";
+                if (fs.ExistsSync(objDirectory + _object + ".js"))
+                    strs.Add(fs.ReadFileSync(objDirectory + _object + ".js", "utf8"));
                 else
-                    yield return fs.ReadFileSync(objDirectory + _object + ".js", "utf8");
+                {
+                    strs.Add("");
+                }
             }
+            return strs;
         }
     }
 
-    public static class EnumerableExtensions
-    {
-        public static T[] Where<T>(this T[] items, Func<T, bool> clause)
-        {
-            List<T> items2 = new List<T>();
-
-            foreach (var item in items)
-            {
-                if (clause(item))
-                {
-                    items2.Add(item);
-                }
-            }
-            return items2.ToArray();
-        }
-        public static T2[] Select<T, T2>(this T[] items, Func<T, T2> clause)
-        {
-            List<T2> items2 = new List<T2>();
-
-            foreach (var item in items)
-            {
-                items2.Add(clause(item));
-            }
-            return items2.ToArray();
-        }
-
-
-
-        public static T[] Where<T>(this IEnumerable<T> items, Func<T, bool> clause)
-        {
-            List<T> items2 = new List<T>();
-
-            foreach (var item in items)
-            {
-                if (clause(item))
-                {
-                    items2.Add(item);
-                }
-            }
-            return items2.ToArray();
-        }
-        public static T2[] Select<T, T2>(this IEnumerable<T> items, Func<T, T2> clause)
-        {
-            List<T2> items2 = new List<T2>();
-
-            foreach (var item in items)
-            {
-                items2.Add(clause(item));
-            }
-            return items2.ToArray();
-        }
-    }
 }

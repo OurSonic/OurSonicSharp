@@ -105,11 +105,7 @@ namespace Build
                     output += string.Format("require('{0}');", depe);
                 }
 
-                var lines = new List<string>();
-                lines.Add(output);
-                lines.AddRange(File.ReadAllLines(to));
-
-                string text = lines.Aggregate("", (a, b) => a + b + "\n");
+                string text = output + ";" + File.ReadAllText(to);
 
 #if COMPRESS
                 Yahoo.Yui.Compressor.JavaScriptCompressor jc = new JavaScriptCompressor();

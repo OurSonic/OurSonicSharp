@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Saltarelle.Linq</id>
+    <version>2.0.1</version>
+    <title>Linq for the Saltarelle C# to JavaScript compiler</title>
+    <authors>Yoshifumi Kawai,  Erik Källén</authors>
+    <owners>Yoshifumi Kawai,  Erik Källén</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.txt</licenseUrl>
+    <projectUrl>http://www.saltarelle-compiler.com/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Import library for Linq.js (linqjs.codeplex.com) for projects compiled with Saltarelle.Compiler. Unfortunately the official version is slightly incompatible with the Saltarelle runtime so you have to use the JS files included in this package instead of the official linq.js release.</description>
+    <tags>compiler c# javascript web</tags>
+    <dependencies>
+      <dependency id="Saltarelle.Runtime" version="2.0" />
+    </dependencies>
+  </metadata>
+</package>

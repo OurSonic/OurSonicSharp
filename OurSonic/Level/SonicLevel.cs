@@ -10,9 +10,9 @@ namespace OurSonic.Level
     public class SonicLevel
     {
         [IntrinsicProperty]
-        public List<Animation> Animations { get; set; }
+        public List<TileAnimationData> TileAnimations { get; set; }
         [IntrinsicProperty]
-        public Tile[][] AnimatedFiles { get; set; }
+        public Tile[][] AnimatedTileFiles { get; set; }
         [IntrinsicProperty]
         public int[][] ChunkMap { get; set; }
         [IntrinsicProperty]
@@ -24,7 +24,7 @@ namespace OurSonic.Level
         [IntrinsicProperty]
         public int LevelHeight { get; set; }
         [IntrinsicProperty]
-        public List<TileChunk> Chunks { get; set; }
+        public List<TileChunk> TileChunks { get; set; }
         [IntrinsicProperty]
         public List<Tile> Tiles { get; set; }
         [IntrinsicProperty]
@@ -32,11 +32,9 @@ namespace OurSonic.Level
         [IntrinsicProperty]
         public List<LevelObjectInfo> Objects { get; set; }
         [IntrinsicProperty]
-        public List<List<PaletteItem>> PaletteItems { get; set; }
+        public List<PaletteItem> AnimatedPalettes { get; set; }
         [IntrinsicProperty]
-        public CanvasElement[][] Palette { get; set; }
-        [IntrinsicProperty]
-        public List<int> PaletteAnimationIndexes { get; set; }
+        public string[][] Palette { get; set; }
         [IntrinsicProperty]
         public Point[] StartPositions { get; set; }
         [IntrinsicProperty]
@@ -58,12 +56,11 @@ namespace OurSonic.Level
         {
             Tiles = new List<Tile>();
             TilePieces = new List<TilePiece>();
-            Chunks = new List<TileChunk>();
+            TileChunks = new List<TileChunk>();
             ChunkMap = new int[0][];
             Rings = new List<Ring>();
             Objects = new List<LevelObjectInfo>();
             HeightMaps = new List<HeightMap>();
-            PaletteAnimationIndexes = new List<int>();
             Tiles = new List<Tile>();
             CurHeightMap = true;
             CurPaletteIndex = 0;
@@ -74,18 +71,15 @@ namespace OurSonic.Level
 
         public TileChunk GetChunkAt(int x, int y)
         {
-            return Chunks[ChunkMap[x][y]];
+            return TileChunks[ChunkMap[x][y]];
         }
 
         public void ClearCache()
         {
             foreach (var tile in Tiles.Array()) {
                 tile.ClearCache();
-            }
-            foreach (var tilePiece in TilePieces.Array()) {
-                tilePiece.ClearCache();
-            }
-            foreach (var chunk in Chunks.Array()) {
+            } 
+            foreach (var chunk in TileChunks.Array()) {
                 chunk.ClearCache();
             }
         }
@@ -108,7 +102,7 @@ namespace OurSonic.Level
     public class PaletteItem
     {
         [IntrinsicProperty]
-        public CanvasElement[] Palette { get; set; }
+        public string[] Palette { get; set; }
         [IntrinsicProperty]
         public int SkipIndex { get; set; }
         [IntrinsicProperty]

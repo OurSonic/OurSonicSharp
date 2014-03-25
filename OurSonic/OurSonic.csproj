@@ -48,7 +48,7 @@
     <Compile Include="Areas\PieceLayoutMaker.cs" />
     <Compile Include="Areas\TileChunkArea.cs" />
     <Compile Include="Areas\UIManagerAreas.cs" />
-    <Compile Include="Level\Animations\Animation.cs" />
+    <Compile Include="Level\Animations\TileAnimationData.cs" />
     <Compile Include="Level\Animations\AnimationInstance.cs" />
     <Compile Include="Level\Events\LevelEvent.cs" />
     <Compile Include="Level\HeightMap.cs" />
@@ -75,6 +75,8 @@
     <Compile Include="Sonic\SensorManager.cs" />
     <Compile Include="Sonic\Sonic.cs" />
     <Compile Include="Sonic\SonicConstants.cs" />
+    <Compile Include="TileAnimationManager.cs" />
+    <Compile Include="TilePaletteAnimationManager.cs" />
     <Compile Include="UIManager\Image.cs" />
     <Compile Include="UIManager\Table.cs" />
     <Compile Include="UIManager\LayoutPanel.cs" />
@@ -152,9 +154,6 @@
     </Reference>
     <Reference Include="Saltarelle.jQuery.UI">
       <HintPath>..\packages\Saltarelle.jQuery.UI.1.10.1\lib\Saltarelle.jQuery.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="Saltarelle.Linq">
-      <HintPath>..\packages\Saltarelle.Linq.2.4.0\lib\Saltarelle.Linq.dll</HintPath>
     </Reference>
     <Reference Include="Saltarelle.Web">
       <HintPath>..\packages\Saltarelle.Web.2.3.0\lib\Saltarelle.Web.dll</HintPath>

@@ -189,6 +189,212 @@
 	$OurSonicModels_Common_DelegateOrValue$1.__typeName = 'OurSonicModels.Common.DelegateOrValue$1';
 	ss.initGenericClass($OurSonicModels_Common_DelegateOrValue$1, $asm, 1);
 	global.OurSonicModels.Common.DelegateOrValue$1 = $OurSonicModels_Common_DelegateOrValue$1;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonicModels.Common.EnumerableExtensions
+	var $OurSonicModels_Common_EnumerableExtensions = function() {
+	};
+	$OurSonicModels_Common_EnumerableExtensions.__typeName = 'OurSonicModels.Common.EnumerableExtensions';
+	$OurSonicModels_Common_EnumerableExtensions.indexOfFast = function(items, ind) {
+		for (var index = 0; index < items.length; index++) {
+			var item = items[index];
+			if (item === ind) {
+				return index;
+			}
+		}
+		return -1;
+	};
+	$OurSonicModels_Common_EnumerableExtensions.indexOfFast$1 = function(items, ind) {
+		for (var index = 0; index < items.length; index++) {
+			var item = items[index];
+			if (item === ind) {
+				return index;
+			}
+		}
+		return -1;
+	};
+	$OurSonicModels_Common_EnumerableExtensions.where$1 = function(T) {
+		return function(items, clause) {
+			var items2 = [];
+			for (var $t1 = 0; $t1 < items.length; $t1++) {
+				var item = items[$t1];
+				if (clause(item)) {
+					ss.add(items2, item);
+				}
+			}
+			return Array.prototype.slice.call(items2);
+		};
+	};
+	$OurSonicModels_Common_EnumerableExtensions.first$1 = function(T) {
+		return function(items, clause) {
+			for (var $t1 = 0; $t1 < items.length; $t1++) {
+				var item = items[$t1];
+				if (clause(item)) {
+					return item;
+				}
+			}
+			return ss.getDefaultValue(T);
+		};
+	};
+	$OurSonicModels_Common_EnumerableExtensions.all$1 = function(T) {
+		return function(items, clause) {
+			for (var $t1 = 0; $t1 < items.length; $t1++) {
+				var item = items[$t1];
+				if (!clause(item)) {
+					return false;
+				}
+			}
+			return true;
+		};
+	};
+	$OurSonicModels_Common_EnumerableExtensions.first = function(T) {
+		return function(items, clause) {
+			var $t1 = ss.getEnumerator(items);
+			try {
+				while ($t1.moveNext()) {
+					var item = $t1.current();
+					if (clause(item)) {
+						return item;
+					}
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+			return ss.getDefaultValue(T);
+		};
+	};
+	$OurSonicModels_Common_EnumerableExtensions.all = function(T) {
+		return function(items, clause) {
+			for (var $t1 = 0; $t1 < items.length; $t1++) {
+				var item = items[$t1];
+				if (!clause(item)) {
+					return false;
+				}
+			}
+			return true;
+		};
+	};
+	$OurSonicModels_Common_EnumerableExtensions.any = function(T) {
+		return function(items, clause) {
+			var $t1 = ss.getEnumerator(items);
+			try {
+				while ($t1.moveNext()) {
+					var item = $t1.current();
+					if (clause(item)) {
+						return true;
+					}
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+			return false;
+		};
+	};
+	$OurSonicModels_Common_EnumerableExtensions.any$1 = function(T) {
+		return function(items, clause) {
+			for (var $t1 = 0; $t1 < items.length; $t1++) {
+				var item = items[$t1];
+				if (clause(item)) {
+					return true;
+				}
+			}
+			return false;
+		};
+	};
+	$OurSonicModels_Common_EnumerableExtensions.orderBy$3 = function(T) {
+		return function(items, clause) {
+			var j = ss.arrayClone(items);
+			j.sort(function(a, b) {
+				return ss.compare(clause(a), clause(b));
+			});
+			return j;
+		};
+	};
+	$OurSonicModels_Common_EnumerableExtensions.orderBy = function(T) {
+		return function(items, clause) {
+			var j = ss.arrayClone(Enumerable.from(items).toArray());
+			j.sort(function(a, b) {
+				return ss.compare(clause(a), clause(b));
+			});
+			return j;
+		};
+	};
+	$OurSonicModels_Common_EnumerableExtensions.orderBy$4 = function(T) {
+		return function(items, clause) {
+			var j = ss.arrayClone(items);
+			j.sort(function(a, b) {
+				return ss.compare(clause(a), clause(b));
+			});
+			return j;
+		};
+	};
+	$OurSonicModels_Common_EnumerableExtensions.orderBy$1 = function(T) {
+		return function(items, clause) {
+			var j = ss.arrayClone(Enumerable.from(items).toArray());
+			j.sort(function(a, b) {
+				return ss.compare(clause(a), clause(b));
+			});
+			return j;
+		};
+	};
+	$OurSonicModels_Common_EnumerableExtensions.orderBy$5 = function(T) {
+		return function(items, clause) {
+			var j = ss.arrayClone(items);
+			j.sort(function(a, b) {
+				return ss.compare(clause(a), clause(b));
+			});
+			return j;
+		};
+	};
+	$OurSonicModels_Common_EnumerableExtensions.orderBy$2 = function(T) {
+		return function(items, clause) {
+			var j = ss.arrayClone(Enumerable.from(items).toArray());
+			j.sort(function(a, b) {
+				return ss.compare(clause(a), clause(b));
+			});
+			return j;
+		};
+	};
+	$OurSonicModels_Common_EnumerableExtensions.select$1 = function(T, T2) {
+		return function(items, clause) {
+			var items2 = [];
+			for (var $t1 = 0; $t1 < items.length; $t1++) {
+				var item = items[$t1];
+				ss.add(items2, clause(item));
+			}
+			return Array.prototype.slice.call(items2);
+		};
+	};
+	$OurSonicModels_Common_EnumerableExtensions.where = function(T) {
+		return function(items, clause) {
+			var items2 = [];
+			var $t1 = ss.getEnumerator(items);
+			try {
+				while ($t1.moveNext()) {
+					var item = $t1.current();
+					if (clause(item)) {
+						ss.add(items2, item);
+					}
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+			return Array.prototype.slice.call(items2);
+		};
+	};
+	$OurSonicModels_Common_EnumerableExtensions.select = function(T, T2) {
+		return function(items, clause) {
+			var items2 = [];
+			for (var $t1 = 0; $t1 < items.length; $t1++) {
+				var item = items[$t1];
+				ss.add(items2, clause(item));
+			}
+			return Array.prototype.slice.call(items2);
+		};
+	};
+	global.OurSonicModels.Common.EnumerableExtensions = $OurSonicModels_Common_EnumerableExtensions;
 	ss.initClass($OurSonicModels_AnimatedPaletteItem, $asm, {});
 	ss.initClass($OurSonicModels_AnimatedPalettePiece, $asm, {});
 	ss.initClass($OurSonicModels_SaveObjectModel, $asm, {});
@@ -202,4 +408,5 @@
 	ss.initClass($OurSonicModels_SLDataRingEntry, $asm, {});
 	ss.initClass($OurSonicModels_SLDataStartPositionEntry, $asm, {});
 	ss.initEnum($OurSonicModels_Solidity, $asm, { NotSolid: 0, TopSolid: 1, LRBSolid: 2, AllSolid: 3 });
+	ss.initClass($OurSonicModels_Common_EnumerableExtensions, $asm, {});
 })();

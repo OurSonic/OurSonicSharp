@@ -59,6 +59,252 @@ namespace OurSonic.Sonic
                 sensor.Value.Draw(canvas, sonic, SensorResults[sensor.Key]);
             }
         }
+
+        public void BuildChunk(TileChunk chunk, bool isLayerOne)
+        {
+            if (isLayerOne)
+            {
+                if (chunk.HeightBlocks1.Truthy())
+                    return;
+                var hb1 = chunk.HeightBlocks1 = new Solidity[128][];
+                var ab1 = chunk.AngleMap1 = new int[8][];
+                for (var _1 = 0; _1 < 128; _1++)
+                {
+                    hb1[_1] = new Solidity[128];
+                }
+                for (var _1 = 0; _1 < 8; _1++)
+                {
+                    ab1[_1] = new int[8];
+                }
+
+                for (var _y = 0; _y < 8; _y++)
+                {
+                    for (var _x = 0; _x < 8; _x++)
+                    {
+                        var tp = chunk.TilePieces[_x][_y];
+
+                        ab1[_x][_y] = tp.GetLayer1Angles();
+
+                        if (!(ab1[_x][_y] == 0 || ab1[_x][_y] == 255 || ab1[_x][_y] == 1))
+                        {
+                            if (tp.XFlip)
+                            {
+                                if (tp.YFlip)
+                                {
+                                    ab1[_x][_y] = 192 - ab1[_x][_y] + 192;
+
+                                    ab1[_x][_y] = 128 - ab1[_x][_y] + 128;
+                                }
+                                else
+                                    ab1[_x][_y] = 128 - ab1[_x][_y] + 128;
+                            }
+                            else
+                            {
+                                if (tp.YFlip)
+                                    ab1[_x][_y] = 192 - ab1[_x][_y] + 192;
+                                else
+                                    ab1[_x][_y] = (ab1[_x][_y]);
+                            }
+                        }
+
+                        var __x = 0;
+                        var __y = 0;
+
+                        HeightMap heightMask = tp.GetLayer1HeightMaps();
+                        int[] heightMaskItems = null;
+                        if (heightMask == null) continue;
+                        Solidity mj;
+                        if (heightMask.Full != null)
+                        {
+                            mj = !heightMask.Full.Value ? 0 : tp.Solid1;
+                            for (__y = 0; __y < 16; __y++)
+                            {
+                                for (__x = 0; __x < 16; __x++)
+                                {
+                                    hb1[(_x * 16 + __x)][(_y * 16 + __y)] = mj;
+                                }
+                            }
+                        }
+                        else
+                            heightMaskItems = heightMask.Items;
+
+                        for (__y = 0; __y < 16; __y++)
+                        {
+                            for (__x = 0; __x < 16; __x++)
+                            {
+                                var jx = 0;
+                                var jy = 0;
+                                if (tp.XFlip)
+                                {
+                                    if (tp.YFlip)
+                                    {
+                                        jx = 15 - __x;
+                                        jy = 15 - __y;
+                                    }
+                                    else
+                                    {
+                                        jx = 15 - __x;
+                                        jy = __y;
+                                    }
+                                }
+                                else
+                                {
+                                    if (tp.YFlip)
+                                    {
+                                        jx = __x;
+                                        jy = 15 - __y;
+                                    }
+                                    else
+                                    {
+                                        jx = __x;
+                                        jy = __y;
+                                    }
+                                }
+
+                                if (heightMask.Full == null)
+                                {
+                                    switch (tp.Solid1)
+                                    {
+                                        case 0:
+                                            hb1[(_x * 16 + jx)][(_y * 16 + jy)] = 0;
+                                            break;
+                                        case (Solidity)1:
+                                        case (Solidity)2:
+                                        case (Solidity)3:
+                                            hb1[(_x * 16 + jx)][(_y * 16 + jy)] = HeightMap.ItemsGood(heightMaskItems, __x, __y) ? tp.Solid1 : 0;
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (chunk.HeightBlocks2.Truthy())
+                    return;
+
+                var hb2 = chunk.HeightBlocks2 = new Solidity[128][];
+                var ab2 = chunk.AngleMap2 = new int[8][];
+                for (var _1 = 0; _1 < 128; _1++)
+                {
+                    hb2[_1] = new Solidity[128];
+                }
+                for (var _1 = 0; _1 < 8; _1++)
+                {
+                    ab2[_1] = new int[8];
+                }
+
+                for (var _y = 0; _y < 8; _y++)
+                {
+                    for (var _x = 0; _x < 8; _x++)
+                    {
+                        var tp = chunk.TilePieces[_x][_y];
+
+                        ab2[_x][_y] = tp.GetLayer2Angles();
+
+                        if (!(ab2[_x][_y] == 0 || ab2[_x][_y] == 255 || ab2[_x][_y] == 1))
+                        {
+                            if (tp.XFlip)
+                            {
+                                if (tp.YFlip)
+                                {
+                                    ab2[_x][_y] = 192 - ab2[_x][_y] + 192;
+
+                                    ab2[_x][_y] = 128 - ab2[_x][_y] + 128;
+                                }
+                                else
+                                    ab2[_x][_y] = 128 - ab2[_x][_y] + 128;
+                            }
+                            else
+                            {
+                                if (tp.YFlip)
+                                    ab2[_x][_y] = 192 - ab2[_x][_y] + 192;
+                                else
+                                    ab2[_x][_y] = (ab2[_x][_y]);
+                            }
+                        }
+
+                        int __x;
+                        int __y;
+                        var hd2 = tp.GetLayer2HeightMaps();
+                        if (hd2 == null) continue;
+                        Solidity mj;
+
+                        int[] hd2Items = null;
+
+                        if (hd2.Full != null)
+                        {
+                            mj = hd2.Full == false ? 0 : tp.Solid2;
+                            for (__y = 0; __y < 16; __y++)
+                            {
+                                for (__x = 0; __x < 16; __x++)
+                                {
+                                    hb2[(_x * 16 + __x)][(_y * 16 + __y)] = mj;
+                                }
+                            }
+                        }
+                        else
+                            hd2Items = hd2.Items;
+
+                        for (__y = 0; __y < 16; __y++)
+                        {
+                            for (__x = 0; __x < 16; __x++)
+                            {
+                                var jx = 0;
+                                var jy = 0;
+                                if (tp.XFlip)
+                                {
+                                    if (tp.YFlip)
+                                    {
+                                        jx = 15 - __x;
+                                        jy = 15 - __y;
+                                    }
+                                    else
+                                    {
+                                        jx = 15 - __x;
+                                        jy = __y;
+                                    }
+                                }
+                                else
+                                {
+                                    if (tp.YFlip)
+                                    {
+                                        jx = __x;
+                                        jy = 15 - __y;
+                                    }
+                                    else
+                                    {
+                                        jx = __x;
+                                        jy = __y;
+                                    }
+                                }
+
+                                if (hd2.Full == null)
+                                {
+                                    switch (tp.Solid2)
+                                    {
+                                        case (Solidity)0:
+                                            hb2[(_x * 16 + jx)][(_y * 16 + jy)] = Solidity.NotSolid;
+                                            break;
+                                        case (Solidity)1:
+                                        case (Solidity)2:
+                                        case (Solidity)3:
+                                            hb2[(_x * 16 + jx)][(_y * 16 + jy)] = HeightMap.ItemsGood(hd2Items, __x, __y) ? tp.Solid2 : 0;
+                                            break;
+                                    }
+                                }
+
+                                //imap[(x * 128 + _x * 16 + __x) + (y * 128 + _y * 16 + __y) * (SonicManager.Instance.SonicLevel.LevelWidth)] = tp.heightMask.angle;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
     }
     public class Sensor
     {
@@ -100,10 +346,12 @@ namespace OurSonic.Sonic
 
         private SensorM checkCollisionLineWrap(int x1, int x2, int y1, int y2, bool ignoreSolid)
         {
+            //todo: this is some of the worst code man has ever written. if youre reading this im sorry. send me an email dested@gmail for an apology.
+
             var _x = x1 / 128;
             var _y = Help.Mod(y1 / 128, SonicManager.Instance.SonicLevel.LevelHeight);
             var tc = SonicManager.Instance.SonicLevel.GetChunkAt(_x, _y);
-            buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
+            Manager.BuildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
 
             var curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
             var cura = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.AngleMap1 : tc.AngleMap2;
@@ -130,7 +378,7 @@ namespace OurSonic.Sonic
                                         return __currentM;
                                     }
                                     tc = SonicManager.Instance.SonicLevel.GetChunkAt(_x - 1, _y);
-                                    buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
+                                    Manager.BuildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
 
                                     curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
                                     cura = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.AngleMap1 : tc.AngleMap2;
@@ -163,7 +411,7 @@ namespace OurSonic.Sonic
 */
 
                                 tc = SonicManager.Instance.SonicLevel.GetChunkAt(_x + 1, _y);
-                                buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
+                                Manager.BuildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
 
                                 curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
                                 cura = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.AngleMap1 : tc.AngleMap2;
@@ -197,7 +445,7 @@ namespace OurSonic.Sonic
                                     }
 */
                                     tc = SonicManager.Instance.SonicLevel.GetChunkAt(_x + 1, _y);
-                                    buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
+                                    Manager.BuildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
 
                                     curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
                                     cura = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.AngleMap1 : tc.AngleMap2;
@@ -226,7 +474,7 @@ namespace OurSonic.Sonic
                                     return __currentM;
                                 }
                                 tc = SonicManager.Instance.SonicLevel.GetChunkAt(_x - 1, _y);
-                                buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
+                                Manager.BuildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
 
                                 curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
                                 cura = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.AngleMap1 : tc.AngleMap2;
@@ -255,7 +503,7 @@ namespace OurSonic.Sonic
                             while (true) {
                                 if (__y - i < 0) {
                                     tc = SonicManager.Instance.SonicLevel.GetChunkAt(_x, Help.Mod(( _y - 1 ), SonicManager.Instance.SonicLevel.LevelHeight));
-                                    buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
+                                    Manager.BuildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
                                     curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
                                     cura = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.AngleMap1 : tc.AngleMap2;
                                     __y += 128;
@@ -279,7 +527,7 @@ namespace OurSonic.Sonic
                         while (true) {
                             if (__y + i >= 128) {
                                 tc = SonicManager.Instance.SonicLevel.GetChunkAt(_x, ( _y + 1 ) % SonicManager.Instance.SonicLevel.LevelHeight);
-                                buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
+                                Manager.BuildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
                                 curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
                                 cura = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.AngleMap1 : tc.AngleMap2;
                                 __y -= 128;
@@ -309,7 +557,7 @@ namespace OurSonic.Sonic
                                 if (__y + i >= 128) {
                                     tc =
                                             SonicManager.Instance.SonicLevel.GetChunkAt(_x, ( _y + 1 ) % SonicManager.Instance.SonicLevel.LevelHeight);
-                                    buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
+                                    Manager.BuildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
                                     curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
                                     cura = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.AngleMap1 : tc.AngleMap2;
                                     __y -= 128;
@@ -334,7 +582,7 @@ namespace OurSonic.Sonic
                         while (true) {
                             if (__y - i < 0) {
                                 tc = SonicManager.Instance.SonicLevel.GetChunkAt(_x, Help.Mod(( _y - 1 ), SonicManager.Instance.SonicLevel.LevelHeight));
-                                buildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
+                                Manager.BuildChunk(tc, SonicManager.Instance.SonicLevel.CurHeightMap);
                                 curh = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.HeightBlocks1 : tc.HeightBlocks2;
                                 cura = SonicManager.Instance.SonicLevel.CurHeightMap ? tc.AngleMap1 : tc.AngleMap2;
                                 __y += 128;
@@ -356,192 +604,6 @@ namespace OurSonic.Sonic
             return null;
         }
 
-        private void buildChunk(TileChunk chunk, bool isLayerOne)
-        {
-            if (isLayerOne) {
-                if (chunk.HeightBlocks1.Truthy())
-                    return;
-                var hb1 = chunk.HeightBlocks1 = new Solidity[128][];
-                var ab1 = chunk.AngleMap1 = new int[8][];
-                for (var _1 = 0; _1 < 128; _1++) {
-                    hb1[_1] = new Solidity[128];
-                }
-                for (var _1 = 0; _1 < 8; _1++) {
-                    ab1[_1] = new int[8];
-                }
-
-                for (var _y = 0; _y < 8; _y++) {
-                    for (var _x = 0; _x < 8; _x++) {
-                        var tp = chunk.TilePieces[_x][_y];
-
-                        ab1[_x][_y] = tp.GetLayer1Angles();
-
-                        if (!( ab1[_x][_y] == 0 || ab1[_x][_y] == 255 || ab1[_x][_y] == 1 )) {
-                            if (tp.XFlip) {
-                                if (tp.YFlip) {
-                                    ab1[_x][_y] = 192 - ab1[_x][_y] + 192;
-
-                                    ab1[_x][_y] = 128 - ab1[_x][_y] + 128;
-                                } else
-                                    ab1[_x][_y] = 128 - ab1[_x][_y] + 128;
-                            } else {
-                                if (tp.YFlip)
-                                    ab1[_x][_y] = 192 - ab1[_x][_y] + 192;
-                                else
-                                    ab1[_x][_y] = ( ab1[_x][_y] );
-                            }
-                        }
-
-                        var __x = 0;
-                        var __y = 0;
-
-                        HeightMap heightMask = tp.GetLayer1HeightMaps();
-                        int[] heightMaskItems = null;
-                        if (heightMask == null) continue;
-                        Solidity mj;
-                        if (heightMask.Full != null) {
-                            mj = !heightMask.Full.Value ? 0 : tp.Solid1;
-                            for (__y = 0; __y < 16; __y++) {
-                                for (__x = 0; __x < 16; __x++) {
-                                    hb1[( _x * 16 + __x )][( _y * 16 + __y )] = mj;
-                                }
-                            }
-                        } else
-                            heightMaskItems = heightMask.Items;
-
-                        for (__y = 0; __y < 16; __y++) {
-                            for (__x = 0; __x < 16; __x++) {
-                                var jx = 0;
-                                var jy = 0;
-                                if (tp.XFlip) {
-                                    if (tp.YFlip) {
-                                        jx = 15 - __x;
-                                        jy = 15 - __y;
-                                    } else {
-                                        jx = 15 - __x;
-                                        jy = __y;
-                                    }
-                                } else {
-                                    if (tp.YFlip) {
-                                        jx = __x;
-                                        jy = 15 - __y;
-                                    } else {
-                                        jx = __x;
-                                        jy = __y;
-                                    }
-                                }
-
-                                if (heightMask.Full == null) {
-                                    switch (tp.Solid1) {
-                                        case 0:
-                                            hb1[( _x * 16 + jx )][( _y * 16 + jy )] = 0;
-                                            break;
-                                        case (Solidity) 1:
-                                        case (Solidity) 2:
-                                        case (Solidity) 3:
-                                            hb1[( _x * 16 + jx )][( _y * 16 + jy )] = HeightMap.ItemsGood(heightMaskItems, __x, __y) ? tp.Solid1 : 0;
-                                            break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                if (chunk.HeightBlocks2.Truthy())
-                    return;
-
-                var hb2 = chunk.HeightBlocks2 = new Solidity[128][];
-                var ab2 = chunk.AngleMap2 = new int[8][];
-                for (var _1 = 0; _1 < 128; _1++) {
-                    hb2[_1] = new Solidity[128];
-                }
-                for (var _1 = 0; _1 < 8; _1++) {
-                    ab2[_1] = new int[8];
-                }
-
-                for (var _y = 0; _y < 8; _y++) {
-                    for (var _x = 0; _x < 8; _x++) {
-                        var tp = chunk.TilePieces[_x][_y];
-
-                        ab2[_x][_y] = tp.GetLayer2Angles();
-
-                        if (!( ab2[_x][_y] == 0 || ab2[_x][_y] == 255 || ab2[_x][_y] == 1 )) {
-                            if (tp.XFlip) {
-                                if (tp.YFlip) {
-                                    ab2[_x][_y] = 192 - ab2[_x][_y] + 192;
-
-                                    ab2[_x][_y] = 128 - ab2[_x][_y] + 128;
-                                } else
-                                    ab2[_x][_y] = 128 - ab2[_x][_y] + 128;
-                            } else {
-                                if (tp.YFlip)
-                                    ab2[_x][_y] = 192 - ab2[_x][_y] + 192;
-                                else
-                                    ab2[_x][_y] = ( ab2[_x][_y] );
-                            }
-                        }
-
-                        int __x;
-                        int __y;
-                        var hd2 = tp.GetLayer2HeightMaps();
-                        if (hd2 == null) continue;
-                        Solidity mj;
-
-                        int[] hd2Items = null;
-
-                        if (hd2.Full != null) {
-                            mj = hd2.Full == false ? 0 : tp.Solid2;
-                            for (__y = 0; __y < 16; __y++) {
-                                for (__x = 0; __x < 16; __x++) {
-                                    hb2[( _x * 16 + __x )][( _y * 16 + __y )] = mj;
-                                }
-                            }
-                        } else
-                            hd2Items = hd2.Items;
-
-                        for (__y = 0; __y < 16; __y++) {
-                            for (__x = 0; __x < 16; __x++) {
-                                var jx = 0;
-                                var jy = 0;
-                                if (tp.XFlip) {
-                                    if (tp.YFlip) {
-                                        jx = 15 - __x;
-                                        jy = 15 - __y;
-                                    } else {
-                                        jx = 15 - __x;
-                                        jy = __y;
-                                    }
-                                } else {
-                                    if (tp.YFlip) {
-                                        jx = __x;
-                                        jy = 15 - __y;
-                                    } else {
-                                        jx = __x;
-                                        jy = __y;
-                                    }
-                                }
-
-                                if (hd2.Full == null) {
-                                    switch (tp.Solid2) {
-                                        case (Solidity) 0:
-                                            hb2[( _x * 16 + jx )][( _y * 16 + jy )] = Solidity.NotSolid;
-                                            break;
-                                        case (Solidity) 1:
-                                        case (Solidity) 2:
-                                        case (Solidity) 3:
-                                            hb2[( _x * 16 + jx )][( _y * 16 + jy )] = HeightMap.ItemsGood(hd2Items, __x, __y) ? tp.Solid2 : 0;
-                                            break;
-                                    }
-                                }
-
-                                //imap[(x * 128 + _x * 16 + __x) + (y * 128 + _y * 16 + __y) * (SonicManager.Instance.SonicLevel.LevelWidth)] = tp.heightMask.angle;
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
         public void Draw(CanvasContext2D canvas, Sonic character, SensorM sensorResult)
         {

@@ -328,6 +328,8 @@ namespace OurSonic
 
         public void RunSonic(SLData level)
         {
+            sonicManager.ClearCache();
+
             sonicManager.Load(level);
 
             sonicManager.WindowLocation.X = 0;
@@ -337,7 +339,6 @@ namespace OurSonic
 
             sonicManager.BigWindowLocation.Width = (int) ( sonicManager.WindowLocation.Width * 1.8 );
             sonicManager.BigWindowLocation.Height = (int) ( sonicManager.WindowLocation.Height * 1.8 );
-            sonicManager.ClearCache();
 
             var dl = Help.GetQueryString();
             if (dl.ContainsKey("run")) {
@@ -345,6 +346,8 @@ namespace OurSonic
                     runGame();
                 runGame();
             }
+
+            sonicManager.CacheTiles();
         }
 
         public static void runGame()

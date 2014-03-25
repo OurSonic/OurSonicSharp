@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
 using OurSonic.Areas;
@@ -7,37 +8,38 @@ using OurSonic.Level.Animations;
 using OurSonic.UIManager;
 using OurSonic.Utility;
 using OurSonicModels;
+using OurSonicModels.Common;
+
 namespace OurSonic.Level.Tiles
 {
     public class TileChunk
     {
-        private const int numOfPiecesWide = 8;
-        private const int numOfPiecesLong = 8;
+        const int piecesSquareSize = 16;
+        const int tilePieceSize = 8;
 
         #region UI
 
         public void DrawUI(CanvasContext2D canvas, Point position, DoublePoint scale, int layer)
         {
-            using (new CanvasHandler(canvas)) {
+            canvas.Save();
+            {
                 canvas.Translate(position.X, position.Y);
                 canvas.Scale(scale.X, scale.Y);
 
-                var pieceWidth = 16 * 1;
-                var pieceHeight = 16 * 1;
+                var pieceWidth = piecesSquareSize * 1;
+                var pieceHeight = piecesSquareSize * 1;
 
                 bool isBack = layer == 0;
 
                 //for building no aniamtion cache
-                drawOld(canvas, new Point(0, 0), layer, pieceWidth, pieceHeight, isBack, false, null, null);
+                //                drawTilePieces(canvas, new Point(0, 0), layer, pieceWidth, pieceHeight, isBack, false, null, null);
             }
+            canvas.Restore();
         }
 
         #endregion
 
-        private List<TileCacheBlock>[] layerCacheBlocks;
         private Point myLocalPoint = new Point(0, 0);
-        private bool? myNeverAnimate;
-        private CanvasInformation[] neverAnimateCache;
         [IntrinsicProperty]
         public bool? IsOnlyBackground { get; set; }
         [IntrinsicProperty]
@@ -47,7 +49,8 @@ namespace OurSonic.Level.Tiles
         [IntrinsicProperty]
         public TilePieceInfo[][] TilePieces { get; set; }
         [IntrinsicProperty]
-        public JsDictionary<int, Animation> Animated { get; set; }
+        //todo remove
+        public JsDictionary<int, TileAnimationData> TileAnimations { get; set; }
         [IntrinsicProperty]
         public int Index { get; set; }
         [IntrinsicProperty]
@@ -59,45 +62,47 @@ namespace OurSonic.Level.Tiles
         [IntrinsicProperty]
         public int[][] AngleMap2 { get; set; }
 
+        private List<int> tileAnimationIndexes;
+        private List<int> paletteAnimationIndexes;
+
         public TileChunk( /*TilePiece[][] tilePieces*/)
         {
             IsOnlyBackground = null;
-            neverAnimateCache = new CanvasInformation[2];
-            layerCacheBlocks = new List<TileCacheBlock>[2];
         }
 
         public void ClearCache()
         {
-            layerCacheBlocks = new List<TileCacheBlock>[2];
-            neverAnimateCache = new CanvasInformation[2];
         }
 
         public TilePiece GetBlockAt(int x, int y)
         {
-            return TilePieces[x / 16][y / 16].GetTilePiece();
+            return TilePieces[x / piecesSquareSize][y / piecesSquareSize].GetTilePiece();
         }
 
         public void SetBlockAt(int x, int y, TilePiece tp)
         {
-            if (TilePieces[x / 16][y / 16].SetTilePiece(tp))
+            if (GetTilePiece(x, y).SetTilePiece(tp))
                 ClearCache();
         }
 
         public TilePieceInfo GetTilePiece(int x, int y)
         {
-            return TilePieces[x / 16][y / 16];
+            return TilePieces[x / piecesSquareSize][y / piecesSquareSize];
         }
 
         public bool OnlyBackground()
         {
-            if (!IsOnlyBackground.HasValue) {
+            if (!IsOnlyBackground.HasValue)
+            {
                 var tpl = TilePieces.Length;
                 var tph = TilePieces[0].Length;
-                for (int i = 0; i < tpl; i++) {
-                    for (int j = 0; j < tph; j++) {
-                        TilePiece tilePiece = TilePieces[i][j].GetTilePiece();
+                for (int pieceY = 0; pieceY < tilePieceSize; pieceY++)
+                {
+                    for (int pieceX = 0; pieceX < tilePieceSize; pieceX++)
+                    {
+                        TilePiece tilePiece = TilePieces[pieceX][pieceY].GetTilePiece();
                         if (tilePiece != null && !tilePiece.OnlyBackground())
-                            return ( IsOnlyBackground = false ).Value;
+                            return (IsOnlyBackground = false).Value;
                     }
                 }
                 IsOnlyBackground = true;
@@ -108,14 +113,17 @@ namespace OurSonic.Level.Tiles
 
         public bool OnlyForeground()
         {
-            if (!IsOnlyForeground.HasValue) {
+            if (!IsOnlyForeground.HasValue)
+            {
                 var tpl = TilePieces.Length;
                 var tph = TilePieces[0].Length;
-                for (int i = 0; i < tpl; i++) {
-                    for (int j = 0; j < tph; j++) {
-                        TilePiece tilePiece = TilePieces[i][j].GetTilePiece();
+                for (int pieceY = 0; pieceY < tilePieceSize; pieceY++)
+                {
+                    for (int pieceX = 0; pieceX < tilePieceSize; pieceX++)
+                    {
+                        TilePiece tilePiece = TilePieces[pieceX][pieceY].GetTilePiece();
                         if (tilePiece != null && !tilePiece.OnlyForeground())
-                            return ( IsOnlyForeground = false ).Value;
+                            return (IsOnlyForeground = false).Value;
                     }
                 }
                 IsOnlyForeground = true;
@@ -127,14 +135,17 @@ namespace OurSonic.Level.Tiles
 
         public bool IsEmpty()
         {
-            if (!Empty.HasValue) {
+            if (!Empty.HasValue)
+            {
                 var tpl = TilePieces.Length;
                 var tph = TilePieces[0].Length;
-                for (int i = 0; i < tpl; i++) {
-                    for (int j = 0; j < tph; j++) {
-                        var r = TilePieces[i][j];
+                for (int pieceY = 0; pieceY < tilePieceSize; pieceY++)
+                {
+                    for (int pieceX = 0; pieceX < tilePieceSize; pieceX++)
+                    {
+                        var r = TilePieces[pieceX][pieceY];
                         if (r != null && r.Block != 0)
-                            return ( Empty = false ).Value;
+                            return (Empty = false).Value;
                     }
                 }
                 Empty = true;
@@ -142,271 +153,473 @@ namespace OurSonic.Level.Tiles
             return Empty.Value;
         }
 
-        public bool NeverAnimates()
+        private bool HasPixelAnimations()
         {
-            if (!myNeverAnimate.HasValue) {
-                var len1 = TilePieces.Length;
-                var len2 = TilePieces[0].Length;
+            return GetAllPaletteAnimationIndexes().Count > 0;
+        }
 
-                bool nothing = true;
-                for (int i = 0; i < len1; i++) {
-                    for (int j = 0; j < len2; j++) {
-                        var pm = TilePieces[i][j].GetTilePiece();
-                        if (pm == null) continue;
-                        if (( Animated.Truthy() && ( Animated[j * len1 + i].Truthy() ) ) || pm.AnimatedFrames.Count > 0) {
-                            nothing = false;
-                            goto done;
+        private bool HasTileAnimations()
+        {
+            return GetAllTileAnimationIndexes().Count > 0;
+        }
+
+
+        private List<int> GetAllPaletteAnimationIndexes()
+        {
+            if (paletteAnimationIndexes == null)
+            {
+                paletteAnimationIndexes = new List<int>();
+
+                for (int pieceY = 0; pieceY < tilePieceSize; pieceY++)
+                {
+                    for (int pieceX = 0; pieceX < tilePieceSize; pieceX++)
+                    {
+                        var piece = TilePieces[pieceX][pieceY].GetTilePiece();
+                        if (piece == null) continue;
+                        if (piece.AnimatedPaletteIndexes == null) continue;
+
+                        foreach (var animatedPaletteIndex in piece.AnimatedPaletteIndexes)
+                        {
+                            if (paletteAnimationIndexes.IndexOfFast(animatedPaletteIndex) == -1)
+                            {
+                                paletteAnimationIndexes.Add(animatedPaletteIndex);
+                            }
                         }
                     }
                 }
-                done:
-                myNeverAnimate = nothing;
             }
-            return myNeverAnimate.Value;
+            return paletteAnimationIndexes;
+
         }
 
-        public void Draw(CanvasContext2D canvas, Point position, int layer)
+
+        private List<int> GetAllTileAnimationIndexes()
         {
-            bool neverAnimates = NeverAnimates();
+            if (tileAnimationIndexes == null)
+            {
+                tileAnimationIndexes = new List<int>();
 
-            if (layerCacheBlocks[layer] == null)
-                layerCacheBlocks[layer] = BuildCacheBlock(layer);
-
-            using (new CanvasHandler(canvas)) {
-                if (neverAnimateCache[layer] != null) {
-                    drawFullChunk(canvas, position, layer);
-
-                    return;
-                }
-
-                CanvasContext2D oldCanvas = null;
-                Point oldPoint = null;
-
-                var pieceWidth = 16;
-                var pieceHeight = 16;
-
-                bool isBack = layer == 0;
-                if (neverAnimates) {
-                    oldCanvas = canvas;
-
-                    neverAnimateCache[layer] = CanvasInformation.Create(numOfPiecesWide * pieceWidth, numOfPiecesLong * pieceHeight);
-                    canvas = neverAnimateCache[layer].Context;
-                    oldPoint = new Point(position);
-                    position.Set(0, 0);
-                    //for building no aniamtion cache
-                    drawOld(canvas, position, layer, pieceWidth, pieceHeight, isBack, neverAnimates, oldPoint, oldCanvas);
-
-                    return;
-                }
-                foreach (var tileCacheBlock in layerCacheBlocks[layer]) {
-                    switch (tileCacheBlock.Type) {
-                        case TileCacheBlockType.Block:
-
-                            drawBlock(canvas, position, tileCacheBlock);
-
-                            break;
-                        case TileCacheBlockType.TilePiece:
-
-                            drawTilePiece(canvas, position, layer, tileCacheBlock, isBack);
-
-                            break;
+                for (int pieceY = 0; pieceY < tilePieceSize; pieceY++)
+                {
+                    for (int pieceX = 0; pieceX < tilePieceSize; pieceX++)
+                    {
+                        var piece = TilePieces[pieceX][pieceY].GetTilePiece();
+                        if (piece == null) continue;
+                        foreach (var tileInfo in piece.Tiles)
+                        {
+                            var tile = tileInfo.GetTile();
+                            if (tile == null) continue;
+                            if (tile.AnimatedTileIndexes == null) continue;
+                            foreach (var animatedTileIndex in tile.AnimatedTileIndexes)
+                            {
+                                if (tileAnimationIndexes.IndexOfFast(animatedTileIndex) == -1)
+                                {
+                                    tileAnimationIndexes.Add(animatedTileIndex);
+                                }
+                            }
+                        }
                     }
                 }
             }
+            return tileAnimationIndexes;
+
         }
 
-        private void drawOld(CanvasContext2D canvas, Point position, int layer, int pieceWidth, int pieceHeight, bool isBack, bool neverAnimates, Point oldPoint, CanvasContext2D oldCanvas)
+        public bool NeverAnimates()
         {
-            int posX = position.X;
-            int posY = position.Y;
+            return !HasTileAnimations() || !HasPixelAnimations();
+        }
 
-            int curKey = 0; //pieceY * numOfPiecesWide + pieceX              VV
-            for (int pieceY = 0; pieceY < numOfPiecesLong; pieceY++) {
-                curKey = pieceY * numOfPiecesWide;
-                for (int pieceX = 0; pieceX < numOfPiecesWide; pieceX++) {
-                    curKey += pieceX;
-                    drawIt(canvas, layer, TilePieces[pieceX][pieceY], isBack, curKey, posX + pieceX * pieceWidth, posY + pieceY * pieceHeight);
+
+        private ChunkLayer<CanvasInformation> BaseCanvasCache;
+        private ChunkLayer<JsDictionary<int, PaletteAnimationCanvasFrames>> PaletteAnimationCanvasesCache;
+        private ChunkLayer<JsDictionary<int, TileAnimationCanvasFrames>> TileAnimationCanvasesCache;
+
+
+        public void InitCache()
+        {
+            BaseCanvasCache = new ChunkLayer<CanvasInformation>();
+            PaletteAnimationCanvasesCache = new ChunkLayer<JsDictionary<int, PaletteAnimationCanvasFrames>>();
+            TileAnimationCanvasesCache = new ChunkLayer<JsDictionary<int, TileAnimationCanvasFrames>>();
+
+
+            TileAnimationCanvasesCache[ChunkLayer.Low] = new JsDictionary<int, TileAnimationCanvasFrames>();
+            TileAnimationCanvasesCache[ChunkLayer.High] = new JsDictionary<int, TileAnimationCanvasFrames>();
+
+            PaletteAnimationCanvasesCache[ChunkLayer.Low] = new JsDictionary<int, PaletteAnimationCanvasFrames>();
+            PaletteAnimationCanvasesCache[ChunkLayer.High] = new JsDictionary<int, PaletteAnimationCanvasFrames>();
+        }
+        public void WarmCache()
+        {
+            CacheBase(ChunkLayer.Low);
+            CacheBase(ChunkLayer.High);
+
+            if (HasPixelAnimations())
+            {
+                CachePaletteAnimation(ChunkLayer.Low);
+                CachePaletteAnimation(ChunkLayer.High);
+            }
+            if (HasTileAnimations())
+            {
+                CacheTileAnimation(ChunkLayer.Low);
+                CacheTileAnimation(ChunkLayer.High);
+            }
+        }
+        public void CachePaletteAnimation(ChunkLayer layer)
+        {
+            var paletteAnimationCanvases = PaletteAnimationCanvasesCache[layer];
+            foreach (var paletteAnimationIndex in GetAllPaletteAnimationIndexes())
+            {
+                var rect = getAnimationPaletteSurfaceInformation(paletteAnimationIndex, layer);
+
+                if (rect == null)
+                {
+                    continue;
+                }
+                var paletteAnimationCanvasFrames = paletteAnimationCanvases[paletteAnimationIndex] = new PaletteAnimationCanvasFrames(paletteAnimationIndex);
+
+                TilePaletteAnimation tilePaletteAnimation = SonicManager.Instance.TilePaletteAnimationManager.Animations[paletteAnimationIndex];
+
+                paletteAnimationCanvasFrames.Position = new Point(rect.X * piecesSquareSize, rect.Y * piecesSquareSize);
+
+
+
+                foreach (var currentFrame in tilePaletteAnimation.Frames)
+                {
+                    tilePaletteAnimation.CurrentFrame = currentFrame.FrameIndex;
+
+                    var paletteAnimationCanvasFrame = paletteAnimationCanvasFrames.Frames[currentFrame.FrameIndex] = new PaletteAnimationCanvasFrame();
+                    currentFrame.SetPalette();
+                    var tilePaletteCanvas = CanvasInformation.Create(rect.Width * piecesSquareSize, rect.Height * piecesSquareSize);
+
+                    paletteAnimationCanvasFrame.Canvas = tilePaletteCanvas;
+
+
+
+                    paletteAnimationCanvasFrame.Canvas.Context.Save();
+                    paletteAnimationCanvasFrame.Canvas.Context.Translate(-rect.X * piecesSquareSize, -rect.Y * piecesSquareSize);
+                    drawTilePiecesAnimatedPalette(tilePaletteCanvas.Context, layer, piecesSquareSize, paletteAnimationIndex);
+                    paletteAnimationCanvasFrame.Canvas.Context.Restore();
+
+
+                    currentFrame.ClearPalette();
+                }
+                tilePaletteAnimation.CurrentFrame = 0;
+            }
+        }
+
+        public void CacheTileAnimation(ChunkLayer layer)
+        {
+            var tileAnimationCanvases = TileAnimationCanvasesCache[layer];
+            foreach (var tileAnimationIndex in GetAllTileAnimationIndexes())
+            {
+
+                var rect = getAnimationTileSurfaceInformation(tileAnimationIndex, layer);
+                if (rect == null)
+                {
+                    continue;
+                }
+
+                var tileAnimationCanvasFrames = tileAnimationCanvases[tileAnimationIndex] = new TileAnimationCanvasFrames(tileAnimationIndex);
+
+                TileAnimation tileAnimation = SonicManager.Instance.TileAnimationManager.Animations[tileAnimationIndex];
+
+                tileAnimationCanvasFrames.Position = new Point(rect.X * piecesSquareSize, rect.Y * piecesSquareSize);
+
+                foreach (var currentFrame in tileAnimation.Frames)
+                {
+                    var tileAnimationCanvasFrame = tileAnimationCanvasFrames.Frames[currentFrame.FrameIndex] = new TileAnimationCanvasFrame();
+
+                    var tileTileCanvas = CanvasInformation.Create(rect.Width * piecesSquareSize, rect.Height * piecesSquareSize);
+                    tileAnimationCanvasFrame.Canvas = tileTileCanvas;
+                    tileAnimation.CurrentFrame = currentFrame.FrameIndex;
+
+                    tileAnimationCanvasFrame.Canvas.Context.Save();
+                    tileAnimationCanvasFrame.Canvas.Context.Translate(-rect.X * piecesSquareSize, -rect.Y * piecesSquareSize);
+                    drawTilePiecesAnimatedTile(tileTileCanvas.Context, layer, piecesSquareSize, tileAnimationIndex);
+                    tileAnimationCanvasFrame.Canvas.Context.Restore();
+
+                }
+                tileAnimation.CurrentFrame = 0;
+            }
+        }
+
+        private Rectangle getAnimationTileSurfaceInformation(int tileAnimationIndex, ChunkLayer layer)
+        {
+
+            int lowestX = int.MaxValue;
+            int highestX = int.MinValue;
+            int lowestY = int.MaxValue;
+            int highestY = int.MinValue;
+
+
+            for (int pieceY = 0; pieceY < tilePieceSize; pieceY++)
+            {
+                for (int pieceX = 0; pieceX < tilePieceSize; pieceX++)
+                {
+                    var pieceInfo = TilePieces[pieceX][pieceY];
+                    var piece = pieceInfo.GetTilePiece();
+                    if (piece == null) continue;
+
+                    if (layer == ChunkLayer.Low ? (piece.OnlyForeground()) : (piece.OnlyBackground())) continue;
+                    if (piece.AnimatedTileIndexes.IndexOfFast(tileAnimationIndex) == -1) continue;
+
+                    if (pieceX < lowestX)
+                        lowestX = pieceX;
+                    if (pieceX > highestX)
+                        highestX = pieceX;
+
+                    if (pieceY < lowestY)
+                        lowestY = pieceY;
+                    if (pieceY > highestY)
+                        highestY = pieceY;
                 }
             }
+            if (lowestX == int.MaxValue) return null;
 
-            if (neverAnimates) {
-                position = oldPoint;
-                canvas = oldCanvas;
 
-                canvas.DrawImage(neverAnimateCache[layer].Canvas, position.X, position.Y);
+            return new Rectangle(lowestX, lowestY, highestX - lowestX + 1, highestY - lowestY + 1);
+        }
+
+
+        private Rectangle getAnimationPaletteSurfaceInformation(int paletteAnimationIndex, ChunkLayer layer)
+        {
+
+            int lowestX = int.MaxValue;
+            int highestX = int.MinValue;
+            int lowestY = int.MaxValue;
+            int highestY = int.MinValue;
+
+
+
+            for (int pieceY = 0; pieceY < tilePieceSize; pieceY++)
+            {
+                for (int pieceX = 0; pieceX < tilePieceSize; pieceX++)
+                {
+                    var piece = TilePieces[pieceX][pieceY].GetTilePiece();
+                    if (piece == null) continue;
+                    if (layer == ChunkLayer.Low ? (piece.OnlyForeground()) : (piece.OnlyBackground())) continue;
+
+                    if (piece.AnimatedPaletteIndexes.IndexOfFast(paletteAnimationIndex) == -1) continue;
+                     
+                    if (pieceX < lowestX)
+                        lowestX = pieceX;
+                    if (pieceX > highestX)
+                        highestX = pieceX;
+
+                    if (pieceY < lowestY)
+                        lowestY = pieceY;
+                    if (pieceY > highestY)
+                        highestY = pieceY;
+                }
             }
+            if (lowestX == int.MaxValue) return null;
+
+            return new Rectangle(lowestX, lowestY, highestX - lowestX + 1, highestY - lowestY + 1);
         }
 
-        private void drawTilePiece(CanvasContext2D canvas, Point position, int layer, TileCacheBlock tileCacheBlock, bool isBack)
-        {
-            drawIt(canvas, layer, tileCacheBlock.TilePieceInfo, isBack, tileCacheBlock.AnimatedKey, position.X + tileCacheBlock.XPos, position.Y + tileCacheBlock.YPos);
 
-            /*
-                        canvas.Save();
-                        canvas.StrokeStyle = "green";
-                        canvas.StrokeRect(position.X * scale.X * pieceWidth, position.Y * scale.Y * pieceHeight, 16 * scale.X, 16 * scale.Y);
-                        canvas.Restore();
-            */
+
+        public void CacheBase(ChunkLayer layer)
+        {
+            BaseCanvasCache[layer] = CanvasInformation.Create(tilePieceSize * piecesSquareSize, tilePieceSize * piecesSquareSize);
+
+            drawTilePiecesBase(BaseCanvasCache[layer].Context, layer, piecesSquareSize);
         }
 
-        private void drawBlock(CanvasContext2D canvas, Point position, TileCacheBlock tileCacheBlock)
+
+        public void Draw(CanvasContext2D canvas, Point position, ChunkLayer layer)
         {
-            canvas.DrawImage(tileCacheBlock.Block.Canvas, position.X /*tileCacheBlock.X * pieceWidth*/, position.Y /*tileCacheBlock.Y * pieceHeight*/);
-            UIManagerAreas areas = SonicManager.Instance.UIManager.UIManagerAreas;
-            if (areas.TileChunkArea != null && areas.TileChunkArea.Data != null && areas.TileChunkArea.Data.Index == Index) {
-                canvas.Save();
-                canvas.StrokeStyle = "yellow";
-                canvas.LineWidth = 2;
-                canvas.StrokeRect(position.X, position.Y, tileCacheBlock.Block.Canvas.Width, tileCacheBlock.Block.Canvas.Height);
-                canvas.Restore();
-            }
-        }
 
-        private void drawFullChunk(CanvasContext2D canvas, Point position, int layer)
-        {
-            canvas.DrawImage(neverAnimateCache[layer].Canvas, position.X, position.Y);
+            canvas.Save();
+            {
+                canvas.DrawImage(BaseCanvasCache[layer].Canvas, position.X, position.Y);
 
-            UIManagerAreas areas = SonicManager.Instance.UIManager.UIManagerAreas;
-            if (areas.TileChunkArea != null && areas.TileChunkArea.Data != null && areas.TileChunkArea.Data.Index == Index) {
-                canvas.Save();
-                canvas.StrokeStyle = "yellow";
-                canvas.LineWidth = 2;
-                canvas.StrokeRect(position.X, position.Y, neverAnimateCache[layer].Canvas.Width, neverAnimateCache[layer].Canvas.Height);
-                canvas.Restore();
-            }
 
-            /*
-                        canvas.Save();
-                        canvas.StrokeStyle = "red";
-                        canvas.StrokeRect(position.X, position.Y, 128 , 128);
-                        canvas.Restore();
-            */
-        }
+                if (HasPixelAnimations())
+                {
 
-        private void drawIt(CanvasContext2D canvas,
-                            int layer,
-                            TilePieceInfo pieceInfo,
-                            bool isBack,
-                            int animatedKey,
-                            int pointx,
-                            int pointy)
-        {
-            var piece = pieceInfo.GetTilePiece();
+                    var paletteAnimationCanvases = PaletteAnimationCanvasesCache[layer];
+                    foreach (var paletteAnimationIndex in GetAllPaletteAnimationIndexes())
+                    {
+                        var paletteAnimationCanvasFrames = paletteAnimationCanvases[paletteAnimationIndex];
+                        if (paletteAnimationCanvasFrames == null) continue;
 
-            if (isBack ? ( piece.OnlyForeground() ) : ( piece.OnlyBackground() )) return;
+                        var currentFrame = SonicManager.Instance.TilePaletteAnimationManager.GetCurrentFrame(paletteAnimationIndex);
+                        var paletteAnimationCanvasFrame = paletteAnimationCanvasFrames.Frames[currentFrame.FrameIndex];
+                        var canvasLayerToDraw = paletteAnimationCanvasFrame.Canvas.Canvas;
+                        canvas.DrawImage(canvasLayerToDraw, position.X + paletteAnimationCanvasFrames.Position.X, position.Y + paletteAnimationCanvasFrames.Position.Y);
+                    }
+                }
 
-            int animatedIndex = 0;
-            Animation animation = Animated[animatedKey];
+                if (HasTileAnimations())
+                {
+                    var tileAnimationCanvases = TileAnimationCanvasesCache[layer];
+                    foreach (var tileAnimationIndex in GetAllTileAnimationIndexes())
+                    {
+                        var tileAnimationCanvasFrames = tileAnimationCanvases[tileAnimationIndex];
+                        if (tileAnimationCanvasFrames == null) continue;
 
-            if (Animated.Truthy() && ( animation.Truthy() ))
-                animatedIndex = animation.LastAnimatedIndex;
-
-            myLocalPoint.X = pointx;
-            myLocalPoint.Y = pointy;
-            piece.Draw(canvas, myLocalPoint, layer, pieceInfo.XFlip, pieceInfo.YFlip, animatedIndex);
-
-            //canvas.StrokeStyle = "#FFF";
-            //canvas.StrokeRect(position.X + pieceX * 16 * scale.X, position.Y + pieceY * 16 * scale.Y, scale.X * 16, scale.Y * 16);
-        }
-
-        public List<TileCacheBlock> BuildCacheBlock(int layer)
-        {
-            List<TileCacheBlock> tilePieces = new List<TileCacheBlock>();
-            TileCacheBlock block = null;
-
-            if (neverAnimateCache[layer] != null)
-                return new List<TileCacheBlock>();
-
-            var pieceWidth = 16;
-            var pieceHeight = 16;
-
-            if (NeverAnimates())
-                return new List<TileCacheBlock>();
-
-            bool isBack = layer == 0;
-
-            for (int pieceX = 0; pieceX < numOfPiecesWide; pieceX++) {
-                for (int pieceY = 0; pieceY < numOfPiecesLong; pieceY++) {
-                    var cacheBlock = buildCacheBlock(layer, pieceWidth, pieceHeight, TilePieces[pieceX][pieceY], isBack, pieceX, pieceY, block);
-
-                    switch (cacheBlock.Type) {
-                        case TileCacheBlockType.Block:
-                            block = cacheBlock;
-                            break;
-                        case TileCacheBlockType.TilePiece:
-                            tilePieces.Add(cacheBlock);
-                            break;
+                        var currentFrame = SonicManager.Instance.TileAnimationManager.GetCurrentFrame(tileAnimationIndex);
+                        var tileAnimationCanvasFrame = tileAnimationCanvasFrames.Frames[currentFrame.FrameIndex];
+                        var canvasLayerToDraw = tileAnimationCanvasFrame.Canvas.Canvas;
+                        canvas.DrawImage(canvasLayerToDraw, position.X + tileAnimationCanvasFrames.Position.X, position.Y + tileAnimationCanvasFrames.Position.Y);
                     }
                 }
             }
+            canvas.Restore();
 
-            List<TileCacheBlock> tileCacheBlocks = new List<TileCacheBlock>(tilePieces);
-            if (block != null)
-                tileCacheBlocks.Add(block);
-            return tileCacheBlocks;
         }
 
-        private TileCacheBlock buildCacheBlock(
-                int layer,
-                int pieceWidth,
-                int pieceHeight,
-                TilePieceInfo pieceInfo,
-                bool isBack,
-                int pieceX,
-                int pieceY,
-                TileCacheBlock oldCacheBlock)
+        private void drawTilePiecesAnimatedPalette(CanvasContext2D canvas, ChunkLayer layer, int piecesSquareSize, int animatedPaletteIndex)
         {
-            //if (isBack ? (piece.onlyForeground) : (piece.onlyBackground)) return null;
+            for (int pieceY = 0; pieceY < tilePieceSize; pieceY++)
+            {
+                for (int pieceX = 0; pieceX < tilePieceSize; pieceX++)
+                {
+                    var pieceInfo = TilePieces[pieceX][pieceY];
+                    var piece = pieceInfo.GetTilePiece();
+                    if (piece.AnimatedPaletteIndexes.IndexOfFast(animatedPaletteIndex) == -1) continue;
 
-            var piece = pieceInfo.GetTilePiece();
-            if (piece == null) return oldCacheBlock;
-            int animatedIndex = 0;
-            Animation animation = Animated[pieceY * numOfPiecesWide + pieceX];
+                    if (layer == ChunkLayer.Low ? (piece.OnlyForeground()) : (piece.OnlyBackground())) continue;
 
-            bool cacheBlockNeeded = false;
-            bool shouldAnimate = piece.ShouldAnimate();
 
-            if (Animated.Truthy() && ( animation.Truthy() ))
-                animatedIndex = animation.LastAnimatedIndex;
-            else {
-                if (piece.AnimatedFrames.Count == 0 && ( !shouldAnimate || myNeverAnimate.Value ))
-                    cacheBlockNeeded = true;
+                    myLocalPoint.X = pieceX * piecesSquareSize;
+                    myLocalPoint.Y = pieceY * piecesSquareSize;
+                    piece.DrawAnimatedPalette(canvas, myLocalPoint, layer, pieceInfo.XFlip, pieceInfo.YFlip, animatedPaletteIndex);
+                }
             }
-
-            if (cacheBlockNeeded) {
-                Point internalPoint = new Point(pieceX * pieceWidth, pieceY * pieceHeight);
-
-                if (oldCacheBlock == null) {
-                    oldCacheBlock = new TileCacheBlock(TileCacheBlockType.Block);
-                    oldCacheBlock.Block = CanvasInformation.Create(pieceWidth * 8, pieceHeight * 8);
-                }
-
-                oldCacheBlock.Block.Context.Save();
-                piece.Draw(oldCacheBlock.Block.Context, internalPoint, layer, pieceInfo.XFlip, pieceInfo.YFlip, animatedIndex);
-
-                //                oldCacheBlock.Block.Context.FillStyle = oldCacheBlock.Color;
-                //                oldCacheBlock.Block.Context.FillRect(internalPoint.X, internalPoint.Y, 16 * scale.X, 16 * scale.Y);
-                oldCacheBlock.Block.Context.Restore();
-                return oldCacheBlock;
-            } else
-                return new TileCacheBlock(TileCacheBlockType.TilePiece) {TilePieceInfo = pieceInfo, XPos = pieceX * pieceWidth, YPos = pieceY * pieceHeight, AnimatedKey = pieceY * numOfPiecesWide + pieceX};
         }
 
-        public void AnimatedTick()
+        private void drawTilePiecesAnimatedTile(CanvasContext2D canvas, ChunkLayer layer, int piecesSquareSize, int animatedTileIndex)
         {
-            foreach (var an in Animated) {
-                var anni = an.Value;
-                if (anni.LastAnimatedFrame.Falsey()) {
-                    anni.LastAnimatedFrame = 0;
-                    anni.LastAnimatedIndex = 0;
+            for (int pieceY = 0; pieceY < tilePieceSize; pieceY++)
+            {
+                for (int pieceX = 0; pieceX < tilePieceSize; pieceX++)
+                {
+
+
+                    var pieceInfo = TilePieces[pieceX][pieceY];
+
+                    var piece = pieceInfo.GetTilePiece();
+                    if (piece.AnimatedTileIndexes.IndexOfFast(animatedTileIndex) == -1) continue;
+
+                    if (layer == ChunkLayer.Low ? (piece.OnlyForeground()) : (piece.OnlyBackground())) continue;
+
+
+                    myLocalPoint.X = pieceX * piecesSquareSize;
+                    myLocalPoint.Y = pieceY * piecesSquareSize;
+                    piece.DrawAnimatedTile(canvas, myLocalPoint, layer, pieceInfo.XFlip, pieceInfo.YFlip, animatedTileIndex);
+
                 }
-                if (anni.Frames[anni.LastAnimatedIndex].Ticks == 0 ||
-                    ( SonicManager.Instance.DrawTickCount - anni.LastAnimatedFrame ) >=
-                    ( ( anni.AutomatedTiming > 0 ) ? anni.AutomatedTiming : anni.Frames[anni.LastAnimatedIndex].Ticks )) {
-                    anni.LastAnimatedFrame = SonicManager.Instance.DrawTickCount;
-                    anni.LastAnimatedIndex = ( anni.LastAnimatedIndex + 1 ) % anni.Frames.Length;
+            }
+        }
+        private void drawTilePiecesBase(CanvasContext2D canvas, ChunkLayer layer, int piecesSquareSize)
+        {
+            for (int pieceY = 0; pieceY < tilePieceSize; pieceY++)
+            {
+                for (int pieceX = 0; pieceX < tilePieceSize; pieceX++)
+                {
+                    var pieceInfo = TilePieces[pieceX][pieceY];
+
+
+                    var piece = pieceInfo.GetTilePiece();
+
+                    if (layer == ChunkLayer.Low ? (piece.OnlyForeground()) : (piece.OnlyBackground())) continue;
+
+                    myLocalPoint.X = pieceX * piecesSquareSize;
+                    myLocalPoint.Y = pieceY * piecesSquareSize;
+                    piece.DrawBase(canvas, myLocalPoint, layer, pieceInfo.XFlip, pieceInfo.YFlip);
+                }
+            }
+        }
+
+    }
+
+    public enum ChunkLayer
+    {
+        Low = 0,
+        High = 1
+    }
+
+    public class ChunkLayer<T>
+    {
+        [IntrinsicProperty]
+        public T Low { get; set; }
+        [IntrinsicProperty]
+        public T High { get; set; }
+
+        public T this[ChunkLayer layer]
+        {
+            get
+            {
+                switch (layer)
+                {
+                    case ChunkLayer.Low:
+                        return Low;
+                    case ChunkLayer.High:
+                        return High;
+                    default:
+                        return default(T);
+                }
+            }
+            set
+            {
+                switch (layer)
+                {
+                    case ChunkLayer.Low:
+                        Low = value;
+                        break;
+                    case ChunkLayer.High:
+                        High = value;
+                        break;
                 }
             }
         }
     }
+
+    public class PaletteAnimationCanvasFrames
+    {
+        public PaletteAnimationCanvasFrames(int paletteAnimationIndex)
+        {
+            PaletteAnimationIndex = paletteAnimationIndex;
+            Frames = new JsDictionary<int, PaletteAnimationCanvasFrame>();
+        }
+        [IntrinsicProperty]
+        public int PaletteAnimationIndex { get; set; }
+        [IntrinsicProperty]
+        public Point Position { get; set; }
+        [IntrinsicProperty]
+        public JsDictionary<int, PaletteAnimationCanvasFrame> Frames { get; set; }
+    }
+    public class PaletteAnimationCanvasFrame
+    {
+        [IntrinsicProperty]
+        public CanvasInformation Canvas { get; set; }
+    }
+
+
+    public class TileAnimationCanvasFrames
+    {
+        public TileAnimationCanvasFrames(int tileAnimationIndex)
+        {
+            TileAnimationIndex = tileAnimationIndex;
+            Frames = new JsDictionary<int, TileAnimationCanvasFrame>();
+        }
+        [IntrinsicProperty]
+        public int TileAnimationIndex { get; set; }
+
+        [IntrinsicProperty]
+        public Point Position { get; set; }
+        [IntrinsicProperty]
+        public JsDictionary<int, TileAnimationCanvasFrame> Frames { get; set; }
+    }
+    public class TileAnimationCanvasFrame
+    {
+        [IntrinsicProperty]
+        public CanvasInformation Canvas { get; set; }
+    }
+
+
 }
+
