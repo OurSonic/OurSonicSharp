@@ -346,6 +346,8 @@ namespace OurSonic
                     runGame();
                 runGame();
             }
+
+            sonicManager.CacheTiles();
         }
 
         public static void runGame()

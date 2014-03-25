@@ -123,6 +123,9 @@ setTimeout(tim, 100);*/
                     SonicEngine.runGame();
                 //#if RELEASE
                 SonicEngine.runGame();
+
+                sonicManager.CacheTiles();
+
                 //#endif
             });
         }

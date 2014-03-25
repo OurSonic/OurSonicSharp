@@ -14,7 +14,8 @@ namespace OurSonic.Sonic
         private int oldSign;
         private SonicConstants physicsVariables;
         private int runningTick;
-        private SensorManager sensorManager;
+        [IntrinsicProperty]
+        public SensorManager SensorManager { get; set; }
         public int sonicLastHitTick;
         private SonicLevel sonicLevel;
         [IntrinsicProperty]
@@ -93,17 +94,20 @@ namespace OurSonic.Sonic
             sonicLevel = sonicManager.SonicLevel;
             X = sonicLevel.StartPositions[0].X;
             Y = sonicLevel.StartPositions[0].Y;
-            sensorManager = new SensorManager();
+            SensorManager = new SensorManager();
             HaltSmoke = new List<Point>();
             Rings = 7;
-            sensorManager.CreateVerticalSensor("a", -9, 0, 36, "#F202F2");
-            sensorManager.CreateVerticalSensor("b", 9, 0, 36, "#02C2F2");
-            sensorManager.CreateVerticalSensor("c", -9, 0, -20, "#2D2C21");
-            sensorManager.CreateVerticalSensor("d", 9, 0, -20, "#C24222");
-            sensorManager.CreateHorizontalSensor("m1", 4, 0, -12, "#212C2E");
-            sensorManager.CreateHorizontalSensor("m2", 4, 0, 13, "#22Ffc1");
+            SensorManager.CreateVerticalSensor("a", -9, 0, 36, "#F202F2");
+            SensorManager.CreateVerticalSensor("b", 9, 0, 36, "#02C2F2");
+            SensorManager.CreateVerticalSensor("c", -9, 0, -20, "#2D2C21");
+            SensorManager.CreateVerticalSensor("d", 9, 0, -20, "#C24222");
+            SensorManager.CreateHorizontalSensor("m1", 4, 0, -12, "#212C2E");
+            SensorManager.CreateHorizontalSensor("m2", 4, 0, 13, "#22Ffc1");
 
             SpriteState = "normal";
+            myRec = new Rectangle(0, 0, 0, 0);
+            sonicLastHitTick = int.MinValue;
+
         }
 
         public void UpdateMode()
@@ -118,7 +122,10 @@ namespace OurSonic.Sonic
                 Mode = RotationMode.RightWall;
             //        x = _H.floor(x);
             //        y = _H.floor(y);
-            myRec = new Rectangle((int) ( X - 10 ), (int) ( Y - 20 ), 10 * 2, 20 * 2);
+            myRec.X = (int)(X - 10);
+            myRec.Y = (int)(Y - 20);
+            myRec.Width = 10*2;
+            myRec.Height = 20*2;
             if (InAir)
                 Mode = RotationMode.Floor;
         }
@@ -136,9 +143,8 @@ namespace OurSonic.Sonic
                     Y += debugSpeed;
                 if (HoldingUp)
                     Y -= debugSpeed;
-                var offset = new Point(0, 0); // getOffsetFromImage();
-                X = ( ( sonicLevel.LevelWidth * 128 ) + ( X ) ) % ( sonicLevel.LevelWidth * 128 ) + offset.X;
-                Y = ( ( sonicLevel.LevelHeight * 128 ) + ( Y ) ) % ( sonicLevel.LevelHeight * 128 ) + offset.Y;
+                X = ( ( sonicLevel.LevelWidth * 128 ) + ( X ) ) % ( sonicLevel.LevelWidth * 128 ) ;
+                Y = ( ( sonicLevel.LevelHeight * 128 ) + ( Y ) ) % ( sonicLevel.LevelHeight * 128 );
                 return;
             }
 
@@ -162,10 +168,10 @@ namespace OurSonic.Sonic
             CheckCollisionWithRings();
             UpdateSprite();
 
-            sensorManager.Check(this);
+            SensorManager.Check(this);
 
-            var sensorM1 = sensorManager.GetResult("m1");
-            var sensorM2 = sensorManager.GetResult("m2");
+            var sensorM1 = SensorManager.GetResult("m1");
+            var sensorM2 = SensorManager.GetResult("m2");
 
             var best = GetBestSensor(sensorM1, sensorM2, Mode);
             if (best != null) {
@@ -198,10 +204,10 @@ namespace OurSonic.Sonic
                         break;
                 }
             }
-            sensorManager.Check(this);
+            SensorManager.Check(this);
 
-            var sensorA = sensorManager.GetResult("a");
-            var sensorB = sensorManager.GetResult("b");
+            var sensorA = SensorManager.GetResult("a");
+            var sensorB = SensorManager.GetResult("b");
             int fy;
             int fx;
 
@@ -286,9 +292,9 @@ namespace OurSonic.Sonic
                 var cur = SonicManager.Instance.SpriteCache.SonicSprites[SpriteState];
                 var __h = cur.Height / 2;
 
-                sensorManager.Check(this);
-                var sensorC = sensorManager.GetResult("c");
-                var sensorD = sensorManager.GetResult("d");
+                SensorManager.Check(this);
+                var sensorC = SensorManager.GetResult("c");
+                var sensorD = SensorManager.GetResult("d");
 
                 if (( sensorC == null && sensorD == null )) {} else {
                     if (sensorD != null && ( sensorC != null ) && ( sensorC.Value >= 0 && sensorD.Value >= 0 )) {
@@ -381,9 +387,10 @@ namespace OurSonic.Sonic
             return false;
         }
 
+        private Point halfSize = new Point(20, 20);
         private Point GetHalfImageSize()
         {
-            return new Point(20, 20);
+            return halfSize;
             /*
                         var scale = SonicManager.Instance.Scale;
                         var cur = SonicManager.Instance.SpriteCache.SonicSprites[SpriteState + scale.X + scale.Y];
@@ -409,6 +416,7 @@ namespace OurSonic.Sonic
                         return new Point(xSize, ySize);
             */
         }
+        private Point offsetFromImage = new Point(0, 0);
 
         private Point GetOffsetFromImage()
         {
@@ -437,7 +445,9 @@ namespace OurSonic.Sonic
                         break;
                 }
             }
-            return new Point(xOffset, yOffset);
+            offsetFromImage.X = xOffset;
+            offsetFromImage.Y = yOffset;
+            return offsetFromImage;
         }
 
         private void UpdateSprite()
@@ -651,8 +661,7 @@ namespace OurSonic.Sonic
                     CurrentlyBall = false;
                 }
             }
-
-            CheckCollisionWithRings();
+             
 
             if (InAir) {
                 if (HoldingRight && !HoldingLeft && !JustHit) {
@@ -836,7 +845,7 @@ namespace OurSonic.Sonic
                 */
                 canvas.Restore();
                 if (SonicManager.Instance.ShowHeightMap)
-                    sensorManager.Draw(canvas, this);
+                    SensorManager.Draw(canvas, this);
                 for (var i = 0; i < HaltSmoke.Count; i++) {
                     var lo = HaltSmoke[i];
                     canvas.DrawImage(
@@ -965,9 +974,14 @@ namespace OurSonic.Sonic
             Jumping = false;
         }
 
+        private Point objectCollision = new Point( 0, 0);
+
         public bool CheckCollisionWithObjects(int x, int y, string letter)
         {
-            var me = new Point(x, y);
+            objectCollision.X = x;
+            objectCollision.Y= y;
+
+            var me = objectCollision;
             var levelObjectInfos = SonicManager.Instance.InFocusObjects;
 
             foreach (var ob in levelObjectInfos) {
@@ -982,19 +996,24 @@ namespace OurSonic.Sonic
             return false;
         }
 
+        private Rectangle ringCollisionRect=new Rectangle(0,0,0,0);
         public void CheckCollisionWithRings()
         {
             var me = myRec;
-            var rectangle = new Rectangle(0, 0, 8 * 2, 8 * 2);
+            ringCollisionRect.X = 0;
+            ringCollisionRect.Y = 0;
+            ringCollisionRect.Width = 8*2;
+            ringCollisionRect.Height = 8*2;
             List<Ring> rings = SonicManager.Instance.SonicLevel.Rings;
 
             for (int index = 0; index < rings.Count; index++) {
                 var ring = rings[index];
                 var pos = ring;
                 if (obtainedRing[index]) continue;
-                rectangle.X = pos.X  ;
-                rectangle.Y = pos.Y  ;
-                if (IntersectingRectangle.IntersectRect(me, rectangle)) {
+                ringCollisionRect.X = pos.X;
+                ringCollisionRect.Y = pos.Y;
+                if (IntersectingRectangle.IntersectRect(me, ringCollisionRect))
+                {
                     Rings++;
                     obtainedRing[index] = true;
                 }

@@ -79,7 +79,8 @@ namespace OurSonic.Level.Tiles
                         var colorIndex = Colors[_x][_y];
                         if (colorIndex == 0) continue;
 
-                        j.Context.DrawImage(palette_[colorPaletteIndex][colorIndex], x + _x, y + _y);
+                        j.Context.FillStyle = palette_[colorPaletteIndex][colorIndex];
+                        j.Context.FillRect(x + _x, y + _y,1,1);
                     }
                 }
                 baseCaches[baseCacheIndex] = baseCache = j;
@@ -143,7 +144,8 @@ namespace OurSonic.Level.Tiles
                         if (colorIndex == 0) continue;
                         if (PaletteIndexesToBeAnimated[animatedPaletteIndex].IndexOfFast(colorIndex) == -1) continue;
 
-                        j.Context.DrawImage(palette_[colorPaletteIndex][colorIndex], x + _x, y + _y);
+                        j.Context.FillStyle = palette_[colorPaletteIndex][colorIndex];
+                        j.Context.FillRect(x + _x, y + _y, 1, 1);
                     }
                 }
 

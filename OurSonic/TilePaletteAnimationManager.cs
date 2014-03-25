@@ -134,7 +134,7 @@ namespace OurSonic
             FrameIndex = frameIndex;
         }
 
-        private CanvasElement[][] tempPalette;
+        private string[][] tempPalette;
         public void SetPalette()
         { 
             var levelPalette = Animation.Manager.SonicManager.SonicLevel.Palette;
@@ -161,19 +161,19 @@ namespace OurSonic
                 if (color != null)
                     levelPalette[palettePiece.PaletteIndex][replaceIndex] = color;
                 else//bug, shouldnt hit
-                    levelPalette[palettePiece.PaletteIndex][replaceIndex] = CanvasInformation.BlackPixel;
+                    levelPalette[palettePiece.PaletteIndex][replaceIndex] = "#000000";
             }
 
 
         }
 
-        private void clonePalette(CanvasElement[][] levelPalette)
+        private void clonePalette(string[][] levelPalette)
         {
-            tempPalette=new CanvasElement[levelPalette.Length][];
+            tempPalette = new string[levelPalette.Length][];
             for (int index = 0; index < levelPalette.Length; index++)
             {
                 var canvasElements = levelPalette[index];
-                tempPalette[index] = new CanvasElement[canvasElements.Length];
+                tempPalette[index] = new string[canvasElements.Length];
                 for (int index2 = 0; index2 < canvasElements.Length; index2++)
                 {
                     tempPalette[index][index2] = canvasElements[index2];

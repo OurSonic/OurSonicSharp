@@ -15,8 +15,10 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Page
 	var $OurSonic_Page = function() {
-		var stats = new xStats();
-		document.body.appendChild(stats.element);
+		//
+		//            var stats = new XStats();
+		//
+		//            Document.Body.AppendChild(stats.Element);
 		new $OurSonic_SonicEngine();
 	};
 	$OurSonic_Page.__typeName = 'OurSonic.Page';
@@ -1979,7 +1981,7 @@
 		this.$oldSign = 0;
 		this.$physicsVariables = null;
 		this.$runningTick = 0;
-		this.$sensorManager = null;
+		this.sensorManager = null;
 		this.sonicLastHitTick = 0;
 		this.$sonicLevel = null;
 		this.watcher = null;
@@ -2013,22 +2015,28 @@
 		this.spriteState = null;
 		this.haltSmoke = null;
 		this.wasJumping = false;
+		this.$halfSize = $OurSonic_Utility_Point.$ctor1(20, 20);
+		this.$offsetFromImage = $OurSonic_Utility_Point.$ctor1(0, 0);
+		this.$objectCollision = $OurSonic_Utility_Point.$ctor1(0, 0);
+		this.$ringCollisionRect = $OurSonic_Utility_Rectangle.$ctor1(0, 0, 0, 0);
 		this.watcher = new $OurSonic_Sonic_Watcher();
 		this.$physicsVariables = $OurSonic_Sonic_SonicConstants.sonic();
 		var sonicManager = $OurSonic_SonicManager.instance;
 		this.$sonicLevel = sonicManager.sonicLevel;
 		this.x = this.$sonicLevel.startPositions[0].x;
 		this.y = this.$sonicLevel.startPositions[0].y;
-		this.$sensorManager = new $OurSonic_Sonic_SensorManager();
+		this.sensorManager = new $OurSonic_Sonic_SensorManager();
 		this.haltSmoke = [];
 		this.rings = 7;
-		this.$sensorManager.createVerticalSensor('a', -9, 0, 36, '#F202F2', false);
-		this.$sensorManager.createVerticalSensor('b', 9, 0, 36, '#02C2F2', false);
-		this.$sensorManager.createVerticalSensor('c', -9, 0, -20, '#2D2C21', false);
-		this.$sensorManager.createVerticalSensor('d', 9, 0, -20, '#C24222', false);
-		this.$sensorManager.createHorizontalSensor('m1', 4, 0, -12, '#212C2E', false);
-		this.$sensorManager.createHorizontalSensor('m2', 4, 0, 13, '#22Ffc1', false);
+		this.sensorManager.createVerticalSensor('a', -9, 0, 36, '#F202F2', false);
+		this.sensorManager.createVerticalSensor('b', 9, 0, 36, '#02C2F2', false);
+		this.sensorManager.createVerticalSensor('c', -9, 0, -20, '#2D2C21', false);
+		this.sensorManager.createVerticalSensor('d', 9, 0, -20, '#C24222', false);
+		this.sensorManager.createHorizontalSensor('m1', 4, 0, -12, '#212C2E', false);
+		this.sensorManager.createHorizontalSensor('m2', 4, 0, 13, '#22Ffc1', false);
 		this.spriteState = 'normal';
+		this.myRec = $OurSonic_Utility_Rectangle.$ctor1(0, 0, 0, 0);
+		this.sonicLastHitTick = -2147483648;
 	};
 	$OurSonic_Sonic_Sonic.__typeName = 'OurSonic.Sonic.Sonic';
 	global.OurSonic.Sonic.Sonic = $OurSonic_Sonic_Sonic;
@@ -3600,6 +3608,7 @@
 				}
 				$OurSonic_SonicEngine.runGame();
 			}
+			this.sonicManager.cacheTiles();
 		},
 		$handleScroll: function(jQueryEvent) {
 			jQueryEvent.preventDefault();
@@ -4072,6 +4081,9 @@
 				_xP = $OurSonic_Utility_Help.mod(_xP, this.sonicLevel.levelWidth);
 				_yP = $OurSonic_Utility_Help.mod(_yP, this.sonicLevel.levelHeight);
 				var chunk = this.sonicLevel.getChunkAt(_xP, _yP);
+				if (ss.isNullOrUndefined(chunk)) {
+					continue;
+				}
 				localPoint.x = _xPreal * 128 - this.windowLocation.x;
 				localPoint.y = _yPreal * 128 - this.windowLocation.y;
 				if (!chunk.isEmpty() && !chunk.onlyForeground()) {
@@ -4090,6 +4102,9 @@
 				_xP = $OurSonic_Utility_Help.mod(_xP, this.sonicLevel.levelWidth);
 				_yP = $OurSonic_Utility_Help.mod(_yP, this.sonicLevel.levelHeight);
 				var chunk = this.sonicLevel.getChunkAt(_xP, _yP);
+				if (ss.isNullOrUndefined(chunk)) {
+					continue;
+				}
 				localPoint.x = _xPreal * 128 - this.windowLocation.x;
 				localPoint.y = _yPreal * 128 - this.windowLocation.y;
 				if (!chunk.isEmpty() && !chunk.onlyBackground()) {
@@ -4304,6 +4319,24 @@
 					}
 				}), (from.height - y) * 50);
 			}
+		},
+		cacheTiles: function() {
+			console.time('tileCache');
+			this.tilePaletteAnimationManager = new $OurSonic_TilePaletteAnimationManager(this);
+			this.tileAnimationManager = new $OurSonic_TileAnimationManager(this);
+			for (var $t1 = 0; $t1 < this.sonicLevel.tileChunks.length; $t1++) {
+				var chunk = this.sonicLevel.tileChunks[$t1];
+				chunk.initCache();
+				chunk.warmCache();
+			}
+			console.timeEnd('tileCache');
+			console.time('collisionCache');
+			for (var $t2 = 0; $t2 < this.sonicLevel.tileChunks.length; $t2++) {
+				var chunk1 = this.sonicLevel.tileChunks[$t2];
+				this.sonicToon.sensorManager.buildChunk(chunk1, false);
+				this.sonicToon.sensorManager.buildChunk(chunk1, true);
+			}
+			console.timeEnd('collisionCache');
 		},
 		loadObjects: function(objects) {
 			this.cachedObjects = {};
@@ -4578,9 +4611,11 @@
 					}
 				}
 			}
-			this.sonicLevel.palette = sonicLevel.Palette.map(ss.mkdel(this, function(a1) {
-				return a1.map($OurSonic_SonicManager.$paletteToCanvas);
-			}));
+			this.sonicLevel.palette = sonicLevel.Palette.map(function(a1) {
+				return a1.map(function(b3) {
+					return b3;
+				});
+			});
 			this.sonicLevel.startPositions = sonicLevel.StartPositions.map(function(a2) {
 				return $OurSonic_Utility_Point.$ctor1(a2.X, a2.Y);
 			});
@@ -4590,7 +4625,9 @@
 					var pal = sonicLevel.PaletteItems[0][k];
 					var $t12 = this.sonicLevel.animatedPalettes;
 					var $t10 = new $OurSonic_Level_PaletteItem();
-					$t10.palette = ss.cast(eval(pal.Palette), Array).map($OurSonic_SonicManager.$paletteToCanvas);
+					$t10.palette = ss.cast(eval(pal.Palette), Array).map(function(b4) {
+						return b4;
+					});
 					$t10.skipIndex = pal.SkipIndex;
 					$t10.totalLength = pal.TotalLength;
 					$t10.pieces = pal.Pieces.map(function(a3) {
@@ -4650,13 +4687,6 @@
 						}
 					}
 				}
-			}
-			this.tilePaletteAnimationManager = new $OurSonic_TilePaletteAnimationManager(this);
-			this.tileAnimationManager = new $OurSonic_TileAnimationManager(this);
-			for (var $t17 = 0; $t17 < this.sonicLevel.tileChunks.length; $t17++) {
-				var chunk = this.sonicLevel.tileChunks[$t17];
-				chunk.initCache();
-				chunk.warmCache();
 			}
 			var finished = ss.mkdel(this, function() {
 				this.loading = false;
@@ -4959,7 +4989,7 @@
 					levelPalette[palettePiece.paletteIndex][replaceIndex] = color;
 				}
 				else {
-					levelPalette[palettePiece.paletteIndex][replaceIndex] = $OurSonic_Utility_CanvasInformation.get_blackPixel();
+					levelPalette[palettePiece.paletteIndex][replaceIndex] = '#000000';
 				}
 			}
 		},
@@ -5412,6 +5442,7 @@
 				}
 				//#if RELEASE
 				$OurSonic_SonicEngine.runGame();
+				sonicManager.cacheTiles();
 				//#endif
 			});
 		}
@@ -7116,7 +7147,8 @@
 						if (colorIndex === 0) {
 							continue;
 						}
-						j.context.drawImage(palette_[colorPaletteIndex][colorIndex], x + _x, y + _y);
+						j.context.fillStyle = palette_[colorPaletteIndex][colorIndex];
+						j.context.fillRect(x + _x, y + _y, 1, 1);
 					}
 				}
 				this.$baseCaches[baseCacheIndex] = baseCache = j;
@@ -7165,7 +7197,8 @@
 						if (OurSonicModels.Common.EnumerableExtensions.indexOfFast(this.paletteIndexesToBeAnimated[animatedPaletteIndex], colorIndex) === -1) {
 							continue;
 						}
-						j.context.drawImage(palette_[colorPaletteIndex][colorIndex], x + _x, y + _y);
+						j.context.fillStyle = palette_[colorPaletteIndex][colorIndex];
+						j.context.fillRect(x + _x, y + _y, 1, 1);
 					}
 				}
 				this.$animatedPaletteCaches[animatedPaletteCacheIndex] = animatedPaletteCache = j;
@@ -7318,6 +7351,9 @@
 						if (ss.isNullOrUndefined(piece)) {
 							continue;
 						}
+						if (ss.isNullOrUndefined(piece.animatedPaletteIndexes)) {
+							continue;
+						}
 						for (var $t1 = 0; $t1 < piece.animatedPaletteIndexes.length; $t1++) {
 							var animatedPaletteIndex = piece.animatedPaletteIndexes[$t1];
 							if (OurSonicModels.Common.EnumerableExtensions.indexOfFast(this.$paletteAnimationIndexes, animatedPaletteIndex) === -1) {
@@ -7342,6 +7378,9 @@
 							var tileInfo = piece.tiles[$t1];
 							var tile = tileInfo.getTile();
 							if (ss.isNullOrUndefined(tile)) {
+								continue;
+							}
+							if (ss.isNullOrUndefined(tile.animatedTileIndexes)) {
 								continue;
 							}
 							for (var $t2 = 0; $t2 < tile.animatedTileIndexes.length; $t2++) {
@@ -7814,10 +7853,11 @@
 	});
 	ss.initClass($OurSonic_Sonic_Sensor, $asm, {
 		$checkCollisionLineWrap: function(x1, x2, y1, y2, ignoreSolid) {
+			//todo: this is some of the worst code man has ever written. if youre reading this im sorry. send me an email dested@gmail for an apology.
 			var _x = ss.Int32.div(x1, 128);
 			var _y = $OurSonic_Utility_Help.mod(ss.Int32.div(y1, 128), $OurSonic_SonicManager.instance.sonicLevel.levelHeight);
 			var tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x, _y);
-			this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+			this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 			var curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 			var cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 			var __x = x1 - _x * 128;
@@ -7842,7 +7882,7 @@
 										return this.$__currentM;
 									}
 									tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x - 1, _y);
-									this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+									this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 									curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 									cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 									__x += 128;
@@ -7876,7 +7916,7 @@
 								//
 								//                                }
 								tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x + 1, _y);
-								this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+								this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 								curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 								cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 								__x -= 128;
@@ -7913,7 +7953,7 @@
 									//
 									//                                    }
 									tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x + 1, _y);
-									this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+									this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 									curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 									cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 									__x -= 128;
@@ -7940,7 +7980,7 @@
 									return this.$__currentM;
 								}
 								tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x - 1, _y);
-								this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+								this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 								curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 								cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 								__x += 128;
@@ -7968,7 +8008,7 @@
 							while (true) {
 								if (__y - i < 0) {
 									tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x, $OurSonic_Utility_Help.mod(_y - 1, $OurSonic_SonicManager.instance.sonicLevel.levelHeight));
-									this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+									this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 									curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 									cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 									__y += 128;
@@ -7996,7 +8036,7 @@
 						while (true) {
 							if (__y + i >= 128) {
 								tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x, (_y + 1) % $OurSonic_SonicManager.instance.sonicLevel.levelHeight);
-								this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+								this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 								curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 								cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 								__y -= 128;
@@ -8032,7 +8072,7 @@
 							while (true) {
 								if (__y + i >= 128) {
 									tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x, (_y + 1) % $OurSonic_SonicManager.instance.sonicLevel.levelHeight);
-									this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+									this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 									curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 									cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 									__y -= 128;
@@ -8062,7 +8102,7 @@
 						while (true) {
 							if (__y - i < 0) {
 								tc = $OurSonic_SonicManager.instance.sonicLevel.getChunkAt(_x, $OurSonic_Utility_Help.mod(_y - 1, $OurSonic_SonicManager.instance.sonicLevel.levelHeight));
-								this.$buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
+								this.manager.buildChunk(tc, $OurSonic_SonicManager.instance.sonicLevel.curHeightMap);
 								curh = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.heightBlocks1 : tc.heightBlocks2);
 								cura = ($OurSonic_SonicManager.instance.sonicLevel.curHeightMap ? tc.angleMap1 : tc.angleMap2);
 								__y += 128;
@@ -8086,7 +8126,130 @@
 			}
 			return null;
 		},
-		$buildChunk: function(chunk, isLayerOne) {
+		draw: function(canvas, character, sensorResult) {
+			var x = $OurSonic_Utility_Help.floor(character.x) - $OurSonic_SonicManager.instance.windowLocation.x;
+			var y = $OurSonic_Utility_Help.floor(character.y) - $OurSonic_SonicManager.instance.windowLocation.y;
+			canvas.beginPath();
+			if (sensorResult && sensorResult.chosen) {
+				canvas.strokeStyle = '#FFF76D';
+				canvas.lineWidth = 4;
+			}
+			else {
+				canvas.strokeStyle = this.color;
+				canvas.lineWidth = 2;
+			}
+			switch (character.mode) {
+				case 134: {
+					canvas.moveTo(x + this.x1, y + this.y1);
+					canvas.lineTo(x + this.x2, y + this.y2);
+					break;
+				}
+				case 44: {
+					canvas.moveTo(x - this.y1, y + this.x1);
+					canvas.lineTo(x - this.y2, y + this.x2);
+					break;
+				}
+				case 314: {
+					canvas.moveTo(x - this.x1, y - this.y1);
+					canvas.lineTo(x - this.x2, y - this.y2);
+					break;
+				}
+				case 224: {
+					canvas.moveTo(x + this.y1, y - this.x1);
+					canvas.lineTo(x + this.y2, y - this.x2);
+					break;
+				}
+			}
+			canvas.closePath();
+			canvas.stroke();
+		},
+		check: function(character) {
+			var _y2 = (character.inAir ? this.y2 : this.y2);
+			var m = null;
+			var x = $OurSonic_Utility_Help.floor(character.x);
+			var y = $OurSonic_Utility_Help.floor(character.y);
+			switch (character.mode) {
+				case 134: {
+					m = this.$checkCollisionLineWrap(x + this.x1, x + this.x2, y + this.y1, y + _y2, this.ignoreSolid);
+					break;
+				}
+				case 44: {
+					m = this.$checkCollisionLineWrap(x - this.y1, x - _y2, y + this.x1, y + this.x2, this.ignoreSolid);
+					break;
+				}
+				case 314: {
+					m = this.$checkCollisionLineWrap(x - this.x1, x - this.x2, y - this.y1, y - _y2, this.ignoreSolid);
+					break;
+				}
+				case 224: {
+					m = this.$checkCollisionLineWrap(x + this.y1, x + _y2, y - this.x1, y - this.x2, this.ignoreSolid);
+					break;
+				}
+			}
+			if (ss.isValue(m)) {
+				m.letter = this.letter;
+				if (m.angle === 255 || m.angle === 0 || m.angle === 1) {
+					if (character.mode === 134) {
+						m.angle = 255;
+					}
+					if (character.mode === 44) {
+						m.angle = 64;
+					}
+					if (character.mode === 314) {
+						m.angle = 128;
+					}
+					if (character.mode === 224) {
+						m.angle = 192;
+					}
+				}
+			}
+			return m;
+		}
+	});
+	ss.initClass($OurSonic_Sonic_SensorM, $asm, {});
+	ss.initClass($OurSonic_Sonic_SensorManager, $asm, {
+		addSensor: function(letter, sensor) {
+			this.sensors[letter] = sensor;
+			this.sensorResults[letter] = null;
+			return sensor;
+		},
+		createVerticalSensor: function(letter, x, y1, y2, color, ignoreSolid) {
+			return this.addSensor(letter, new $OurSonic_Sonic_Sensor(x, x, y1, y2, this, color, ignoreSolid, letter));
+		},
+		createHorizontalSensor: function(letter, y, x1, x2, color, ignoreSolid) {
+			return this.addSensor(letter, new $OurSonic_Sonic_Sensor(x1, x2, y, y, this, color, ignoreSolid, letter));
+		},
+		check: function(character) {
+			var none = false;
+			var $t1 = new ss.ObjectEnumerator(this.sensors);
+			try {
+				while ($t1.moveNext()) {
+					var i = $t1.current();
+					this.sensorResults[i.key] = i.value.check(character);
+					none = none || ss.isValue(this.sensorResults[i.key]);
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+			return none;
+		},
+		getResult: function(mn) {
+			return this.sensorResults[mn];
+		},
+		draw: function(canvas, sonic) {
+			var $t1 = new ss.ObjectEnumerator(this.sensors);
+			try {
+				while ($t1.moveNext()) {
+					var sensor = $t1.current();
+					sensor.value.draw(canvas, sonic, this.sensorResults[sensor.key]);
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+		},
+		buildChunk: function(chunk, isLayerOne) {
 			if (isLayerOne) {
 				if (chunk.heightBlocks1) {
 					return;
@@ -8274,129 +8437,6 @@
 					}
 				}
 			}
-		},
-		draw: function(canvas, character, sensorResult) {
-			var x = $OurSonic_Utility_Help.floor(character.x) - $OurSonic_SonicManager.instance.windowLocation.x;
-			var y = $OurSonic_Utility_Help.floor(character.y) - $OurSonic_SonicManager.instance.windowLocation.y;
-			canvas.beginPath();
-			if (sensorResult && sensorResult.chosen) {
-				canvas.strokeStyle = '#FFF76D';
-				canvas.lineWidth = 4;
-			}
-			else {
-				canvas.strokeStyle = this.color;
-				canvas.lineWidth = 2;
-			}
-			switch (character.mode) {
-				case 134: {
-					canvas.moveTo(x + this.x1, y + this.y1);
-					canvas.lineTo(x + this.x2, y + this.y2);
-					break;
-				}
-				case 44: {
-					canvas.moveTo(x - this.y1, y + this.x1);
-					canvas.lineTo(x - this.y2, y + this.x2);
-					break;
-				}
-				case 314: {
-					canvas.moveTo(x - this.x1, y - this.y1);
-					canvas.lineTo(x - this.x2, y - this.y2);
-					break;
-				}
-				case 224: {
-					canvas.moveTo(x + this.y1, y - this.x1);
-					canvas.lineTo(x + this.y2, y - this.x2);
-					break;
-				}
-			}
-			canvas.closePath();
-			canvas.stroke();
-		},
-		check: function(character) {
-			var _y2 = (character.inAir ? this.y2 : this.y2);
-			var m = null;
-			var x = $OurSonic_Utility_Help.floor(character.x);
-			var y = $OurSonic_Utility_Help.floor(character.y);
-			switch (character.mode) {
-				case 134: {
-					m = this.$checkCollisionLineWrap(x + this.x1, x + this.x2, y + this.y1, y + _y2, this.ignoreSolid);
-					break;
-				}
-				case 44: {
-					m = this.$checkCollisionLineWrap(x - this.y1, x - _y2, y + this.x1, y + this.x2, this.ignoreSolid);
-					break;
-				}
-				case 314: {
-					m = this.$checkCollisionLineWrap(x - this.x1, x - this.x2, y - this.y1, y - _y2, this.ignoreSolid);
-					break;
-				}
-				case 224: {
-					m = this.$checkCollisionLineWrap(x + this.y1, x + _y2, y - this.x1, y - this.x2, this.ignoreSolid);
-					break;
-				}
-			}
-			if (ss.isValue(m)) {
-				m.letter = this.letter;
-				if (m.angle === 255 || m.angle === 0 || m.angle === 1) {
-					if (character.mode === 134) {
-						m.angle = 255;
-					}
-					if (character.mode === 44) {
-						m.angle = 64;
-					}
-					if (character.mode === 314) {
-						m.angle = 128;
-					}
-					if (character.mode === 224) {
-						m.angle = 192;
-					}
-				}
-			}
-			return m;
-		}
-	});
-	ss.initClass($OurSonic_Sonic_SensorM, $asm, {});
-	ss.initClass($OurSonic_Sonic_SensorManager, $asm, {
-		addSensor: function(letter, sensor) {
-			this.sensors[letter] = sensor;
-			this.sensorResults[letter] = null;
-			return sensor;
-		},
-		createVerticalSensor: function(letter, x, y1, y2, color, ignoreSolid) {
-			return this.addSensor(letter, new $OurSonic_Sonic_Sensor(x, x, y1, y2, this, color, ignoreSolid, letter));
-		},
-		createHorizontalSensor: function(letter, y, x1, x2, color, ignoreSolid) {
-			return this.addSensor(letter, new $OurSonic_Sonic_Sensor(x1, x2, y, y, this, color, ignoreSolid, letter));
-		},
-		check: function(character) {
-			var none = false;
-			var $t1 = new ss.ObjectEnumerator(this.sensors);
-			try {
-				while ($t1.moveNext()) {
-					var i = $t1.current();
-					this.sensorResults[i.key] = i.value.check(character);
-					none = none || ss.isValue(this.sensorResults[i.key]);
-				}
-			}
-			finally {
-				$t1.dispose();
-			}
-			return none;
-		},
-		getResult: function(mn) {
-			return this.sensorResults[mn];
-		},
-		draw: function(canvas, sonic) {
-			var $t1 = new ss.ObjectEnumerator(this.sensors);
-			try {
-				while ($t1.moveNext()) {
-					var sensor = $t1.current();
-					sensor.value.draw(canvas, sonic, this.sensorResults[sensor.key]);
-				}
-			}
-			finally {
-				$t1.dispose();
-			}
 		}
 	});
 	ss.initClass($OurSonic_Sonic_Sonic, $asm, {
@@ -8415,7 +8455,10 @@
 			}
 			//        x = _H.floor(x);
 			//        y = _H.floor(y);
-			this.myRec = $OurSonic_Utility_Rectangle.$ctor1(ss.Int32.trunc(this.x - 10), ss.Int32.trunc(this.y - 20), 20, 40);
+			this.myRec.x = ss.Int32.trunc(this.x - 10);
+			this.myRec.y = ss.Int32.trunc(this.y - 20);
+			this.myRec.width = 20;
+			this.myRec.height = 40;
 			if (this.inAir) {
 				this.mode = 134;
 			}
@@ -8435,10 +8478,8 @@
 				if (this.holdingUp) {
 					this.y -= debugSpeed;
 				}
-				var offset = $OurSonic_Utility_Point.$ctor1(0, 0);
-				// getOffsetFromImage();
-				this.x = (sonicLevel.levelWidth * 128 + this.x) % (sonicLevel.levelWidth * 128) + offset.x;
-				this.y = (sonicLevel.levelHeight * 128 + this.y) % (sonicLevel.levelHeight * 128) + offset.y;
+				this.x = (sonicLevel.levelWidth * 128 + this.x) % (sonicLevel.levelWidth * 128);
+				this.y = (sonicLevel.levelHeight * 128 + this.y) % (sonicLevel.levelHeight * 128);
 				return;
 			}
 			this.updateMode();
@@ -8458,9 +8499,9 @@
 			this.$effectPhysics();
 			this.checkCollisionWithRings();
 			this.$updateSprite();
-			this.$sensorManager.check(this);
-			var sensorM1 = this.$sensorManager.getResult('m1');
-			var sensorM2 = this.$sensorManager.getResult('m2');
+			this.sensorManager.check(this);
+			var sensorM1 = this.sensorManager.getResult('m1');
+			var sensorM2 = this.sensorManager.getResult('m2');
 			var best = this.$getBestSensor(sensorM1, sensorM2, this.mode);
 			if (ss.isValue(best)) {
 				switch (this.mode) {
@@ -8497,9 +8538,9 @@
 					}
 				}
 			}
-			this.$sensorManager.check(this);
-			var sensorA = this.$sensorManager.getResult('a');
-			var sensorB = this.$sensorManager.getResult('b');
+			this.sensorManager.check(this);
+			var sensorA = this.sensorManager.getResult('a');
+			var sensorB = this.sensorManager.getResult('b');
 			var fy;
 			var fx;
 			var hSize = this.$getHalfImageSize();
@@ -8580,9 +8621,9 @@
 				this.updateMode();
 				var cur = $OurSonic_SonicManager.instance.spriteCache.sonicSprites[this.spriteState];
 				var __h = ss.Int32.div(cur.height, 2);
-				this.$sensorManager.check(this);
-				var sensorC = this.$sensorManager.getResult('c');
-				var sensorD = this.$sensorManager.getResult('d');
+				this.sensorManager.check(this);
+				var sensorC = this.sensorManager.getResult('c');
+				var sensorD = this.sensorManager.getResult('d');
 				if (ss.isNullOrUndefined(sensorC) && ss.isNullOrUndefined(sensorD)) {
 				}
 				else {
@@ -8690,7 +8731,7 @@
 			return false;
 		},
 		$getHalfImageSize: function() {
-			return $OurSonic_Utility_Point.$ctor1(20, 20);
+			return this.$halfSize;
 			//
 			//                        var scale = SonicManager.Instance.Scale;
 			//
@@ -8765,7 +8806,9 @@
 					}
 				}
 			}
-			return $OurSonic_Utility_Point.$ctor1(xOffset, yOffset);
+			this.$offsetFromImage.x = xOffset;
+			this.$offsetFromImage.y = yOffset;
+			return this.$offsetFromImage;
 		},
 		$updateSprite: function() {
 			var absgsp = Math.abs(this.gsp);
@@ -9010,7 +9053,6 @@
 					this.currentlyBall = false;
 				}
 			}
-			this.checkCollisionWithRings();
 			if (this.inAir) {
 				if (this.holdingRight && !this.holdingLeft && !this.justHit) {
 					this.facing = true;
@@ -9212,7 +9254,7 @@
 				//                canvas.strokeRect(-cur.width / 2, -cur.height / 2, cur.width, cur.height);
 				canvas.restore();
 				if ($OurSonic_SonicManager.instance.showHeightMap) {
-					this.$sensorManager.draw(canvas, this);
+					this.sensorManager.draw(canvas, this);
 				}
 				for (var i = 0; i < this.haltSmoke.length; i++) {
 					var lo = this.haltSmoke[i];
@@ -9316,7 +9358,9 @@
 			this.jumping = false;
 		},
 		checkCollisionWithObjects: function(x, y, letter) {
-			var me = $OurSonic_Utility_Point.$ctor1(x, y);
+			this.$objectCollision.x = x;
+			this.$objectCollision.y = y;
+			var me = this.$objectCollision;
 			var levelObjectInfos = $OurSonic_SonicManager.instance.inFocusObjects;
 			for (var $t1 = 0; $t1 < levelObjectInfos.length; $t1++) {
 				var ob = levelObjectInfos[$t1];
@@ -9333,7 +9377,10 @@
 		},
 		checkCollisionWithRings: function() {
 			var me = this.myRec;
-			var rectangle = $OurSonic_Utility_Rectangle.$ctor1(0, 0, 16, 16);
+			this.$ringCollisionRect.x = 0;
+			this.$ringCollisionRect.y = 0;
+			this.$ringCollisionRect.width = 16;
+			this.$ringCollisionRect.height = 16;
 			var rings = $OurSonic_SonicManager.instance.sonicLevel.rings;
 			for (var index = 0; index < rings.length; index++) {
 				var ring = rings[index];
@@ -9341,9 +9388,9 @@
 				if (this.obtainedRing[index]) {
 					continue;
 				}
-				rectangle.x = pos.x;
-				rectangle.y = pos.y;
-				if ($OurSonic_Utility_IntersectingRectangle.intersectRect(me, rectangle)) {
+				this.$ringCollisionRect.x = pos.x;
+				this.$ringCollisionRect.y = pos.y;
+				if ($OurSonic_Utility_IntersectingRectangle.intersectRect(me, this.$ringCollisionRect)) {
 					this.rings++;
 					this.obtainedRing[index] = true;
 				}

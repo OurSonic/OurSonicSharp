@@ -612,6 +612,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 _xP = Help.Mod(_xP, SonicLevel.LevelWidth);
                 _yP = Help.Mod(_yP, SonicLevel.LevelHeight);
                 TileChunk chunk = SonicLevel.GetChunkAt(_xP, _yP);
+                if (chunk == null) continue;
                 localPoint.X = (_xPreal * 128) - WindowLocation.X;
                 localPoint.Y = (_yPreal * 128) - WindowLocation.Y;
 
@@ -632,6 +633,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 _xP = Help.Mod(_xP, SonicLevel.LevelWidth);
                 _yP = Help.Mod(_yP, SonicLevel.LevelHeight);
                 TileChunk chunk = SonicLevel.GetChunkAt(_xP, _yP);
+                if (chunk == null) continue;
 
                 localPoint.X = (_xPreal * 128) - WindowLocation.X;
                 localPoint.Y = (_yPreal * 128) - WindowLocation.Y;
@@ -888,7 +890,29 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
         }
 
 
+        public void CacheTiles()
+        {
 
+            Console.Time("tileCache");
+            TilePaletteAnimationManager = new TilePaletteAnimationManager(this);
+            TileAnimationManager = new TileAnimationManager(this);
+            foreach (var chunk in SonicLevel.TileChunks)
+            {
+                chunk.InitCache();
+                chunk.WarmCache();
+            }
+            Console.TimeEnd("tileCache");
+
+
+            Console.Time("collisionCache");
+            foreach (var chunk in SonicLevel.TileChunks)
+            {
+                SonicToon.SensorManager.BuildChunk(chunk, false);
+                SonicToon.SensorManager.BuildChunk(chunk, true);
+            }
+            Console.TimeEnd("collisionCache");
+
+        }
     }
 }
 //http://www.youtube.com/watch?v=_VTJtFERW54

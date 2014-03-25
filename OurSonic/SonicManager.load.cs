@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Html;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Serialization;
 using OurSonic.Level;
 using OurSonic.Level.Animations;
@@ -271,7 +272,7 @@ namespace OurSonic
                 }
             }
 
-            SonicLevel.Palette = sonicLevel.Palette.Map(a => a.Map(paletteToCanvas));
+            SonicLevel.Palette = sonicLevel.Palette.Map(a => a.Map(b=>b));
             SonicLevel.StartPositions = sonicLevel.StartPositions.Map(a => new Point(a.X, a.Y)).Array();
 
             SonicLevel.AnimatedPalettes = new List<PaletteItem>();
@@ -281,7 +282,7 @@ namespace OurSonic
                     AnimatedPaletteItem pal = sonicLevel.PaletteItems[0][k];
                     SonicLevel.AnimatedPalettes.Add(new PaletteItem()
                     {
-                        Palette = ((string[])Script.Eval(pal.Palette)).Map(paletteToCanvas),
+                        Palette = ((string[])Script.Eval(pal.Palette)).Map(b=>b),
                         SkipIndex = pal.SkipIndex,
                         TotalLength = pal.TotalLength,
                         Pieces =
@@ -352,15 +353,6 @@ namespace OurSonic
             }
 
 
-            TilePaletteAnimationManager = new TilePaletteAnimationManager(this);
-            TileAnimationManager = new TileAnimationManager(this);
-            foreach (var chunk in SonicLevel.TileChunks)
-            {
-                chunk.InitCache();
-                chunk.WarmCache();
-            }
-
-
             var finished = new Action(() => { Loading = false; });
             PreloadSprites(() => {
                                finished();
@@ -406,6 +398,7 @@ namespace OurSonic
 */
         }
 
+
         private static CanvasElement paletteToCanvas(string b)
         {
             var cn = CanvasInformation.Create(1, 1);
@@ -415,4 +408,21 @@ namespace OurSonic
         }
          
     }
+
+    [Imported()]
+    public class Console
+    {
+        [ScriptAlias("console.time")]
+        public static void Time(string name)
+        {
+
+        }
+        [ScriptAlias("console.timeEnd")]
+        public static void TimeEnd(string name)
+        {
+
+        }
+    }
+
+
 }

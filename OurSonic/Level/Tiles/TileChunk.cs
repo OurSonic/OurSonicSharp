@@ -176,6 +176,8 @@ namespace OurSonic.Level.Tiles
                     {
                         var piece = TilePieces[pieceX][pieceY].GetTilePiece();
                         if (piece == null) continue;
+                        if (piece.AnimatedPaletteIndexes == null) continue;
+
                         foreach (var animatedPaletteIndex in piece.AnimatedPaletteIndexes)
                         {
                             if (paletteAnimationIndexes.IndexOfFast(animatedPaletteIndex) == -1)
@@ -207,6 +209,7 @@ namespace OurSonic.Level.Tiles
                         {
                             var tile = tileInfo.GetTile();
                             if (tile == null) continue;
+                            if (tile.AnimatedTileIndexes == null) continue;
                             foreach (var animatedTileIndex in tile.AnimatedTileIndexes)
                             {
                                 if (tileAnimationIndexes.IndexOfFast(animatedTileIndex) == -1)

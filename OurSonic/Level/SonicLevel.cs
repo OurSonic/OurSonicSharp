@@ -34,7 +34,7 @@ namespace OurSonic.Level
         [IntrinsicProperty]
         public List<PaletteItem> AnimatedPalettes { get; set; }
         [IntrinsicProperty]
-        public CanvasElement[][] Palette { get; set; }
+        public string[][] Palette { get; set; }
         [IntrinsicProperty]
         public Point[] StartPositions { get; set; }
         [IntrinsicProperty]
@@ -102,7 +102,7 @@ namespace OurSonic.Level
     public class PaletteItem
     {
         [IntrinsicProperty]
-        public CanvasElement[] Palette { get; set; }
+        public string[] Palette { get; set; }
         [IntrinsicProperty]
         public int SkipIndex { get; set; }
         [IntrinsicProperty]
