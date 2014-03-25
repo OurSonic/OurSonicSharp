@@ -265,6 +265,131 @@ namespace OurSonic.Level.Tiles
                 CacheTileAnimation(ChunkLayer.High);
             }
         }
+
+        public CanvasInformation Debug_DrawCache()
+        {
+            double numWide = 10;
+            int numOfChunks = 0;
+            for (int i = 0; i < 2; i++)
+            {
+                var chunkLayer = (ChunkLayer)i;
+
+                if (BaseCanvasCache[chunkLayer] != null) numOfChunks++;
+
+                foreach (var paletteAnimationCanvasCache in PaletteAnimationCanvasesCache[chunkLayer])
+                {
+                    foreach (var frame in paletteAnimationCanvasCache.Value.Frames)
+                    {
+                        numOfChunks++;
+                    }
+                }
+                foreach (var tileAnimationCanvasCache in TileAnimationCanvasesCache[chunkLayer])
+                {
+                    foreach (var frame in tileAnimationCanvasCache.Value.Frames)
+                    {
+                        numOfChunks++;
+                    }
+                }
+            }
+            var canvas = CanvasInformation.Create((int)(numWide * 128), (int)Math.Ceiling(numOfChunks / numWide) * 128);
+            canvas.Context.FillStyle = "#111111";
+            canvas.Context.FillRect(0, 0, canvas.Canvas.Width, canvas.Canvas.Height);
+            numOfChunks = 0;
+            canvas.Context.StrokeStyle = "#FFFFFF";
+            canvas.Context.LineWidth = 4;
+
+            for (int i = 0; i < 2; i++)
+            {
+                var chunkLayer = (ChunkLayer) i;
+
+
+                canvas.Context.StrokeStyle = chunkLayer == ChunkLayer.Low ? "Green" : "Yellow";
+
+                if (BaseCanvasCache[chunkLayer] != null)
+                {
+
+                    var context = canvas.Context;
+                    context.Save();
+
+                    var x = (int)((numOfChunks % numWide) * 128);
+                    var y = (int)Math.Floor(numOfChunks / numWide) * 128;
+
+                    context.Translate(x, y);
+                    canvas.Context.FillStyle = chunkLayer == ChunkLayer.Low ? "#333333" : "#777777";
+                    context.FillRect(0, 0, 128, 128);
+                    context.DrawImage(BaseCanvasCache[chunkLayer].Canvas, 0, 0);
+                    context.StrokeRect(0, 0, 128, 128);
+                    context.Restore();
+                    numOfChunks++;
+
+                }
+
+                canvas.Context.StrokeStyle = chunkLayer == ChunkLayer.Low ? "pink" : "purple";
+
+
+                foreach (var paletteAnimationCanvasCache in PaletteAnimationCanvasesCache[chunkLayer])
+                {
+                    foreach (var frame in paletteAnimationCanvasCache.Value.Frames)
+                    {
+                        var context = canvas.Context;
+                        context.Save();
+
+                        var x = (int)((numOfChunks % numWide) * 128);
+                        var y = (int)Math.Floor(numOfChunks / numWide) * 128;
+
+                        context.Translate(x, y);
+                        canvas.Context.FillStyle = chunkLayer == ChunkLayer.Low ? "#333333" : "#777777";
+                        context.FillRect(0, 0, 128, 128);
+
+                        context.DrawImage(frame.Value.Canvas.Canvas, paletteAnimationCanvasCache.Value.Position.X, paletteAnimationCanvasCache.Value.Position.Y);
+                        context.StrokeRect(0, 0, 128, 128);
+                        context.Restore();
+                        numOfChunks++;
+
+                    }
+                }
+                canvas.Context.StrokeStyle = chunkLayer == ChunkLayer.Low ? "red" : "orange";
+
+                foreach (var tileAnimationCanvasCache in TileAnimationCanvasesCache[chunkLayer])
+                {
+                    foreach (var frame in tileAnimationCanvasCache.Value.Frames)
+                    {
+                        var context = canvas.Context;
+                        context.Save();
+
+                        var x = (int)((numOfChunks % numWide) * 128);
+                        var y = (int)Math.Floor(numOfChunks / numWide) * 128;
+
+                        context.Translate(x, y);
+                        canvas.Context.FillStyle = chunkLayer == ChunkLayer.Low ? "#333333" : "#777777";
+                        context.FillRect(0, 0, 128, 128);
+
+                        context.DrawImage(frame.Value.Canvas.Canvas, tileAnimationCanvasCache.Value.Position.Y, tileAnimationCanvasCache.Value.Position.Y);
+                        context.StrokeRect(0, 0, 128, 128);
+                        context.Restore();
+                        numOfChunks++;
+
+                    }
+                }
+            }
+            canvas.Context.StrokeStyle = "blue";
+            canvas.Context.StrokeRect(0, 0, canvas.Canvas.Width, canvas.Canvas.Height);
+            canvas.Context.FillStyle = "white";
+            canvas.Context.Font = "20px bold";
+            canvas.Context.FillText("Number Of Chunks: " + numOfChunks, 50, 50);
+            return canvas;
+        }
+
+
+        public void CacheBase(ChunkLayer layer)
+        {
+            if (layer == ChunkLayer.Low ? (OnlyForeground()) : (OnlyBackground())) return;
+
+            BaseCanvasCache[layer] = CanvasInformation.Create(tilePieceSize * piecesSquareSize, tilePieceSize * piecesSquareSize);
+
+            drawTilePiecesBase(BaseCanvasCache[layer].Context, layer, piecesSquareSize);
+        }
+
         public void CachePaletteAnimation(ChunkLayer layer)
         {
             var paletteAnimationCanvases = PaletteAnimationCanvasesCache[layer];
@@ -418,14 +543,6 @@ namespace OurSonic.Level.Tiles
             return new Rectangle(lowestX, lowestY, highestX - lowestX + 1, highestY - lowestY + 1);
         }
 
-
-
-        public void CacheBase(ChunkLayer layer)
-        {
-            BaseCanvasCache[layer] = CanvasInformation.Create(tilePieceSize * piecesSquareSize, tilePieceSize * piecesSquareSize);
-
-            drawTilePiecesBase(BaseCanvasCache[layer].Context, layer, piecesSquareSize);
-        }
 
 
         public void Draw(CanvasContext2D canvas, Point position, ChunkLayer layer)

@@ -94,8 +94,8 @@ namespace OurSonic
         public TilePaletteAnimationManager TilePaletteAnimationManager { get; set; }
         [IntrinsicProperty]
         public TileAnimationManager TileAnimationManager { get; set; }
-        
-      
+
+
         static SonicManager()
         {
         }
@@ -182,7 +182,7 @@ namespace OurSonic
 
         private bool effectClick(jQueryEvent elementEvent)
         {
-        //    if (CurrentGameState == GameState.Playing) return false;
+            //    if (CurrentGameState == GameState.Playing) return false;
 
             var e = new Point((int)((double)elementEvent.ClientX / Scale.X / RealScale.X + WindowLocation.X),
                               (int)((double)elementEvent.ClientY / Scale.Y / RealScale.Y + WindowLocation.Y));
@@ -645,7 +645,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 {
                     var fd = SpriteCache.HeightMapChunks[(SonicLevel.CurHeightMap ? 1 : 2) + " " + chunk.Index];
 
-                    if (fd==null)
+                    if (fd == null)
                     {
                         fd = cacheHeightMapForChunk(chunk);
                     }
@@ -672,14 +672,14 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 for (var _x = 0; _x < 8; _x++)
                 {
                     var tp = md.TilePieces[_x][_y];
-                    var solid = (int) (SonicLevel.CurHeightMap ? tp.Solid1 : tp.Solid2);
+                    var solid = (int)(SonicLevel.CurHeightMap ? tp.Solid1 : tp.Solid2);
 
                     var hd = SonicLevel.CurHeightMap ? tp.GetLayer1HeightMaps() : tp.GetLayer2HeightMaps();
 
                     var __x = _x;
                     var __y = _y;
                     var vangle = 0;
-                    var posm = new Point(posj1.X + (__x*16), posj1.Y + (__y*16));
+                    var posm = new Point(posj1.X + (__x * 16), posj1.Y + (__y * 16));
 
                     if (hd.Falsey()) continue;
                     if (hd.Full == false)
@@ -690,8 +690,8 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                         if (solid > 0)
                         {
                             ctx.FillStyle = HeightMap.colors[solid];
-                            ctx.FillRect(posj1.X + (__x*16),
-                                posj1.Y + (__y*16),
+                            ctx.FillRect(posj1.X + (__x * 16),
+                                posj1.Y + (__y * 16),
                                 16,
                                 16);
                         }
@@ -912,6 +912,61 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             }
             Console.TimeEnd("collisionCache");
 
+
+
+            if (false)
+            {
+                debugDraw();
+            }
+        }
+
+        private void debugDraw()
+        {
+            int numWide = 10;
+            int dropOffIndex = 0;
+            List<string> pieces = new List<string>();
+
+            while (true)
+            {
+                List<CanvasInformation> debugCanvases = new List<CanvasInformation>();
+                int totalHeight = 0;
+                var broke = false;
+                for (int index = dropOffIndex; index < SonicLevel.TileChunks.Count; index++)
+                {
+                    var chunk = SonicLevel.TileChunks[index];
+                    var canvasCache = chunk.Debug_DrawCache();
+                    totalHeight += canvasCache.Canvas.Height;
+                    debugCanvases.Add(canvasCache);
+                    if (totalHeight > 10000)
+                    {
+                        dropOffIndex = index + 1;
+                        broke = true;
+                        break;
+                    }
+                }
+
+                var bigOne = CanvasInformation.Create(numWide * 128, totalHeight);
+                int currentPosition = 0;
+                for (int index = 0; index < debugCanvases.Count; index++)
+                {
+                    var canvasInformation = debugCanvases[index];
+                    bigOne.Context.DrawImage(canvasInformation.Canvas, 0, currentPosition);
+                    currentPosition += canvasInformation.Canvas.Height;
+                }
+                pieces.Add(bigOne.Canvas.Me().toDataURL());
+                if (!broke) break;
+            }
+
+            var str = "<html><body>";
+            foreach (var piece in pieces)
+            {
+                str += "<img src=\"" + piece + "\"/>\n";
+            }
+            str += "</body></html>";
+            var tx = (TextAreaElement) Window.Document.CreateElement("textarea");
+            tx.Style.Position = "absolute";
+            tx.Value = str;
+            Window.Document.Body.AppendChild(tx);
         }
     }
 }

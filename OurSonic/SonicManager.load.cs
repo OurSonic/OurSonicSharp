@@ -18,26 +18,29 @@ namespace OurSonic
     public partial class SonicManager
     {
         public JsDictionary<string, LevelObject> cachedObjects;
-        
+
 
         public void loadObjects(KeyValuePair<string, string>[] objects)
         {
             cachedObjects = new JsDictionary<string, LevelObject>();
 
-            foreach (LevelObjectInfo t in SonicLevel.Objects) {
+            foreach (LevelObjectInfo t in SonicLevel.Objects)
+            {
                 var o = t.Key;
-                if (cachedObjects.ContainsKey(o)) {
+                if (cachedObjects.ContainsKey(o))
+                {
                     t.SetObjectData(cachedObjects[o]);
                     continue;
                 }
                 var d = objects.First(p => p.Key == o);
-                if (d.Falsey()) {
+                if (d.Falsey())
+                {
                     t.SetObjectData(new LevelObject(o));
                     continue;
                 }
                 LevelObjectData dat;
                 if (d.Value.Length == 0) dat = new LevelObjectData();
-                else dat = (LevelObjectData) Json.Parse(d.Value);
+                else dat = (LevelObjectData)Json.Parse(d.Value);
 
                 var dr = ObjectManager.ExtendObject(dat);
                 cachedObjects[o] = dr;
@@ -96,7 +99,8 @@ namespace OurSonic
             Status = "Determining Level Information";
 
             SonicLevel = new SonicLevel();
-            for (var n = 0; n < sonicLevel.Rings.Length; n++) {
+            for (var n = 0; n < sonicLevel.Rings.Length; n++)
+            {
                 SonicLevel.Rings[n] = new Ring(true);
 
                 SonicLevel.Rings[n].X = sonicLevel.Rings[n].X;
@@ -108,7 +112,8 @@ namespace OurSonic
             SonicLevel.ChunkMap = sonicLevel.Foreground;
             SonicLevel.BGChunkMap = sonicLevel.Background;
 
-            for (int l = 0; l < sonicLevel.Objects.Length; l++) {
+            for (int l = 0; l < sonicLevel.Objects.Length; l++)
+            {
                 SonicLevel.Objects[l] = new LevelObjectInfo(sonicLevel.Objects[l]);
                 SonicLevel.Objects[l].Index = l;
             }
@@ -128,16 +133,19 @@ namespace OurSonic
                 var tiles = fc;
                 List<int> mj = new List<int>();
 
-                for (int i = 0; i < tiles.Length; i++) {
+                for (int i = 0; i < tiles.Length; i++)
+                {
                     var value = sonicLevel.Tiles[j][i];
-                    mj.Add(( value >> 4 ));
-                    mj.Add(( value & 0xF ));
+                    mj.Add((value >> 4));
+                    mj.Add((value & 0xF));
                 }
                 var mfc = new int[8][];
-                for (int o = 0; o < 8; o++) {
+                for (int o = 0; o < 8; o++)
+                {
                     mfc[o] = new int[8];
                 }
-                for (int n = 0; n < mj.Count; n++) {
+                for (int n = 0; n < mj.Count; n++)
+                {
                     mfc[n % 8][n / 8] = mj[n];
                 }
 
@@ -146,27 +154,33 @@ namespace OurSonic
             }
             var acs = SonicLevel.AnimatedChunks = new List<TileChunk>();
 
-            if (sonicLevel.AnimatedFiles.Truthy()) {
+            if (sonicLevel.AnimatedFiles.Truthy())
+            {
                 SonicLevel.AnimatedTileFiles = new Tile[sonicLevel.AnimatedFiles.Length][];
-                for (var animatedFileIndex = 0; animatedFileIndex < sonicLevel.AnimatedFiles.Length; animatedFileIndex++) {
+                for (var animatedFileIndex = 0; animatedFileIndex < sonicLevel.AnimatedFiles.Length; animatedFileIndex++)
+                {
                     var animatedFile = sonicLevel.AnimatedFiles[animatedFileIndex];
                     SonicLevel.AnimatedTileFiles[animatedFileIndex] = new Tile[animatedFile.Length];
 
-                    for (int filePiece = 0; filePiece < animatedFile.Length; filePiece++) {
+                    for (int filePiece = 0; filePiece < animatedFile.Length; filePiece++)
+                    {
                         var c = animatedFile[filePiece];
                         var tiles = c;
                         List<int> mjc = new List<int>();
 
-                        for (int l = 0; l < tiles.Length; l++) {
+                        for (int l = 0; l < tiles.Length; l++)
+                        {
                             var value = animatedFile[filePiece][l];
-                            mjc.Add(( value >> 4 ));
-                            mjc.Add(( value & 0xF ));
+                            mjc.Add((value >> 4));
+                            mjc.Add((value & 0xF));
                         }
                         var mfc = new int[8][];
-                        for (int o = 0; o < 8; o++) {
+                        for (int o = 0; o < 8; o++)
+                        {
                             mfc[o] = new int[8];
                         }
-                        for (int n = 0; n < mjc.Count; n++) {
+                        for (int n = 0; n < mjc.Count; n++)
+                        {
                             mfc[n % 8][n / 8] = mjc[n];
                         }
                         Tile tile = new Tile(mfc);
@@ -178,21 +192,24 @@ namespace OurSonic
                 }
             }
 
-            for (int j = 0; j < sonicLevel.Blocks.Length; j++) {
+            for (int j = 0; j < sonicLevel.Blocks.Length; j++)
+            {
                 var fc = sonicLevel.Blocks[j];
                 var mj = new TilePiece();
                 mj.Index = j;
                 mj.Tiles = new List<TileItem>();
 
-                for (int p = 0; p < fc.Length; p++) {
-                    mj.Tiles.Add(new TileItem() {
-                                                        _Tile = fc[p].Tile,
-                                                        Index = p,
-                                                        Palette = fc[p].Palette,
-                                                        Priority = fc[p].Priority,
-                                                        XFlip = fc[p].XFlip,
-                                                        YFlip = fc[p].YFlip,
-                                                });
+                for (int p = 0; p < fc.Length; p++)
+                {
+                    mj.Tiles.Add(new TileItem()
+                    {
+                        _Tile = fc[p].Tile,
+                        Index = p,
+                        Palette = fc[p].Palette,
+                        Priority = fc[p].Priority,
+                        XFlip = fc[p].XFlip,
+                        YFlip = fc[p].YFlip,
+                    });
                 }
                 mj.Init();
                 SonicLevel.TilePieces[j] = mj;
@@ -203,24 +220,27 @@ namespace OurSonic
                     new List<TileAnimationData>(
                             sonicLevel.Animations.Map(
                                     a =>
-                                    new TileAnimationData() {
-                                                            AnimationTileFile = a.AnimationFile,
-                                                            AnimationTileIndex = a.AnimationTileIndex,
-                                                            AutomatedTiming = a.AutomatedTiming,
-                                                            NumberOfTiles = a.NumberOfTiles,
-                                                            DataFrames =
-                                                                    (TileAnimationDataFrame[])
-                                                                    a.Frames.Map(
-                                                                            b =>
-                                                                            new TileAnimationDataFrame() {Ticks = b.Ticks, StartingTileIndex = b.StartingTileIndex}).Slice(0)
-                                                    }));
+                                    new TileAnimationData()
+                                    {
+                                        AnimationTileFile = a.AnimationFile,
+                                        AnimationTileIndex = a.AnimationTileIndex,
+                                        AutomatedTiming = a.AutomatedTiming,
+                                        NumberOfTiles = a.NumberOfTiles,
+                                        DataFrames =
+                                                (TileAnimationDataFrame[])
+                                                a.Frames.Map(
+                                                        b =>
+                                                        new TileAnimationDataFrame() { Ticks = b.Ticks, StartingTileIndex = b.StartingTileIndex }).Slice(0)
+                                    }));
             SonicLevel.CollisionIndexes1 = sonicLevel.CollisionIndexes1;
             SonicLevel.CollisionIndexes2 = sonicLevel.CollisionIndexes2;
 
-            for (int i = 0; i < sonicLevel.HeightMaps.Length; i++) {
+            for (int i = 0; i < sonicLevel.HeightMaps.Length; i++)
+            {
                 var b1 = true;
                 var b2 = true;
-                for (int m = 0; m < sonicLevel.HeightMaps[i].Length; m++) {
+                for (int m = 0; m < sonicLevel.HeightMaps[i].Length; m++)
+                {
                     if (b1 && sonicLevel.HeightMaps[i][m] != 0)
                         b1 = false;
 
@@ -235,34 +255,43 @@ namespace OurSonic
                     SonicLevel.HeightMaps[i] = new HeightMap(sonicLevel.HeightMaps[i], i);
             }
 
-            for (int j = 0; j < sonicLevel.Chunks.Length; j++) {
+            for (int j = 0; j < sonicLevel.Chunks.Length; j++)
+            {
                 var fc = sonicLevel.Chunks[j];
                 var mj = new TileChunk();
                 mj.Index = j;
                 mj.TilePieces = new TilePieceInfo[8][];
-                for (int i = 0; i < 8; i++) {
+                for (int i = 0; i < 8; i++)
+                {
                     mj.TilePieces[i] = new TilePieceInfo[8];
                 }
-                for (int p = 0; p < fc.Length; p++) {
-                    mj.TilePieces[p % 8][p / 8] = new TilePieceInfo() {
-                                                                              Index = p,
-                                                                              Block = fc[p].Block,
-                                                                              Solid1 = fc[p].Solid1,
-                                                                              Solid2 = fc[p].Solid2,
-                                                                              XFlip = fc[p].XFlip,
-                                                                              YFlip = fc[p].YFlip
-                                                                      };
+                for (int p = 0; p < fc.Length; p++)
+                {
+                    mj.TilePieces[p % 8][p / 8] = new TilePieceInfo()
+                    {
+                        Index = p,
+                        Block = fc[p].Block,
+                        Solid1 = fc[p].Solid1,
+                        Solid2 = fc[p].Solid2,
+                        XFlip = fc[p].XFlip,
+                        YFlip = fc[p].YFlip
+                    };
                 }
 
                 SonicLevel.TileChunks[j] = mj;
                 mj.TileAnimations = new JsDictionary<int, TileAnimationData>();
-                for (int tpX = 0; tpX < mj.TilePieces.Length; tpX++) {
-                    for (int tpY = 0; tpY < mj.TilePieces[tpX].Length; tpY++) {
+                for (int tpX = 0; tpX < mj.TilePieces.Length; tpX++)
+                {
+                    for (int tpY = 0; tpY < mj.TilePieces[tpX].Length; tpY++)
+                    {
                         var pm = mj.TilePieces[tpX][tpY].GetTilePiece();
-                        if (pm != null) {
-                            foreach (var mjc in pm.Tiles) {
+                        if (pm != null)
+                        {
+                            foreach (var mjc in pm.Tiles)
+                            {
                                 var fa = containsAnimatedTile(mjc._Tile, SonicLevel);
-                                if (fa.Truthy()) {
+                                if (fa.Truthy())
+                                {
                                     mj.TileAnimations[tpY * 8 + tpX] = fa;
                                     acs[j] = mj;
                                 }
@@ -272,17 +301,19 @@ namespace OurSonic
                 }
             }
 
-            SonicLevel.Palette = sonicLevel.Palette.Map(a => a.Map(b=>b));
+            SonicLevel.Palette = sonicLevel.Palette.Map(a => a.Map(b => b));
             SonicLevel.StartPositions = sonicLevel.StartPositions.Map(a => new Point(a.X, a.Y)).Array();
 
             SonicLevel.AnimatedPalettes = new List<PaletteItem>();
-            if (sonicLevel.PaletteItems.Length > 0) {
+            if (sonicLevel.PaletteItems.Length > 0)
+            {
 
-                for (int k = 0; k < sonicLevel.PaletteItems[0].Length; k++) {
+                for (int k = 0; k < sonicLevel.PaletteItems[0].Length; k++)
+                {
                     AnimatedPaletteItem pal = sonicLevel.PaletteItems[0][k];
                     SonicLevel.AnimatedPalettes.Add(new PaletteItem()
                     {
-                        Palette = ((string[])Script.Eval(pal.Palette)).Map(b=>b),
+                        Palette = ((string[])Script.Eval(pal.Palette)).Map(b => b),
                         SkipIndex = pal.SkipIndex,
                         TotalLength = pal.TotalLength,
                         Pieces =
@@ -296,15 +327,18 @@ namespace OurSonic
                 }
             }
 
-            foreach (var tilePiece in SonicLevel.TilePieces) {
+            foreach (var tilePiece in SonicLevel.TilePieces)
+            {
                 tilePiece.AnimatedPaletteIndexes = new List<int>();
                 tilePiece.AnimatedTileIndexes = new List<int>();
                 if (SonicLevel.AnimatedPalettes.Count > 0)
                 {
-                    foreach (var mj in tilePiece.Tiles) {
+                    foreach (var mj in tilePiece.Tiles)
+                    {
                         Tile tile = mj.GetTile();
 
-                        if (tile.Truthy()) {
+                        if (tile.Truthy())
+                        {
                             tile.AnimatedPaletteIndexes = new List<int>();
                             var pl = tile.GetAllPaletteIndexes();
                             tile.PaletteIndexesToBeAnimated = new JsDictionary<int, List<int>>();
@@ -325,20 +359,23 @@ namespace OurSonic
                             }
 
 
-                            for (int animatedPaletteIndex = 0; animatedPaletteIndex < SonicLevel.AnimatedPalettes.Count; animatedPaletteIndex++) {
+                            for (int animatedPaletteIndex = 0; animatedPaletteIndex < SonicLevel.AnimatedPalettes.Count; animatedPaletteIndex++)
+                            {
                                 var pal = SonicLevel.AnimatedPalettes[animatedPaletteIndex];
                                 tile.PaletteIndexesToBeAnimated[animatedPaletteIndex] = new List<int>();
 
                                 foreach (var mjce in pal.Pieces)
                                 {
                                     PaletteItemPieces mje1 = mjce;
-                                    if (mj.Palette == mje1.PaletteIndex) {
-                                        if (pl.Any(j => j == mje1.PaletteOffset / 2 || j == mje1.PaletteOffset / 2 + 1)) {
+                                    if (mj.Palette == mje1.PaletteIndex)
+                                    {
+                                        if (pl.Any(j => j == mje1.PaletteOffset / 2 || j == mje1.PaletteOffset / 2 + 1))
+                                        {
                                             tilePiece.AnimatedPaletteIndexes.Add(animatedPaletteIndex);
                                             tile.AnimatedPaletteIndexes.Add(animatedPaletteIndex);
                                             foreach (var pIndex in pl)
                                             {
-                                                if (pIndex == mje1.PaletteOffset/2 || pIndex == mje1.PaletteOffset/2 + 1)
+                                                if (pIndex == mje1.PaletteOffset / 2 || pIndex == mje1.PaletteOffset / 2 + 1)
                                                 {
                                                     tile.PaletteIndexesToBeAnimated[animatedPaletteIndex].Add(pIndex);
                                                 }
@@ -354,10 +391,11 @@ namespace OurSonic
 
 
             var finished = new Action(() => { Loading = false; });
-            PreloadSprites(() => {
-                               finished();
-                               ForceResize();
-                           },
+            PreloadSprites(() =>
+            {
+                finished();
+                ForceResize();
+            },
                            (s) => { });
             ForceResize();
             OnLevelLoad(SonicLevel);
@@ -406,7 +444,7 @@ namespace OurSonic
             cn.Context.FillRect(0, 0, 1, 1);
             return cn.Canvas;
         }
-         
+
     }
 
     [Imported()]
@@ -421,6 +459,10 @@ namespace OurSonic
         public static void TimeEnd(string name)
         {
 
+        }
+        [ScriptAlias("console.log")]
+        public static void Log(object toDataUrl)
+        {
         }
     }
 

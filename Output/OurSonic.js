@@ -15,10 +15,8 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Page
 	var $OurSonic_Page = function() {
-		//
-		//            var stats = new XStats();
-		//
-		//            Document.Body.AppendChild(stats.Element);
+		var stats = new xStats();
+		document.body.appendChild(stats.element);
 		new $OurSonic_SonicEngine();
 	};
 	$OurSonic_Page.__typeName = 'OurSonic.Page';
@@ -4337,6 +4335,49 @@
 				this.sonicToon.sensorManager.buildChunk(chunk1, true);
 			}
 			console.timeEnd('collisionCache');
+			this.$debugDraw();
+		},
+		$debugDraw: function() {
+			var numWide = 10;
+			var dropOffIndex = 0;
+			var pieces = [];
+			while (true) {
+				var debugCanvases = [];
+				var totalHeight = 0;
+				var broke = false;
+				for (var index = dropOffIndex; index < this.sonicLevel.tileChunks.length; index++) {
+					var chunk = this.sonicLevel.tileChunks[index];
+					var canvasCache = chunk.debug_DrawCache();
+					totalHeight += canvasCache.canvas.height;
+					ss.add(debugCanvases, canvasCache);
+					if (totalHeight > 10000) {
+						dropOffIndex = index + 1;
+						broke = true;
+						break;
+					}
+				}
+				var bigOne = $OurSonic_Utility_CanvasInformation.create(numWide * 128, totalHeight);
+				var currentPosition = 0;
+				for (var index1 = 0; index1 < debugCanvases.length; index1++) {
+					var canvasInformation = debugCanvases[index1];
+					bigOne.context.drawImage(canvasInformation.canvas, 0, currentPosition);
+					currentPosition += canvasInformation.canvas.height;
+				}
+				ss.add(pieces, ss.cast(bigOne.canvas.toDataURL(), String));
+				if (!broke) {
+					break;
+				}
+			}
+			var str = '<html><body>';
+			for (var $t1 = 0; $t1 < pieces.length; $t1++) {
+				var piece = pieces[$t1];
+				str += '<img src="' + piece + '"/>\n';
+			}
+			str += '</body></html>';
+			var tx = window.document.createElement('textarea');
+			tx.style.position = 'absolute';
+			tx.value = str;
+			window.document.body.appendChild(tx);
 		},
 		loadObjects: function(objects) {
 			this.cachedObjects = {};
@@ -7419,6 +7460,150 @@
 				this.cacheTileAnimation(1);
 			}
 		},
+		debug_DrawCache: function() {
+			var numWide = 10;
+			var numOfChunks = 0;
+			for (var i = 0; i < 2; i++) {
+				var chunkLayer = i;
+				if (ss.isValue(this.$baseCanvasCache.get_item(chunkLayer))) {
+					numOfChunks++;
+				}
+				var $t1 = new ss.ObjectEnumerator(this.$paletteAnimationCanvasesCache.get_item(chunkLayer));
+				try {
+					while ($t1.moveNext()) {
+						var paletteAnimationCanvasCache = $t1.current();
+						var $t2 = new ss.ObjectEnumerator(paletteAnimationCanvasCache.value.frames);
+						try {
+							while ($t2.moveNext()) {
+								var frame = $t2.current();
+								numOfChunks++;
+							}
+						}
+						finally {
+							$t2.dispose();
+						}
+					}
+				}
+				finally {
+					$t1.dispose();
+				}
+				var $t3 = new ss.ObjectEnumerator(this.$tileAnimationCanvasesCache.get_item(chunkLayer));
+				try {
+					while ($t3.moveNext()) {
+						var tileAnimationCanvasCache = $t3.current();
+						var $t4 = new ss.ObjectEnumerator(tileAnimationCanvasCache.value.frames);
+						try {
+							while ($t4.moveNext()) {
+								var frame1 = $t4.current();
+								numOfChunks++;
+							}
+						}
+						finally {
+							$t4.dispose();
+						}
+					}
+				}
+				finally {
+					$t3.dispose();
+				}
+			}
+			var canvas = $OurSonic_Utility_CanvasInformation.create(ss.Int32.trunc(numWide * 128), ss.Int32.trunc(Math.ceil(numOfChunks / numWide)) * 128);
+			canvas.context.fillStyle = '#111111';
+			canvas.context.fillRect(0, 0, canvas.canvas.width, canvas.canvas.height);
+			numOfChunks = 0;
+			canvas.context.strokeStyle = '#FFFFFF';
+			canvas.context.lineWidth = 4;
+			for (var i1 = 0; i1 < 2; i1++) {
+				var chunkLayer1 = i1;
+				canvas.context.strokeStyle = ((chunkLayer1 === 0) ? 'Green' : 'Yellow');
+				if (ss.isValue(this.$baseCanvasCache.get_item(chunkLayer1))) {
+					var context = canvas.context;
+					context.save();
+					var x = ss.Int32.trunc(numOfChunks % numWide * 128);
+					var y = ss.Int32.trunc(Math.floor(numOfChunks / numWide)) * 128;
+					context.translate(x, y);
+					canvas.context.fillStyle = ((chunkLayer1 === 0) ? '#333333' : '#777777');
+					context.fillRect(0, 0, 128, 128);
+					context.drawImage(this.$baseCanvasCache.get_item(chunkLayer1).canvas, 0, 0);
+					context.strokeRect(0, 0, 128, 128);
+					context.restore();
+					numOfChunks++;
+				}
+				canvas.context.strokeStyle = ((chunkLayer1 === 0) ? 'pink' : 'purple');
+				var $t5 = new ss.ObjectEnumerator(this.$paletteAnimationCanvasesCache.get_item(chunkLayer1));
+				try {
+					while ($t5.moveNext()) {
+						var paletteAnimationCanvasCache1 = $t5.current();
+						var $t6 = new ss.ObjectEnumerator(paletteAnimationCanvasCache1.value.frames);
+						try {
+							while ($t6.moveNext()) {
+								var frame2 = $t6.current();
+								var context1 = canvas.context;
+								context1.save();
+								var x1 = ss.Int32.trunc(numOfChunks % numWide * 128);
+								var y1 = ss.Int32.trunc(Math.floor(numOfChunks / numWide)) * 128;
+								context1.translate(x1, y1);
+								canvas.context.fillStyle = ((chunkLayer1 === 0) ? '#333333' : '#777777');
+								context1.fillRect(0, 0, 128, 128);
+								context1.drawImage(frame2.value.canvas.canvas, paletteAnimationCanvasCache1.value.position.x, paletteAnimationCanvasCache1.value.position.y);
+								context1.strokeRect(0, 0, 128, 128);
+								context1.restore();
+								numOfChunks++;
+							}
+						}
+						finally {
+							$t6.dispose();
+						}
+					}
+				}
+				finally {
+					$t5.dispose();
+				}
+				canvas.context.strokeStyle = ((chunkLayer1 === 0) ? 'red' : 'orange');
+				var $t7 = new ss.ObjectEnumerator(this.$tileAnimationCanvasesCache.get_item(chunkLayer1));
+				try {
+					while ($t7.moveNext()) {
+						var tileAnimationCanvasCache1 = $t7.current();
+						var $t8 = new ss.ObjectEnumerator(tileAnimationCanvasCache1.value.frames);
+						try {
+							while ($t8.moveNext()) {
+								var frame3 = $t8.current();
+								var context2 = canvas.context;
+								context2.save();
+								var x2 = ss.Int32.trunc(numOfChunks % numWide * 128);
+								var y2 = ss.Int32.trunc(Math.floor(numOfChunks / numWide)) * 128;
+								context2.translate(x2, y2);
+								canvas.context.fillStyle = ((chunkLayer1 === 0) ? '#333333' : '#777777');
+								context2.fillRect(0, 0, 128, 128);
+								context2.drawImage(frame3.value.canvas.canvas, tileAnimationCanvasCache1.value.position.y, tileAnimationCanvasCache1.value.position.y);
+								context2.strokeRect(0, 0, 128, 128);
+								context2.restore();
+								numOfChunks++;
+							}
+						}
+						finally {
+							$t8.dispose();
+						}
+					}
+				}
+				finally {
+					$t7.dispose();
+				}
+			}
+			canvas.context.strokeStyle = 'blue';
+			canvas.context.strokeRect(0, 0, canvas.canvas.width, canvas.canvas.height);
+			canvas.context.fillStyle = 'white';
+			canvas.context.font = '20px bold';
+			canvas.context.fillText('Number Of Chunks: ' + numOfChunks, 50, 50);
+			return canvas;
+		},
+		cacheBase: function(layer) {
+			if (((layer === 0) ? this.onlyForeground() : this.onlyBackground())) {
+				return;
+			}
+			this.$baseCanvasCache.set_item(layer, $OurSonic_Utility_CanvasInformation.create(128, 128));
+			this.$drawTilePiecesBase(this.$baseCanvasCache.get_item(layer).context, layer, $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize);
+		},
 		cachePaletteAnimation: function(layer) {
 			var paletteAnimationCanvases = this.$paletteAnimationCanvasesCache.get_item(layer);
 			var $t1 = this.$getAllPaletteAnimationIndexes();
@@ -7545,10 +7730,6 @@
 				return null;
 			}
 			return $OurSonic_Utility_Rectangle.$ctor1(lowestX, lowestY, highestX - lowestX + 1, highestY - lowestY + 1);
-		},
-		cacheBase: function(layer) {
-			this.$baseCanvasCache.set_item(layer, $OurSonic_Utility_CanvasInformation.create(128, 128));
-			this.$drawTilePiecesBase(this.$baseCanvasCache.get_item(layer).context, layer, $OurSonic_Level_Tiles_TileChunk.$piecesSquareSize);
 		},
 		draw: function(canvas, position, layer) {
 			canvas.save();
