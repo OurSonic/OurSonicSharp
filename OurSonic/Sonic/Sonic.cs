@@ -852,7 +852,8 @@ namespace OurSonic.Sonic
 
         public void DrawUI(CanvasContext2D canvas, Point pos)
         {
-            using (new CanvasHandler(canvas)) {
+            canvas.Save();
+            {
                 if (canvas.Font != "13pt Arial bold")
                     canvas.Font = "13pt Arial bold";
                 canvas.FillStyle = "White";
@@ -868,6 +869,7 @@ namespace OurSonic.Sonic
                 if (HLock > 0)
                     canvas.FillText("HLock: " + HLock, pos.X + 90, pos.Y + 195);
             }
+            canvas.Restore();
         }
 
         public void Hit(double x, double y)
