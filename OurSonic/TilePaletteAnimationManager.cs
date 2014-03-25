@@ -17,6 +17,19 @@ namespace OurSonic
         public TilePaletteAnimationManager(SonicManager sonicManager)
         {
             SonicManager = sonicManager;
+            Init();
+        }
+
+        private void Init()
+        {
+            Animations = new JsDictionary<int, TilePaletteAnimation>();
+            for (int animatedPaletteIndex = 0;
+                animatedPaletteIndex < SonicManager.SonicLevel.AnimatedPalettes.Count;
+                animatedPaletteIndex++)
+            {
+                Animations[animatedPaletteIndex] = new TilePaletteAnimation(this,SonicManager.SonicLevel.AnimatedPalettes[animatedPaletteIndex]);
+                Animations[animatedPaletteIndex].Init();
+            }
         }
 
         public void ClearCache()
@@ -26,29 +39,21 @@ namespace OurSonic
         }
 
         public void TickAnimatedPalettes()
-        {
-            if (Animations == null)
-            {
-                Animations = new JsDictionary<int, TilePaletteAnimation>();
-                for (int animatedPaletteIndex = 0; animatedPaletteIndex < SonicManager.SonicLevel.AnimatedPalettes.Count; animatedPaletteIndex++)
-                {
-                    Animations[animatedPaletteIndex] = new TilePaletteAnimation(this, SonicManager.SonicLevel.AnimatedPalettes[animatedPaletteIndex]);
-                }
-            }
-
-
+        { 
             foreach (var animation in Animations)
             {
                 TilePaletteAnimation tilePaletteAnimation = animation.Value;
                 tilePaletteAnimation.Tick();
             }
-
-
         }
 
         public TilePaletteAnimationFrame GetCurrentFrame(int paletteAnimationIndex)
         {
             return Animations[paletteAnimationIndex].GetCurrentFrame();
+        }
+        public TilePaletteAnimation GetPaletteAnimation(int paletteAnimationIndex)
+        {
+            return Animations[paletteAnimationIndex];
         }
     }
     public class TilePaletteAnimation
@@ -91,15 +96,29 @@ namespace OurSonic
                 //todo ^^^this calc is suspected to be wrong
                 {
                     CurrentFrame = j / pal.SkipIndex;
-                }
-            
-                if (Frames[CurrentFrame] == null)
-                {
-                    Frames[CurrentFrame] = new TilePaletteAnimationFrame(CurrentFrame, this);
-                }
+                } 
             }
 
 
+        }
+
+        public void Init()
+        {
+
+            var pal = AnimatedPaletteData;
+
+            if (pal.SkipIndex == 0) return;
+            if (pal.TotalLength == 0) return;
+
+            //when to move to the next frame
+            for (int j = 0; j <= pal.TotalLength; j += pal.SkipIndex)
+            {
+                int frameIndex = j / pal.SkipIndex;
+                if (Frames[frameIndex] == null)
+                {
+                    Frames[frameIndex] = new TilePaletteAnimationFrame(frameIndex, this);
+                }
+            }
         }
     }
 

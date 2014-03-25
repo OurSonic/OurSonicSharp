@@ -90,9 +90,11 @@ namespace OurSonic
             }
         }
 
+        [IntrinsicProperty]
         public TilePaletteAnimationManager TilePaletteAnimationManager { get; set; }
+        [IntrinsicProperty]
         public TileAnimationManager TileAnimationManager { get; set; }
-
+        
       
         static SonicManager()
         {
@@ -100,9 +102,6 @@ namespace OurSonic
 
         public SonicManager(SonicEngine engine, CanvasInformation gameCanvas, Action resize)
         {
-            TilePaletteAnimationManager = new TilePaletteAnimationManager(this);
-            TileAnimationManager = new TileAnimationManager(this);
-
             Instance = this;
             //            SonicToon = new Sonic();
 
@@ -823,10 +822,10 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
 
         public void ClearCache()
         {
-            SonicLevel.ClearCache();
-            SpriteCache.ClearCache();
-            TilePaletteAnimationManager.ClearCache();
-            TileAnimationManager.ClearCache();
+            if (SpriteCache != null) SpriteCache.ClearCache();
+            if (SonicLevel != null) SonicLevel.ClearCache();
+            if (TilePaletteAnimationManager != null) TilePaletteAnimationManager.ClearCache();
+            if (TileAnimationManager != null) TileAnimationManager.ClearCache();
         }
 
         public bool MouseUp(jQueryEvent queryEvent)

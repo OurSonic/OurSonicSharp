@@ -20,7 +20,7 @@ namespace OurSonic.Areas
 
             tileChunkArea.AddControl(chunkPieceList = new ScrollBox(30, 70, 96 - 16, 3, 64) {BackColor = "rgb(50,60,127)"});
 
-            TileChunk[] tileChunks = SonicManager.Instance.SonicLevel.Chunks.Array();
+            TileChunk[] tileChunks = SonicManager.Instance.SonicLevel.TileChunks.Array();
             for (int index = 0; index < tileChunks.Length; index++) {
                 var tileChunk = tileChunks[index];
                 ImageButton<TileChunk> chunkButton = new ImageButton<TileChunk>(tileChunk, 0, 0, 0, 0);

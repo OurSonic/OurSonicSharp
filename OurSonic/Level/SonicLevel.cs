@@ -24,7 +24,7 @@ namespace OurSonic.Level
         [IntrinsicProperty]
         public int LevelHeight { get; set; }
         [IntrinsicProperty]
-        public List<TileChunk> Chunks { get; set; }
+        public List<TileChunk> TileChunks { get; set; }
         [IntrinsicProperty]
         public List<Tile> Tiles { get; set; }
         [IntrinsicProperty]
@@ -56,7 +56,7 @@ namespace OurSonic.Level
         {
             Tiles = new List<Tile>();
             TilePieces = new List<TilePiece>();
-            Chunks = new List<TileChunk>();
+            TileChunks = new List<TileChunk>();
             ChunkMap = new int[0][];
             Rings = new List<Ring>();
             Objects = new List<LevelObjectInfo>();
@@ -71,7 +71,7 @@ namespace OurSonic.Level
 
         public TileChunk GetChunkAt(int x, int y)
         {
-            return Chunks[ChunkMap[x][y]];
+            return TileChunks[ChunkMap[x][y]];
         }
 
         public void ClearCache()
@@ -79,7 +79,7 @@ namespace OurSonic.Level
             foreach (var tile in Tiles.Array()) {
                 tile.ClearCache();
             } 
-            foreach (var chunk in Chunks.Array()) {
+            foreach (var chunk in TileChunks.Array()) {
                 chunk.ClearCache();
             }
         }

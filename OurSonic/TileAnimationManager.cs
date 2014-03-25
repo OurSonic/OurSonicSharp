@@ -14,19 +14,22 @@ namespace OurSonic
         public TileAnimationManager(SonicManager sonicManager)
         {
             SonicManager = sonicManager;
+            Init();
+
+        }
+
+        private void Init()
+        {
+            Animations = new JsDictionary<int, TileAnimation>();
+            for (int animatedTileIndex = 0; animatedTileIndex < SonicManager.SonicLevel.TileAnimations.Count; animatedTileIndex++)
+            {
+                Animations[animatedTileIndex] = new TileAnimation(this, SonicManager.SonicLevel.TileAnimations[animatedTileIndex]);
+                Animations[animatedTileIndex].Init();
+            }
         }
 
         public void TickAnimatedTiles()
-        {
-            if (Animations == null)
-            {
-                Animations = new JsDictionary<int, TileAnimation>();
-                for (int animatedTileIndex = 0; animatedTileIndex < SonicManager.SonicLevel.TileAnimations.Count; animatedTileIndex++)
-                {
-                    Animations[animatedTileIndex] = new TileAnimation(this, SonicManager.SonicLevel.TileAnimations[animatedTileIndex]);
-                }
-            }
-
+        { 
 
             foreach (var animation in Animations)
             {
@@ -43,24 +46,12 @@ namespace OurSonic
         }
 
         public void TickAnimatedPalettes()
-        {
-            if (Animations == null)
-            {
-                Animations = new JsDictionary<int, TileAnimation>();
-                for (int animatedTileIndex = 0; animatedTileIndex < SonicManager.SonicLevel.TileAnimations.Count; animatedTileIndex++)
-                {
-                    Animations[animatedTileIndex] = new TileAnimation(this, SonicManager.SonicLevel.TileAnimations[animatedTileIndex]);
-                }
-            }
-
-
+        { 
             foreach (var animation in Animations)
             {
                 var tileAnimation = animation.Value;
                 tileAnimation.Tick();
             }
-
-
         }
 
         public TileAnimationFrame GetCurrentFrame(int tileAnimationIndex)
@@ -85,9 +76,7 @@ namespace OurSonic
             Manager = manager;
             AnimatedTileData = animatedTileData;
             Frames = new List<TileAnimationFrame>();
-
             CurrentFrame = 0;
-            Frames[CurrentFrame] = new TileAnimationFrame(CurrentFrame, this);//prime frames
         }
 
         public TileAnimationFrame GetCurrentFrame()
@@ -111,14 +100,18 @@ namespace OurSonic
                 anni.LastAnimatedIndex = (anni.LastAnimatedIndex + 1) % anni.DataFrames.Length;
                 CurrentFrame = anni.LastAnimatedIndex;
 
-                if (Frames[CurrentFrame] == null)
-                {
-                    Frames[CurrentFrame] = new TileAnimationFrame(CurrentFrame, this);
-                }
             }
  
 
 
+        }
+
+        public void Init()
+        {
+            for (int index = 0; index < AnimatedTileData.DataFrames.Length; index++)
+            {
+                Frames[index] = new TileAnimationFrame(index, this);
+            }
         }
     }
 
@@ -137,7 +130,6 @@ namespace OurSonic
         public TileAnimationDataFrame FrameData()
         {
             return Animation.AnimatedTileData.DataFrames[FrameIndex];
-
         } 
          
     }

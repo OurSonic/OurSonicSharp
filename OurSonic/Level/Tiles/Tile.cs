@@ -116,7 +116,7 @@ namespace OurSonic.Level.Tiles
                 {
                     var colorIndex = Colors[_x][_y];
                     if (colorIndex == 0) continue;
-                    if (PaletteIndexesToBeAnimated[animatedPaletteIndex].IndexOf(colorIndex) == -1) continue;
+                    if (PaletteIndexesToBeAnimated[animatedPaletteIndex].IndexOfFast(colorIndex) == -1) continue;
 
                     j.Context.DrawImage(palette_[colorPaletteIndex][colorIndex], x + _x, y + _y);
                 }
@@ -128,7 +128,7 @@ namespace OurSonic.Level.Tiles
         }
         public void DrawAnimatedTile(CanvasContext2D canvas, Point pos, bool xflip, bool yflip, int palette, int animatedTileIndex)
         {
-            if (AnimatedTileIndexes.IndexOf(animatedTileIndex) == -1) return;
+            if (AnimatedTileIndexes.IndexOfFast(animatedTileIndex) == -1) return;
             var tileAnimationFrame = SonicManager.Instance.TileAnimationManager.GetCurrentFrame(animatedTileIndex);
             var tileAnimation = tileAnimationFrame.Animation;
             var tileAnimationData = tileAnimation.AnimatedTileData;

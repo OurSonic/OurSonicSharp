@@ -6,6 +6,25 @@ namespace OurSonicModels.Common
 {
     public static class EnumerableExtensions
     {
+        public static int IndexOfFast(this List<int> items, int ind)
+        {
+            for (int index = 0; index < items.Count; index++)
+            {
+                var item = items[index];
+                if (item == ind) return index;
+            }
+            return -1;
+        }
+        public static int IndexOfFast(this int[] items, int ind)
+        {
+            for (int index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (item == ind) return index;
+            }
+            return -1;
+        }
+
         public static T[] Where<T>(this T[] items, Func<T, bool> clause)
         {
             List<T> items2 = new List<T>();

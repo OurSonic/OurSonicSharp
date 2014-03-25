@@ -83,7 +83,7 @@ setTimeout(tim, 100);*/
                                                                          if (load)
                                                                          {
                                                                              //#if RELEASE
-                                                                             loadLevel(level);
+                                                                             //loadLevel(level);
                                                                              //#endif
                                                                              load = false;
                                                                          }
@@ -107,6 +107,8 @@ setTimeout(tim, 100);*/
                 UIManager.UIManager.UpdateTitle("Loading: ");
 
                 var sonicManager = SonicManager.Instance;
+                sonicManager.ClearCache();
+
                 sonicManager.Load(level);
 
                 sonicManager.WindowLocation.X = 0;
@@ -116,7 +118,6 @@ setTimeout(tim, 100);*/
 
                 sonicManager.BigWindowLocation.Width = (int)(sonicManager.WindowLocation.Width * 1.8);
                 sonicManager.BigWindowLocation.Height = (int)(sonicManager.WindowLocation.Height * 1.8);
-                sonicManager.ClearCache();
 
                 if (sonicManager.CurrentGameState == GameState.Playing)
                     SonicEngine.runGame();

@@ -253,7 +253,7 @@ namespace OurSonic
                                                                       };
                 }
 
-                SonicLevel.Chunks[j] = mj;
+                SonicLevel.TileChunks[j] = mj;
                 mj.TileAnimations = new JsDictionary<int, TileAnimationData>();
                 for (int tpX = 0; tpX < mj.TilePieces.Length; tpX++) {
                     for (int tpY = 0; tpY < mj.TilePieces[tpX].Length; tpY++) {
@@ -351,6 +351,16 @@ namespace OurSonic
                 }
             }
 
+
+            TilePaletteAnimationManager = new TilePaletteAnimationManager(this);
+            TileAnimationManager = new TileAnimationManager(this);
+            foreach (var chunk in SonicLevel.TileChunks)
+            {
+                chunk.InitCache();
+                chunk.WarmCache();
+            }
+
+
             var finished = new Action(() => { Loading = false; });
             PreloadSprites(() => {
                                finished();
@@ -367,12 +377,12 @@ namespace OurSonic
         var finished = function () {
             sonicManager.uiManager.levelManagerArea.visible = true;
             sonicManager.loading = false;
-            sonicManager.uiManager.modifyTC.tileChunk = sonicManager.SonicLevel.Chunks[0];
+            sonicManager.uiManager.modifyTC.tileChunk = sonicManager.SonicLevel.TileChunks[0];
             sonicManager.uiManager.modifyTilePieceArea.tilePiece = sonicManager.uiManager.modifyTP.tilePiece = sonicManager.SonicLevel.TilePieces[0];
 
         };
 
-        //        var inds = sonicManager.inds = { r:0,t: 0, tp: 0, tc: 0, total: (sonicManager.SonicLevel.Chunks.length * 2 + sonicManager.SonicLevel.TilePieces.length * 5 + sonicManager.SonicLevel.Tiles.length), done: false };
+        //        var inds = sonicManager.inds = { r:0,t: 0, tp: 0, tc: 0, total: (sonicManager.SonicLevel.TileChunks.length * 2 + sonicManager.SonicLevel.TilePieces.length * 5 + sonicManager.SonicLevel.Tiles.length), done: false };
 
         sonicManager.CACHING = true;
         sonicManager.preLoadSprites(scale, function () {

@@ -194,6 +194,24 @@
 	var $OurSonicModels_Common_EnumerableExtensions = function() {
 	};
 	$OurSonicModels_Common_EnumerableExtensions.__typeName = 'OurSonicModels.Common.EnumerableExtensions';
+	$OurSonicModels_Common_EnumerableExtensions.indexOfFast = function(items, ind) {
+		for (var index = 0; index < items.length; index++) {
+			var item = items[index];
+			if (item === ind) {
+				return index;
+			}
+		}
+		return -1;
+	};
+	$OurSonicModels_Common_EnumerableExtensions.indexOfFast$1 = function(items, ind) {
+		for (var index = 0; index < items.length; index++) {
+			var item = items[index];
+			if (item === ind) {
+				return index;
+			}
+		}
+		return -1;
+	};
 	$OurSonicModels_Common_EnumerableExtensions.where$1 = function(T) {
 		return function(items, clause) {
 			var items2 = [];
