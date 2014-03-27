@@ -11,6 +11,7 @@ using OurSonicModels.Common;
 
 namespace OurSonic.UI.Controllers
 {
+    
     internal class LevelSelectorController
     {
         public const string Name = "LevelSelectorController";
@@ -18,7 +19,7 @@ namespace OurSonic.UI.Controllers
         private readonly LevelSelectorScope scope;
         private readonly CreateUIService createUIService;
 
-        public LevelSelectorController(LevelSelectorScope scope,CreateUIService createUIService)
+        public LevelSelectorController(LevelSelectorScope scope, CreateUIService createUIService)
         {
             this.scope = scope;
             this.scope.Visible = true;
@@ -33,8 +34,8 @@ namespace OurSonic.UI.Controllers
 
 
             scope.Watch("model.selectedLevel", () => this.scope.Callback.LoadLevel(this.scope.Model.SelectedLevel));
-            
-             
+
+
             bool neverGot = true;
             SonicEngine.Instance.client.On<DataObject<string>>("LoadLevel.Response", LoadLevel);
             Window.SetTimeout(() =>
@@ -46,7 +47,7 @@ namespace OurSonic.UI.Controllers
 
                     scope.Apply();
 
-                } 
+                }
             }, 3000);
 
             SonicEngine.Instance.client.On<DataObject<string[]>>("GetLevels.Response",
@@ -55,7 +56,7 @@ namespace OurSonic.UI.Controllers
                                                                      neverGot = false;
                                                                      scope.Model.Levels = new List<LevelModel>(data.Data.OrderBy(a => a).Select(a => new LevelModel() { Name = a }));
                                                                      scope.Apply();
-                                                       
+
                                                                  });
             SonicEngine.Instance.client.Emit("GetLevels.Request", null);
 
@@ -74,7 +75,7 @@ namespace OurSonic.UI.Controllers
         {
             Help.DecodeString<SLData>(data.Data, (level) =>
             {
-                scope.Model.LoadingStatus=("Loading: ");
+                scope.Model.LoadingStatus = ("Loading: ");
 
                 var sonicManager = SonicManager.Instance;
                 sonicManager.ClearCache();

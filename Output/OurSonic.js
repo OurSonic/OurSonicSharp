@@ -26,6 +26,8 @@
 	$OurSonic_BuildAngular.setup = function() {
 		var module = angular.module('acg', ['ui.utils', 'ui.codemirror']).config(['$httpProvider', $OurSonic_BuildAngular.$buildHttpProvider]).controller($OurSonic_UI_Controllers_$LevelSelectorController.$name, [$OurSonic_BuildAngular.$scopeName, $OurSonic_UI_Services_CreateUIService.name$1, function(scope, createUIService) {
 			return new $OurSonic_UI_Controllers_$LevelSelectorController(scope, createUIService);
+		}]).controller($OurSonic_UI_Controllers_$ObjectFrameworkListController.$name, [$OurSonic_BuildAngular.$scopeName, $OurSonic_UI_Services_CreateUIService.name$1, function(scope1, createUIService1) {
+			return new $OurSonic_UI_Controllers_$ObjectFrameworkListController(scope1, createUIService1);
 		}]).service($OurSonic_UI_Services_CreateUIService.name$1, [$OurSonic_BuildAngular.$compileName, $OurSonic_BuildAngular.$rootScopeName, function(compileService, rootScopeService) {
 			return new $OurSonic_UI_Services_CreateUIService(compileService, rootScopeService);
 		}]).directive($OurSonic_UI_Directives_FancyListDirective.name$1, [function() {
@@ -36,8 +38,10 @@
 			return new $OurSonic_UI_Directives_FloatingWindowDirective();
 		}]).directive($OurSonic_UI_Directives_ForNextDirective.name$1, [function() {
 			return new $OurSonic_UI_Directives_ForNextDirective();
-		}]).run([$OurSonic_BuildAngular.$http, $OurSonic_BuildAngular.$templateCache, function(http, templateCache) {
+		}]).run([$OurSonic_BuildAngular.$http, $OurSonic_BuildAngular.$templateCache, $OurSonic_UI_Services_CreateUIService.name$1, function(http, templateCache, createUIService2) {
 			$OurSonic_BuildAngular.$buildCache(http, templateCache);
+			createUIService2.create($OurSonic_UI_Controllers_$LevelSelectorController.$view);
+			createUIService2.create($OurSonic_UI_Controllers_$ObjectFrameworkListController.$view);
 		}]);
 		//            MinimizeController.Register(module);
 		angular.bootstrap(window.document, ['acg']);
@@ -2169,6 +2173,39 @@
 	};
 	$OurSonic_UI_Controllers_$LevelSelectorController.__typeName = 'OurSonic.UI.Controllers.$LevelSelectorController';
 	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Controllers.ObjectFrameworkListController
+	var $OurSonic_UI_Controllers_$ObjectFrameworkListController = function(scope, createUIService) {
+		this.$scope = null;
+		this.$createUIService = null;
+		this.$scope = scope;
+		this.$scope.visible = true;
+		this.$createUIService = createUIService;
+		this.$scope.model = $OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeModel.$ctor();
+		this.$scope.callback = $OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeCallback.$ctor();
+		this.$scope.callback.loadObject = ss.delegateCombine(this.$scope.callback.loadObject, ss.mkdel(this, this.$loadObjectFn));
+		scope.$watch('model.selectedObject', ss.mkdel(this, function() {
+			this.$loadObjectFn(this.$scope.model.selectedObject);
+		}));
+		var getObjects = function() {
+			$OurSonic_SonicEngine.instance.client.emit('GetAllObjects', '');
+			$OurSonic_SonicEngine.instance.client.on('GetAllObjects.Response', function(data) {
+				var obj = data.Data;
+				scope.model.objects = ss.arrayClone(OurSonicModels.Common.EnumerableExtensions.select$1(String, $OurSonic_UI_Scope_Controller_ObjectModel).call(null, OurSonicModels.Common.EnumerableExtensions.orderBy$4(String).call(null, obj, function(a) {
+					return a;
+				}), function(a1) {
+					var $t1 = $OurSonic_UI_Scope_Controller_ObjectModel.$ctor();
+					$t1.name = a1;
+					return $t1;
+				}));
+				scope.$apply();
+			});
+		};
+		this.$scope.callback.createFramework = ss.delegateCombine(this.$scope.callback.createFramework, ss.mkdel(this, this.$createFrameworkFn));
+		this.$scope.callback.saveFramework = ss.delegateCombine(this.$scope.callback.saveFramework, ss.mkdel(this, this.$saveFrameworkFn));
+		getObjects();
+	};
+	$OurSonic_UI_Controllers_$ObjectFrameworkListController.__typeName = 'OurSonic.UI.Controllers.$ObjectFrameworkListController';
+	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.UI.Directives.DraggableDirective
 	var $OurSonic_UI_Directives_DraggableDirective = function() {
 		this.link = null;
@@ -2283,6 +2320,60 @@
 		return $this;
 	};
 	global.OurSonic.UI.Scope.Controller.LevelSelectorScopeModel = $OurSonic_UI_Scope_Controller_LevelSelectorScopeModel;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Scope.Controller.ObjectFrameworkListScope
+	var $OurSonic_UI_Scope_Controller_ObjectFrameworkListScope = function() {
+		this.model = null;
+		this.callback = null;
+		$OurSonic_UI_Scope_Directive_FloatingWindowBaseScope.call(this);
+	};
+	$OurSonic_UI_Scope_Controller_ObjectFrameworkListScope.__typeName = 'OurSonic.UI.Scope.Controller.ObjectFrameworkListScope';
+	global.OurSonic.UI.Scope.Controller.ObjectFrameworkListScope = $OurSonic_UI_Scope_Controller_ObjectFrameworkListScope;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Scope.Controller.ObjectFrameworkListScopeCallback
+	var $OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeCallback = function() {
+	};
+	$OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeCallback.__typeName = 'OurSonic.UI.Scope.Controller.ObjectFrameworkListScopeCallback';
+	$OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeCallback.createInstance = function() {
+		return $OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeCallback.$ctor();
+	};
+	$OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeCallback.$ctor = function() {
+		var $this = {};
+		$this.loadObject = null;
+		$this.createFramework = null;
+		$this.saveFramework = null;
+		return $this;
+	};
+	global.OurSonic.UI.Scope.Controller.ObjectFrameworkListScopeCallback = $OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeCallback;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Scope.Controller.ObjectFrameworkListScopeModel
+	var $OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeModel = function() {
+	};
+	$OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeModel.__typeName = 'OurSonic.UI.Scope.Controller.ObjectFrameworkListScopeModel';
+	$OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeModel.createInstance = function() {
+		return $OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeModel.$ctor();
+	};
+	$OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeModel.$ctor = function() {
+		var $this = {};
+		$this.selectedObject = null;
+		$this.objects = null;
+		return $this;
+	};
+	global.OurSonic.UI.Scope.Controller.ObjectFrameworkListScopeModel = $OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeModel;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Scope.Controller.ObjectModel
+	var $OurSonic_UI_Scope_Controller_ObjectModel = function() {
+	};
+	$OurSonic_UI_Scope_Controller_ObjectModel.__typeName = 'OurSonic.UI.Scope.Controller.ObjectModel';
+	$OurSonic_UI_Scope_Controller_ObjectModel.createInstance = function() {
+		return $OurSonic_UI_Scope_Controller_ObjectModel.$ctor();
+	};
+	$OurSonic_UI_Scope_Controller_ObjectModel.$ctor = function() {
+		var $this = {};
+		$this.name = null;
+		return $this;
+	};
+	global.OurSonic.UI.Scope.Controller.ObjectModel = $OurSonic_UI_Scope_Controller_ObjectModel;
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.UI.Scope.Directive.FloatingWindowBaseScope
 	var $OurSonic_UI_Scope_Directive_FloatingWindowBaseScope = function() {
@@ -9960,6 +10051,78 @@
 			}));
 		}
 	});
+	ss.initClass($OurSonic_UI_Controllers_$ObjectFrameworkListController, $asm, {
+		$saveFrameworkFn: function() {
+			//   var oldTitle = UIManager.UIManager.CurLevelName;
+			//   UIManager.UIManager.UpdateTitle("Saving Object");
+			//   
+			//   var k = uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Key;
+			//   var o = uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.oldKey ??
+			//   uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Key;
+			//   var v = Help.Stringify(uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework);
+			//   
+			//   SonicEngine.Instance.client.Emit("SaveObject", new SaveObjectModel { Key = k, OldKey = o, Data = v });
+			//   SonicEngine.Instance.client.On<bool>("SaveObject.Response", (data) => { UIManager.UIManager.UpdateTitle(oldTitle); });
+			//   
+			//   getObjects();
+		},
+		$createFrameworkFn: function() {
+			//
+			//            uiManager.UIManagerAreas.ObjectFrameworkArea.Populate(new LevelObject("SomeKey"));
+			//
+			//            uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Visible = true;
+		},
+		$loadObjectFn: function(arg) {
+			//
+			//            var objects = SonicManager.Instance.cachedObjects;
+			//
+			//            if (objects != null)
+			//
+			//            {
+			//
+			//            if (objects[name] != null)
+			//
+			//            {
+			//
+			//            uiManager.UIManagerAreas.ObjectFrameworkArea.Populate(objects[name]);
+			//
+			//            uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Visible = true;
+			//
+			//            return;
+			//
+			//            }
+			//
+			//            }
+			//
+			//            
+			//
+			//            var oldTitle = UIManager.UIManager.CurLevelName;
+			//
+			//            
+			//
+			//            UIManager.UIManager.UpdateTitle("Downloading Object:" + name);
+			//
+			//            
+			//
+			//            SonicEngine.Instance.client.Emit("GetObject", new DataObject<string>(name));
+			//
+			//            SonicEngine.Instance.client.On<DataObject<string>>("GetObject.Response",
+			//
+			//            (lvl) =>
+			//
+			//            {
+			//
+			//            UIManager.UIManager.UpdateTitle(oldTitle);
+			//
+			//            var d = ObjectManager.ExtendObject(jQuery.ParseJsonData<LevelObjectData>(lvl.Data));
+			//
+			//            uiManager.UIManagerAreas.ObjectFrameworkArea.Populate(d);
+			//
+			//            uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Visible = true;
+			//
+			//            });
+		}
+	});
 	ss.initClass($OurSonic_UI_Directives_DraggableDirective, $asm, {
 		$linkFn: function(scope, element, attrs) {
 			element.draggable({ cancel: '.window .inner-window' });
@@ -10165,6 +10328,10 @@
 	ss.initClass($OurSonic_UI_Scope_Controller_LevelSelectorScope, $asm, {}, $OurSonic_UI_Scope_Directive_FloatingWindowBaseScope);
 	ss.initClass($OurSonic_UI_Scope_Controller_LevelSelectorScopeCallback, $asm, {});
 	ss.initClass($OurSonic_UI_Scope_Controller_LevelSelectorScopeModel, $asm, {});
+	ss.initClass($OurSonic_UI_Scope_Controller_ObjectFrameworkListScope, $asm, {}, $OurSonic_UI_Scope_Directive_FloatingWindowBaseScope);
+	ss.initClass($OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeCallback, $asm, {});
+	ss.initClass($OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeModel, $asm, {});
+	ss.initClass($OurSonic_UI_Scope_Controller_ObjectModel, $asm, {});
 	ss.initClass($OurSonic_UI_Scope_Directive_FloatingWindowPosition, $asm, {});
 	ss.initClass($OurSonic_UI_Scope_Directive_FloatingWindowScope, $asm, {}, OurSonic.UI.Scope.BaseScope);
 	ss.initClass($OurSonic_UI_Scope_Directive_Size, $asm, {});
@@ -10235,7 +10402,7 @@
 			};
 		},
 		create: function(ui) {
-			var scope = ss.cast(this.$myRootScopeService.$new(), $OurSonic_UI_Services_ManagedScope);
+			var scope = this.$myRootScopeService.$new();
 			var item = this.$myCompileService($(ss.formatString('<div ng-include src="\'{1}partials/UIs/{0}.html\'"></div>', ui, $OurSonic_Utility_Constants.contentAddress)))(scope);
 			item.appendTo(window.document.body);
 			if (ss.isNullOrUndefined(scope.$$phase)) {
@@ -11748,6 +11915,8 @@
 	$OurSonic_UI_Controllers_$LevelSelectorController.$name = 'LevelSelectorController';
 	$OurSonic_UI_Controllers_$LevelSelectorController.$view = 'LevelSelector';
 	$OurSonic_UI_Services_CreateUIService.name$1 = 'CreateUIService';
+	$OurSonic_UI_Controllers_$ObjectFrameworkListController.$name = 'ObjectFrameworkListController';
+	$OurSonic_UI_Controllers_$ObjectFrameworkListController.$view = 'ObjectFrameworkList';
 	$OurSonic_UI_Directives_FancyListDirective.name$1 = 'fancyList';
 	$OurSonic_UI_Directives_DraggableDirective.name$1 = 'draggable';
 	$OurSonic_UI_Directives_FloatingWindowDirective.name$1 = 'floatingWindow';

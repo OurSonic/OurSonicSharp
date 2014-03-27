@@ -27,18 +27,26 @@ namespace OurSonic
             var module = angular.Module("acg", new string[] { "ui.utils", "ui.codemirror" })
                             .Config(new object[] { "$httpProvider", new Action<dynamic>(buildHttpProvider) })
                             .Controller(LevelSelectorController.Name, new object[] { ScopeName, CreateUIService.Name, new Func<LevelSelectorScope, CreateUIService, object>((scope, createUIService) => new LevelSelectorController(scope, createUIService)) })
+                            .Controller(ObjectFrameworkListController.Name, new object[] { ScopeName, CreateUIService.Name, new Func<ObjectFrameworkListScope, CreateUIService, object>((scope, createUIService) => new ObjectFrameworkListController(scope, createUIService)) })
                             .Service(CreateUIService.Name, new object[] { CompileName, RootScopeName, new Func<CompileService, IRootScopeService, object>((compileService, rootScopeService) => new CreateUIService(compileService, rootScopeService)) })
                             .Directive(FancyListDirective.Name, new object[] { new Func<object>(() => new FancyListDirective()) })
                             .Directive(DraggableDirective.Name, new object[] { new Func<object>(() => new DraggableDirective()) })
                             .Directive(FloatingWindowDirective.Name, new object[] { new Func<object>(() => new FloatingWindowDirective()) })
                             .Directive(ForNextDirective.Name, new object[] { new Func<object>(() => new ForNextDirective()) })
                 //                            .Filter(RoundFilter.Name, new object[] { new Func<Func<object, object>>(() => new RoundFilter().Filter) })
-                            .Run(new object[] { Http, TemplateCache, new Action<IHttpService, ITemplateCacheService>((http, templateCache) => buildCache(http, templateCache)) });
+                            .Run(new object[] { Http, TemplateCache,CreateUIService.Name, new Action<IHttpService, ITemplateCacheService,CreateUIService>(
+                                (http, templateCache,createUIService) =>
+                                {
+                                    buildCache(http, templateCache);
+                                    createUIService.Create(LevelSelectorController.View);
+                                    createUIService.Create(ObjectFrameworkListController.View);
+                                }) });
 
             //            MinimizeController.Register(module);
 
             angular.Bootstrap(Window.Document, "acg");
 
+            
         }
 
         private static void buildCache(IHttpService http, ITemplateCacheService templateCache)

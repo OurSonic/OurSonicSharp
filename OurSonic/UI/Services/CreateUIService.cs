@@ -110,7 +110,7 @@ namespace OurSonic.UI.Services
 
         public CreatedUI<ManagedScope> Create(string ui)
         {
-            var scope = (ManagedScope)myRootScopeService.New();
+            var scope = myRootScopeService.New().Me<ManagedScope>();
             var item =
                 myCompileService(
                     jQuery.FromHtml(string.Format("<div ng-include src=\"'{1}partials/UIs/{0}.html'\"></div>", ui, Constants.ContentAddress)))(scope);

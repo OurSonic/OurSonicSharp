@@ -82,12 +82,14 @@
     <Compile Include="UIManager\Table.cs" />
     <Compile Include="UIManager\LayoutPanel.cs" />
     <Compile Include="UI\Controllers\LevelSelectorController.cs" />
+    <Compile Include="UI\Controllers\ObjectFrameworkListController.cs" />
     <Compile Include="UI\Directives\DraggableDirective.cs" />
     <Compile Include="UI\Directives\FloatingWindowDirective.cs" />
     <Compile Include="UI\Directives\ForNextDirective.cs" />
     <Compile Include="UI\Scope\BaseScope.cs" />
     <Compile Include="UI\Scope\Controller\LevelSelectorScope.cs" />
     <Compile Include="UI\Directives\FancyListDirective.cs" />
+    <Compile Include="UI\Scope\Controller\ObjectFrameworkListScope.cs" />
     <Compile Include="UI\Scope\Directive\FloatingWindowBaseScope.cs" />
     <Compile Include="UI\Scope\Directive\FloatingWindowPosition.cs" />
     <Compile Include="UI\Scope\Directive\FloatingWindowScope.cs" />
@@ -176,6 +178,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="UI\Partials\Areas\ObjectFrameworkList.html" />
     <Content Include="UI\Partials\Areas\LevelSelector.html" />
     <Content Include="UI\Partials\Directives\fancyList.html" />
     <Content Include="UI\Partials\Directives\floatingWindow.html" />

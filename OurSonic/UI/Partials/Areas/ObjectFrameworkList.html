@@ -1,0 +1,16 @@
+﻿<div ng-controller="ObjectFrameworkListController">
+    <div floating-window left="'15%'" top="'75%'" width="'360px'" height="'320px'" window-title="'Object Frameworks'" visible="visible">
+        <h3>{{model.loadingStatus}}</h3>
+
+        <div class="form-group btn-group">
+            <button class="btn col-main" ng-click="callback.createFramework()">Create Framework</button>
+            <button class="btn col-main" ng-click="callback.saveFramework()">Save Framework</button>
+        </div>
+
+
+        <div style="height: 220px;" class="full-width" fancy-list items="model.objects" bind="model.selectedObject">
+            {{item.name}}
+        </div>
+
+    </div>
+</div>
