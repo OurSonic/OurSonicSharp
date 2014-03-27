@@ -1,0 +1,6 @@
+﻿<div style="overflow-y: scroll; overflow-x: hidden;" class="fancy-list">
+    <div ng-repeat="item in items">
+        <div ng-click="itemClick(item)" ng-transclude ng-class="currentClass(item)">
+        </div>
+    </div>
+</div>

@@ -152,8 +152,8 @@ namespace Build
 
                 //serverftp.Upload("/usr/local/src/sonic/" + to.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries).Last(), to);
             }
-
-
+            if (Directory.Exists(@"C:\inetpub\wwwroot\sonic\partials"))
+                Directory.Delete(@"C:\inetpub\wwwroot\sonic\partials",true);
             DirectoryCopy(pre + shufSharp + @"\output\partials\", @"C:\inetpub\wwwroot\sonic\partials", true);
 
             /*

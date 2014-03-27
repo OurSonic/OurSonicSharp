@@ -26,8 +26,9 @@ namespace OurSonic
 
             var module = angular.Module("acg", new string[] { "ui.utils", "ui.codemirror" })
                             .Config(new object[] { "$httpProvider", new Action<dynamic>(buildHttpProvider) })
-                            .Controller(LoginController.Name, new object[] { ScopeName, CreateUIService.Name, new Func<LoginScope, CreateUIService, object>((scope, createUIService) => new LoginController(scope, createUIService)) })
+                            .Controller(LevelSelectorController.Name, new object[] { ScopeName, CreateUIService.Name, new Func<LevelSelectorScope, CreateUIService, object>((scope, createUIService) => new LevelSelectorController(scope, createUIService)) })
                             .Service(CreateUIService.Name, new object[] { CompileName, RootScopeName, new Func<CompileService, IRootScopeService, object>((compileService, rootScopeService) => new CreateUIService(compileService, rootScopeService)) })
+                            .Directive(FancyListDirective.Name, new object[] { new Func<object>(() => new FancyListDirective()) })
                             .Directive(DraggableDirective.Name, new object[] { new Func<object>(() => new DraggableDirective()) })
                             .Directive(FloatingWindowDirective.Name, new object[] { new Func<object>(() => new FloatingWindowDirective()) })
                             .Directive(ForNextDirective.Name, new object[] { new Func<object>(() => new ForNextDirective()) })
@@ -44,7 +45,7 @@ namespace OurSonic
         {
             string[] uis =
             {  							
-  							LoginController.View,
+  							LevelSelectorController.View,
                             
             };
             for (int index = 0; index < uis.Length; index++)

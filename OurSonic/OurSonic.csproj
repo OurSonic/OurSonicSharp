@@ -81,12 +81,13 @@
     <Compile Include="UIManager\Image.cs" />
     <Compile Include="UIManager\Table.cs" />
     <Compile Include="UIManager\LayoutPanel.cs" />
-    <Compile Include="UI\Controllers\LoginController.cs" />
+    <Compile Include="UI\Controllers\LevelSelectorController.cs" />
     <Compile Include="UI\Directives\DraggableDirective.cs" />
     <Compile Include="UI\Directives\FloatingWindowDirective.cs" />
     <Compile Include="UI\Directives\ForNextDirective.cs" />
     <Compile Include="UI\Scope\BaseScope.cs" />
-    <Compile Include="UI\Scope\Controller\LoginScope.cs" />
+    <Compile Include="UI\Scope\Controller\LevelSelectorScope.cs" />
+    <Compile Include="UI\Directives\FancyListDirective.cs" />
     <Compile Include="UI\Scope\Directive\FloatingWindowBaseScope.cs" />
     <Compile Include="UI\Scope\Directive\FloatingWindowPosition.cs" />
     <Compile Include="UI\Scope\Directive\FloatingWindowScope.cs" />
@@ -175,7 +176,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="UI\Partials\Areas\Login.html" />
+    <Content Include="UI\Partials\Areas\LevelSelector.html" />
+    <Content Include="UI\Partials\Directives\fancyList.html" />
     <Content Include="UI\Partials\Directives\floatingWindow.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.4.0\tools\Saltarelle.Compiler.targets')" />

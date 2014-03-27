@@ -24,10 +24,12 @@
 	};
 	$OurSonic_BuildAngular.__typeName = 'OurSonic.BuildAngular';
 	$OurSonic_BuildAngular.setup = function() {
-		var module = angular.module('acg', ['ui.utils', 'ui.codemirror']).config(['$httpProvider', $OurSonic_BuildAngular.$buildHttpProvider]).controller($OurSonic_UI_Controllers_$LoginController.$name, [$OurSonic_BuildAngular.$scopeName, $OurSonic_UI_Services_CreateUIService.name$1, function(scope, createUIService) {
-			return new $OurSonic_UI_Controllers_$LoginController(scope, createUIService);
+		var module = angular.module('acg', ['ui.utils', 'ui.codemirror']).config(['$httpProvider', $OurSonic_BuildAngular.$buildHttpProvider]).controller($OurSonic_UI_Controllers_$LevelSelectorController.$name, [$OurSonic_BuildAngular.$scopeName, $OurSonic_UI_Services_CreateUIService.name$1, function(scope, createUIService) {
+			return new $OurSonic_UI_Controllers_$LevelSelectorController(scope, createUIService);
 		}]).service($OurSonic_UI_Services_CreateUIService.name$1, [$OurSonic_BuildAngular.$compileName, $OurSonic_BuildAngular.$rootScopeName, function(compileService, rootScopeService) {
 			return new $OurSonic_UI_Services_CreateUIService(compileService, rootScopeService);
+		}]).directive($OurSonic_UI_Directives_FancyListDirective.name$1, [function() {
+			return new $OurSonic_UI_Directives_FancyListDirective();
 		}]).directive($OurSonic_UI_Directives_DraggableDirective.name$1, [function() {
 			return new $OurSonic_UI_Directives_DraggableDirective();
 		}]).directive($OurSonic_UI_Directives_FloatingWindowDirective.name$1, [function() {
@@ -41,7 +43,7 @@
 		angular.bootstrap(window.document, ['acg']);
 	};
 	$OurSonic_BuildAngular.$buildCache = function(http, templateCache) {
-		var uis = [$OurSonic_UI_Controllers_$LoginController.$view];
+		var uis = [$OurSonic_UI_Controllers_$LevelSelectorController.$view];
 		for (var index = 0; index < uis.length; index++) {
 			var ui = { $: ss.formatString('{1}partials/UIs/{0}.html', uis[index], $OurSonic_Utility_Constants.contentAddress) };
 			http.get(ui.$, null).success(ss.mkdel({ ui: ui }, function(a) {
@@ -2125,34 +2127,47 @@
 	$OurSonic_Sonic_Watcher.__typeName = 'OurSonic.Sonic.Watcher';
 	global.OurSonic.Sonic.Watcher = $OurSonic_Sonic_Watcher;
 	////////////////////////////////////////////////////////////////////////////////
-	// OurSonic.UI.Controllers.LoginController
-	var $OurSonic_UI_Controllers_$LoginController = function(scope, createUIService) {
-		this.$myScope = null;
-		this.$myCreateUIService = null;
-		this.$myScope = scope;
-		this.$myScope.visible = true;
-		this.$myCreateUIService = createUIService;
-		this.$myScope.model = $OurSonic_UI_Scope_Controller_LoginScopeModel.$ctor();
-		//
-		//                        scope.Model.dosomething += (o) =>
-		//
-		//                        {
-		//
-		//                        Console.WriteLine(o);
-		//
-		//                        };
-		scope.model.username = 'dested1';
-		scope.model.password = 'd';
-		this.$myScope.model.windowClosed = function() {
+	// OurSonic.UI.Controllers.LevelSelectorController
+	var $OurSonic_UI_Controllers_$LevelSelectorController = function(scope, createUIService) {
+		this.$scope = null;
+		this.$createUIService = null;
+		this.$scope = scope;
+		this.$scope.visible = true;
+		this.$createUIService = createUIService;
+		this.$scope.model = $OurSonic_UI_Scope_Controller_LevelSelectorScopeModel.$ctor();
+		this.$scope.callback = $OurSonic_UI_Scope_Controller_LevelSelectorScopeCallback.$ctor();
+		scope.model.loadingStatus = 'Level Not Loaded';
+		this.$scope.callback.windowClosed = function() {
 			window.alert('woooo');
 		};
-		this.$myScope.model.loginAccount = ss.mkdel(this, this.$loginAccountFn);
-		this.$myScope.model.createAccount = ss.mkdel(this, this.$createAccountFn);
-		// myScope.Model.Username = "dested1";
-		// myScope.Model.Password = "d";
-		//            Window.SetTimeout(LoginAccountFn, 250);
+		this.$scope.callback.loadLevel = ss.delegateCombine(this.$scope.callback.loadLevel, ss.mkdel(this, this.$loadLevelFn));
+		//scope.SwingAway(SwingDirection.Left, false, null);
+		scope.$watch('model.selectedLevel', ss.mkdel(this, function() {
+			this.$scope.callback.loadLevel(this.$scope.model.selectedLevel);
+		}));
+		var neverGot = true;
+		$OurSonic_SonicEngine.instance.client.on('LoadLevel.Response', ss.mkdel(this, this.$loadLevel));
+		window.setTimeout(ss.mkdel(this, function() {
+			if (neverGot) {
+				scope.model.loadingStatus = 'Connection Failed, static level loaded';
+				this.$loadLevel(new (ss.makeGenericType(OurSonicModels.Common.DataObject$1, [String]))(ss.cast(window.STATICLEVEL, String)));
+				scope.$apply();
+			}
+		}), 3000);
+		$OurSonic_SonicEngine.instance.client.on('GetLevels.Response', function(data) {
+			neverGot = false;
+			scope.model.levels = ss.arrayClone(OurSonicModels.Common.EnumerableExtensions.select$1(String, $OurSonic_UI_Scope_Controller_LevelModel).call(null, OurSonicModels.Common.EnumerableExtensions.orderBy$4(String).call(null, data.Data, function(a) {
+				return a;
+			}), function(a1) {
+				var $t1 = $OurSonic_UI_Scope_Controller_LevelModel.$ctor();
+				$t1.name = a1;
+				return $t1;
+			}));
+			scope.$apply();
+		});
+		$OurSonic_SonicEngine.instance.client.emit('GetLevels.Request', null);
 	};
-	$OurSonic_UI_Controllers_$LoginController.__typeName = 'OurSonic.UI.Controllers.$LoginController';
+	$OurSonic_UI_Controllers_$LevelSelectorController.__typeName = 'OurSonic.UI.Controllers.$LevelSelectorController';
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.UI.Directives.DraggableDirective
 	var $OurSonic_UI_Directives_DraggableDirective = function() {
@@ -2161,6 +2176,24 @@
 	};
 	$OurSonic_UI_Directives_DraggableDirective.__typeName = 'OurSonic.UI.Directives.DraggableDirective';
 	global.OurSonic.UI.Directives.DraggableDirective = $OurSonic_UI_Directives_DraggableDirective;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Directives.FancyListDirective
+	var $OurSonic_UI_Directives_FancyListDirective = function() {
+		this.link = null;
+		this.replace = false;
+		this.restrict = null;
+		this.scope = null;
+		this.templateUrl = null;
+		this.transclude = false;
+		this.restrict = 'EA';
+		this.templateUrl = ss.formatString('{0}partials/fancyList.html', $OurSonic_Utility_Constants.contentAddress);
+		this.replace = true;
+		this.transclude = true;
+		this.scope = { items: '=', bind: '=' };
+		this.link = ss.mkdel(this, this.$linkFn);
+	};
+	$OurSonic_UI_Directives_FancyListDirective.__typeName = 'OurSonic.UI.Directives.FancyListDirective';
+	global.OurSonic.UI.Directives.FancyListDirective = $OurSonic_UI_Directives_FancyListDirective;
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.UI.Directives.FloatingWindowDirective
 	var $OurSonic_UI_Directives_FloatingWindowDirective = function() {
@@ -2197,32 +2230,59 @@
 	$OurSonic_UI_Scope__KeepBaseScopeAlive.__typeName = 'OurSonic.UI.Scope._KeepBaseScopeAlive';
 	global.OurSonic.UI.Scope._KeepBaseScopeAlive = $OurSonic_UI_Scope__KeepBaseScopeAlive;
 	////////////////////////////////////////////////////////////////////////////////
-	// OurSonic.UI.Scope.Controller.LoginScope
-	var $OurSonic_UI_Scope_Controller_LoginScope = function() {
-		this.model = null;
-		$OurSonic_UI_Scope_Directive_FloatingWindowBaseScope.call(this);
+	// OurSonic.UI.Scope.Controller.LevelModel
+	var $OurSonic_UI_Scope_Controller_LevelModel = function() {
 	};
-	$OurSonic_UI_Scope_Controller_LoginScope.__typeName = 'OurSonic.UI.Scope.Controller.LoginScope';
-	global.OurSonic.UI.Scope.Controller.LoginScope = $OurSonic_UI_Scope_Controller_LoginScope;
-	////////////////////////////////////////////////////////////////////////////////
-	// OurSonic.UI.Scope.Controller.LoginScopeModel
-	var $OurSonic_UI_Scope_Controller_LoginScopeModel = function() {
+	$OurSonic_UI_Scope_Controller_LevelModel.__typeName = 'OurSonic.UI.Scope.Controller.LevelModel';
+	$OurSonic_UI_Scope_Controller_LevelModel.createInstance = function() {
+		return $OurSonic_UI_Scope_Controller_LevelModel.$ctor();
 	};
-	$OurSonic_UI_Scope_Controller_LoginScopeModel.__typeName = 'OurSonic.UI.Scope.Controller.LoginScopeModel';
-	$OurSonic_UI_Scope_Controller_LoginScopeModel.createInstance = function() {
-		return $OurSonic_UI_Scope_Controller_LoginScopeModel.$ctor();
-	};
-	$OurSonic_UI_Scope_Controller_LoginScopeModel.$ctor = function() {
+	$OurSonic_UI_Scope_Controller_LevelModel.$ctor = function() {
 		var $this = {};
-		$this.windowClosed = null;
-		$this.username = null;
-		$this.password = null;
-		$this.createAccount = null;
-		$this.loginAccount = null;
-		$this.dosomething = null;
+		$this.name = null;
 		return $this;
 	};
-	global.OurSonic.UI.Scope.Controller.LoginScopeModel = $OurSonic_UI_Scope_Controller_LoginScopeModel;
+	global.OurSonic.UI.Scope.Controller.LevelModel = $OurSonic_UI_Scope_Controller_LevelModel;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Scope.Controller.LevelSelectorScope
+	var $OurSonic_UI_Scope_Controller_LevelSelectorScope = function() {
+		this.model = null;
+		this.callback = null;
+		$OurSonic_UI_Scope_Directive_FloatingWindowBaseScope.call(this);
+	};
+	$OurSonic_UI_Scope_Controller_LevelSelectorScope.__typeName = 'OurSonic.UI.Scope.Controller.LevelSelectorScope';
+	global.OurSonic.UI.Scope.Controller.LevelSelectorScope = $OurSonic_UI_Scope_Controller_LevelSelectorScope;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Scope.Controller.LevelSelectorScopeCallback
+	var $OurSonic_UI_Scope_Controller_LevelSelectorScopeCallback = function() {
+	};
+	$OurSonic_UI_Scope_Controller_LevelSelectorScopeCallback.__typeName = 'OurSonic.UI.Scope.Controller.LevelSelectorScopeCallback';
+	$OurSonic_UI_Scope_Controller_LevelSelectorScopeCallback.createInstance = function() {
+		return $OurSonic_UI_Scope_Controller_LevelSelectorScopeCallback.$ctor();
+	};
+	$OurSonic_UI_Scope_Controller_LevelSelectorScopeCallback.$ctor = function() {
+		var $this = {};
+		$this.windowClosed = null;
+		$this.loadLevel = null;
+		return $this;
+	};
+	global.OurSonic.UI.Scope.Controller.LevelSelectorScopeCallback = $OurSonic_UI_Scope_Controller_LevelSelectorScopeCallback;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Scope.Controller.LevelSelectorScopeModel
+	var $OurSonic_UI_Scope_Controller_LevelSelectorScopeModel = function() {
+	};
+	$OurSonic_UI_Scope_Controller_LevelSelectorScopeModel.__typeName = 'OurSonic.UI.Scope.Controller.LevelSelectorScopeModel';
+	$OurSonic_UI_Scope_Controller_LevelSelectorScopeModel.createInstance = function() {
+		return $OurSonic_UI_Scope_Controller_LevelSelectorScopeModel.$ctor();
+	};
+	$OurSonic_UI_Scope_Controller_LevelSelectorScopeModel.$ctor = function() {
+		var $this = {};
+		$this.selectedLevel = null;
+		$this.loadingStatus = null;
+		$this.levels = null;
+		return $this;
+	};
+	global.OurSonic.UI.Scope.Controller.LevelSelectorScopeModel = $OurSonic_UI_Scope_Controller_LevelSelectorScopeModel;
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.UI.Scope.Directive.FloatingWindowBaseScope
 	var $OurSonic_UI_Scope_Directive_FloatingWindowBaseScope = function() {
@@ -9873,17 +9933,47 @@
 			return this.mult * v;
 		}
 	});
-	ss.initClass($OurSonic_UI_Controllers_$LoginController, $asm, {
-		$createAccountFn: function() {
-			this.$myScope.swingAway(7, false, null);
+	ss.initClass($OurSonic_UI_Controllers_$LevelSelectorController, $asm, {
+		$loadLevelFn: function(arg) {
+			this.$scope.model.loadingStatus = 'Downloading ' + arg.name;
+			$OurSonic_SonicEngine.instance.client.emit('LoadLevel.Request', new (ss.makeGenericType(OurSonicModels.Common.DataObject$1, [String]))(arg.name));
 		},
-		$loginAccountFn: function() {
-			this.$myScope.swingAway(3, false, null);
+		$loadLevel: function(data) {
+			$OurSonic_Utility_Help.decodeString$1(OurSonicModels.SLData).call(null, data.Data, ss.mkdel(this, function(level) {
+				this.$scope.model.loadingStatus = 'Loading: ';
+				var sonicManager = $OurSonic_SonicManager.instance;
+				sonicManager.clearCache();
+				sonicManager.load(level);
+				sonicManager.windowLocation.x = 0;
+				sonicManager.windowLocation.y = 0;
+				sonicManager.bigWindowLocation.x = ss.Int32.trunc(sonicManager.windowLocation.x - sonicManager.windowLocation.width * 0.2);
+				sonicManager.bigWindowLocation.y = ss.Int32.trunc(sonicManager.windowLocation.y - sonicManager.windowLocation.height * 0.2);
+				sonicManager.bigWindowLocation.width = ss.Int32.trunc(sonicManager.windowLocation.width * 1.8);
+				sonicManager.bigWindowLocation.height = ss.Int32.trunc(sonicManager.windowLocation.height * 1.8);
+				if (sonicManager.currentGameState === 0) {
+					$OurSonic_SonicEngine.runGame();
+				}
+				//#if RELEASE
+				$OurSonic_SonicEngine.runGame();
+				sonicManager.cacheTiles();
+				//#endif
+			}));
 		}
 	});
 	ss.initClass($OurSonic_UI_Directives_DraggableDirective, $asm, {
 		$linkFn: function(scope, element, attrs) {
 			element.draggable({ cancel: '.window .inner-window' });
+		}
+	});
+	ss.initClass($OurSonic_UI_Directives_FancyListDirective, $asm, {
+		$linkFn: function(scope, element, attr) {
+			scope.itemClick = function(item) {
+				scope.bind = item;
+			};
+			scope.currentClass = function(item1) {
+				return (!!ss.referenceEquals(item1, scope.bind) ? 'fancy-list-item fancy-list-item-selected' : 'fancy-list-item ');
+			};
+			scope.parentScope = scope['$parent']['$parent']['$parent'];
 		}
 	});
 	ss.initClass($OurSonic_UI_Directives_FloatingWindowDirective, $asm, {
@@ -10069,10 +10159,12 @@
 		}
 	});
 	ss.initClass($OurSonic_UI_Scope__KeepBaseScopeAlive, $asm, {});
+	ss.initClass($OurSonic_UI_Scope_Controller_LevelModel, $asm, {});
 	ss.initClass($OurSonic_UI_Services_ManagedScope, $asm, {}, OurSonic.UI.Scope.BaseScope);
 	ss.initClass($OurSonic_UI_Scope_Directive_FloatingWindowBaseScope, $asm, {}, $OurSonic_UI_Services_ManagedScope);
-	ss.initClass($OurSonic_UI_Scope_Controller_LoginScope, $asm, {}, $OurSonic_UI_Scope_Directive_FloatingWindowBaseScope);
-	ss.initClass($OurSonic_UI_Scope_Controller_LoginScopeModel, $asm, {});
+	ss.initClass($OurSonic_UI_Scope_Controller_LevelSelectorScope, $asm, {}, $OurSonic_UI_Scope_Directive_FloatingWindowBaseScope);
+	ss.initClass($OurSonic_UI_Scope_Controller_LevelSelectorScopeCallback, $asm, {});
+	ss.initClass($OurSonic_UI_Scope_Controller_LevelSelectorScopeModel, $asm, {});
 	ss.initClass($OurSonic_UI_Scope_Directive_FloatingWindowPosition, $asm, {});
 	ss.initClass($OurSonic_UI_Scope_Directive_FloatingWindowScope, $asm, {}, OurSonic.UI.Scope.BaseScope);
 	ss.initClass($OurSonic_UI_Scope_Directive_Size, $asm, {});
@@ -11631,31 +11723,32 @@
 		}
 	});
 	ss.initClass($OurSonic_Utility_SpriteLoaderStep, $asm, {});
-	$OurSonic_UI_Controllers_$LoginController.$name = 'LoginController';
-	$OurSonic_UI_Controllers_$LoginController.$view = 'Login';
 	$OurSonic_Utility_CanvasInformation.$blackPixel = null;
 	$OurSonic_Utility_Help.$cos_table = [1, 0.9997, 0.9988, 0.99729, 0.99518, 0.99248, 0.98918, 0.98528, 0.98079, 0.9757, 0.97003, 0.96378, 0.95694, 0.94953, 0.94154, 0.93299, 0.92388, 0.91421, 0.90399, 0.89322, 0.88192, 0.87009, 0.85773, 0.84485, 0.83147, 0.81758, 0.80321, 0.78835, 0.77301, 0.75721, 0.74095, 0.72425, 0.70711, 0.68954, 0.67156, 0.65317, 0.63439, 0.61523, 0.5957, 0.57581, 0.55557, 0.535, 0.5141, 0.4929, 0.4714, 0.44961, 0.42755, 0.40524, 0.38268, 0.3599, 0.33689, 0.31368, 0.29028, 0.26671, 0.24298, 0.2191, 0.19509, 0.17096, 0.14673, 0.12241, 0.09802, 0.07356, 0.04907, 0.02454, 0, -0.02454, -0.04907, -0.07356, -0.09802, -0.12241, -0.14673, -0.17096, -0.19509, -0.2191, -0.24298, -0.26671, -0.29028, -0.31368, -0.33689, -0.3599, -0.38268, -0.40524, -0.42755, -0.44961, -0.4714, -0.4929, -0.5141, -0.535, -0.55557, -0.57581, -0.5957, -0.61523, -0.63439, -0.65317, -0.67156, -0.68954, -0.70711, -0.72425, -0.74095, -0.75721, -0.77301, -0.78835, -0.80321, -0.81758, -0.83147, -0.84485, -0.85773, -0.87009, -0.88192, -0.89322, -0.90399, -0.91421, -0.92388, -0.93299, -0.94154, -0.94953, -0.95694, -0.96378, -0.97003, -0.9757, -0.98079, -0.98528, -0.98918, -0.99248, -0.99518, -0.99729, -0.9988, -0.9997, -1, -0.9997, -0.9988, -0.99729, -0.99518, -0.99248, -0.98918, -0.98528, -0.98079, -0.9757, -0.97003, -0.96378, -0.95694, -0.94953, -0.94154, -0.93299, -0.92388, -0.91421, -0.90399, -0.89322, -0.88192, -0.87009, -0.85773, -0.84485, -0.83147, -0.81758, -0.80321, -0.78835, -0.77301, -0.75721, -0.74095, -0.72425, -0.70711, -0.68954, -0.67156, -0.65317, -0.63439, -0.61523, -0.5957, -0.57581, -0.55557, -0.535, -0.5141, -0.4929, -0.4714, -0.44961, -0.42756, -0.40524, -0.38268, -0.3599, -0.33689, -0.31368, -0.29028, -0.26671, -0.24298, -0.2191, -0.19509, -0.17096, -0.14673, -0.12241, -0.09802, -0.07356, -0.04907, -0.02454, 0, 0.02454, 0.04907, 0.07356, 0.09802, 0.12241, 0.14673, 0.17096, 0.19509, 0.2191, 0.24298, 0.26671, 0.29028, 0.31368, 0.33689, 0.3599, 0.38268, 0.40524, 0.42756, 0.44961, 0.4714, 0.4929, 0.5141, 0.535, 0.55557, 0.57581, 0.5957, 0.61523, 0.63439, 0.65317, 0.67156, 0.68954, 0.70711, 0.72425, 0.74095, 0.75721, 0.77301, 0.78835, 0.80321, 0.81758, 0.83147, 0.84485, 0.85773, 0.87009, 0.88192, 0.89322, 0.90399, 0.91421, 0.92388, 0.93299, 0.94154, 0.94953, 0.95694, 0.96378, 0.97003, 0.9757, 0.98079, 0.98528, 0.98918, 0.99248, 0.99518, 0.99729, 0.9988, 0.9997];
+	$OurSonic_SonicManager.instance = null;
+	$OurSonic_SonicManager.$_cachedOffs = {};
+	$OurSonic_Utility_Constants.contentAddress = '';
+	$OurSonic_Level_HeightMap.colors = ['', 'rgba(255,98,235,0.6)', 'rgba(24,218,235,0.6)', 'rgba(24,98,235,0.6)'];
 	$OurSonic_Level_Tiles_TileChunk.$piecesSquareSize = 16;
 	$OurSonic_Level_Tiles_TileChunk.$tilePieceSize = 8;
 	$OurSonic_Level_Tiles_TilePiece.$drawInfo = [[0, 0], [1, 0], [0, 1], [1, 1]];
 	$OurSonic_Level_Tiles_TilePiece.$drawOrder = [[3, 2, 1, 0], [1, 0, 3, 2], [2, 3, 0, 1], [0, 1, 2, 3]];
 	$OurSonic_Level_Objects_ObjectManager.broken = $OurSonic_Utility_Help.loadSprite('assets/Sprites/broken.png', function(e) {
 	});
-	$OurSonic_Level_HeightMap.colors = ['', 'rgba(255,98,235,0.6)', 'rgba(24,218,235,0.6)', 'rgba(24,98,235,0.6)'];
-	$OurSonic_SonicManager.instance = null;
-	$OurSonic_SonicManager.$_cachedOffs = {};
-	$OurSonic_Utility_Extensions.$offsets = [1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-	$OurSonic_Utility_Extensions.$curY = 0;
-	$OurSonic_Utility_Extensions.DOES = 0;
-	$OurSonic_Utility_Constants.contentAddress = '';
-	$OurSonic_SonicEngine.instance = null;
 	$OurSonic_UIManager_UIManager.smallTextFont = '8pt Calibri ';
 	$OurSonic_UIManager_UIManager.buttonFont = '12pt Calibri ';
 	$OurSonic_UIManager_UIManager.smallButtonFont = '13pt Arial bold ';
 	$OurSonic_UIManager_UIManager.textFont = '11pt Arial bold ';
 	$OurSonic_UIManager_UIManager.$_curLevelName = null;
 	$OurSonic_UIManager_UIManager.instance = null;
+	$OurSonic_Utility_Extensions.$offsets = [1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	$OurSonic_Utility_Extensions.$curY = 0;
+	$OurSonic_Utility_Extensions.DOES = 0;
+	$OurSonic_SonicEngine.instance = null;
+	$OurSonic_UI_Controllers_$LevelSelectorController.$name = 'LevelSelectorController';
+	$OurSonic_UI_Controllers_$LevelSelectorController.$view = 'LevelSelector';
 	$OurSonic_UI_Services_CreateUIService.name$1 = 'CreateUIService';
+	$OurSonic_UI_Directives_FancyListDirective.name$1 = 'fancyList';
 	$OurSonic_UI_Directives_DraggableDirective.name$1 = 'draggable';
 	$OurSonic_UI_Directives_FloatingWindowDirective.name$1 = 'floatingWindow';
 	$OurSonic_UI_Directives_FloatingWindowDirective.$items = new (ss.makeGenericType(ss.Dictionary$2, [Object, $OurSonic_UI_Scope_Directive_FloatingWindowScope]))();
