@@ -48,6 +48,7 @@
     <Compile Include="Areas\PieceLayoutMaker.cs" />
     <Compile Include="Areas\TileChunkArea.cs" />
     <Compile Include="Areas\UIManagerAreas.cs" />
+    <Compile Include="UI\BuildAngular.cs" />
     <Compile Include="Level\Animations\TileAnimationData.cs" />
     <Compile Include="Level\Animations\AnimationInstance.cs" />
     <Compile Include="Level\Events\LevelEvent.cs" />
@@ -80,6 +81,16 @@
     <Compile Include="UIManager\Image.cs" />
     <Compile Include="UIManager\Table.cs" />
     <Compile Include="UIManager\LayoutPanel.cs" />
+    <Compile Include="UI\Controllers\LoginController.cs" />
+    <Compile Include="UI\Directives\DraggableDirective.cs" />
+    <Compile Include="UI\Directives\FloatingWindowDirective.cs" />
+    <Compile Include="UI\Directives\ForNextDirective.cs" />
+    <Compile Include="UI\Scope\BaseScope.cs" />
+    <Compile Include="UI\Scope\Controller\LoginScope.cs" />
+    <Compile Include="UI\Scope\Directive\FloatingWindowBaseScope.cs" />
+    <Compile Include="UI\Scope\Directive\FloatingWindowPosition.cs" />
+    <Compile Include="UI\Scope\Directive\FloatingWindowScope.cs" />
+    <Compile Include="UI\Services\CreateUIService.cs" />
     <Compile Include="Utility\CanvasInformation.cs" />
     <Compile Include="Utility\ClickState.cs" />
     <Compile Include="Utility\Color.cs" />
@@ -129,6 +140,10 @@
       <Project>{D16CB407-F890-4670-8DB6-37DF76880297}</Project>
       <Name>OurSonicModels</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WebLibraries\AngularJS\AngularJS.csproj">
+      <Project>{815CC797-F742-4C48-8C98-BD7DE050D95A}</Project>
+      <Name>AngularJS</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WebLibraries\CodeMirrorLibrary\CodeMirrorLibrary.csproj">
       <Project>{BBF1829B-3446-4C0D-A75A-9BC713D2A6A1}</Project>
       <Name>CodeMirrorLibrary</Name>
@@ -158,6 +173,10 @@
     <Reference Include="Saltarelle.Web">
       <HintPath>..\packages\Saltarelle.Web.2.3.0\lib\Saltarelle.Web.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="UI\Partials\Areas\Login.html" />
+    <Content Include="UI\Partials\Directives\floatingWindow.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.4.0\tools\Saltarelle.Compiler.targets')" />
   <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.4.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.4.0\tools\Saltarelle.Compiler.targets')" />

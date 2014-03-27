@@ -13,7 +13,7 @@ namespace Build
     {
         public static void Main(string[] args)
         {
-            string shufSharp = "OurSonicSharp";
+            string shufSharp = "osoni";
 
             var projs = new[] {
                                       shufSharp + @"\OurSonic\",
@@ -25,17 +25,41 @@ namespace Build
             var pre = md.Parent.Parent.Parent.Parent.FullName + "\\";
             Console.WriteLine("starting");
 
-            foreach (var proj in projs) {
+            foreach (var proj in projs)
+            {
 #if DEBUG
-                var from = pre + proj + @"\bin\debug\" + proj.Split(new[] {"\\"}, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
+                var from = pre + proj + @"\bin\debug\" + proj.Split(new[] { "\\" }, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
 #else
                 var from = pre + proj + @"\bin\release\" + proj.Split(new[] {"\\"}, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
 #endif
-                var to = pre + shufSharp + @"\output\" + proj.Split(new[] {"\\"}, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
+                var to = pre + shufSharp + @"\output\" + proj.Split(new[] { "\\" }, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
                 if (File.Exists(to)) File.Delete(to);
                 File.Copy(from, to);
                 Console.WriteLine("copying " + to);
             }
+
+            foreach (var file in Directory.GetFiles(pre + shufSharp + @"\OurSonic\UI\Partials\Areas"))
+            {
+
+                var to = pre + shufSharp + @"\output\partials\UIs\" + file.Split(new[] { "\\" }, StringSplitOptions.RemoveEmptyEntries).Last();
+
+                if (File.Exists(to)) File.Delete(to);
+
+                File.Copy(file, to);
+            }
+            foreach (var file in Directory.GetFiles(pre + shufSharp + @"\OurSonic\UI\Partials\Directives"))
+            {
+
+                var to = pre + shufSharp + @"\output\partials\" + file.Split(new[] { "\\" }, StringSplitOptions.RemoveEmptyEntries).Last();
+
+                if (File.Exists(to)) File.Delete(to);
+
+                File.Copy(file, to);
+            }
+                
+            
+                                      
+            
 
             //client imports happens in buildsite.cs
             var imports = new Dictionary<string, Application> {
@@ -89,7 +113,7 @@ namespace Build
                                };
 */
 #endif 
-
+            
             foreach (var depend in imports) {
                 var to = pre + shufSharp + @"\output\" + depend.Key.Split(new[] {"\\"}, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
                 var output = "";
@@ -129,6 +153,9 @@ namespace Build
                 //serverftp.Upload("/usr/local/src/sonic/" + to.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries).Last(), to);
             }
 
+
+            DirectoryCopy(pre + shufSharp + @"\output\partials\", @"C:\inetpub\wwwroot\sonic\partials", true);
+
             /*
                         foreach (var d in Directory.GetDirectories(pre + shufSharp + @"\ShuffleGames\"))
                         {
@@ -144,7 +171,43 @@ namespace Build
                         }
             */
         }
+        private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            // Get the subdirectories for the specified directory.
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+            DirectoryInfo[] dirs = dir.GetDirectories();
 
+            if (!dir.Exists)
+            {
+                throw new DirectoryNotFoundException(
+                    "Source directory does not exist or could not be found: "
+                    + sourceDirName);
+            }
+
+            // If the destination directory doesn't exist, create it. 
+            if (!Directory.Exists(destDirName))
+            {
+                Directory.CreateDirectory(destDirName);
+            }
+
+            // Get the files in the directory and copy them to the new location.
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string temppath = Path.Combine(destDirName, file.Name);
+                file.CopyTo(temppath, false);
+            }
+
+            // If copying subdirectories, copy them and their contents to new location. 
+            if (copySubDirs)
+            {
+                foreach (DirectoryInfo subdir in dirs)
+                {
+                    string temppath = Path.Combine(destDirName, subdir.Name);
+                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
+                }
+            }
+        }
         #region Nested type: Application
 
         public class Application

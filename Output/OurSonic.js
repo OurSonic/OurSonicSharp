@@ -9,15 +9,58 @@
 	global.OurSonic.Level.Objects = global.OurSonic.Level.Objects || {};
 	global.OurSonic.Level.Tiles = global.OurSonic.Level.Tiles || {};
 	global.OurSonic.Sonic = global.OurSonic.Sonic || {};
+	global.OurSonic.UI = global.OurSonic.UI || {};
+	global.OurSonic.UI.Directives = global.OurSonic.UI.Directives || {};
+	global.OurSonic.UI.Scope = global.OurSonic.UI.Scope || {};
+	global.OurSonic.UI.Scope.Controller = global.OurSonic.UI.Scope.Controller || {};
+	global.OurSonic.UI.Scope.Directive = global.OurSonic.UI.Scope.Directive || {};
+	global.OurSonic.UI.Services = global.OurSonic.UI.Services || {};
 	global.OurSonic.UIManager = global.OurSonic.UIManager || {};
 	global.OurSonic.Utility = global.OurSonic.Utility || {};
 	ss.initAssembly($asm, 'OurSonic');
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.BuildAngular
+	var $OurSonic_BuildAngular = function() {
+	};
+	$OurSonic_BuildAngular.__typeName = 'OurSonic.BuildAngular';
+	$OurSonic_BuildAngular.setup = function() {
+		var module = angular.module('acg', ['ui.utils', 'ui.codemirror']).config(['$httpProvider', $OurSonic_BuildAngular.$buildHttpProvider]).controller($OurSonic_UI_Controllers_$LoginController.$name, [$OurSonic_BuildAngular.$scopeName, $OurSonic_UI_Services_CreateUIService.name$1, function(scope, createUIService) {
+			return new $OurSonic_UI_Controllers_$LoginController(scope, createUIService);
+		}]).service($OurSonic_UI_Services_CreateUIService.name$1, [$OurSonic_BuildAngular.$compileName, $OurSonic_BuildAngular.$rootScopeName, function(compileService, rootScopeService) {
+			return new $OurSonic_UI_Services_CreateUIService(compileService, rootScopeService);
+		}]).directive($OurSonic_UI_Directives_DraggableDirective.name$1, [function() {
+			return new $OurSonic_UI_Directives_DraggableDirective();
+		}]).directive($OurSonic_UI_Directives_FloatingWindowDirective.name$1, [function() {
+			return new $OurSonic_UI_Directives_FloatingWindowDirective();
+		}]).directive($OurSonic_UI_Directives_ForNextDirective.name$1, [function() {
+			return new $OurSonic_UI_Directives_ForNextDirective();
+		}]).run([$OurSonic_BuildAngular.$http, $OurSonic_BuildAngular.$templateCache, function(http, templateCache) {
+			$OurSonic_BuildAngular.$buildCache(http, templateCache);
+		}]);
+		//            MinimizeController.Register(module);
+		angular.bootstrap(window.document, ['acg']);
+	};
+	$OurSonic_BuildAngular.$buildCache = function(http, templateCache) {
+		var uis = [$OurSonic_UI_Controllers_$LoginController.$view];
+		for (var index = 0; index < uis.length; index++) {
+			var ui = { $: ss.formatString('{1}partials/UIs/{0}.html', uis[index], $OurSonic_Utility_Constants.contentAddress) };
+			http.get(ui.$, null).success(ss.mkdel({ ui: ui }, function(a) {
+				return templateCache.put(this.ui.$, a);
+			}));
+		}
+	};
+	$OurSonic_BuildAngular.$buildHttpProvider = function(httpProvider) {
+		httpProvider.defaults.useXDomain = true;
+		delete httpProvider.defaults.headers.common['X-Requested-With'];
+	};
+	global.OurSonic.BuildAngular = $OurSonic_BuildAngular;
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.Page
 	var $OurSonic_Page = function() {
 		var stats = new xStats();
 		document.body.appendChild(stats.element);
 		new $OurSonic_SonicEngine();
+		$OurSonic_BuildAngular.setup();
 	};
 	$OurSonic_Page.__typeName = 'OurSonic.Page';
 	$OurSonic_Page.main = function() {
@@ -2082,6 +2125,230 @@
 	$OurSonic_Sonic_Watcher.__typeName = 'OurSonic.Sonic.Watcher';
 	global.OurSonic.Sonic.Watcher = $OurSonic_Sonic_Watcher;
 	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Controllers.LoginController
+	var $OurSonic_UI_Controllers_$LoginController = function(scope, createUIService) {
+		this.$myScope = null;
+		this.$myCreateUIService = null;
+		this.$myScope = scope;
+		this.$myScope.visible = true;
+		this.$myCreateUIService = createUIService;
+		this.$myScope.model = $OurSonic_UI_Scope_Controller_LoginScopeModel.$ctor();
+		//
+		//                        scope.Model.dosomething += (o) =>
+		//
+		//                        {
+		//
+		//                        Console.WriteLine(o);
+		//
+		//                        };
+		scope.model.username = 'dested1';
+		scope.model.password = 'd';
+		this.$myScope.model.windowClosed = function() {
+			window.alert('woooo');
+		};
+		this.$myScope.model.loginAccount = ss.mkdel(this, this.$loginAccountFn);
+		this.$myScope.model.createAccount = ss.mkdel(this, this.$createAccountFn);
+		// myScope.Model.Username = "dested1";
+		// myScope.Model.Password = "d";
+		//            Window.SetTimeout(LoginAccountFn, 250);
+	};
+	$OurSonic_UI_Controllers_$LoginController.__typeName = 'OurSonic.UI.Controllers.$LoginController';
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Directives.DraggableDirective
+	var $OurSonic_UI_Directives_DraggableDirective = function() {
+		this.link = null;
+		this.link = ss.mkdel(this, this.$linkFn);
+	};
+	$OurSonic_UI_Directives_DraggableDirective.__typeName = 'OurSonic.UI.Directives.DraggableDirective';
+	global.OurSonic.UI.Directives.DraggableDirective = $OurSonic_UI_Directives_DraggableDirective;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Directives.FloatingWindowDirective
+	var $OurSonic_UI_Directives_FloatingWindowDirective = function() {
+		this.link = null;
+		this.$myElement = null;
+		this.$myScope = null;
+		this.replace = false;
+		this.restrict = null;
+		this.scope = null;
+		this.templateUrl = null;
+		this.transclude = false;
+		//            myUIManagerService = uiManagerService;
+		this.restrict = 'EA';
+		this.templateUrl = ss.formatString('{0}partials/floatingWindow.html', $OurSonic_Utility_Constants.contentAddress);
+		this.replace = true;
+		this.transclude = true;
+		this.scope = { width: '=', height: '=', left: '=', top: '=', windowTitle: '=', visible: '=', onclose: '&' };
+		this.link = ss.mkdel(this, this.$linkFn);
+	};
+	$OurSonic_UI_Directives_FloatingWindowDirective.__typeName = 'OurSonic.UI.Directives.FloatingWindowDirective';
+	global.OurSonic.UI.Directives.FloatingWindowDirective = $OurSonic_UI_Directives_FloatingWindowDirective;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Directives.ForNextDirective
+	var $OurSonic_UI_Directives_ForNextDirective = function() {
+		this.link = null;
+		this.link = ss.mkdel(this, this.$linkFn);
+	};
+	$OurSonic_UI_Directives_ForNextDirective.__typeName = 'OurSonic.UI.Directives.ForNextDirective';
+	global.OurSonic.UI.Directives.ForNextDirective = $OurSonic_UI_Directives_ForNextDirective;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Scope._KeepBaseScopeAlive
+	var $OurSonic_UI_Scope__KeepBaseScopeAlive = function() {
+	};
+	$OurSonic_UI_Scope__KeepBaseScopeAlive.__typeName = 'OurSonic.UI.Scope._KeepBaseScopeAlive';
+	global.OurSonic.UI.Scope._KeepBaseScopeAlive = $OurSonic_UI_Scope__KeepBaseScopeAlive;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Scope.Controller.LoginScope
+	var $OurSonic_UI_Scope_Controller_LoginScope = function() {
+		this.model = null;
+		$OurSonic_UI_Scope_Directive_FloatingWindowBaseScope.call(this);
+	};
+	$OurSonic_UI_Scope_Controller_LoginScope.__typeName = 'OurSonic.UI.Scope.Controller.LoginScope';
+	global.OurSonic.UI.Scope.Controller.LoginScope = $OurSonic_UI_Scope_Controller_LoginScope;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Scope.Controller.LoginScopeModel
+	var $OurSonic_UI_Scope_Controller_LoginScopeModel = function() {
+	};
+	$OurSonic_UI_Scope_Controller_LoginScopeModel.__typeName = 'OurSonic.UI.Scope.Controller.LoginScopeModel';
+	$OurSonic_UI_Scope_Controller_LoginScopeModel.createInstance = function() {
+		return $OurSonic_UI_Scope_Controller_LoginScopeModel.$ctor();
+	};
+	$OurSonic_UI_Scope_Controller_LoginScopeModel.$ctor = function() {
+		var $this = {};
+		$this.windowClosed = null;
+		$this.username = null;
+		$this.password = null;
+		$this.createAccount = null;
+		$this.loginAccount = null;
+		$this.dosomething = null;
+		return $this;
+	};
+	global.OurSonic.UI.Scope.Controller.LoginScopeModel = $OurSonic_UI_Scope_Controller_LoginScopeModel;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Scope.Directive.FloatingWindowBaseScope
+	var $OurSonic_UI_Scope_Directive_FloatingWindowBaseScope = function() {
+		this.swingAway = null;
+		this.swingBack = null;
+		this.minimize = null;
+		this.visible = false;
+		this.minimized = false;
+		this.onClose = null;
+		this.onReady = null;
+		this.destroyWindow = null;
+		$OurSonic_UI_Services_ManagedScope.call(this);
+	};
+	$OurSonic_UI_Scope_Directive_FloatingWindowBaseScope.__typeName = 'OurSonic.UI.Scope.Directive.FloatingWindowBaseScope';
+	global.OurSonic.UI.Scope.Directive.FloatingWindowBaseScope = $OurSonic_UI_Scope_Directive_FloatingWindowBaseScope;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Scope.Directive.FloatingWindowPosition
+	var $OurSonic_UI_Scope_Directive_FloatingWindowPosition = function() {
+	};
+	$OurSonic_UI_Scope_Directive_FloatingWindowPosition.__typeName = 'OurSonic.UI.Scope.Directive.FloatingWindowPosition';
+	$OurSonic_UI_Scope_Directive_FloatingWindowPosition.createInstance = function() {
+		return $OurSonic_UI_Scope_Directive_FloatingWindowPosition.$ctor();
+	};
+	$OurSonic_UI_Scope_Directive_FloatingWindowPosition.$ctor = function() {
+		var $this = {};
+		$this.display = null;
+		$this.left = null;
+		$this.top = null;
+		$this.marginLeft = null;
+		$this.marginTop = null;
+		$this.zIndex = 0;
+		return $this;
+	};
+	global.OurSonic.UI.Scope.Directive.FloatingWindowPosition = $OurSonic_UI_Scope_Directive_FloatingWindowPosition;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Scope.Directive.FloatingWindowScope
+	var $OurSonic_UI_Scope_Directive_FloatingWindowScope = function() {
+		this.$parent = null;
+		this.visible = false;
+		this.width = null;
+		this.height = null;
+		this.left = null;
+		this.top = null;
+		this.sizeStyle = null;
+		this.lastSizeStyle = null;
+		this.positionStyles = null;
+		this.lastPositionStyles = null;
+		this.windowTitle = null;
+		this.onclose = null;
+		this.close = null;
+		this.minimize = null;
+		this.maximize = null;
+		this.restore = null;
+		this.isMaximized = false;
+		OurSonic.UI.Scope.BaseScope.call(this);
+	};
+	$OurSonic_UI_Scope_Directive_FloatingWindowScope.__typeName = 'OurSonic.UI.Scope.Directive.FloatingWindowScope';
+	global.OurSonic.UI.Scope.Directive.FloatingWindowScope = $OurSonic_UI_Scope_Directive_FloatingWindowScope;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Scope.Directive.Size
+	var $OurSonic_UI_Scope_Directive_Size = function() {
+	};
+	$OurSonic_UI_Scope_Directive_Size.__typeName = 'OurSonic.UI.Scope.Directive.Size';
+	$OurSonic_UI_Scope_Directive_Size.createInstance = function() {
+		return $OurSonic_UI_Scope_Directive_Size.$ctor();
+	};
+	$OurSonic_UI_Scope_Directive_Size.$ctor = function() {
+		var $this = {};
+		$this.width = null;
+		$this.height = null;
+		return $this;
+	};
+	global.OurSonic.UI.Scope.Directive.Size = $OurSonic_UI_Scope_Directive_Size;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Scope.Directive.SwingDirection
+	var $OurSonic_UI_Scope_Directive_SwingDirection = function() {
+	};
+	$OurSonic_UI_Scope_Directive_SwingDirection.__typeName = 'OurSonic.UI.Scope.Directive.SwingDirection';
+	global.OurSonic.UI.Scope.Directive.SwingDirection = $OurSonic_UI_Scope_Directive_SwingDirection;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Services.CreatedUI
+	var $OurSonic_UI_Services_CreatedUI$1 = function(T) {
+		var $type = function(scope, element) {
+			this.scope = null;
+			this.element = null;
+			this.scope = scope;
+			this.element = element;
+		};
+		ss.registerGenericClassInstance($type, $OurSonic_UI_Services_CreatedUI$1, [T], {
+			destroy: function() {
+				if (!ss.staticEquals(this.scope.onDestroy, null)) {
+					this.scope.onDestroy();
+				}
+				this.scope.$destroy();
+				this.element.remove();
+			}
+		}, function() {
+			return null;
+		}, function() {
+			return [];
+		});
+		return $type;
+	};
+	$OurSonic_UI_Services_CreatedUI$1.__typeName = 'OurSonic.UI.Services.CreatedUI$1';
+	ss.initGenericClass($OurSonic_UI_Services_CreatedUI$1, $asm, 1);
+	global.OurSonic.UI.Services.CreatedUI$1 = $OurSonic_UI_Services_CreatedUI$1;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Services.CreateUIService
+	var $OurSonic_UI_Services_CreateUIService = function(compileService, rootScopeService) {
+		this.$myCompileService = null;
+		this.$myRootScopeService = null;
+		this.$singltons = {};
+		this.$myCompileService = compileService;
+		this.$myRootScopeService = rootScopeService;
+	};
+	$OurSonic_UI_Services_CreateUIService.__typeName = 'OurSonic.UI.Services.CreateUIService';
+	global.OurSonic.UI.Services.CreateUIService = $OurSonic_UI_Services_CreateUIService;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Services.ManagedScope
+	var $OurSonic_UI_Services_ManagedScope = function() {
+		this.onDestroy = null;
+		OurSonic.UI.Scope.BaseScope.call(this);
+	};
+	$OurSonic_UI_Services_ManagedScope.__typeName = 'OurSonic.UI.Services.ManagedScope';
+	global.OurSonic.UI.Services.ManagedScope = $OurSonic_UI_Services_ManagedScope;
+	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.UIManager.Button
 	var $OurSonic_UIManager_Button = function(x, y, width, height, text) {
 		this.font = null;
@@ -3309,6 +3576,7 @@
 	};
 	$OurSonic_Utility_SpriteLoaderStep.__typeName = 'OurSonic.Utility.SpriteLoaderStep';
 	global.OurSonic.Utility.SpriteLoaderStep = $OurSonic_Utility_SpriteLoaderStep;
+	ss.initClass($OurSonic_BuildAngular, $asm, {});
 	ss.initClass($OurSonic_Page, $asm, {});
 	ss.initClass($OurSonic_SonicEngine, $asm, {
 		$bindInput: function() {
@@ -4335,7 +4603,9 @@
 				this.sonicToon.sensorManager.buildChunk(chunk1, true);
 			}
 			console.timeEnd('collisionCache');
-			this.$debugDraw();
+			if (false) {
+				this.$debugDraw();
+			}
 		},
 		$debugDraw: function() {
 			var numWide = 10;
@@ -9603,6 +9873,295 @@
 			return this.mult * v;
 		}
 	});
+	ss.initClass($OurSonic_UI_Controllers_$LoginController, $asm, {
+		$createAccountFn: function() {
+			this.$myScope.swingAway(7, false, null);
+		},
+		$loginAccountFn: function() {
+			this.$myScope.swingAway(3, false, null);
+		}
+	});
+	ss.initClass($OurSonic_UI_Directives_DraggableDirective, $asm, {
+		$linkFn: function(scope, element, attrs) {
+			element.draggable({ cancel: '.window .inner-window' });
+		}
+	});
+	ss.initClass($OurSonic_UI_Directives_FloatingWindowDirective, $asm, {
+		$linkFn: function(scope, element, attr) {
+			this.$myElement = element;
+			this.$myScope = scope;
+			$OurSonic_UI_Directives_FloatingWindowDirective.$items.add(element, scope);
+			element.click(ss.thisFix(ss.mkdel(this, function(elem, event) {
+				this.$focus();
+			})));
+			scope.$parent.swingAway = ss.mkdel(this, function(a, b, c) {
+				this.swingAway(a, b, element, c);
+			});
+			scope.$parent.swingBack = ss.mkdel(this, function(c1) {
+				this.swingBack(scope, element, c1);
+			});
+			scope.$parent.minimize = function() {
+				scope.$parent.minimized = true;
+				scope.minimize();
+			};
+			scope.$parent.destroyWindow = function() {
+				scope.$destroy();
+				element.remove();
+			};
+			var $t1 = $OurSonic_UI_Scope_Directive_FloatingWindowPosition.$ctor();
+			$t1.left = scope.left;
+			$t1.top = scope.top;
+			$t1.display = 'block';
+			scope.positionStyles = $t1;
+			scope.positionStyles.zIndex = 10000;
+			if (scope.left.indexOf('%') !== -1) {
+				scope.positionStyles.marginLeft = -ss.Int32.div(parseInt(ss.replaceAllString(scope.width, 'px', '')), 2) + 'px';
+			}
+			if (scope.top.indexOf('%') !== -1) {
+				scope.positionStyles.marginTop = -ss.Int32.div(parseInt(ss.replaceAllString(scope.height, 'px', '')), 2) + 'px';
+			}
+			var $t2 = $OurSonic_UI_Scope_Directive_Size.$ctor();
+			$t2.width = scope.width;
+			$t2.height = scope.height;
+			scope.sizeStyle = $t2;
+			scope.maximize = function() {
+				if (!scope.isMaximized) {
+					scope.lastPositionStyles = scope.positionStyles;
+					scope.lastSizeStyle = scope.sizeStyle;
+					var $t3 = $OurSonic_UI_Scope_Directive_FloatingWindowPosition.$ctor();
+					$t3.left = '0';
+					$t3.top = '0';
+					$t3.display = 'block';
+					scope.positionStyles = $t3;
+					var $t4 = $OurSonic_UI_Scope_Directive_Size.$ctor();
+					$t4.width = '100%';
+					$t4.height = '100%';
+					scope.sizeStyle = $t4;
+				}
+				else {
+					scope.positionStyles = scope.lastPositionStyles;
+					scope.sizeStyle = scope.lastSizeStyle;
+					scope.lastPositionStyles = null;
+					scope.lastSizeStyle = null;
+				}
+				scope.isMaximized = !scope.isMaximized;
+			};
+			scope.close = function() {
+				if (!ss.staticEquals(scope.onclose, null)) {
+					scope.onclose();
+				}
+				if (!ss.staticEquals(scope.$parent.onClose, null)) {
+					scope.$parent.onClose();
+				}
+				//todo destroy
+				scope.positionStyles.display = 'none';
+			};
+			scope.minimize = function() {
+				//                myUIManagerService.OnMinimize(scope);
+				scope.$parent.swingAway(5, false, function() {
+					scope.positionStyles.display = 'none';
+				});
+			};
+			scope.restore = function() {
+				scope.$parent.swingBack(null);
+				scope.positionStyles.display = 'block';
+			};
+			this.$focus();
+			if (!ss.staticEquals(scope.$parent.onReady, null)) {
+				scope.$parent.onReady();
+			}
+		},
+		$focus: function() {
+			var $t1 = $OurSonic_UI_Directives_FloatingWindowDirective.$items.getEnumerator();
+			try {
+				while ($t1.moveNext()) {
+					var floatingWindowScope = $t1.current();
+					floatingWindowScope.value.positionStyles.zIndex = 10000;
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+			if ($OurSonic_UI_Directives_FloatingWindowDirective.$items.containsKey(this.$myElement)) {
+				$OurSonic_UI_Directives_FloatingWindowDirective.$items.get_item(this.$myElement).positionStyles.zIndex = 10001;
+				if (ss.isNullOrUndefined(this.$myScope.$root.$$phase)) {
+					this.$myScope.$apply();
+				}
+			}
+		},
+		swingBack: function(scope, element, callback) {
+			window.setTimeout(function() {
+				var js = {};
+				js['left'] = scope.left;
+				js['top'] = scope.top;
+				element.css('display', 'block');
+				element.animate(js, 'fast', 'swing', callback);
+			}, 1);
+		},
+		swingAway: function(direction, simulate, element, callback) {
+			var js = {};
+			var distance = '3000';
+			switch (direction) {
+				case 0: {
+					js['left'] = '-' + distance + 'px';
+					js['top'] = '-' + distance + 'px';
+					break;
+				}
+				case 1: {
+					js['top'] = '-' + distance + 'px';
+					break;
+				}
+				case 2: {
+					js['left'] = distance + 'px';
+					js['top'] = '-' + distance + 'px';
+					break;
+				}
+				case 3: {
+					js['left'] = distance + 'px';
+					break;
+				}
+				case 4: {
+					js['left'] = distance + 'px';
+					js['top'] = distance + 'px';
+					break;
+				}
+				case 5: {
+					js['top'] = distance + 'px';
+					break;
+				}
+				case 6: {
+					js['left'] = '-' + distance + 'px';
+					js['top'] = distance + 'px';
+					break;
+				}
+				case 7: {
+					js['left'] = distance + 'px';
+					break;
+				}
+			}
+			if (simulate) {
+				element.css(js);
+				element.css('display', 'none');
+				if (!ss.staticEquals(callback, null)) {
+					callback();
+				}
+			}
+			else {
+				element.animate(js, 'slow', 'swing', function() {
+					element.css('display', 'none');
+					if (!ss.staticEquals(callback, null)) {
+						callback();
+					}
+				});
+			}
+		}
+	});
+	ss.initClass($OurSonic_UI_Directives_ForNextDirective, $asm, {
+		$linkFn: function(scope, element, attrs) {
+			$OurSonic_UI_Directives_ForNextDirective.$forCounter++;
+			var next = element.next();
+			var id = next.attr('id');
+			if (ss.isNullOrUndefined(id)) {
+				id = 'forLink' + $OurSonic_UI_Directives_ForNextDirective.$forCounter;
+				next.attr('id', id);
+			}
+			element.attr('for', id);
+		}
+	});
+	ss.initClass($OurSonic_UI_Scope__KeepBaseScopeAlive, $asm, {});
+	ss.initClass($OurSonic_UI_Services_ManagedScope, $asm, {}, OurSonic.UI.Scope.BaseScope);
+	ss.initClass($OurSonic_UI_Scope_Directive_FloatingWindowBaseScope, $asm, {}, $OurSonic_UI_Services_ManagedScope);
+	ss.initClass($OurSonic_UI_Scope_Controller_LoginScope, $asm, {}, $OurSonic_UI_Scope_Directive_FloatingWindowBaseScope);
+	ss.initClass($OurSonic_UI_Scope_Controller_LoginScopeModel, $asm, {});
+	ss.initClass($OurSonic_UI_Scope_Directive_FloatingWindowPosition, $asm, {});
+	ss.initClass($OurSonic_UI_Scope_Directive_FloatingWindowScope, $asm, {}, OurSonic.UI.Scope.BaseScope);
+	ss.initClass($OurSonic_UI_Scope_Directive_Size, $asm, {});
+	ss.initEnum($OurSonic_UI_Scope_Directive_SwingDirection, $asm, { topLeft: 0, top: 1, topRight: 2, right: 3, bottomRight: 4, bottom: 5, bottomLeft: 6, left: 7 });
+	ss.initClass($OurSonic_UI_Services_CreateUIService, $asm, {
+		create$1: function(T) {
+			return function(ui) {
+				return this.create$3(T).call(this, ui, function(a, b) {
+				});
+			};
+		},
+		create$3: function(T) {
+			return function(ui, populateScope) {
+				var scope = this.$myRootScopeService.$new();
+				var html = $(ss.formatString('<div ng-include src="\'{1}partials/UIs/{0}.html\'"></div>', ui, $OurSonic_Utility_Constants.contentAddress));
+				populateScope(scope, html);
+				var item = this.$myCompileService(html)(scope);
+				item.appendTo(window.document.body);
+				if (ss.isNullOrUndefined(scope.$$phase)) {
+					scope.$apply();
+				}
+				scope = angular.element(item.children()[0]).scope() || scope;
+				return new (ss.makeGenericType($OurSonic_UI_Services_CreatedUI$1, [T]))(scope, item);
+			};
+		},
+		createSingleton: function(ui) {
+			return this.createSingleton$1($OurSonic_UI_Services_ManagedScope).call(this, ui);
+		},
+		createSingleton$1: function(T) {
+			return function(ui) {
+				return this.createSingleton$2(T).call(this, ui, function(a, b) {
+				});
+			};
+		},
+		createSingleton$2: function(T) {
+			return function(ui, populateScope) {
+				var scope;
+				if (ss.keyExists(this.$singltons, ui)) {
+					var html = this.$singltons[ui];
+					if (html.parent().length === 0) {
+						delete this.$singltons[ui];
+					}
+				}
+				if (ss.keyExists(this.$singltons, ui)) {
+					var html1 = this.$singltons[ui];
+					scope = this.$myRootScopeService.$new();
+					populateScope(scope, html1);
+					var item = this.$myCompileService(html1)(scope);
+					if (ss.isNullOrUndefined(scope.$$phase)) {
+						scope.$apply();
+					}
+					scope = angular.element(item.children()[0]).scope() || scope;
+					return new (ss.makeGenericType($OurSonic_UI_Services_CreatedUI$1, [T]))(scope, html1);
+				}
+				else {
+					scope = this.$myRootScopeService.$new();
+					var html2 = $(ss.formatString('<div ng-include src="\'{1}partials/UIs/{0}.html\'"></div>', ui, $OurSonic_Utility_Constants.contentAddress));
+					populateScope(scope, html2);
+					var item1 = this.$myCompileService(html2)(scope);
+					item1.appendTo(window.document.body);
+					if (ss.isNullOrUndefined(scope.$$phase)) {
+						scope.$apply();
+					}
+					scope = angular.element(item1.children()[0]).scope() || scope;
+					this.$singltons[ui] = item1;
+					return new (ss.makeGenericType($OurSonic_UI_Services_CreatedUI$1, [T]))(scope, item1);
+				}
+			};
+		},
+		create: function(ui) {
+			var scope = ss.cast(this.$myRootScopeService.$new(), $OurSonic_UI_Services_ManagedScope);
+			var item = this.$myCompileService($(ss.formatString('<div ng-include src="\'{1}partials/UIs/{0}.html\'"></div>', ui, $OurSonic_Utility_Constants.contentAddress)))(scope);
+			item.appendTo(window.document.body);
+			if (ss.isNullOrUndefined(scope.$$phase)) {
+				scope.$apply();
+			}
+			scope = angular.element(item.children()[0]).scope() || scope;
+			return new (ss.makeGenericType($OurSonic_UI_Services_CreatedUI$1, [$OurSonic_UI_Services_ManagedScope]))(scope, item);
+		},
+		create$2: function(ui, scope) {
+			var item = this.$myCompileService($(ss.formatString('<div ng-include src="\'{1}partials/UIs/{0}.html\'"></div>', ui, $OurSonic_Utility_Constants.contentAddress)))(scope);
+			item.appendTo(window.document.body);
+			if (ss.isNullOrUndefined(scope.$$phase)) {
+				scope.$apply();
+			}
+			scope = angular.element(item.children()[0]).scope() || scope;
+			return new (ss.makeGenericType($OurSonic_UI_Services_CreatedUI$1, [$OurSonic_UI_Services_ManagedScope]))(scope, item);
+		}
+	});
 	ss.initClass($OurSonic_UIManager_Button, $asm, {
 		construct: function() {
 			$OurSonic_UIManager_Element.prototype.construct.call(this);
@@ -11072,26 +11631,40 @@
 		}
 	});
 	ss.initClass($OurSonic_Utility_SpriteLoaderStep, $asm, {});
+	$OurSonic_UI_Controllers_$LoginController.$name = 'LoginController';
+	$OurSonic_UI_Controllers_$LoginController.$view = 'Login';
 	$OurSonic_Utility_CanvasInformation.$blackPixel = null;
 	$OurSonic_Utility_Help.$cos_table = [1, 0.9997, 0.9988, 0.99729, 0.99518, 0.99248, 0.98918, 0.98528, 0.98079, 0.9757, 0.97003, 0.96378, 0.95694, 0.94953, 0.94154, 0.93299, 0.92388, 0.91421, 0.90399, 0.89322, 0.88192, 0.87009, 0.85773, 0.84485, 0.83147, 0.81758, 0.80321, 0.78835, 0.77301, 0.75721, 0.74095, 0.72425, 0.70711, 0.68954, 0.67156, 0.65317, 0.63439, 0.61523, 0.5957, 0.57581, 0.55557, 0.535, 0.5141, 0.4929, 0.4714, 0.44961, 0.42755, 0.40524, 0.38268, 0.3599, 0.33689, 0.31368, 0.29028, 0.26671, 0.24298, 0.2191, 0.19509, 0.17096, 0.14673, 0.12241, 0.09802, 0.07356, 0.04907, 0.02454, 0, -0.02454, -0.04907, -0.07356, -0.09802, -0.12241, -0.14673, -0.17096, -0.19509, -0.2191, -0.24298, -0.26671, -0.29028, -0.31368, -0.33689, -0.3599, -0.38268, -0.40524, -0.42755, -0.44961, -0.4714, -0.4929, -0.5141, -0.535, -0.55557, -0.57581, -0.5957, -0.61523, -0.63439, -0.65317, -0.67156, -0.68954, -0.70711, -0.72425, -0.74095, -0.75721, -0.77301, -0.78835, -0.80321, -0.81758, -0.83147, -0.84485, -0.85773, -0.87009, -0.88192, -0.89322, -0.90399, -0.91421, -0.92388, -0.93299, -0.94154, -0.94953, -0.95694, -0.96378, -0.97003, -0.9757, -0.98079, -0.98528, -0.98918, -0.99248, -0.99518, -0.99729, -0.9988, -0.9997, -1, -0.9997, -0.9988, -0.99729, -0.99518, -0.99248, -0.98918, -0.98528, -0.98079, -0.9757, -0.97003, -0.96378, -0.95694, -0.94953, -0.94154, -0.93299, -0.92388, -0.91421, -0.90399, -0.89322, -0.88192, -0.87009, -0.85773, -0.84485, -0.83147, -0.81758, -0.80321, -0.78835, -0.77301, -0.75721, -0.74095, -0.72425, -0.70711, -0.68954, -0.67156, -0.65317, -0.63439, -0.61523, -0.5957, -0.57581, -0.55557, -0.535, -0.5141, -0.4929, -0.4714, -0.44961, -0.42756, -0.40524, -0.38268, -0.3599, -0.33689, -0.31368, -0.29028, -0.26671, -0.24298, -0.2191, -0.19509, -0.17096, -0.14673, -0.12241, -0.09802, -0.07356, -0.04907, -0.02454, 0, 0.02454, 0.04907, 0.07356, 0.09802, 0.12241, 0.14673, 0.17096, 0.19509, 0.2191, 0.24298, 0.26671, 0.29028, 0.31368, 0.33689, 0.3599, 0.38268, 0.40524, 0.42756, 0.44961, 0.4714, 0.4929, 0.5141, 0.535, 0.55557, 0.57581, 0.5957, 0.61523, 0.63439, 0.65317, 0.67156, 0.68954, 0.70711, 0.72425, 0.74095, 0.75721, 0.77301, 0.78835, 0.80321, 0.81758, 0.83147, 0.84485, 0.85773, 0.87009, 0.88192, 0.89322, 0.90399, 0.91421, 0.92388, 0.93299, 0.94154, 0.94953, 0.95694, 0.96378, 0.97003, 0.9757, 0.98079, 0.98528, 0.98918, 0.99248, 0.99518, 0.99729, 0.9988, 0.9997];
-	$OurSonic_SonicManager.instance = null;
-	$OurSonic_SonicManager.$_cachedOffs = {};
-	$OurSonic_Level_HeightMap.colors = ['', 'rgba(255,98,235,0.6)', 'rgba(24,218,235,0.6)', 'rgba(24,98,235,0.6)'];
 	$OurSonic_Level_Tiles_TileChunk.$piecesSquareSize = 16;
 	$OurSonic_Level_Tiles_TileChunk.$tilePieceSize = 8;
 	$OurSonic_Level_Tiles_TilePiece.$drawInfo = [[0, 0], [1, 0], [0, 1], [1, 1]];
 	$OurSonic_Level_Tiles_TilePiece.$drawOrder = [[3, 2, 1, 0], [1, 0, 3, 2], [2, 3, 0, 1], [0, 1, 2, 3]];
 	$OurSonic_Level_Objects_ObjectManager.broken = $OurSonic_Utility_Help.loadSprite('assets/Sprites/broken.png', function(e) {
 	});
+	$OurSonic_Level_HeightMap.colors = ['', 'rgba(255,98,235,0.6)', 'rgba(24,218,235,0.6)', 'rgba(24,98,235,0.6)'];
+	$OurSonic_SonicManager.instance = null;
+	$OurSonic_SonicManager.$_cachedOffs = {};
+	$OurSonic_Utility_Extensions.$offsets = [1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	$OurSonic_Utility_Extensions.$curY = 0;
+	$OurSonic_Utility_Extensions.DOES = 0;
+	$OurSonic_Utility_Constants.contentAddress = '';
+	$OurSonic_SonicEngine.instance = null;
 	$OurSonic_UIManager_UIManager.smallTextFont = '8pt Calibri ';
 	$OurSonic_UIManager_UIManager.buttonFont = '12pt Calibri ';
 	$OurSonic_UIManager_UIManager.smallButtonFont = '13pt Arial bold ';
 	$OurSonic_UIManager_UIManager.textFont = '11pt Arial bold ';
 	$OurSonic_UIManager_UIManager.$_curLevelName = null;
 	$OurSonic_UIManager_UIManager.instance = null;
-	$OurSonic_Utility_Extensions.$offsets = [1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-	$OurSonic_Utility_Extensions.$curY = 0;
-	$OurSonic_Utility_Extensions.DOES = 0;
-	$OurSonic_SonicEngine.instance = null;
+	$OurSonic_UI_Services_CreateUIService.name$1 = 'CreateUIService';
+	$OurSonic_UI_Directives_DraggableDirective.name$1 = 'draggable';
+	$OurSonic_UI_Directives_FloatingWindowDirective.name$1 = 'floatingWindow';
+	$OurSonic_UI_Directives_FloatingWindowDirective.$items = new (ss.makeGenericType(ss.Dictionary$2, [Object, $OurSonic_UI_Scope_Directive_FloatingWindowScope]))();
+	$OurSonic_UI_Directives_ForNextDirective.name$1 = 'forNext';
+	$OurSonic_UI_Directives_ForNextDirective.$forCounter = 0;
+	$OurSonic_BuildAngular.$scopeName = '$scope';
+	$OurSonic_BuildAngular.$rootScopeName = '$rootScope';
+	$OurSonic_BuildAngular.$compileName = '$compile';
+	$OurSonic_BuildAngular.$http = '$http';
+	$OurSonic_BuildAngular.$templateCache = '$templateCache';
 	$OurSonic_Page.main();
 })();

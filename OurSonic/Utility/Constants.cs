@@ -20,5 +20,7 @@ namespace OurSonic.Utility
             }
             return null;
         }
+
+        public const string ContentAddress = "";
     }
 }

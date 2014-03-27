@@ -1,0 +1,26 @@
+﻿<div ng-controller="LoginController">
+    <div floating-window left="'15%'" top="'15%'" height="'182px'" width="'200px'" window-title="'Login'" onclose=" model.windowClosed()" visible="visible">
+        <section>
+            <div class="form-group">
+                <label for-next>Username:</label><input type="text" class="form-control" ng-model="model.username" />
+            </div>
+            <div class="form-group">
+                <label for-next>Password:</label><input type="password" class="form-control" ng-model="model.password" />
+            </div>
+        </section>
+        <div class="btn-group right">
+            <button class="btn col-main" ng-click="model.createAccount()">Create</button>
+            <button class="btn col-main" ng-click="model.loginAccount()">Login</button>
+        </div>
+        <!--       <br/>
+               {{model.dosomething('fff')}}
+           <div special-ng-repeat="[{a:1},{a:2},{a:3},{a:4},{a:5}]" row-height="40">
+               item numebr:{{$parent.item|json}}
+               <br/>
+               {{$parent.model.dosomething|json}}
+               {{$parent.model.dosomething(this)}}
+               {{$parent.model.dosomething(item)}}
+               <br/><br/>
+           </div>-->
+    </div>
+</div>
