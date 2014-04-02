@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using OurSonic.UI.Controllers;
 using OurSonic.UI.Scope.Directive;
+using OurSonicModels;
 
 namespace OurSonic.UI.Scope.Controller
 {
@@ -18,17 +20,11 @@ namespace OurSonic.UI.Scope.Controller
     {
         public Action<ObjectModel> LoadObject { get; set; }
         public Action CreateFramework { get; set; }
-        public Action SaveFramework { get; set; }
     }
     [Serializable]
     public class ObjectFrameworkListScopeModel
     {
         public ObjectModel SelectedObject { get; set; }
         public List<ObjectModel> Objects { get; set; }
-    }
-    [Serializable]
-    public class ObjectModel
-    {
-        public string Name { get; set; }
     }
 }

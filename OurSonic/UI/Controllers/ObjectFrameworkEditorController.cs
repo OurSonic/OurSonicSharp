@@ -113,8 +113,9 @@ namespace OurSonic.UI.Controllers
 
             SonicEngine.Instance.client.Emit("SaveObject", new SaveObjectModel { Key = k, OldKey = o, Data = v });
             SonicEngine.Instance.client.On<bool>("SaveObject.Response", (data) =>
-                                                                        { 
-                                                                            SonicEngine.Instance.client.Emit("GetAllObjects", "");  
+                                                                        {
+
+                                                                            SonicEngine.Instance.client.Emit("GetAllObjectsData", "");
                                                                         });
              
 

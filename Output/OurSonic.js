@@ -10,6 +10,7 @@
 	global.OurSonic.Level.Tiles = global.OurSonic.Level.Tiles || {};
 	global.OurSonic.Sonic = global.OurSonic.Sonic || {};
 	global.OurSonic.UI = global.OurSonic.UI || {};
+	global.OurSonic.UI.Controllers = global.OurSonic.UI.Controllers || {};
 	global.OurSonic.UI.Directives = global.OurSonic.UI.Directives || {};
 	global.OurSonic.UI.Scope = global.OurSonic.UI.Scope || {};
 	global.OurSonic.UI.Scope.Controller = global.OurSonic.UI.Scope.Controller || {};
@@ -42,6 +43,8 @@
 			return new $OurSonic_UI_Directives_FancyHorizontalListDirective();
 		}]).directive($OurSonic_UI_Directives_FancyHorizontalListIndexDirective.name$1, [function() {
 			return new $OurSonic_UI_Directives_FancyHorizontalListIndexDirective();
+		}]).directive($OurSonic_UI_Directives_CanvasPieceLayoutEditDirective.name$1, [function() {
+			return new $OurSonic_UI_Directives_CanvasPieceLayoutEditDirective();
 		}]).directive($OurSonic_UI_Directives_CanvasPieceLayoutDirective.name$1, [function() {
 			return new $OurSonic_UI_Directives_CanvasPieceLayoutDirective();
 		}]).directive($OurSonic_UI_Directives_CanvasAssetFrameDirective.name$1, [function() {
@@ -535,7 +538,7 @@
 		};
 		$t6.addControl($OurSonic_UIManager_Button).call($t6, $t5);
 		var $t8 = this.levelManager;
-		var $t7 = new $OurSonic_UIManager_Button(50, 70, 120, 28, ss.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Debug Animations'));
+		var $t7 = new $OurSonic_UIManager_Button(50, 110, 120, 28, ss.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Debug Animations'));
 		$t7.click = function(p1) {
 			$OurSonic_Level_Tiles_TileChunk.set_debugAnimations(!$OurSonic_Level_Tiles_TileChunk.get_debugAnimations());
 		};
@@ -1216,7 +1219,7 @@
 		var $t1 = new (ss.makeGenericType($OurSonic_UIManager_UIArea$1, [$OurSonic_Level_Tiles_TileChunk]))(null, 700, 500, 390, 390);
 		$t1.closable = true;
 		var tileChunkArea = $t2.tileChunkArea = $t1;
-		tileChunkArea.visible = false;
+		tileChunkArea.visible = true;
 		uiManager.addArea(tileChunkArea);
 		var $t3 = new $OurSonic_UIManager_TextArea(30, 25, ss.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Tile Chunks'));
 		$t3.color = 'blue';
@@ -1644,7 +1647,7 @@
 		this.objectData = null;
 		this.upperNibble = 0;
 		this.lowerNibble = 0;
-		this.pieceIndex = 0;
+		this.pieceLayoutIndex = 0;
 		this.pieces = null;
 		this.dead = false;
 		this.state = null;
@@ -1673,8 +1676,6 @@
 		$this.assetIndex = 0;
 		$this.frameIndex = 0;
 		$this.pieceIndex = 0;
-		$this.x = 0;
-		$this.y = 0;
 		$this.collided = false;
 		$this.xflip = false;
 		$this.yflip = false;
@@ -1750,6 +1751,7 @@
 		$t1.initScript = d.initScript;
 		$t1.tickScript = d.tickScript;
 		var obj = $t1;
+		obj.description = d.description;
 		//d.oldKey = name;
 		obj.assets = [];
 		for (var i = 0; i < d.assets.length; i++) {
@@ -2294,21 +2296,37 @@
 				this.$loadObjectFn(this.$scope.model.selectedObject);
 			}
 		}));
-		$OurSonic_SonicEngine.instance.client.on('GetAllObjects.Response', function(data) {
+		$OurSonic_SonicEngine.instance.client.on('GetAllObjectsData.Response', function(data) {
 			var obj = data.Data;
-			scope.model.objects = ss.arrayClone(OurSonicModels.Common.EnumerableExtensions.select$1(String, $OurSonic_UI_Scope_Controller_ObjectModel).call(null, OurSonicModels.Common.EnumerableExtensions.orderBy$4(String).call(null, obj, function(a) {
-				return a;
+			scope.model.objects = ss.arrayClone(OurSonicModels.Common.EnumerableExtensions.select$1(OurSonicModels.ObjectModelData, $OurSonic_UI_Controllers_ObjectModel).call(null, OurSonicModels.Common.EnumerableExtensions.orderBy$4(OurSonicModels.ObjectModelData).call(null, obj, function(a) {
+				return a.name;
 			}), function(a1) {
-				var $t1 = $OurSonic_UI_Scope_Controller_ObjectModel.$ctor();
-				$t1.name = a1;
+				var $t1 = $OurSonic_UI_Controllers_ObjectModel.$ctor();
+				$t1.name = a1.name;
+				$t1.object = $OurSonic_Level_Objects_ObjectManager.extendObject($.parseJSON(a1.data));
 				return $t1;
 			}));
 			scope.$apply();
 		});
 		this.$scope.callback.createFramework = ss.delegateCombine(this.$scope.callback.createFramework, ss.mkdel(this, this.$createFrameworkFn));
-		$OurSonic_SonicEngine.instance.client.emit('GetAllObjects', '');
+		$OurSonic_SonicEngine.instance.client.emit('GetAllObjectsData', '');
 	};
 	$OurSonic_UI_Controllers_$ObjectFrameworkListController.__typeName = 'OurSonic.UI.Controllers.$ObjectFrameworkListController';
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Controllers.ObjectModel
+	var $OurSonic_UI_Controllers_ObjectModel = function() {
+	};
+	$OurSonic_UI_Controllers_ObjectModel.__typeName = 'OurSonic.UI.Controllers.ObjectModel';
+	$OurSonic_UI_Controllers_ObjectModel.createInstance = function() {
+		return $OurSonic_UI_Controllers_ObjectModel.$ctor();
+	};
+	$OurSonic_UI_Controllers_ObjectModel.$ctor = function() {
+		var $this = {};
+		$this.name = null;
+		$this.object = null;
+		return $this;
+	};
+	global.OurSonic.UI.Controllers.ObjectModel = $OurSonic_UI_Controllers_ObjectModel;
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.UI.Directives.AssetFrameEditType
 	var $OurSonic_UI_Directives_AssetFrameEditType = function() {
@@ -2400,11 +2418,29 @@
 		this.template = '<canvas></canvas>';
 		this.replace = true;
 		this.transclude = true;
-		this.scope = { pieceLayout: '=', objectData: '=', selectedPieceLayoutPiece: '=', showImages: '=', width: '=', scale: '=', height: '=' };
+		this.scope = { pieceLayout: '=', objectData: '=', width: '=', height: '=' };
 		this.link = ss.mkdel(this, this.$linkFn);
 	};
 	$OurSonic_UI_Directives_CanvasPieceLayoutDirective.__typeName = 'OurSonic.UI.Directives.CanvasPieceLayoutDirective';
 	global.OurSonic.UI.Directives.CanvasPieceLayoutDirective = $OurSonic_UI_Directives_CanvasPieceLayoutDirective;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Directives.CanvasPieceLayoutEditDirective
+	var $OurSonic_UI_Directives_CanvasPieceLayoutEditDirective = function() {
+		this.link = null;
+		this.replace = false;
+		this.restrict = null;
+		this.scope = null;
+		this.template = null;
+		this.transclude = false;
+		this.restrict = 'EA';
+		this.template = '<canvas></canvas>';
+		this.replace = true;
+		this.transclude = true;
+		this.scope = { pieceLayout: '=', objectData: '=', selectedPieceLayoutPiece: '=', showImages: '=', width: '=', scale: '=', height: '=' };
+		this.link = ss.mkdel(this, this.$linkFn);
+	};
+	$OurSonic_UI_Directives_CanvasPieceLayoutEditDirective.__typeName = 'OurSonic.UI.Directives.CanvasPieceLayoutEditDirective';
+	global.OurSonic.UI.Directives.CanvasPieceLayoutEditDirective = $OurSonic_UI_Directives_CanvasPieceLayoutEditDirective;
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.UI.Directives.DraggableDirective
 	var $OurSonic_UI_Directives_DraggableDirective = function() {
@@ -2701,7 +2737,6 @@
 		var $this = {};
 		$this.loadObject = null;
 		$this.createFramework = null;
-		$this.saveFramework = null;
 		return $this;
 	};
 	global.OurSonic.UI.Scope.Controller.ObjectFrameworkListScopeCallback = $OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeCallback;
@@ -2720,20 +2755,6 @@
 		return $this;
 	};
 	global.OurSonic.UI.Scope.Controller.ObjectFrameworkListScopeModel = $OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeModel;
-	////////////////////////////////////////////////////////////////////////////////
-	// OurSonic.UI.Scope.Controller.ObjectModel
-	var $OurSonic_UI_Scope_Controller_ObjectModel = function() {
-	};
-	$OurSonic_UI_Scope_Controller_ObjectModel.__typeName = 'OurSonic.UI.Scope.Controller.ObjectModel';
-	$OurSonic_UI_Scope_Controller_ObjectModel.createInstance = function() {
-		return $OurSonic_UI_Scope_Controller_ObjectModel.$ctor();
-	};
-	$OurSonic_UI_Scope_Controller_ObjectModel.$ctor = function() {
-		var $this = {};
-		$this.name = null;
-		return $this;
-	};
-	global.OurSonic.UI.Scope.Controller.ObjectModel = $OurSonic_UI_Scope_Controller_ObjectModel;
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonic.UI.Scope.Directive.CanvasAssetFrameEditScope
 	var $OurSonic_UI_Scope_Directive_CanvasAssetFrameEditScope = function() {
@@ -2774,8 +2795,8 @@
 	$OurSonic_UI_Scope_Directive_CanvasAssetFrameScope.__typeName = 'OurSonic.UI.Scope.Directive.CanvasAssetFrameScope';
 	global.OurSonic.UI.Scope.Directive.CanvasAssetFrameScope = $OurSonic_UI_Scope_Directive_CanvasAssetFrameScope;
 	////////////////////////////////////////////////////////////////////////////////
-	// OurSonic.UI.Scope.Directive.CanvasPieceLayoutScope
-	var $OurSonic_UI_Scope_Directive_CanvasPieceLayoutScope = function() {
+	// OurSonic.UI.Scope.Directive.CanvasPieceLayoutEditScope
+	var $OurSonic_UI_Scope_Directive_CanvasPieceLayoutEditScope = function() {
 		this.pieceLayout = null;
 		this.width = 0;
 		this.height = 0;
@@ -2783,6 +2804,17 @@
 		this.selectedPieceLayoutPiece = null;
 		this.scale = 0;
 		this.zeroPosition = null;
+		this.objectData = null;
+		$OurSonic_UI_Services_ManagedScope.call(this);
+	};
+	$OurSonic_UI_Scope_Directive_CanvasPieceLayoutEditScope.__typeName = 'OurSonic.UI.Scope.Directive.CanvasPieceLayoutEditScope';
+	global.OurSonic.UI.Scope.Directive.CanvasPieceLayoutEditScope = $OurSonic_UI_Scope_Directive_CanvasPieceLayoutEditScope;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonic.UI.Scope.Directive.CanvasPieceLayoutScope
+	var $OurSonic_UI_Scope_Directive_CanvasPieceLayoutScope = function() {
+		this.pieceLayout = null;
+		this.width = 0;
+		this.height = 0;
 		this.objectData = null;
 		$OurSonic_UI_Services_ManagedScope.call(this);
 	};
@@ -3977,12 +4009,6 @@
 		return function(o) {
 			return ss.getDefaultValue(T);
 		};
-	};
-	$OurSonic_Utility_Help.mergeRect = function(main, small) {
-		main.x = Math.min(small.x, main.x);
-		main.width = Math.max(small.x + small.width + main.x, main.width);
-		main.y = Math.min(small.y, main.y);
-		main.height = Math.max(small.y + small.height + main.y, main.height);
 	};
 	$OurSonic_Utility_Help.roundRect = function(ctx, x, y, width, height, radius, fill, stroke) {
 		ctx.save();
@@ -7443,7 +7469,7 @@
 			var $t1 = new (ss.makeGenericType($OurSonic_UIManager_UIArea$1, [$OurSonic_Level_Tiles_TilePiece]))(null, 1100, 400, 390, 390);
 			$t1.closable = true;
 			var tilePieceArea = $t2.tilePieceArea = $t1;
-			tilePieceArea.visible = false;
+			tilePieceArea.visible = true;
 			uiManager.addArea(tilePieceArea);
 			var $t3 = new $OurSonic_UIManager_TextArea(30, 25, ss.makeGenericType(OurSonicModels.Common.DelegateOrValue$1, [String]).op_Implicit$2('Tile Pieces'));
 			$t3.color = 'blue';
@@ -7846,8 +7872,8 @@
 			}
 		},
 		setPieceLayoutIndex: function(ind) {
-			this.pieceIndex = ind;
-			var pcs = this.objectData.pieceLayouts[this.pieceIndex].pieces;
+			this.pieceLayoutIndex = ind;
+			var pcs = this.objectData.pieceLayouts[this.pieceLayoutIndex].pieces;
 			this.pieces = [];
 			for (var $t1 = 0; $t1 < pcs.length; $t1++) {
 				var t = pcs[$t1];
@@ -7856,8 +7882,8 @@
 		},
 		setObjectData: function(obj) {
 			this.objectData = obj;
-			if (this.objectData.pieceLayouts.length > this.pieceIndex && this.objectData.pieceLayouts[this.pieceIndex].pieces.length > 0) {
-				this.setPieceLayoutIndex(this.pieceIndex);
+			if (this.objectData.pieceLayouts.length > this.pieceLayoutIndex && this.objectData.pieceLayouts[this.pieceLayoutIndex].pieces.length > 0) {
+				this.setPieceLayoutIndex(this.pieceLayoutIndex);
 			}
 		},
 		tick: function(object, level, sonic) {
@@ -7874,7 +7900,7 @@
 			}
 		},
 		mainPieceLayout: function() {
-			return this.objectData.pieceLayouts[this.pieceIndex];
+			return this.objectData.pieceLayouts[this.pieceLayoutIndex];
 		},
 		getRect: function() {
 			if (this.objectData.pieceLayouts.length === 0) {
@@ -7884,27 +7910,7 @@
 				this.$_rect.height = $OurSonic_Level_Objects_ObjectManager.broken.height;
 				return this.$_rect;
 			}
-			var pcs = this.pieces;
-			this.$_rect.y = 0;
-			this.$_rect.y = 0;
-			this.$_rect.width = 0;
-			this.$_rect.height = 0;
-			for (var $t1 = 0; $t1 < pcs.length; $t1++) {
-				var j = pcs[$t1];
-				var piece = this.objectData.pieces[j.pieceIndex];
-				var asset = this.objectData.assets[piece.assetIndex];
-				if (asset.frames.length > 0) {
-					var frm = asset.frames[j.frameIndex];
-					$OurSonic_Utility_Help.mergeRect(this.$_rect, $OurSonic_Utility_Rectangle.$ctor1(frm.offsetX + j.x, frm.offsetY + j.y, frm.width, frm.height));
-				}
-			}
-			this.$_rect.x = this.$_rect.x;
-			this.$_rect.y = this.$_rect.y;
-			this.$_rect.width -= this.$_rect.x;
-			this.$_rect.height -= this.$_rect.y;
-			this.$_rect.x += ss.Int32.trunc(this.x);
-			this.$_rect.y += ss.Int32.trunc(this.y);
-			return this.$_rect;
+			return this.objectData.pieceLayouts[this.pieceLayoutIndex].getRectangle(this.objectData);
 		},
 		draw: function(canvas, x, y, showHeightMap) {
 			if (this.dead || !this.objectData) {
@@ -7933,13 +7939,13 @@
 			this.xflip = this.o.XFlip;
 			this.yflip = this.o.YFlip;
 			this.dead = false;
-			this.pieceIndex = 0;
+			this.pieceLayoutIndex = 0;
 			//maybe
 			this.subdata = this.o.SubType;
 			this.upperNibble = this.subdata >> 4;
 			this.lowerNibble = this.subdata & 15;
-			if (this.objectData.pieceLayouts.length > this.pieceIndex && this.objectData.pieceLayouts[this.pieceIndex].pieces.length > 0) {
-				this.setPieceLayoutIndex(this.pieceIndex);
+			if (this.objectData.pieceLayouts.length > this.pieceLayoutIndex && this.objectData.pieceLayouts[this.pieceLayoutIndex].pieces.length > 0) {
+				this.setPieceLayoutIndex(this.pieceLayoutIndex);
 			}
 		},
 		collides: function(sonic) {
@@ -7969,7 +7975,7 @@
 				if (asset.frames.length > 0) {
 					var frm = asset.frames[j.frameIndex];
 					var map = (isHurtMap ? frm.hurtSonicMap : frm.collisionMap);
-					if (this.twoDArray(map, mX + frm.offsetX + j.x, mY + frm.offsetY + j.y, this.xflip ^ piece.xflip, this.yflip ^ piece.yflip) === true) {
+					if (this.twoDArray(map, mX + frm.offsetX, mY + frm.offsetY, this.xflip ^ piece.xflip, this.yflip ^ piece.yflip) === true) {
 						return j;
 					}
 				}
@@ -8041,24 +8047,26 @@
 		},
 		drawUI: function(canvas, showImages, selectedPieceIndex, levelObject) {
 			canvas.save();
-			canvas.strokeStyle = '#000000';
-			canvas.lineWidth = 2;
-			canvas.beginPath();
-			canvas.moveTo(-1000, 0);
-			canvas.lineTo(1000, 0);
-			canvas.closePath();
-			canvas.stroke();
-			canvas.beginPath();
-			canvas.moveTo(0, -1000);
-			canvas.lineTo(0, 1000);
-			canvas.closePath();
-			canvas.stroke();
-			for (var i = 1; i < this.pieces.length; i++) {
-				var j = this.pieces[i];
+			if (!showImages) {
+				canvas.strokeStyle = '#000000';
+				canvas.lineWidth = 2;
 				canvas.beginPath();
-				canvas.moveTo(j.x, j.y);
-				canvas.lineTo(this.pieces[i - 1].x, this.pieces[i - 1].y);
+				canvas.moveTo(-1000, 0);
+				canvas.lineTo(1000, 0);
+				canvas.closePath();
 				canvas.stroke();
+				canvas.beginPath();
+				canvas.moveTo(0, -1000);
+				canvas.lineTo(0, 1000);
+				canvas.closePath();
+				canvas.stroke();
+				for (var i = 1; i < this.pieces.length; i++) {
+					var j = this.pieces[i];
+					canvas.beginPath();
+					canvas.moveTo(j.x, j.y);
+					canvas.lineTo(this.pieces[i - 1].x, this.pieces[i - 1].y);
+					canvas.stroke();
+				}
 			}
 			for (var $t1 = 0; $t1 < this.pieces.length; $t1++) {
 				var levelObjectPieceLayoutPiece = this.pieces[$t1];
@@ -8067,7 +8075,7 @@
 					var asset = levelObject.assets[piece.assetIndex];
 					if (asset.frames.length > 0) {
 						var frm = asset.frames[0];
-						frm.drawUI(canvas, $OurSonic_Utility_Point.$ctor1(levelObjectPieceLayoutPiece.x - frm.offsetX, levelObjectPieceLayoutPiece.y - frm.offsetY), false, true, true, false, piece.xflip, piece.yflip);
+						frm.drawUI(canvas, $OurSonic_Utility_Point.$ctor1(levelObjectPieceLayoutPiece.x - frm.offsetX, levelObjectPieceLayoutPiece.y - frm.offsetY), false, false, false, false, piece.xflip, piece.yflip);
 					}
 				}
 				else {
@@ -8099,9 +8107,38 @@
 				var asset = framework.assets[piece.assetIndex];
 				if (asset.frames.length > 0) {
 					var frm = asset.frames[j.frameIndex];
-					frm.drawUI(canvas, $OurSonic_Utility_Point.$ctor1(x + j.x - frm.offsetX, y + j.y - frm.offsetY), false, showHeightMap, showHeightMap, false, instance.xflip ^ piece.xflip, instance.yflip ^ piece.yflip);
+					frm.drawUI(canvas, $OurSonic_Utility_Point.$ctor1(x - frm.offsetX, y - frm.offsetY), false, showHeightMap, showHeightMap, false, instance.xflip ^ piece.xflip, instance.yflip ^ piece.yflip);
 				}
 			}
+		},
+		getRectangle: function(levelObject) {
+			var left = 2147483647;
+			var top = 2147483647;
+			var right = -2147483648;
+			var bottom = -2147483648;
+			for (var $t1 = 0; $t1 < this.pieces.length; $t1++) {
+				var levelObjectPieceLayoutPiece = this.pieces[$t1];
+				var piece = levelObject.pieces[levelObjectPieceLayoutPiece.pieceIndex];
+				var asset = levelObject.assets[piece.assetIndex];
+				var frame = asset.frames[piece.frameIndex];
+				var pieceX = levelObjectPieceLayoutPiece.x - frame.offsetX;
+				var pieceY = levelObjectPieceLayoutPiece.y - frame.offsetY;
+				var pieceWidth = frame.width;
+				var pieceHeight = frame.height;
+				if (pieceX < left) {
+					left = pieceX;
+				}
+				if (pieceY < top) {
+					top = pieceY;
+				}
+				if (pieceX + pieceWidth > right) {
+					right = pieceX + pieceWidth;
+				}
+				if (pieceY + pieceHeight > bottom) {
+					bottom = pieceY + pieceHeight;
+				}
+			}
+			return $OurSonic_Utility_Rectangle.$ctor1(left, top, right - left, bottom - top);
 		}
 	});
 	ss.initClass($OurSonic_Level_Objects_LevelObjectPieceLayoutPiece, $asm, {});
@@ -10719,7 +10756,7 @@
 			$t2.data = v;
 			$t3.emit('SaveObject', $t2);
 			$OurSonic_SonicEngine.instance.client.on('SaveObject.Response', function(data) {
-				$OurSonic_SonicEngine.instance.client.emit('GetAllObjects', '');
+				$OurSonic_SonicEngine.instance.client.emit('GetAllObjectsData', '');
 			});
 		},
 		$modifyScriptFn: function(arg) {
@@ -10811,20 +10848,56 @@
 					return;
 				}
 			}
-			var oldTitle = $OurSonic_UIManager_UIManager.get_curLevelName();
-			$OurSonic_UIManager_UIManager.updateTitle('Downloading Object:' + name);
-			$OurSonic_SonicEngine.instance.client.emit('GetObject', new (ss.makeGenericType(OurSonicModels.Common.DataObject$1, [String]))(name));
-			$OurSonic_SonicEngine.instance.client.on('GetObject.Response', ss.mkdel(this, function(lvl) {
-				$OurSonic_UIManager_UIManager.updateTitle(oldTitle);
-				var d = $OurSonic_Level_Objects_ObjectManager.extendObject($.parseJSON(lvl.Data));
-				this.$createUIService.createSingleton$2($OurSonic_UI_Scope_Controller_ObjectFrameworkEditorScope).call(this.$createUIService, $OurSonic_UI_Controllers_$ObjectFrameworkEditorController.$view, function(scope1, elem1) {
-					scope1.callback = $OurSonic_UI_Scope_Controller_ObjectFrameworkEditorScopeCallback.$ctor();
-					scope1.model = $OurSonic_UI_Scope_Controller_ObjectFrameworkEditorScopeModel.$ctor();
-					scope1.model.objectData = d;
-				});
-			}));
+			if (arg.object.pieceLayouts.length > 0) {
+				var pl = arg.object.pieceLayouts[0];
+				//    pl.DrawUI();
+			}
+			this.$createUIService.createSingleton$2($OurSonic_UI_Scope_Controller_ObjectFrameworkEditorScope).call(this.$createUIService, $OurSonic_UI_Controllers_$ObjectFrameworkEditorController.$view, function(scope1, elem1) {
+				scope1.callback = $OurSonic_UI_Scope_Controller_ObjectFrameworkEditorScopeCallback.$ctor();
+				scope1.model = $OurSonic_UI_Scope_Controller_ObjectFrameworkEditorScopeModel.$ctor();
+				scope1.model.objectData = arg.object;
+			});
+			//
+			//                        var oldTitle = UIManager.UIManager.CurLevelName;
+			//
+			//                        
+			//
+			//                        UIManager.UIManager.UpdateTitle("Downloading Object:" + name);
+			//
+			//                        
+			//
+			//                        SonicEngine.Instance.client.Emit("GetObject", new DataObject<string>(name));
+			//
+			//                        SonicEngine.Instance.client.On<DataObject<string>>("GetObject.Response",
+			//
+			//                        (lvl) =>
+			//
+			//                        {
+			//
+			//                        UIManager.UIManager.UpdateTitle(oldTitle);
+			//
+			//                        var d = ObjectManager.ExtendObject(jQuery.ParseJsonData<LevelObjectData>(lvl.Data));
+			//
+			//                        
+			//
+			//                        createUIService.CreateSingleton<ObjectFrameworkEditorScope>(ObjectFrameworkEditorController.View, (scope, elem) =>
+			//
+			//                        {
+			//
+			//                        scope.Callback = new ObjectFrameworkEditorScopeCallback();
+			//
+			//                        scope.Model = new ObjectFrameworkEditorScopeModel();
+			//
+			//                        scope.Model.ObjectData = d;
+			//
+			//                        });
+			//
+			//                        
+			//
+			//                        });
 		}
 	});
+	ss.initClass($OurSonic_UI_Controllers_ObjectModel, $asm, {});
 	ss.initEnum($OurSonic_UI_Directives_AssetFrameEditType, $asm, { hurtMap: 'hurtMap', colorMap: 'colorMap', collisionMap: 'collisionMap', offset: 'offset' }, true);
 	ss.initClass($OurSonic_UI_Directives_CanvasAssetFrameDirective, $asm, {
 		$linkFn: function(scope, element, attr) {
@@ -11035,6 +11108,39 @@
 		}
 	});
 	ss.initClass($OurSonic_UI_Directives_CanvasPieceLayoutDirective, $asm, {
+		$linkFn: function(scope, element, attr) {
+			element.width(scope.width);
+			element.height(scope.height);
+			element[0].style.display = 'inline-block';
+			var $t1 = element[0];
+			var context = ss.cast(ss.cast($t1, ss.isValue($t1) && (ss.isInstanceOfType($t1, Element) && $t1.tagName === 'CANVAS')).getContext('2d'), CanvasRenderingContext2D);
+			var updatePieceLayout = function() {
+				context.canvas.width = context.canvas.width;
+				context.webkitImageSmoothingEnabled = false;
+				context.mozImageSmoothingEnabled = false;
+				context.imageSmoothingEnabled = false;
+				context.fillStyle = '#FFFFFF';
+				context.fillRect(0, 0, scope.width, scope.height);
+				context.beginPath();
+				context.rect(0, 0, scope.width, scope.height);
+				context.clip();
+				context.closePath();
+				if (ss.isNullOrUndefined(scope.pieceLayout)) {
+					return;
+				}
+				var rect = scope.pieceLayout.getRectangle(scope.objectData);
+				context.scale(scope.width / rect.width, scope.height / rect.height);
+				context.translate(-rect.x, -rect.y);
+				scope.pieceLayout.drawUI(context, true, -1, scope.objectData);
+			};
+			scope.$watch('pieceLayout', updatePieceLayout);
+			scope.$watch('pieceLayout.pieces', updatePieceLayout, true);
+		},
+		$pointInArea: function(x, y, rad, posX, posY) {
+			return posX > x - rad && posY > y - rad && posX < x + rad && posY < y + rad;
+		}
+	});
+	ss.initClass($OurSonic_UI_Directives_CanvasPieceLayoutEditDirective, $asm, {
 		$linkFn: function(scope, element, attr) {
 			element.width(scope.width);
 			element.height(scope.height);
@@ -11373,10 +11479,10 @@
 	ss.initClass($OurSonic_UI_Scope_Controller_ObjectFrameworkListScope, $asm, {}, $OurSonic_UI_Scope_Directive_FloatingWindowBaseScope);
 	ss.initClass($OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeCallback, $asm, {});
 	ss.initClass($OurSonic_UI_Scope_Controller_ObjectFrameworkListScopeModel, $asm, {});
-	ss.initClass($OurSonic_UI_Scope_Controller_ObjectModel, $asm, {});
 	ss.initClass($OurSonic_UI_Scope_Directive_CanvasAssetFrameEditScope, $asm, {}, $OurSonic_UI_Services_ManagedScope);
 	ss.initClass($OurSonic_UI_Scope_Directive_CanvasAssetFramePaletteEditScope, $asm, {}, $OurSonic_UI_Services_ManagedScope);
 	ss.initClass($OurSonic_UI_Scope_Directive_CanvasAssetFrameScope, $asm, {}, $OurSonic_UI_Services_ManagedScope);
+	ss.initClass($OurSonic_UI_Scope_Directive_CanvasPieceLayoutEditScope, $asm, {}, $OurSonic_UI_Services_ManagedScope);
 	ss.initClass($OurSonic_UI_Scope_Directive_CanvasPieceLayoutScope, $asm, {}, $OurSonic_UI_Services_ManagedScope);
 	ss.initClass($OurSonic_UI_Scope_Directive_CanvasPieceScope, $asm, {}, $OurSonic_UI_Services_ManagedScope);
 	ss.initClass($OurSonic_UI_Scope_Directive_FloatingWindowPosition, $asm, {});
@@ -12962,6 +13068,7 @@
 	$OurSonic_UI_Directives_FancyListIndexDirective.name$1 = 'fancyListIndex';
 	$OurSonic_UI_Directives_FancyHorizontalListDirective.name$1 = 'fancyHorizontalList';
 	$OurSonic_UI_Directives_FancyHorizontalListIndexDirective.name$1 = 'fancyHorizontalListIndex';
+	$OurSonic_UI_Directives_CanvasPieceLayoutEditDirective.name$1 = 'canvasPieceLayoutEdit';
 	$OurSonic_UI_Directives_CanvasPieceLayoutDirective.name$1 = 'canvasPieceLayout';
 	$OurSonic_UI_Directives_CanvasAssetFrameDirective.name$1 = 'canvasAssetFrame';
 	$OurSonic_UI_Directives_CanvasAssetFrameEditDirective.name$1 = 'canvasAssetFrameEdit';

@@ -36,23 +36,28 @@ namespace OurSonic.UI.Controllers
                     loadObjectFn(this.scope.Model.SelectedObject);
             });
 
-             
 
-            SonicEngine.Instance.client.On<DataObject<string[]>>("GetAllObjects.Response",
+
+            SonicEngine.Instance.client.On<DataObject<ObjectModelData[]>>("GetAllObjectsData.Response",
                                                               (data) =>
                                                               {
                                                                   var obj = data.Data;
 
-                                                                  scope.Model.Objects = new List<ObjectModel>(obj.OrderBy(a => a).Select(a => new ObjectModel() { Name = a }));
+                                                                  scope.Model.Objects = new List<ObjectModel>(obj.OrderBy(a => a.Name).Select(a => new ObjectModel()
+                                                                                                                                                 {
+                                                                                                                                                     Name = a.Name,
+                                                                                                                                                     Object = ObjectManager.ExtendObject(jQuery.ParseJsonData<LevelObjectData>(a.Data))
+
+                                                                                                                                                 }));
                                                                   scope.Apply();
 
                                                               });
             this.scope.Callback.CreateFramework += createFrameworkFn;
 
 
-            SonicEngine.Instance.client.Emit("GetAllObjects", "");
+            SonicEngine.Instance.client.Emit("GetAllObjectsData", "");
 
-        } 
+        }
 
         private void createFrameworkFn()
         {
@@ -63,7 +68,7 @@ namespace OurSonic.UI.Controllers
                 scope.Model = new ObjectFrameworkEditorScopeModel();
                 scope.Model.ObjectData = new LevelObject("SomeKey");
             });
- 
+
 
         }
 
@@ -85,27 +90,50 @@ namespace OurSonic.UI.Controllers
                 }
             }
 
-            var oldTitle = UIManager.UIManager.CurLevelName;
+            if (arg.Object.PieceLayouts.Count > 0)
+            {
+                var pl = arg.Object.PieceLayouts[0];
+            //    pl.DrawUI();
 
-            UIManager.UIManager.UpdateTitle("Downloading Object:" + name);
+            }
 
-            SonicEngine.Instance.client.Emit("GetObject", new DataObject<string>(name));
-            SonicEngine.Instance.client.On<DataObject<string>>("GetObject.Response",
-                                                               (lvl) =>
-                                                               {
-                                                                   UIManager.UIManager.UpdateTitle(oldTitle);
-                                                                   var d = ObjectManager.ExtendObject(jQuery.ParseJsonData<LevelObjectData>(lvl.Data));
 
-                                                                   createUIService.CreateSingleton<ObjectFrameworkEditorScope>(ObjectFrameworkEditorController.View, (scope, elem) =>
-                                                                   {
-                                                                       scope.Callback = new ObjectFrameworkEditorScopeCallback();
-                                                                       scope.Model = new ObjectFrameworkEditorScopeModel();
-                                                                       scope.Model.ObjectData = d;
-                                                                   });
+            createUIService.CreateSingleton<ObjectFrameworkEditorScope>(ObjectFrameworkEditorController.View, (scope, elem) =>
+            {
+                scope.Callback = new ObjectFrameworkEditorScopeCallback();
+                scope.Model = new ObjectFrameworkEditorScopeModel();
+                scope.Model.ObjectData = arg.Object;
+            });
 
-                                                               });
+            /*
+                        var oldTitle = UIManager.UIManager.CurLevelName;
+
+                        UIManager.UIManager.UpdateTitle("Downloading Object:" + name);
+
+                        SonicEngine.Instance.client.Emit("GetObject", new DataObject<string>(name));
+                        SonicEngine.Instance.client.On<DataObject<string>>("GetObject.Response",
+                                                                           (lvl) =>
+                                                                           {
+                                                                               UIManager.UIManager.UpdateTitle(oldTitle);
+                                                                               var d = ObjectManager.ExtendObject(jQuery.ParseJsonData<LevelObjectData>(lvl.Data));
+
+                                                                               createUIService.CreateSingleton<ObjectFrameworkEditorScope>(ObjectFrameworkEditorController.View, (scope, elem) =>
+                                                                               {
+                                                                                   scope.Callback = new ObjectFrameworkEditorScopeCallback();
+                                                                                   scope.Model = new ObjectFrameworkEditorScopeModel();
+                                                                                   scope.Model.ObjectData = d;
+                                                                               });
+
+                                                                           });*/
 
         }
 
     }
+    [Serializable]
+    public class ObjectModel
+    {
+        public string Name { get; set; }
+        public LevelObject Object { get; set; }
+    }
+
 }

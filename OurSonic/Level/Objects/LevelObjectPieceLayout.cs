@@ -32,34 +32,36 @@ namespace OurSonic.Level.Objects
             }
         }
 
-        public void DrawUI(CanvasRenderingContext2D canvas, bool showImages, int selectedPieceIndex,LevelObject levelObject)
+        public void DrawUI(CanvasRenderingContext2D canvas, bool showImages, int selectedPieceIndex, LevelObject levelObject)
         {
             canvas.Save();
 
-            canvas.StrokeStyle = "#000000";
-            canvas.LineWidth = 2;
-
-            
-            canvas.BeginPath();
-            canvas.MoveTo(-1000, 0);
-            canvas.LineTo(1000, 0);
-            canvas.ClosePath();
-            canvas.Stroke();
-
-            canvas.BeginPath();
-            canvas.MoveTo(0, -1000);
-            canvas.LineTo(0, 1000);
-            canvas.ClosePath();
-            canvas.Stroke();
-
-            for (var i = 1; i < Pieces.Count; i++)
+            if (!showImages)
             {
-                var j = Pieces[i];
+                canvas.StrokeStyle = "#000000";
+                canvas.LineWidth = 2;
+
 
                 canvas.BeginPath();
-                canvas.MoveTo(j.X, j.Y);
-                canvas.LineTo(Pieces[i - 1].X, Pieces[i - 1].Y);
+                canvas.MoveTo(-1000, 0);
+                canvas.LineTo(1000, 0);
+                canvas.ClosePath();
                 canvas.Stroke();
+
+                canvas.BeginPath();
+                canvas.MoveTo(0, -1000);
+                canvas.LineTo(0, 1000);
+                canvas.ClosePath();
+                canvas.Stroke();
+                for (var i = 1; i < Pieces.Count; i++)
+                {
+                    var j = Pieces[i];
+
+                    canvas.BeginPath();
+                    canvas.MoveTo(j.X, j.Y);
+                    canvas.LineTo(Pieces[i - 1].X, Pieces[i - 1].Y);
+                    canvas.Stroke();
+                }
             }
 
             foreach (var levelObjectPieceLayoutPiece in Pieces)
@@ -74,8 +76,8 @@ namespace OurSonic.Level.Objects
                         frm.DrawUI(canvas,
                                    new Point(levelObjectPieceLayoutPiece.X - frm.OffsetX, levelObjectPieceLayoutPiece.Y - frm.OffsetY),
                                    false,
-                                   true,
-                                   true,
+                                   false,
+                                   false,
                                    false,
                                    piece.Xflip,
                                    piece.Yflip);
@@ -99,7 +101,7 @@ namespace OurSonic.Level.Objects
                     canvas.Fill();
                 }
 
-            } 
+            }
             canvas.Restore();
         }
 
@@ -114,7 +116,7 @@ namespace OurSonic.Level.Objects
                 {
                     var frm = asset.Frames[j.FrameIndex];
                     frm.DrawUI(canvas,
-                               new Point((x + j.X) - (frm.OffsetX), (y + j.Y) - (frm.OffsetY)),
+                               new Point((x /*+ j.X*/) - (frm.OffsetX), (y /*+ j.Y*/) - (frm.OffsetY)),
                         //                               new Point(frm.Width, frm.Height),
                                false,
                                showHeightMap,
@@ -124,6 +126,45 @@ namespace OurSonic.Level.Objects
                                instance.Yflip ^ piece.Yflip);
                 }
             }
+        }
+
+        public Rectangle GetRectangle(LevelObject levelObject)
+        {
+            int left = int.MaxValue;
+            int top = int.MaxValue;
+            int right = int.MinValue;
+            int bottom = int.MinValue;
+
+
+            foreach (var levelObjectPieceLayoutPiece in Pieces)
+            {
+                var piece = levelObject.Pieces[levelObjectPieceLayoutPiece.PieceIndex];
+                var asset = levelObject.Assets[piece.AssetIndex];
+                var frame = asset.Frames[piece.FrameIndex];
+                
+                var pieceX = levelObjectPieceLayoutPiece.X -  frame.OffsetX;
+                var pieceY = levelObjectPieceLayoutPiece.Y -  frame.OffsetY;
+                var pieceWidth = frame.Width;
+                var pieceHeight = frame.Height;
+
+                if (pieceX < left)
+                {
+                    left = pieceX;
+                }
+                if (pieceY < top)
+                {
+                    top = pieceY;
+                }
+                if (pieceX + pieceWidth > right)
+                {
+                    right = pieceX + pieceWidth;
+                }
+                if (pieceY + pieceHeight > bottom)
+                {
+                    bottom = pieceY + pieceHeight;
+                }
+            }
+            return new Rectangle(left, top, right - left, bottom - top);
         }
     }
 }

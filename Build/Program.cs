@@ -57,8 +57,8 @@ namespace Build
                 File.Copy(file, to);
             }
 
-                                    
-            
+
+
 
             //client imports happens in buildsite.cs
             var imports = new Dictionary<string, Application> {
@@ -73,6 +73,10 @@ namespace Build
                                 @"./RawDeflate.js",
 */
                                                                                                                })
+                                                                      }, {
+                                                                              shufSharp + @"\OurSonicModels\",
+                                                                              new Application(false,new List<string> ())                                                                                                               
+                                                                              
                                                                       }, {
                                                                                  shufSharp + @"\OurSonicNode\",
                                                                                  new Application(true,
@@ -111,25 +115,31 @@ namespace Build
                                    Console.WriteLine();
                                };
 */
-#endif 
-            
-            foreach (var depend in imports) {
-                var to = pre + shufSharp + @"\output\" + depend.Key.Split(new[] {"\\"}, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
+#endif
+
+            foreach (var depend in imports)
+            {
+                var to = pre + shufSharp + @"\output\" + depend.Key.Split(new[] { "\\" }, StringSplitOptions.RemoveEmptyEntries).Last() + ".js";
                 var output = "";
 
-                if (depend.Value.Node) {
+                if (depend.Value.Node)
+                {
                     output += "require('./mscorlib.js');";
-//                    output += "Enumerable=require('./linq.js');";
-                } else {
+
+                    //                    output += "Enumerable=require('./linq.js');";
+                }
+                else
+                {
                     //output += "require('./mscorlib.debug.js');";
                 }
 
-                foreach (var depe in depend.Value.IncludesAfter) {
+                foreach (var depe in depend.Value.IncludesAfter)
+                {
                     output += string.Format("require('{0}');", depe);
                 }
 
                 string text = output + ";" + File.ReadAllText(to);
-
+                text = text.Replace("require('mscorlib')", "");
 #if COMPRESS
                 Yahoo.Yui.Compressor.JavaScriptCompressor jc = new JavaScriptCompressor();
                 jc.ObfuscateJavascript = true;
@@ -139,7 +149,7 @@ namespace Build
                 File.WriteAllText(to, text);
                 Console.WriteLine("writing " + to);
 
-                var name = to.Split(new char[] {'\\'}, StringSplitOptions.RemoveEmptyEntries).Last();
+                var name = to.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries).Last();
                 File.WriteAllText(@"C:\inetpub\wwwroot\sonic\" + name, text);
 
 #if FTP
@@ -152,7 +162,7 @@ namespace Build
                 //serverftp.Upload("/usr/local/src/sonic/" + to.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries).Last(), to);
             }
             if (Directory.Exists(@"C:\inetpub\wwwroot\sonic\partials"))
-                Directory.Delete(@"C:\inetpub\wwwroot\sonic\partials",true);
+                Directory.Delete(@"C:\inetpub\wwwroot\sonic\partials", true);
             DirectoryCopy(pre + shufSharp + @"\output\partials\", @"C:\inetpub\wwwroot\sonic\partials", true);
             File.Copy(pre + shufSharp + @"\output\index.html", @"C:\inetpub\wwwroot\sonic\index.html", true);
             File.Copy(pre + shufSharp + @"\output\main.css", @"C:\inetpub\wwwroot\sonic\main.css", true);

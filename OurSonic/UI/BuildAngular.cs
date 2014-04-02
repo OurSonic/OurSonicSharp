@@ -35,6 +35,7 @@ namespace OurSonic
                             .Directive(FancyListIndexDirective.Name, new object[] { new Func<object>(() => new FancyListIndexDirective()) })
                             .Directive(FancyHorizontalListDirective.Name, new object[] { new Func<object>(() => new FancyHorizontalListDirective()) })
                             .Directive(FancyHorizontalListIndexDirective.Name, new object[] { new Func<object>(() => new FancyHorizontalListIndexDirective()) })
+                            .Directive(CanvasPieceLayoutEditDirective.Name, new object[] { new Func<object>(() => new CanvasPieceLayoutEditDirective()) })
                             .Directive(CanvasPieceLayoutDirective.Name, new object[] { new Func<object>(() => new CanvasPieceLayoutDirective()) })
                             .Directive(CanvasAssetFrameDirective.Name, new object[] { new Func<object>(() => new CanvasAssetFrameDirective()) })
                             .Directive(CanvasAssetFrameEditDirective.Name, new object[] { new Func<object>(() => new CanvasAssetFrameEditDirective()) })

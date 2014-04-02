@@ -6,7 +6,8 @@
 
 
         <div style="height: 210px;" class="full-width" fancy-list items="model.objects" bind="model.selectedObject">
-            {{item.name}}
+            <canvas-piece-layout piece-layout="item.object.pieceLayouts[0]" width="50" height="50" object-data="item.object" ></canvas-piece-layout>
+            {{item.name}} - {{item.object.description}}
         </div>
 
     </div>

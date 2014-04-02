@@ -220,7 +220,7 @@
                         {{item.name}}
                     </div>
                     <div style="display: inline-block">
-                        <canvas-piece-layout piece-layout="model.selectedPieceLayout" scale="model.pieceLayoutScale" object-data="model.objectData" show-images="model.pieceLayoutShowImages" selected-piece-layout-piece="model.selectedPieceLayoutPiece" width="400" height="400"></canvas-piece-layout>
+                        <canvas-piece-layout-edit piece-layout="model.selectedPieceLayout" scale="model.pieceLayoutScale" object-data="model.objectData" show-images="model.pieceLayoutShowImages" selected-piece-layout-piece="model.selectedPieceLayoutPiece" width="400" height="400"></canvas-piece-layout-edit>
                         <div style="width: 400px; height: 120px; text-align: center;" fancy-horizontal-list-index items="model.objectData.pieces" bind-index="model.selectedPieceLayoutPiece.pieceIndex">
                             <canvas-piece-asset asset="parentScope.model.objectData.assets[item.assetIndex]" inline="false" width="100" height="100"></canvas-piece-asset>
                             {{item.name}}

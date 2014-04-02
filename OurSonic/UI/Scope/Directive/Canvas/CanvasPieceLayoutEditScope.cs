@@ -5,7 +5,7 @@ using OurSonic.Utility;
 
 namespace OurSonic.UI.Scope.Directive
 {
-    public class CanvasPieceLayoutScope : ManagedScope
+    public class CanvasPieceLayoutEditScope : ManagedScope
     {
         [IntrinsicProperty]
         public LevelObjectPieceLayout PieceLayout { get; set; }
@@ -22,6 +22,17 @@ namespace OurSonic.UI.Scope.Directive
         [IntrinsicProperty]
         public Point ZeroPosition { get; set; }
 
+        [IntrinsicProperty]
+        public LevelObject ObjectData { get; set; }
+    }
+    public class CanvasPieceLayoutScope : ManagedScope
+    {
+        [IntrinsicProperty]
+        public LevelObjectPieceLayout PieceLayout { get; set; }
+        [IntrinsicProperty]
+        public int Width { get; set; }
+        [IntrinsicProperty]
+        public int Height { get; set; }
         [IntrinsicProperty]
         public LevelObject ObjectData { get; set; }
     }

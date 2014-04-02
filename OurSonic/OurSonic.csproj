@@ -93,6 +93,7 @@
     <Compile Include="UI\Directives\Canvas\CanvasAssetFramePaletteEditDirective.cs" />
     <Compile Include="UI\Directives\Canvas\CanvasPieceAssetDirective.cs" />
     <Compile Include="UI\Directives\Canvas\CanvasAssetFrameEditDirective.cs" />
+    <Compile Include="UI\Directives\Canvas\CanvasPieceLayoutEditDirective.cs" />
     <Compile Include="UI\Directives\Canvas\CanvasPieceLayoutDirective.cs" />
     <Compile Include="UI\Directives\FancyListIndexDirective.cs" />
     <Compile Include="UI\Directives\FancyHorizontalListIndexDirective.cs" />
@@ -110,7 +111,7 @@
     <Compile Include="UI\Scope\Directive\Canvas\CanvasAssetFrameScope.cs" />
     <Compile Include="UI\Scope\Directive\Canvas\CanvasPieceScope.cs" />
     <Compile Include="UI\Scope\Directive\Canvas\CanvasAssetFrameEditScope.cs" />
-    <Compile Include="UI\Scope\Directive\Canvas\CanvasPieceLayoutScope.cs" />
+    <Compile Include="UI\Scope\Directive\Canvas\CanvasPieceLayoutEditScope.cs" />
     <Compile Include="UI\Scope\Directive\FloatingWindowBaseScope.cs" />
     <Compile Include="UI\Scope\Directive\FloatingWindowPosition.cs" />
     <Compile Include="UI\Scope\Directive\FloatingWindowScope.cs" />

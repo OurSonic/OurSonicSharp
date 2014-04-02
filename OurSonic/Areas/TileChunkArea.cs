@@ -13,7 +13,7 @@ namespace OurSonic.Areas
         public TileChunkArea(UIManager.UIManager uiManager)
         {
             var tileChunkArea = uiManager.UIManagerAreas.TileChunkArea = new UIArea<TileChunk>(null, 700, 500, 390, 390) {Closable = true};
-            tileChunkArea.Visible = false;
+            tileChunkArea.Visible = true;
 
             uiManager.AddArea(tileChunkArea);
             tileChunkArea.AddControl(new TextArea(30, 25, "Tile Chunks") {Color = "blue"});
@@ -74,7 +74,7 @@ namespace OurSonic.Areas
         private void buildTilePiece(UIManager.UIManager uiManager)
         {
             var tilePieceArea = uiManager.UIManagerAreas.TilePieceArea = new UIArea<TilePiece>(null, 1100, 400, 390, 390) {Closable = true};
-            tilePieceArea.Visible = false;
+            tilePieceArea.Visible = true;
 
             uiManager.AddArea(tilePieceArea);
             tilePieceArea.AddControl(new TextArea(30, 25, "Tile Pieces") {Color = "blue"});

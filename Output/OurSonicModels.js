@@ -1,4 +1,4 @@
-﻿(function() {
+;(function() {
 	'use strict';
 	var $asm = {};
 	global.OurSonicModels = global.OurSonicModels || {};
@@ -22,6 +22,21 @@
 		return {};
 	};
 	global.OurSonicModels.AnimatedPalettePiece = $OurSonicModels_AnimatedPalettePiece;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonicModels.ObjectModelData
+	var $OurSonicModels_ObjectModelData = function() {
+	};
+	$OurSonicModels_ObjectModelData.__typeName = 'OurSonicModels.ObjectModelData';
+	$OurSonicModels_ObjectModelData.createInstance = function() {
+		return $OurSonicModels_ObjectModelData.$ctor();
+	};
+	$OurSonicModels_ObjectModelData.$ctor = function() {
+		var $this = {};
+		$this.name = null;
+		$this.data = null;
+		return $this;
+	};
+	global.OurSonicModels.ObjectModelData = $OurSonicModels_ObjectModelData;
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonicModels.SaveObjectModel
 	var $OurSonicModels_SaveObjectModel = function() {
@@ -397,6 +412,7 @@
 	global.OurSonicModels.Common.EnumerableExtensions = $OurSonicModels_Common_EnumerableExtensions;
 	ss.initClass($OurSonicModels_AnimatedPaletteItem, $asm, {});
 	ss.initClass($OurSonicModels_AnimatedPalettePiece, $asm, {});
+	ss.initClass($OurSonicModels_ObjectModelData, $asm, {});
 	ss.initClass($OurSonicModels_SaveObjectModel, $asm, {});
 	ss.initClass($OurSonicModels_SLData, $asm, {});
 	ss.initClass($OurSonicModels_SLDataAnimation, $asm, {});

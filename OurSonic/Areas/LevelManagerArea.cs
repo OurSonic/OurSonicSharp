@@ -17,7 +17,7 @@ namespace OurSonic.Areas
             LevelManager.AddControl(new TextArea(30, 25, "Level Manager") { Color = "blue" });
 
             LevelManager.AddControl(new Button(50, 70, 120, 28, "Live Objects") { Click = (p) => { new LiveObjectsArea(uiManager); } });
-            LevelManager.AddControl(new Button(80, 70, 120, 28, "Debug Animations") { Click = (p) => { TileChunk.DebugAnimations = !TileChunk.DebugAnimations; } });
+            LevelManager.AddControl(new Button(50, 110, 120, 28, "Debug Animations") { Click = (p) => { TileChunk.DebugAnimations = !TileChunk.DebugAnimations; } });
         }
     }
 }

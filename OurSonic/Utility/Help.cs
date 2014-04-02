@@ -313,14 +313,7 @@ namespace OurSonic.Utility
                 }
         */
 
-        public static void MergeRect(Rectangle main, Rectangle small)
-        {
-            main.X = Math.Min(small.X, main.X);
-            main.Width = Math.Max(((small.X + small.Width) + main.X), main.Width);
-            main.Y = Math.Min(small.Y, main.Y);
-            main.Height = Math.Max(((small.Y + small.Height) + main.Y), main.Height);
-        }
-
+ 
         public static void RoundRect(CanvasRenderingContext2D ctx, int x, int y, int width, int height, int radius = 5, bool fill = true, bool stroke = false)
         {
             ctx.Save();
