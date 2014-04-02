@@ -56,7 +56,7 @@ namespace OurSonic.Level
             Items[jx] = 16 - jy;
         }
 
-        public void Draw(CanvasContext2D canvas, Point pos, bool xflip, bool yflip, int solid, int angle)
+        public void Draw(CanvasRenderingContext2D canvas, Point pos, bool xflip, bool yflip, int solid, int angle)
         {
             if (Items == null) return;
             canvas.Save();

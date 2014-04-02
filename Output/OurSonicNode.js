@@ -1,5 +1,4 @@
 require('./mscorlib.js');require('./lib/RawDeflate.js');require('./OurSonicModels.js');;'use strict';
-require('mscorlib');
 var socketio = require('socket.io');
 var $asm = {};
 global.OurSonicNode = global.OurSonicNode || {};

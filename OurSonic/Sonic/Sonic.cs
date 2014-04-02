@@ -750,7 +750,7 @@ namespace OurSonic.Sonic
             Y = ( ( sonicLevel.LevelHeight * 128 ) + ( Y + Ysp ) ) % ( sonicLevel.LevelHeight * 128 );
         }
 
-        public void Draw(CanvasContext2D canvas)
+        public void Draw(CanvasRenderingContext2D canvas)
         {
             var fx = ( X );
             var fy = ( Y );
@@ -859,7 +859,7 @@ namespace OurSonic.Sonic
             }
         }
 
-        public void DrawUI(CanvasContext2D canvas, Point pos)
+        public void DrawUI(CanvasRenderingContext2D canvas, Point pos)
         {
             canvas.Save();
             {

@@ -63,7 +63,7 @@ namespace OurSonic.Areas
             return base.OnMouseUp(e);
         }
 
-        public override void Draw(CanvasContext2D canv)
+        public override void Draw(CanvasRenderingContext2D canv)
         {
             base.Draw(canv);
 

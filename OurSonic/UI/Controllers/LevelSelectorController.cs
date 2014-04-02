@@ -11,7 +11,7 @@ using OurSonicModels.Common;
 
 namespace OurSonic.UI.Controllers
 {
-    
+
     internal class LevelSelectorController
     {
         public const string Name = "LevelSelectorController";
@@ -28,12 +28,16 @@ namespace OurSonic.UI.Controllers
             this.scope.Callback = new LevelSelectorScopeCallback();
             scope.Model.LoadingStatus = "Level Not Loaded";
 
-            this.scope.Callback.WindowClosed = () => { Window.Alert("woooo"); };
+            this.scope.Callback.WindowClosed = () => {   };
             this.scope.Callback.LoadLevel += loadLevelFn;
             //scope.SwingAway(SwingDirection.Left, false, null);
 
 
-            scope.Watch("model.selectedLevel", () => this.scope.Callback.LoadLevel(this.scope.Model.SelectedLevel));
+            scope.Watch("model.selectedLevel", () =>
+                                               {
+                                                   if (this.scope.Model.SelectedLevel != null)
+                                                       this.scope.Callback.LoadLevel(this.scope.Model.SelectedLevel);
+                                               });
 
 
             bool neverGot = true;

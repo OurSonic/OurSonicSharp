@@ -71,7 +71,8 @@ namespace OurSonic
             uiCanvas.DomCanvas.Bind("contextmenu", (e) => e.PreventDefault());
             bool dontPress = false;
             Document.AddEventListener("keypress",
-                                      e => {
+                                      e =>
+                                      {  
                                           //if (sonicManager.CurrentGameState == GameState.Editing)
                                           dontPress = sonicManager.UIManager.OnKeyDown(e);
                                       },
@@ -478,16 +479,14 @@ namespace OurSonic
 
         public void GameDraw()
         {
-            if (!sonicManager.InHaltMode)
-                Clear(gameCanvas);
 
 
-            sonicManager.MainDraw(gameCanvas.Context);
+            sonicManager.MainDraw(gameCanvas);
         }
 
         public void UIDraw()
         {
-            if (!sonicManager.InHaltMode)
+            //if (!sonicManager.InHaltMode)
                 Clear(uiCanvas);
             uiCanvas.Context.Me().webkitImageSmoothingEnabled = false;
 

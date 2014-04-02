@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Html;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Xml;
 using jQueryApi;
 using ng;
 using OurSonic.UI.Scope;
@@ -74,6 +75,10 @@ namespace OurSonic.UI.Services
             if (singltons.ContainsKey(ui))
             {
                 var html = singltons[ui];
+                if (html[0].NodeType == XmlNodeType.Comment)
+                {
+                    singltons[ui] = html = (AngularElement) html.Next();
+                }
 
                 scope = myRootScopeService.New<T>();
                 populateScope(scope, html);
@@ -89,9 +94,7 @@ namespace OurSonic.UI.Services
             else
             {
                 scope = myRootScopeService.New<T>();
-                var html =
-                    jQuery.FromHtml(string.Format("<div ng-include src=\"'{1}partials/UIs/{0}.html'\"></div>", ui,
-                        Constants.ContentAddress));
+                var html = jQuery.FromHtml(string.Format("<div ng-include src=\"'{1}partials/UIs/{0}.html'\"></div>", ui, Constants.ContentAddress));
                 populateScope(scope, html);
                 var item = myCompileService(html)(scope);
                 item.AppendTo(Window.Document.Body);

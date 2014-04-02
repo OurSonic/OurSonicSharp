@@ -25,7 +25,7 @@ public static class angular
 
     public static void Bootstrap(DocumentInstance document, params string[] parms) { }
 
-    public static AngularElement Element(DocumentInstance document)
+    public static AngularElement Element(Event document)
     {
         return null;
     }

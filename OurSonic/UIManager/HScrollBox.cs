@@ -144,7 +144,7 @@ namespace OurSonic.UIManager
             return true;
         }
 
-        public override void Draw(CanvasContext2D canv)
+        public override void Draw(CanvasRenderingContext2D canv)
         {
             if (!Visible) return;
 

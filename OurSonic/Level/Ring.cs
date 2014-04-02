@@ -24,7 +24,7 @@ namespace OurSonic.Level
             Active = active;
         }
 
-        public void Draw(CanvasContext2D canvas, Point pos)
+        public void Draw(CanvasRenderingContext2D canvas, Point pos)
         {
             if (Active) {
                 Ysp += 0.09375;

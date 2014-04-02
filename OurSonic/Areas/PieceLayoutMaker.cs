@@ -37,9 +37,9 @@ namespace OurSonic.Areas
             ZeroPosition = new Point(0, 0);
         }
 
-        public void Draw(CanvasContext2D canvas, Point pos, Point scale)
+        public void Draw(CanvasRenderingContext2D canvas, Point pos, Point scale)
         {
-            PieceLayout.DrawUI(canvas, pos, scale, ShowOutline, ShowImages, SelectedPieceIndex, ZeroPosition, largeScale);
+//            PieceLayout.DrawUI(canvas, pos, ShowImages, SelectedPieceIndex, ZeroPosition, largeScale);
         }
 
         public void MouseUp()

@@ -71,6 +71,8 @@ namespace ng
         void Apply(string exp);
         [AlternateSignature]
         void Apply();
+        [AlternateSignature]
+        void Apply(Action act);
         [ScriptName("$digest")]
         void Digest();  
         [ScriptName("$new")]

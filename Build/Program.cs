@@ -13,7 +13,7 @@ namespace Build
     {
         public static void Main(string[] args)
         {
-            string shufSharp = "osoni";
+            string shufSharp = "sonic";
 
             var projs = new[] {
                                       shufSharp + @"\OurSonic\",
@@ -56,9 +56,8 @@ namespace Build
 
                 File.Copy(file, to);
             }
-                
-            
-                                      
+
+                                    
             
 
             //client imports happens in buildsite.cs
@@ -155,7 +154,8 @@ namespace Build
             if (Directory.Exists(@"C:\inetpub\wwwroot\sonic\partials"))
                 Directory.Delete(@"C:\inetpub\wwwroot\sonic\partials",true);
             DirectoryCopy(pre + shufSharp + @"\output\partials\", @"C:\inetpub\wwwroot\sonic\partials", true);
-
+            File.Copy(pre + shufSharp + @"\output\index.html", @"C:\inetpub\wwwroot\sonic\index.html", true);
+            File.Copy(pre + shufSharp + @"\output\main.css", @"C:\inetpub\wwwroot\sonic\main.css", true);
             /*
                         foreach (var d in Directory.GetDirectories(pre + shufSharp + @"\ShuffleGames\"))
                         {

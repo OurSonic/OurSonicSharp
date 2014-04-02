@@ -5,7 +5,6 @@ using OurSonic.UI.Scope.Directive;
 
 namespace OurSonic.UI.Scope.Controller
 {
-
     public class ObjectFrameworkListScope : FloatingWindowBaseScope
     {
         [IntrinsicProperty]

@@ -1,35 +1,36 @@
 using System;
+using System.Collections.Generic;
 using System.Html;
 using System.Runtime.CompilerServices;
+
 namespace CodeMirrorLibrary
 {
     [IgnoreNamespace]
-    [Imported()]
+    [Imported]
     [Serializable]
     public sealed class CodeMirrorOptions
     {
-        [ScriptName("lineNumbers")]
-        [IntrinsicProperty]
+        public string Value { get; set; }
+        public string Mode { get; set; }
+        public string Theme { get; set; }
+        public int IndentUnit { get; set; }
+        public bool SmartIndent { get; set; }
+        public int TabSize { get; set; }
+        public bool IndentWithTabs { get; set; }
         public bool LineNumbers { get; set; }
-        [ScriptName("lineWrapping")]
-        [IntrinsicProperty]
+        public bool ElectricChars { get; set; }
+        [ScriptName("rtlMoveVisually")]
+        public bool RTLMoveVisually { get; set; }
+        public CodeMirrorKeyMap KeyMap { get; set; }
+        public JsDictionary<string,string> ExtraKeys { get; set; }
+        public int FirstLineNumber { get; set; }
         public bool LineWrapping { get; set; }
-        [ScriptName("matchBrackets")]
-        [IntrinsicProperty]
         public bool MatchBrackets { get; set; }
-        [ScriptName("onGutterClick")]
-        [IntrinsicProperty]
-        public Action<CodeMirror, int, ElementEvent> OnGutterClick { get; set; }
-        [ScriptName("onCursorActivity")]
-        [IntrinsicProperty]
-        public Action<ElementEvent> OnCursorActivity { get; set; }
-        [ScriptName("onFocus")]
-        [IntrinsicProperty]
-        public Action<ElementEvent> OnFocus { get; set; }
-        [ScriptName("onBlur")]
-        [IntrinsicProperty]
-        public Action<ElementEvent> OnBlur { get; set; }
-        [IntrinsicProperty]
-        public Action OnChange { get; set; }
+        public Action<CodeMirror, int,string, Event> OnGutterClick { get; set; }
+        public Action<Event> OnCursorActivity { get; set; }
+        public Action<Event> OnFocus { get; set; }
+        public Action<Event> OnBlur { get; set; }
+        public string[] Gutters  { get; set; }
+        public Action<CodeMirror> OnLoad { get; set; }
     }
 }

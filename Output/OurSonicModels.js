@@ -313,7 +313,7 @@
 	};
 	$OurSonicModels_Common_EnumerableExtensions.orderBy = function(T) {
 		return function(items, clause) {
-			var j = ss.arrayClone(Enumerable.from(items).toArray());
+			var j = ss.arrayClone(Array.prototype.slice.call(items));
 			j.sort(function(a, b) {
 				return ss.compare(clause(a), clause(b));
 			});
@@ -331,7 +331,7 @@
 	};
 	$OurSonicModels_Common_EnumerableExtensions.orderBy$1 = function(T) {
 		return function(items, clause) {
-			var j = ss.arrayClone(Enumerable.from(items).toArray());
+			var j = ss.arrayClone(Array.prototype.slice.call(items));
 			j.sort(function(a, b) {
 				return ss.compare(clause(a), clause(b));
 			});
@@ -349,7 +349,7 @@
 	};
 	$OurSonicModels_Common_EnumerableExtensions.orderBy$2 = function(T) {
 		return function(items, clause) {
-			var j = ss.arrayClone(Enumerable.from(items).toArray());
+			var j = ss.arrayClone(Array.prototype.slice.call(items));
 			j.sort(function(a, b) {
 				return ss.compare(clause(a), clause(b));
 			});

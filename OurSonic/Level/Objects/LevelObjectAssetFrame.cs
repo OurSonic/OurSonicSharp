@@ -38,7 +38,8 @@ namespace OurSonic.Level.Objects
             CollisionMap = new int[100][];
             HurtSonicMap = new int[100][];
 
-            for (var i = 0; i < 100; i++) {
+            for (var i = 0; i < 100; i++)
+            {
                 CollisionMap[i] = new int[100];
                 HurtSonicMap[i] = new int[100];
             }
@@ -54,7 +55,8 @@ namespace OurSonic.Level.Objects
         public void SetHeight(int h)
         {
             Height = h;
-            for (var j = 0; j < Width; j++) {
+            for (var j = 0; j < Width; j++)
+            {
                 CollisionMap[j] = CollisionMap[j].Slice(0, h);
             }
             ClearCache();
@@ -106,9 +108,9 @@ namespace OurSonic.Level.Objects
 
     };*/
 
-        public void DrawSimple(CanvasContext2D mainCanvas, Point pos, int width, int height, bool xflip, bool yflip )
+        public void DrawSimple(CanvasRenderingContext2D mainCanvas, Point pos, int width, int height, bool xflip, bool yflip)
         {
-            var c = GetCache(new Point(width, height) ,false,false,false);
+            var c = GetCache(false, false, false);
 
             mainCanvas.Save();
             mainCanvas.Translate(pos.X, pos.Y);
@@ -118,80 +120,78 @@ namespace OurSonic.Level.Objects
             mainCanvas.Restore();
         }
 
- 
-        public CanvasInformation GetCache(Point size,   bool showOutline, bool showCollideMap, bool showHurtMap)
+
+        public CanvasInformation GetCache(bool showOutline, bool showCollideMap, bool showHurtMap)
         {
-            var m=
+            var m =
                     Image[
-                              ( size.X * 47 ) ^   
-                            ( ( ( showOutline ? 1 : 0 ) + 2 ) * 7 ) ^ ( ( ( showCollideMap ? 1 : 0 ) + 2 ) * 89 ) ^
-                            ( ( ( showHurtMap ? 1 : 0 ) + 2 ) * 79 )];
+                            (((showOutline ? 1 : 0) + 2) * 7) ^ (((showCollideMap ? 1 : 0) + 2) * 89) ^
+                            (((showHurtMap ? 1 : 0) + 2) * 79)];
 
 
-            if (m == null) { 
-                    var mj = CanvasInformation.Create(size.X, size.Y);
-                    var canvas = mj.Context;
+            if (m == null)
+            {
+                var mj = CanvasInformation.Create(Width, Height);
+                var canvas = mj.Context;
 
-                    canvas.Save();
+                canvas.Save();
 
-                    canvas.StrokeStyle = "#000000";
-                    canvas.LineWidth = 1;
-                 
-                 
+                canvas.StrokeStyle = "#000000";
+                canvas.LineWidth = 1;
 
-                    for (var x = 0; x < Width; x++)
+
+
+                for (var x = 0; x < Width; x++)
+                {
+                    for (var y = 0; y < Height; y++)
                     {
-                        for (var y = 0; y < Height; y++)
+                        var ex = x;
+                        var ey = y;
+                        var d = ColorMap[ex][ey];
+
+                        var color = Palette[d];
+                        if (color == TransparentColor)
                         {
-                            var ex = x;
-                            var ey = y;
-                            var d = ColorMap[ex][ey];
+                            canvas.FillStyle = "rgba(0,0,0,0)";
+                        }
+                        else
+                        {
+                            //  var negative = _H.negateColor(color);
+                            canvas.FillStyle = "#" + color;
+                        }
 
-                            var color = Palette[d];
-                            if (color == TransparentColor)
+
+                        //if (canvas.strokeStyle != "#" + negative)
+                        //    canvas.strokeStyle = "#" + negative; 
+
+                        canvas.FillRect(ex, ey, 1, 1);
+                        //  if (showOutline)
+                        //    canvas.strokeRect(ex, ey, 1, 1);
+
+                        if (showCollideMap)
+                        {
+                            if (CollisionMap[ex][ey] > 0)
                             {
-                                if (canvas.FillStyle != "rgba(0,0,0,0)")
-                                    canvas.FillStyle = "rgba(0,0,0,0)";
+                                canvas.FillStyle = "rgba(30,34,255,0.6)";
+                                canvas.FillRect(ex, ey, 1, 1);
                             }
-                            else
+                        }
+
+                        if (showHurtMap)
+                        {
+                            if (HurtSonicMap[ex][ey] > 0)
                             {
-                                //  var negative = _H.negateColor(color);
-                                if (canvas.FillStyle != "#" + color)
-                                    canvas.FillStyle = "#" + color;
-                            }
-
-                            
-                            //if (canvas.strokeStyle != "#" + negative)
-                            //    canvas.strokeStyle = "#" + negative; 
-
-                            canvas.FillRect(ex, ey, 1, 1);
-                            //  if (showOutline)
-                            //    canvas.strokeRect(ex, ey, 1, 1);
-
-                            if (showCollideMap)
-                            {
-                                if (CollisionMap[ex][ey] > 0)
-                                {
-                                    canvas.FillStyle = "rgba(30,34,255,0.6)";
-                                    canvas.FillRect(ex, ey, 1, 1);
-                                }
-                            }
-
-                            if (showHurtMap)
-                            {
-                                if (HurtSonicMap[ex][ey] > 0)
-                                {
-                                    canvas.FillStyle = "rgba(211,12,55,0.6)";
-                                    canvas.FillRect(ex, ey, 1, 1);
-                                }
+                                canvas.FillStyle = "rgba(211,12,55,0.6)";
+                                canvas.FillRect(ex, ey, 1, 1);
                             }
                         }
                     }
-                  
-                    canvas.Restore();
-                    m  = mj;
-                    SetCache(mj, size,   showOutline, showCollideMap, showHurtMap);
-                } 
+                }
+
+                canvas.Restore();
+                m = mj;
+                SetCache(mj, showOutline, showCollideMap, showHurtMap);
+            }
 
             return m;
         }
@@ -201,17 +201,13 @@ namespace OurSonic.Level.Objects
             Image = new JsDictionary<int, CanvasInformation>();
         }
 
-        public void SetCache(CanvasInformation image, Point size,  bool showOutline, bool showCollideMap, bool showHurtMap)
+        public void SetCache(CanvasInformation image, bool showOutline, bool showCollideMap, bool showHurtMap)
         {
-            Image[
-                       ( size.X * 47 ) ^   
-                    ( ( ( showOutline ? 1 : 0 ) + 2 ) * 7 ) ^ ( ( ( showCollideMap ? 1 : 0 ) + 2 ) * 89 ) ^
-                    ( ( ( showHurtMap ? 1 : 0 ) + 2 ) * 79 )] = image;
+            Image[(((showOutline ? 1 : 0) + 2) * 7) ^ (((showCollideMap ? 1 : 0) + 2) * 89) ^ (((showHurtMap ? 1 : 0) + 2) * 79)] = image;
         }
 
-        public void DrawUI(CanvasContext2D _canvas,
+        public void DrawUI(CanvasRenderingContext2D _canvas,
                            Point pos,
-                           Point size,
                            bool showOutline,
                            bool showCollideMap,
                            bool showHurtMap,
@@ -219,15 +215,13 @@ namespace OurSonic.Level.Objects
                            bool xflip,
                            bool yflip)
         {
-            var fd = GetCache(size,   showOutline, showCollideMap, showHurtMap);
+            var fd = GetCache(showOutline, showCollideMap, showHurtMap);
 
 
 
             _canvas.Save();
 
             _canvas.Translate(pos.X, pos.Y);
-
-            _canvas.Scale((double)size.X / Width, (double)size.Y / Height);
             if (xflip)
             {
                 if (yflip)
@@ -236,7 +230,7 @@ namespace OurSonic.Level.Objects
                     _canvas.Rotate(-90 * Math.PI / 180);
                     _canvas.Translate(-fd.Canvas.Width / 2d, -fd.Canvas.Height / 2d);
 
-                    _canvas.Translate(0, size.Y);
+                    _canvas.Translate(0, Height);
                     _canvas.Scale(1, -1);
                 }
                 else
@@ -250,29 +244,29 @@ namespace OurSonic.Level.Objects
             {
                 if (yflip)
                 {
-                    _canvas.Translate(0, size.Y);
+                    _canvas.Translate(0, Height);
                     _canvas.Scale(1, -1);
                 }
                 else { }
             }
-_canvas.DrawImage(fd.Canvas, 0, 0);
-if (showOffset)
-{
-    _canvas.BeginPath();
-    _canvas.MoveTo(OffsetX, 0);
-    _canvas.LineTo(OffsetX, Height);
-    _canvas.LineWidth = 1;
-    _canvas.StrokeStyle = "#000000";
-    _canvas.Stroke();
-    
-    _canvas.BeginPath();
-    _canvas.MoveTo(0, OffsetY);
-    _canvas.LineTo(Width, OffsetY);
-    _canvas.LineWidth = 1;
-    _canvas.StrokeStyle = "#000000";
-    _canvas.Stroke();
-}
-           
+            _canvas.DrawImage(fd.Canvas, 0, 0);
+            if (showOffset)
+            {
+                _canvas.BeginPath();
+                _canvas.MoveTo(OffsetX, 0);
+                _canvas.LineTo(OffsetX, Height);
+                _canvas.LineWidth = 1;
+                _canvas.StrokeStyle = "#000000";
+                _canvas.Stroke();
+
+                _canvas.BeginPath();
+                _canvas.MoveTo(0, OffsetY);
+                _canvas.LineTo(Width, OffsetY);
+                _canvas.LineWidth = 1;
+                _canvas.StrokeStyle = "#000000";
+                _canvas.Stroke();
+            }
+
             _canvas.Restore();
         }
     }

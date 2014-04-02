@@ -1,0 +1,8 @@
+﻿<div ng-controller="AssetFrameEditorController">
+    <div floating-window left="'15%'" top="'25%'" width="'390px'" height="'300px'" window-title="'Level Selector'" onclose="callback.windowClosed()" visible="visible">
+        <h3>{{model.loadingStatus}}</h3>
+
+            {{model.Frame|json}}
+
+    </div>
+</div>

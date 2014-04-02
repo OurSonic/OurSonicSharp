@@ -31,9 +31,9 @@ namespace OurSonic.Areas
             ShowOutline = true;
         }
 
-        public void Draw(CanvasContext2D canvas, Point pos, Point size, bool showCollideMap, bool showHurtMap)
+        public void Draw(CanvasRenderingContext2D canvas, Point pos, Point size, bool showCollideMap, bool showHurtMap)
         {
-            AssetFrame.DrawUI(canvas, pos, size, ShowOutline, showCollideMap, showHurtMap, ShowOffset, false, false);
+            AssetFrame.DrawUI(canvas, pos, ShowOutline, showCollideMap, showHurtMap, ShowOffset, false, false);
         }
 
         public void DrawPixel(Point location1)

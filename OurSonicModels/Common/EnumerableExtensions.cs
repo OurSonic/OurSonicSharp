@@ -113,7 +113,7 @@ namespace OurSonicModels.Common
             j.Sort((a, b) => clause(a).CompareTo(clause(b)));
             return j;
         }
-        public static T[] OrderBy<T>(this IEnumerable<T> items, Func<T, int> clause)
+        public static T[] OrderBy<T>(this List<T> items, Func<T, int> clause)
         {
             var j = items.ToArray().Clone();
             j.Sort((a, b) => clause(a).CompareTo(clause(b)));
@@ -125,7 +125,7 @@ namespace OurSonicModels.Common
             j.Sort((a, b) => clause(a).CompareTo(clause(b)));
             return j;
         }
-        public static T[] OrderBy<T>(this IEnumerable<T> items, Func<T, string> clause)
+        public static T[] OrderBy<T>(this List<T> items, Func<T, string> clause)
         {
             var j = items.ToArray().Clone();
             j.Sort((a, b) => clause(a).CompareTo(clause(b)));
@@ -137,7 +137,7 @@ namespace OurSonicModels.Common
             j.Sort((a, b) => clause(a).CompareTo(clause(b)));
             return j;
         }
-        public static T[] OrderBy<T>(this IEnumerable<T> items, Func<T, double> clause)
+        public static T[] OrderBy<T>(this List<T> items, Func<T, double> clause)
         {
             var j = items.ToArray().Clone();
             j.Sort((a, b) => clause(a).CompareTo(clause(b)));

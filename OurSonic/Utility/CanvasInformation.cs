@@ -8,7 +8,7 @@ namespace OurSonic.Utility
     {
         private static CanvasElement blackPixel;
         [IntrinsicProperty]
-        public CanvasContext2D Context { get; set; }
+        public CanvasRenderingContext2D Context { get; set; }
         [IntrinsicProperty]
         public jQueryObject DomCanvas { get; set; }
         [IntrinsicProperty]
@@ -29,7 +29,7 @@ namespace OurSonic.Utility
             }
         }
 
-        public CanvasInformation(CanvasContext2D context, jQueryObject domCanvas)
+        public CanvasInformation(CanvasRenderingContext2D context, jQueryObject domCanvas)
         {
             Context = context;
             DomCanvas = domCanvas;
@@ -49,7 +49,7 @@ namespace OurSonic.Utility
             canvas.Width = w;
             canvas.Height = h;
 
-            var ctx = (CanvasContext2D) canvas.GetContext("2d");
+            var ctx = (CanvasRenderingContext2D) canvas.GetContext("2d");
             ctx.Me().webkitImageSmoothingEnabled = false;
             ctx.Me().mozImageSmoothingEnabled = false;
             ctx.Me().imageSmoothingEnabled = false;

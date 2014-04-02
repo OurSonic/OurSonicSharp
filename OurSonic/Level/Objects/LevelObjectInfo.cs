@@ -150,7 +150,7 @@ namespace OurSonic.Level.Objects
             return _rect;
         }
 
-        public void Draw(CanvasContext2D canvas, int x, int y, bool showHeightMap)
+        public void Draw(CanvasRenderingContext2D canvas, int x, int y, bool showHeightMap)
         {
             if (Dead || ObjectData.Falsey()) return;
 

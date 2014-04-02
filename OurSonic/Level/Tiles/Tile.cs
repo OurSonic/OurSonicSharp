@@ -36,7 +36,7 @@ namespace OurSonic.Level.Tiles
         private JsDictionary<int, CanvasInformation> baseCaches = new JsDictionary<int, CanvasInformation>();
         private JsDictionary<int, CanvasInformation> animatedPaletteCaches = new JsDictionary<int, CanvasInformation>();
 
-        public void DrawBase(CanvasContext2D canvas, Point pos, bool xflip, bool yflip, int palette, bool isAnimatedTile = false)
+        public void DrawBase(CanvasRenderingContext2D canvas, Point pos, bool xflip, bool yflip, int palette, bool isAnimatedTile = false)
         {
 
             //we dont predraw animated tiles
@@ -102,7 +102,7 @@ namespace OurSonic.Level.Tiles
         }
 
 
-        public void DrawAnimatedPalette(CanvasContext2D canvas, Point pos, bool xflip, bool yflip, int palette, int animatedPaletteIndex, bool isAnimatedTile = false)
+        public void DrawAnimatedPalette(CanvasRenderingContext2D canvas, Point pos, bool xflip, bool yflip, int palette, int animatedPaletteIndex, bool isAnimatedTile = false)
         {
             //we dont predraw animated tiles
             if (AnimatedTileIndexes != null && (!isAnimatedTile && AnimatedTileIndexes.Count > 0)) return;
@@ -157,7 +157,7 @@ namespace OurSonic.Level.Tiles
 
 
         }
-        public void DrawAnimatedTile(CanvasContext2D canvas, Point pos, bool xflip, bool yflip, int palette, int animatedTileIndex)
+        public void DrawAnimatedTile(CanvasRenderingContext2D canvas, Point pos, bool xflip, bool yflip, int palette, int animatedTileIndex)
         {
             if (AnimatedTileIndexes.IndexOfFast(animatedTileIndex) == -1) return;
             var tileAnimationFrame = SonicManager.Instance.TileAnimationManager.GetCurrentFrame(animatedTileIndex);

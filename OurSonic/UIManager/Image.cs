@@ -17,7 +17,7 @@ namespace OurSonic.UIManager
     public class Image : Element
     {
         [IntrinsicProperty]
-        public Action<CanvasContext2D, int, int> OnDraw { get; set; }
+        public Action<CanvasRenderingContext2D, int, int> OnDraw { get; set; }
 
         public Image(int x, int y, int width, int height)
                 : base(x, y)
@@ -57,7 +57,7 @@ namespace OurSonic.UIManager
             return base.OnMouseOver(e);
         }
 
-        public override void Draw(CanvasContext2D canv)
+        public override void Draw(CanvasRenderingContext2D canv)
         {
             if (!Visible) return;
 

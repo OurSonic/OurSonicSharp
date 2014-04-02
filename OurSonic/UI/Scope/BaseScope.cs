@@ -127,6 +127,9 @@ namespace OurSonic.UI.Scope
         public void Apply(Func<IScope, object> exp)
         {
         }
+        public void Apply(Action exp)
+        {
+        }
 
         public void Apply()
         {

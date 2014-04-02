@@ -72,7 +72,7 @@ namespace OurSonic.Level.Tiles
             return (onlyForeground = true);
         }
 
-        public bool Draw(CanvasContext2D canvas,
+        public bool Draw(CanvasRenderingContext2D canvas,
                          Point position,
                          ChunkLayer layer,
                          bool xFlip,
@@ -112,7 +112,7 @@ namespace OurSonic.Level.Tiles
 
 
 
-        public bool DrawBase(CanvasContext2D canvas,
+        public bool DrawBase(CanvasRenderingContext2D canvas,
                  Point position,
                  ChunkLayer layer,
                  bool xFlip,
@@ -148,7 +148,7 @@ namespace OurSonic.Level.Tiles
             DrawIt(canvas, ac.Canvas, position);
             return true;
         }
-        public bool DrawAnimatedPalette(CanvasContext2D canvas, Point position, ChunkLayer layer, bool xFlip, bool yFlip, int animatedPaletteIndex)
+        public bool DrawAnimatedPalette(CanvasRenderingContext2D canvas, Point position, ChunkLayer layer, bool xFlip, bool yFlip, int animatedPaletteIndex)
         {
             var drawOrderIndex = 0;
             drawOrderIndex = xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3);
@@ -180,7 +180,7 @@ namespace OurSonic.Level.Tiles
             DrawIt(canvas, ac.Canvas, position);
             return true;
         }
-        public bool DrawAnimatedTile(CanvasContext2D canvas, Point position, ChunkLayer layer, bool xFlip, bool yFlip, int animatedTileIndex)
+        public bool DrawAnimatedTile(CanvasRenderingContext2D canvas, Point position, ChunkLayer layer, bool xFlip, bool yFlip, int animatedTileIndex)
         {
             var drawOrderIndex = 0;
             drawOrderIndex = xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3);
@@ -236,7 +236,7 @@ namespace OurSonic.Level.Tiles
         }
 
 
-        private void DrawIt(CanvasContext2D canvas, CanvasElement fd, Point position)
+        private void DrawIt(CanvasRenderingContext2D canvas, CanvasElement fd, Point position)
         {
             canvas.DrawImage(fd, position.X, position.Y);
 

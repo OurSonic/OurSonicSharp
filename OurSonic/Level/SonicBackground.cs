@@ -9,6 +9,6 @@ namespace OurSonic.Level
         public int Width { get; set; }
         [IntrinsicProperty]
         public int Height { get; set; }
-        public void Draw(CanvasContext2D canvas, Point point, int wOffset) {}
+        public void Draw(CanvasRenderingContext2D canvas, Point point, int wOffset) {}
     }
 }

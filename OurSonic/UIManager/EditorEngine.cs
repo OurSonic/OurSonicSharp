@@ -230,7 +230,7 @@ namespace OurSonic.UIManager
             return Editing;
         }
 
-        public void Draw(CanvasContext2D canv)
+        public void Draw(CanvasRenderingContext2D canv)
         {
             canv.Save();
             var size = 0;

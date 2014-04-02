@@ -1,4 +1,4 @@
-/*global angular, CodeMirror, Error*/
+﻿/*global angular, CodeMirror, Error*/
 /**
  * Binds a CodeMirror widget to a <textarea> element.
  */

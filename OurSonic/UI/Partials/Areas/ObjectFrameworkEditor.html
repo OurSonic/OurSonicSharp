@@ -1,0 +1,258 @@
+﻿<div ng-controller="ObjectFrameworkEditorController">
+    <div floating-window left="'55%'" top="'45%'" width="'860px'" height="'760px'" window-title="'Object Framework Editor'" visible="visible">
+        <h3>{{model.loadingStatus}}</h3>
+
+        <div class="left-third">
+            <div class="form-group">
+                <label>Assets</label>
+                <div style="height: 100px;" class="full-width" fancy-list items="model.objectData.assets" bind="model.selectedAsset">
+                    <canvas-piece-asset asset="item" width="25" height="25" inline="true"></canvas-piece-asset>
+                    {{item.name}}
+                </div>
+                <button class="btn col-main full-width pad-top-small" ng-click="callback.addAsset()">Add Asset</button>
+            </div>
+            <div class="form-group">
+                <label>Pieces</label>
+                <div style="height: 100px;" class="full-width" fancy-list items="model.objectData.pieces" bind="model.selectedPiece">
+                    <canvas-piece-asset asset="parentScope.model.objectData.assets[item.assetIndex]" inline="true" width="25" height="25"></canvas-piece-asset>
+                    {{item.name}}
+                </div>
+                <button class="btn col-main full-width pad-top-small" ng-click="callback.addPiece()">Add Piece</button>
+            </div>
+            <div class="form-group">
+                <label>Piece Layouts</label>
+                <div style="height: 100px;" class="full-width" fancy-list items="model.objectData.pieceLayouts" bind="model.selectedPieceLayout">
+                    {{item.name}}
+                </div>
+                <button class="btn col-main full-width pad-top-small" ng-click="callback.addPieceLayout()">Add Piece Layout</button>
+            </div>
+            <div class="form-group">
+                <label>Projectiles</label>
+                <div style="height: 100px;" class="full-width" fancy-list items="model.objectData.projectiles" bind="model.selectedProjectile">
+                    {{item.name}}
+                </div>
+                <button class="btn col-main full-width pad-top-small" ng-click="callback.addProjectile()">Add Projectile</button>
+            </div>
+            <button class="btn col-main full-width pad-top-small" ng-click="callback.saveChanges()">Save Changes</button>
+
+        </div>
+        <div class="right-two-thirds">
+
+            <div class="almost-half-width inline">
+                <ol class="property-box">
+                    <li>
+                        <label for-next>Key</label>
+                        <input type="text" ng-model="model.objectData.key" />
+                    </li>
+                </ol>
+            </div>
+            <div class="almost-half-width inline">
+                <ol class="property-box">
+                    <li>
+
+                        <label for-next>Description</label>
+                        <input type="text" ng-model="model.objectData.description" />
+                    </li>
+                </ol>
+            </div>
+
+            <section>
+                <section>
+                    <button class="btn col-main almost-half-width" ng-click="callback.modifyScript('init')">On Init</button>
+                    <button class="btn col-main almost-half-width" ng-click="callback.modifyScript('tick')">On Tick</button>
+                </section>
+                <section style="padding-top: 5px;">
+                    <button class="btn col-main almost-half-width" ng-click="callback.modifyScript('collide')">On Collide</button>
+                    <button class="btn col-main almost-half-width" ng-click="callback.modifyScript('hurt')">On Hurt Sonic</button>
+                </section>
+            </section>
+
+            <div ng-if="model.modifyScript!='none'">
+
+                <div ng-switch on="model.modifyScript">
+                    <div ng-switch-when="init">
+                        <textarea ui-codemirror="model.codeMirrorOptions" ng-model="model.objectData.initScript" ui-refresh="model.forceUpdate"></textarea>
+                    </div>
+                    <div ng-switch-when="tick">
+                        <textarea ui-codemirror="model.codeMirrorOptions" ng-model="model.objectData.tickScript" ui-refresh="model.forceUpdate"></textarea>
+                    </div>
+                    <div ng-switch-when="collide">
+                        <textarea ui-codemirror="model.codeMirrorOptions" ng-model="model.objectData.collideScript" ui-refresh="model.forceUpdate"></textarea>
+                    </div>
+                    <div ng-switch-when="hurt">
+                        <textarea ui-codemirror="model.codeMirrorOptions" ng-model="model.objectData.hurtScript" ui-refresh="model.forceUpdate"></textarea>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div ng-if="model.selectedAsset">
+                <div class="almost-half-width inline">
+                    <ol class="property-box">
+                        <li>
+                            <label for-next>Name</label>
+                            <input type="text" ng-model="model.selectedAsset.name" />
+                        </li>
+                    </ol>
+                </div>
+                <div class="almost-half-width inline">
+                    <ol class="property-box">
+                        <li>
+                            <button class="btn col-main" ng-click="callback.removeAsset()">Remove</button>
+                            <button class="btn col-main" style="float: right;" ng-click="callback.addFrameToAsset()">Add Frame</button>
+                        </li>
+                    </ol>
+                </div>
+                <div style="height: 100px; text-align: center;" class="full-width" fancy-horizontal-list items="model.selectedAsset.frames" bind="model.selectedAssetFrame">
+                    <canvas-asset-frame frame="item" inline="false" width="50" height="50"></canvas-asset-frame>
+                    {{item.name}}
+                </div>
+
+                <div class="left-side">
+                    <ol class="property-box">
+                        <li>
+                            <label for-next>Name</label>
+                            <input type="text" ng-model="model.selectedAssetFrame.name" />
+
+                        </li>
+                        <li>
+                            <label for-next>Transparent Color</label>
+                            <input type="color" ng-model="model.selectedAssetFrame.transparentColor" />
+                        </li>
+                        <li>
+                            <label for-next>Width</label>
+                            <input class=" " type="number" min="0" max="500" ng-model="model.selectedAssetFrame.width" /><span> {{model.selectedAssetFrame.width}}</span>
+                        </li>
+                        <li>
+                            <label for-next>Height</label>
+                            <input class=" " type="number" min="0" max="500" ng-model="model.selectedAssetFrame.height" /><span>{{model.selectedAssetFrame.height}}</span>
+                        </li>
+                        <li>
+                        <li>
+                            <button class="btn col-main" ng-click="callback.removeFrameFromAsset()">Remove</button>
+                        </li>
+                    </ol>
+
+                </div>
+                <div class="right-side">
+                    <div class="btn-group full-width">
+                        <label class="btn btn-primary">
+                            <input type="radio" ng-model="model.assetEditType" value="collisionMap">
+                            Collision Map
+                        </label>
+                        <label class="btn btn-primary">
+                            <input type="radio" ng-model="model.assetEditType" value="hurtMap">
+                            Hurt Map
+                        </label>
+                        <label class="btn btn-primary">
+                            <input type="radio" ng-model="model.assetEditType" value="offset">
+                            Offset
+                        </label>
+                    </div>
+                    <canvas-asset-frame-edit frame="model.selectedAssetFrame" edit-type="model.assetEditType" edit="false" width="266" height="266"></canvas-asset-frame-edit>
+                    <canvas-asset-frame-palette-edit frame="model.selectedAssetFrame" width="266" height="50" wide="true" edit="false" show-current="false"></canvas-asset-frame-palette-edit>
+                    <button class="btn col-main full-width" ng-click="callback.editAssetFrame()">Edit</button>
+
+                </div>
+
+
+
+
+            </div>
+            <div ng-if="model.selectedPiece">
+
+                <div class="almost-half-width inline">
+                    <ol class="property-box">
+                        <li>
+
+                            <label for-next>Name</label>
+                            <input type="text" ng-model="model.selectedPiece.name" />
+                        </li>
+                    </ol>
+                </div>
+
+                <div style="height: 100px; text-align: center;" class="full-width" fancy-horizontal-list-index items="model.objectData.assets" bind-index="model.selectedPiece.assetIndex">
+                    <canvas-piece-asset asset="item" inline="false" width="50" height="50"></canvas-piece-asset>
+                    {{item.name}}
+                </div>
+
+
+                <div class="btn-group">
+                    <label class="btn btn-primary">
+                        <input type="checkbox" ng-model="model.selectedPiece.xflip">
+                        X-Flip
+                    </label>
+                    <label class="btn btn-primary">
+                        <input type="checkbox" ng-model="model.selectedPiece.yflip">
+                        Y-Flip
+                    </label>
+                </div>
+            </div>
+            <div ng-if="model.selectedPieceLayout">
+                <div class="almost-half-width inline">
+                    <ol class="property-box">
+                        <li>
+
+                            <label for-next>Name</label>
+                            <input type="text" ng-model="model.selectedPieceLayout.name" />
+                        </li>
+                    </ol>
+                </div>
+                <div class="almost-half-width inline">
+                    <ol class="property-box">
+                        <li>
+
+                            <label for-next>Scale</label>
+                            <input class=" " type="number" min="0" step="0.1" max="4" ng-model="model.pieceLayoutScale" /><span> {{model.selectedAssetFrame.width}}</span>
+                        </li>
+                    </ol>
+                </div>
+
+
+                <button class="btn col-main" ng-click="callback.removePieceLayout()">Remove</button>
+
+                <button class="btn col-main" ng-click="model.pieceLayoutShowImages=!model.pieceLayoutShowImages">{{model.pieceLayoutShowImages?'Hide':'Show'}} Images</button>
+                <div>
+
+                    <div style="width: 120px; height: 520px; text-align: center; display: inline-block;" fancy-list items="model.selectedPieceLayout.pieces" bind="model.selectedPieceLayoutPiece">
+                        <canvas-piece-asset asset="parentScope.model.objectData.assets[parentScope.model.objectData.pieces[item.pieceIndex].assetIndex]" inline="false" width="100" height="100"></canvas-piece-asset>
+                        {{item.name}}
+                    </div>
+                    <div style="display: inline-block">
+                        <canvas-piece-layout piece-layout="model.selectedPieceLayout" scale="model.pieceLayoutScale" object-data="model.objectData" show-images="model.pieceLayoutShowImages" selected-piece-layout-piece="model.selectedPieceLayoutPiece" width="400" height="400"></canvas-piece-layout>
+                        <div style="width: 400px; height: 120px; text-align: center;" fancy-horizontal-list-index items="model.objectData.pieces" bind-index="model.selectedPieceLayoutPiece.pieceIndex">
+                            <canvas-piece-asset asset="parentScope.model.objectData.assets[item.assetIndex]" inline="false" width="100" height="100"></canvas-piece-asset>
+                            {{item.name}}
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+            <div ng-if="model.selectedProjectile">
+
+
+                <label for-next>Name</label>
+                <input type="text" ng-model="model.selectedProjectile.name" />
+                <div style="height: 100px; text-align: center;" class="full-width" fancy-horizontal-list-index items="model.objectData.assets" bind-index="model.selectedProjectile.assetIndex">
+                    <canvas-piece-asset asset="item" inline="false" width="50" height="50"></canvas-piece-asset>
+                    {{item.name}}
+                </div>
+
+
+                <div class="btn-group">
+                    <label class="btn btn-primary">
+                        <input type="checkbox" ng-model="model.selectedProjectile.xflip">
+                        X-Flip
+                    </label>
+                    <label class="btn btn-primary">
+                        <input type="checkbox" ng-model="model.selectedProjectile.yflip">
+                        Y-Flip
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

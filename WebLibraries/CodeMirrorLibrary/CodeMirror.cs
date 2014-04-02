@@ -1,67 +1,70 @@
+using System;
 using System.Html;
 using System.Runtime.CompilerServices;
+
 namespace CodeMirrorLibrary
 {
     [IgnoreNamespace]
-    [Imported()]
+    [Imported]
     [ScriptName("CodeMirror")]
     public class CodeMirror
     {
         public Element ScrollerElement
         {
-            [ScriptName("getScrollerElement")]
-            get { return null; }
+            [ScriptName("getScrollerElement")] get { return null; }
         }
 
-        [ScriptName("fromTextArea")]
         public static CodeMirror FromTextArea(Element element, CodeMirrorOptions options)
         {
             return null;
         }
 
-        [ScriptName("refresh")]
         public void Refresh() {}
-
-        [ScriptName("setMarker")]
-        public void SetMarker(int lineIndex, string style) {}
-
-        [ScriptName("setValue")]
+        public void SetGutterMarker(int lineIndex, string gutterID, Element style) { }
         public void SetValue(string data) {}
-
-        [ScriptName("clearMarker")]
-        public void ClearMarker(int lineNumber) {}
-
-        [ScriptName("setCursor")]
+        public void ClearGutter(string gutterID) {}
         public void SetCursor(int lineNumber, int colNumber) {}
 
-        [ScriptName("getValue")]
         public string GetValue()
         {
             return null;
         }
 
-        [ScriptName("getCursor")]
         public CodeEditorCursor GetCursor()
         {
             return null;
         }
+        public CodeEditorToken GetTokenAt(CodeEditorCursor cursor)
+        {
+            return null;
+        }
+        public int IndexFromPos(CodeEditorCursor cursor)
+        {
+            return 0;
+        }
 
-        [ScriptName("setLineClass")]
-        public CodeMirrorLine SetLineClass(CodeMirrorLine line, string style)
+        public CodeMirrorLine AddLineClass(CodeMirrorLine line, string where, string style)
         {
             return null;
         }
 
-        [ScriptName("setLineClass")]
-        public CodeMirrorLine SetLineClass(int lineIndex, string style)
+        public CodeMirrorLine AddLineClass(int lineIndex, string where, string style)
         {
             return null;
         }
 
-        [ScriptName("setOption")]
+        public CodeMirrorLine RemoveLineClass(CodeMirrorLine line, string where, string style)
+        {
+            return null;
+        }
+
+        public CodeMirrorLine RemoveLineClass(int lineIndex, string where, string style)
+        {
+            return null;
+        }
+
         public void SetOption(string key, object value) {}
 
-        [ScriptName("lineCount")]
         public int LineCount()
         {
             return 0;
@@ -72,30 +75,20 @@ namespace CodeMirrorLibrary
             return null;
         }
 
-        public Element GetScrollerElement()
+        public void ClearMarker(int lineIndex)
         {
-            return null;
         }
 
-        public TextAreaElement GetInputField()
+        public void SetMarker(int lineIndex, string element)
         {
-            return null;
         }
     }
-    [IgnoreNamespace]
-    [Imported()]
-    public class CodeMirrorLine
+    [Imported]
+    [Serializable]
+    public class CodeEditorToken
     {
-        [IntrinsicProperty]
-        [ScriptName("markerText")]
-        public bool MarkerText { get; set; }
-    }
-    [IgnoreNamespace]
-    [Imported()]
-    public class CodeEditorCursor
-    {
-        [IntrinsicProperty]
-        [ScriptName("line")]
-        public CodeMirrorLine Line { get; set; }
+        public int Start { get; set; }
+        public string String { get; set; }
+        public int End { get; set; }
     }
 }

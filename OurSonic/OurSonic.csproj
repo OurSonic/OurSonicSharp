@@ -13,6 +13,8 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NoStdLib>True</NoStdLib>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -48,6 +50,8 @@
     <Compile Include="Areas\PieceLayoutMaker.cs" />
     <Compile Include="Areas\TileChunkArea.cs" />
     <Compile Include="Areas\UIManagerAreas.cs" />
+    <Compile Include="Level\Tiles\TileChunk.cache.cs" />
+    <Compile Include="Level\Tiles\TileChunk.debug.cs" />
     <Compile Include="UI\BuildAngular.cs" />
     <Compile Include="Level\Animations\TileAnimationData.cs" />
     <Compile Include="Level\Animations\AnimationInstance.cs" />
@@ -81,15 +85,32 @@
     <Compile Include="UIManager\Image.cs" />
     <Compile Include="UIManager\Table.cs" />
     <Compile Include="UIManager\LayoutPanel.cs" />
+    <Compile Include="UI\Controllers\AssetFrameEditorController.cs" />
+    <Compile Include="UI\Controllers\ObjectFrameworkEditorController.cs" />
     <Compile Include="UI\Controllers\LevelSelectorController.cs" />
     <Compile Include="UI\Controllers\ObjectFrameworkListController.cs" />
+    <Compile Include="UI\Directives\Canvas\CanvasAssetFrameDirective.cs" />
+    <Compile Include="UI\Directives\Canvas\CanvasAssetFramePaletteEditDirective.cs" />
+    <Compile Include="UI\Directives\Canvas\CanvasPieceAssetDirective.cs" />
+    <Compile Include="UI\Directives\Canvas\CanvasAssetFrameEditDirective.cs" />
+    <Compile Include="UI\Directives\Canvas\CanvasPieceLayoutDirective.cs" />
+    <Compile Include="UI\Directives\FancyListIndexDirective.cs" />
+    <Compile Include="UI\Directives\FancyHorizontalListIndexDirective.cs" />
+    <Compile Include="UI\Directives\FancyHorizontalListDirective.cs" />
     <Compile Include="UI\Directives\DraggableDirective.cs" />
     <Compile Include="UI\Directives\FloatingWindowDirective.cs" />
     <Compile Include="UI\Directives\ForNextDirective.cs" />
     <Compile Include="UI\Scope\BaseScope.cs" />
+    <Compile Include="UI\Scope\Controller\AssetFrameEditorScope.cs" />
     <Compile Include="UI\Scope\Controller\LevelSelectorScope.cs" />
     <Compile Include="UI\Directives\FancyListDirective.cs" />
+    <Compile Include="UI\Scope\Controller\ObjectFrameworkEditorScope.cs" />
     <Compile Include="UI\Scope\Controller\ObjectFrameworkListScope.cs" />
+    <Compile Include="UI\Scope\Directive\Canvas\CanvasAssetFramePaletteEditScope.cs" />
+    <Compile Include="UI\Scope\Directive\Canvas\CanvasAssetFrameScope.cs" />
+    <Compile Include="UI\Scope\Directive\Canvas\CanvasPieceScope.cs" />
+    <Compile Include="UI\Scope\Directive\Canvas\CanvasAssetFrameEditScope.cs" />
+    <Compile Include="UI\Scope\Directive\Canvas\CanvasPieceLayoutScope.cs" />
     <Compile Include="UI\Scope\Directive\FloatingWindowBaseScope.cs" />
     <Compile Include="UI\Scope\Directive\FloatingWindowPosition.cs" />
     <Compile Include="UI\Scope\Directive\FloatingWindowScope.cs" />
@@ -102,6 +123,7 @@
     <Compile Include="Utility\DoublePoint.cs" />
     <Compile Include="Utility\Dragger.cs" />
     <Compile Include="Utility\ExtraData.cs" />
+    <Compile Include="Utility\FloatPoint.cs" />
     <Compile Include="Utility\GameState.cs" />
     <Compile Include="Utility\IntersectingRectangle.cs" />
     <Compile Include="SpeedTester.cs" />
@@ -161,11 +183,22 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="UI\Partials\Areas\AssetFrameEditor.html" />
+    <Content Include="UI\Partials\Areas\ObjectFrameworkEditor.html" />
+    <Content Include="UI\Partials\Areas\ObjectFrameworkList.html" />
+    <Content Include="UI\Partials\Areas\LevelSelector.html" />
+    <Content Include="UI\Partials\Directives\fancyListIndex.html" />
+    <Content Include="UI\Partials\Directives\fancyHorizontalListIndex.html" />
+    <Content Include="UI\Partials\Directives\fancyHorizontalList.html" />
+    <Content Include="UI\Partials\Directives\fancyList.html" />
+    <Content Include="UI\Partials\Directives\floatingWindow.html" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib">
-      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.2.4.0\tools\Assemblies\mscorlib.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.2.5.0\tools\Assemblies\mscorlib.dll</HintPath>
     </Reference>
     <Reference Include="Saltarelle.jQuery">
       <HintPath>..\packages\Saltarelle.jQuery.1.10.1\lib\Saltarelle.jQuery.dll</HintPath>
@@ -174,17 +207,12 @@
       <HintPath>..\packages\Saltarelle.jQuery.UI.1.10.1\lib\Saltarelle.jQuery.UI.dll</HintPath>
     </Reference>
     <Reference Include="Saltarelle.Web">
-      <HintPath>..\packages\Saltarelle.Web.2.3.0\lib\Saltarelle.Web.dll</HintPath>
+      <HintPath>..\packages\Saltarelle.Web.3.1.0\lib\Saltarelle.Web.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="UI\Partials\Areas\ObjectFrameworkList.html" />
-    <Content Include="UI\Partials\Areas\LevelSelector.html" />
-    <Content Include="UI\Partials\Directives\fancyList.html" />
-    <Content Include="UI\Partials\Directives\floatingWindow.html" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.4.0\tools\Saltarelle.Compiler.targets')" />
-  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.4.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.4.0\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

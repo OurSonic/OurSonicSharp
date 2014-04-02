@@ -81,7 +81,7 @@ namespace OurSonic.UIManager
             }
         }
 
-        public override bool OnKeyDown(ElementEvent e)
+        public override bool OnKeyDown(Event e)
         {
             base.OnKeyDown(e);
             if (!Visible) return false;
@@ -176,7 +176,7 @@ namespace OurSonic.UIManager
             return base.OnScroll(e);
         }
 
-        public override void Draw(CanvasContext2D canv)
+        public override void Draw(CanvasRenderingContext2D canv)
         {
             if (!Visible) return;
             var _x = X;

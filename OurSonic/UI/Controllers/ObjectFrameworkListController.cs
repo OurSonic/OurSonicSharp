@@ -30,67 +30,57 @@ namespace OurSonic.UI.Controllers
 
             this.scope.Callback.LoadObject += loadObjectFn;
 
-            scope.Watch("model.selectedObject", () => loadObjectFn(this.scope.Model.SelectedObject));
-
-
-
-            Action getObjects = () =>
+            scope.Watch("model.selectedObject", () =>
             {
-                SonicEngine.Instance.client.Emit("GetAllObjects", "");
-                SonicEngine.Instance.client.On<DataObject<string[]>>("GetAllObjects.Response",
-                                                                     (data) =>
-                                                                     {
-                                                                         var obj = data.Data;
+                if (this.scope.Model.SelectedObject != null)
+                    loadObjectFn(this.scope.Model.SelectedObject);
+            });
 
-                                                                         scope.Model.Objects = new List<ObjectModel>(obj.OrderBy(a => a).Select(a => new ObjectModel() { Name = a }));
-                                                                         scope.Apply();
+             
 
-                                                                     });
-            };
+            SonicEngine.Instance.client.On<DataObject<string[]>>("GetAllObjects.Response",
+                                                              (data) =>
+                                                              {
+                                                                  var obj = data.Data;
 
+                                                                  scope.Model.Objects = new List<ObjectModel>(obj.OrderBy(a => a).Select(a => new ObjectModel() { Name = a }));
+                                                                  scope.Apply();
 
+                                                              });
             this.scope.Callback.CreateFramework += createFrameworkFn;
-            this.scope.Callback.SaveFramework += saveFrameworkFn;
-            getObjects();
 
-        }
 
-        private void saveFrameworkFn()
-        {
-         /*   var oldTitle = UIManager.UIManager.CurLevelName;
-            UIManager.UIManager.UpdateTitle("Saving Object");
+            SonicEngine.Instance.client.Emit("GetAllObjects", "");
 
-            var k = uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Key;
-            var o = uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.oldKey ??
-                    uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework.Key;
-            var v = Help.Stringify(uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Data.ObjectFramework);
-
-            SonicEngine.Instance.client.Emit("SaveObject", new SaveObjectModel { Key = k, OldKey = o, Data = v });
-            SonicEngine.Instance.client.On<bool>("SaveObject.Response", (data) => { UIManager.UIManager.UpdateTitle(oldTitle); });
-
-            getObjects();*/
-
-        }
+        } 
 
         private void createFrameworkFn()
         {
-/*
-            uiManager.UIManagerAreas.ObjectFrameworkArea.Populate(new LevelObject("SomeKey"));
-            uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Visible = true;
-*/
+
+            createUIService.CreateSingleton<ObjectFrameworkEditorScope>(ObjectFrameworkEditorController.View, (scope, elem) =>
+            {
+                scope.Callback = new ObjectFrameworkEditorScopeCallback();
+                scope.Model = new ObjectFrameworkEditorScopeModel();
+                scope.Model.ObjectData = new LevelObject("SomeKey");
+            });
+ 
 
         }
 
         private void loadObjectFn(ObjectModel arg)
         {
-/*
+            var name = arg.Name;
             var objects = SonicManager.Instance.cachedObjects;
             if (objects != null)
             {
                 if (objects[name] != null)
                 {
-                    uiManager.UIManagerAreas.ObjectFrameworkArea.Populate(objects[name]);
-                    uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Visible = true;
+                    createUIService.CreateSingleton<ObjectFrameworkEditorScope>(ObjectFrameworkEditorController.View, (scope, elem) =>
+                    {
+                        scope.Callback = new ObjectFrameworkEditorScopeCallback();
+                        scope.Model = new ObjectFrameworkEditorScopeModel();
+                        scope.Model.ObjectData = objects[name];
+                    });
                     return;
                 }
             }
@@ -105,10 +95,15 @@ namespace OurSonic.UI.Controllers
                                                                {
                                                                    UIManager.UIManager.UpdateTitle(oldTitle);
                                                                    var d = ObjectManager.ExtendObject(jQuery.ParseJsonData<LevelObjectData>(lvl.Data));
-                                                                   uiManager.UIManagerAreas.ObjectFrameworkArea.Populate(d);
-                                                                   uiManager.UIManagerAreas.ObjectFrameworkArea.objectFrameworkArea.Visible = true;
+
+                                                                   createUIService.CreateSingleton<ObjectFrameworkEditorScope>(ObjectFrameworkEditorController.View, (scope, elem) =>
+                                                                   {
+                                                                       scope.Callback = new ObjectFrameworkEditorScopeCallback();
+                                                                       scope.Model = new ObjectFrameworkEditorScopeModel();
+                                                                       scope.Model.ObjectData = d;
+                                                                   });
+
                                                                });
-*/
 
         }
 

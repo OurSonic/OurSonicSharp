@@ -4,7 +4,7 @@ namespace OurSonic.Level.Animations
     public class AnimationInstance
     {
         public void Tick() {}
-        public void Draw(CanvasContext2D canvas, int i, int i1) {}
+        public void Draw(CanvasRenderingContext2D canvas, int i, int i1) {}
 /*
 
 function AnimationInstance(animation, x, y, tick) {
