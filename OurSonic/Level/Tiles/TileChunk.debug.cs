@@ -13,47 +13,123 @@ using OurSonicModels.Common;
 namespace OurSonic.Level.Tiles
 {
     public partial class TileChunk
-    {
-        public static bool DebugAnimations { get; set; }
+    { 
 
-        public void DrawAnimationDebug(CanvasRenderingContext2D canvas, Point position, ChunkLayer layer)
+        public void DrawAnimationDebug(CanvasRenderingContext2D canvas, Point position, ChunkLayer layer, TileChunkDebugDrawOptions debugDrawOptions )
         {
-            if (!DebugAnimations) return;
+            if (debugDrawOptions == null) return;
             canvas.Save();
+            canvas.FillStyle = "White";
+            canvas.TextBaseline = TextBaseline.Top;
             {
                 int yOffset = layer == ChunkLayer.Low ? 0 : 64;
-                canvas.FillStyle = "White";
-                canvas.FillText("Base", position.X + 0, position.Y + yOffset);
-
-                if (HasPixelAnimations())
+                if (debugDrawOptions.ShowBaseData)
                 {
-                    var paletteAnimationCanvases = PaletteAnimationCanvasesCache[layer];
-                    foreach (var paletteAnimationIndex in GetAllPaletteAnimationIndexes())
-                    {
-                        var paletteAnimationCanvasFrames = paletteAnimationCanvases[paletteAnimationIndex];
-                        if (paletteAnimationCanvasFrames == null) continue;
-
-                        var currentFrame = SonicManager.Instance.TilePaletteAnimationManager.GetCurrentFrame(paletteAnimationIndex);
-
-                        canvas.FillText("Palette " + paletteAnimationIndex + "-" + currentFrame.FrameIndex, position.X + 25, position.Y + yOffset + (paletteAnimationIndex * 13));
-                    }
+                    canvas.FillText("Base", position.X + 0, position.Y + yOffset);
                 }
 
-                if (HasTileAnimations())
+                if (debugDrawOptions.ShowPaletteAnimationData)
                 {
-                    var tileAnimationCanvases = TileAnimationCanvasesCache[layer];
-                    foreach (var tileAnimationIndex in GetAllTileAnimationIndexes())
+                    if (HasPixelAnimations())
                     {
-                        var tileAnimationCanvasFrames = tileAnimationCanvases[tileAnimationIndex];
-                        if (tileAnimationCanvasFrames == null) continue;
+                        var paletteAnimationCanvases = PaletteAnimationCanvasesCache[layer];
+                        foreach (var paletteAnimationIndex in GetAllPaletteAnimationIndexes())
+                        {
+                            var paletteAnimationCanvasFrames = paletteAnimationCanvases[paletteAnimationIndex];
+                            if (paletteAnimationCanvasFrames == null) continue;
 
-                        var currentFrame = SonicManager.Instance.TileAnimationManager.GetCurrentFrame(tileAnimationIndex);
-                        canvas.FillText("Tile " + tileAnimationIndex + "-" + currentFrame.FrameIndex, position.X + 75, position.Y + yOffset + (tileAnimationIndex * 13));
+                            var currentFrame = SonicManager.Instance.TilePaletteAnimationManager.GetCurrentFrame(paletteAnimationIndex);
+
+                            canvas.FillText("Palette " + paletteAnimationIndex + "-" + currentFrame.FrameIndex, position.X + 25, position.Y + yOffset + (paletteAnimationIndex*13));
+                        }
+                    }
+                }
+                if (debugDrawOptions.ShowTileAnimationData)
+                {
+                    if (HasTileAnimations())
+                    {
+                        var tileAnimationCanvases = TileAnimationCanvasesCache[layer];
+                        foreach (var tileAnimationIndex in GetAllTileAnimationIndexes())
+                        {
+                            var tileAnimationCanvasFrames = tileAnimationCanvases[tileAnimationIndex];
+                            if (tileAnimationCanvasFrames == null) continue;
+
+                            var currentFrame = SonicManager.Instance.TileAnimationManager.GetCurrentFrame(tileAnimationIndex);
+                            canvas.FillText("Tile " + tileAnimationIndex + "-" + currentFrame.FrameIndex, position.X + 75, position.Y + yOffset + (tileAnimationIndex*13));
+                        }
                     }
                 }
             }
-            canvas.StrokeStyle = "black";
-            canvas.StrokeRect(position.X, position.Y, 128, 128);
+            if (debugDrawOptions.OutlineChunk)
+            {
+                canvas.StrokeStyle = "black";
+                canvas.StrokeRect(position.X, position.Y, 128, 128);
+            }
+
+            if (debugDrawOptions.OutlineTiles)
+            {
+                canvas.StrokeStyle = "green";
+                for (int x = 0; x < TileSideLength; x++)
+                {
+                    for (int y = 0; y < TileSideLength; y++)
+                    {
+                        canvas.StrokeRect(position.X + (x * TileSquareSize), position.Y + (y * TileSquareSize), TileSquareSize, TileSquareSize);
+                    }
+                }
+            }
+            if (debugDrawOptions.OutlineTilePieces)
+            {
+                canvas.StrokeStyle = "purple";
+                for (int x = 0; x < TilePieceSideLength; x++)
+                {
+                    for (int y = 0; y < TilePieceSideLength; y++)
+                    {
+                        canvas.StrokeRect(position.X + (x * TilePiecesSquareSize), position.Y + (y * TilePiecesSquareSize), TilePiecesSquareSize, TilePiecesSquareSize);
+                    }
+                }
+            }
+            if (debugDrawOptions.OutlineTile != null)
+            {
+                /*
+                                canvas.StrokeStyle = "yellow";
+                                for (int x = 0; x < TileSideLength; x++)
+                                {
+                                    for (int y = 0; y < TileSideLength; y++)
+                                    {
+                                        var tilePieceInfo = this.GetTilePiece(x, y);
+                                        if (tilePieceInfo == null) continue;
+                                        var tilePiece = tilePieceInfo.GetTilePiece();
+                                        if (tilePiece == null) continue;
+
+                        
+
+                                        if (tilePiece == debugDrawOptions.OutlineTilePiece)
+                                        {
+                                            canvas.StrokeRect(position.X + (x * TileSquareSize), position.Y + (y * TileSquareSize), TileSquareSize, TileSquareSize);
+                                        }
+                                    }
+                                }
+                */
+            }
+            
+            if (debugDrawOptions.OutlineTilePiece != null)
+            {
+                canvas.StrokeStyle = "yellow";
+                for (int x = 0; x < TilePieceSideLength; x++)
+                {
+                    for (int y = 0; y < TilePieceSideLength; y++)
+                    {
+                        var tilePieceInfo = this.GetTilePieceInfo(x, y,false);
+                        if (tilePieceInfo == null) continue;
+                        var tilePiece = tilePieceInfo.GetTilePiece();
+                        if (tilePiece == null) continue;
+                        if (tilePiece.Index == debugDrawOptions.OutlineTilePiece.Block)
+                        {
+                            canvas.StrokeRect(position.X + (x * TilePiecesSquareSize), position.Y + (y * TilePiecesSquareSize), TilePiecesSquareSize, TilePiecesSquareSize);
+                        }
+                    }
+                }
+            }
             canvas.Restore();
         }
 
@@ -64,7 +140,7 @@ namespace OurSonic.Level.Tiles
             int numOfChunks = 0;
             for (int i = 0; i < 2; i++)
             {
-                var chunkLayer = (ChunkLayer)i;
+                var chunkLayer = (ChunkLayer) i;
 
                 if (BaseCanvasCache[chunkLayer] != null) numOfChunks++;
 
@@ -83,7 +159,7 @@ namespace OurSonic.Level.Tiles
                     }
                 }
             }
-            var canvas = CanvasInformation.Create((int)(numWide * 128), (int)Math.Ceiling(numOfChunks / numWide) * 128);
+            var canvas = CanvasInformation.Create((int) (numWide*128), (int) Math.Ceiling(numOfChunks/numWide)*128, false);
             canvas.Context.FillStyle = "#111111";
             canvas.Context.FillRect(0, 0, canvas.Canvas.Width, canvas.Canvas.Height);
             numOfChunks = 0;
@@ -92,7 +168,7 @@ namespace OurSonic.Level.Tiles
 
             for (int i = 0; i < 2; i++)
             {
-                var chunkLayer = (ChunkLayer)i;
+                var chunkLayer = (ChunkLayer) i;
 
 
                 canvas.Context.StrokeStyle = chunkLayer == ChunkLayer.Low ? "Green" : "Yellow";
@@ -103,8 +179,8 @@ namespace OurSonic.Level.Tiles
                     var context = canvas.Context;
                     context.Save();
 
-                    var x = (int)((numOfChunks % numWide) * 128);
-                    var y = (int)Math.Floor(numOfChunks / numWide) * 128;
+                    var x = (int) ((numOfChunks%numWide)*128);
+                    var y = (int) Math.Floor(numOfChunks/numWide)*128;
 
                     context.Translate(x, y);
                     canvas.Context.FillStyle = chunkLayer == ChunkLayer.Low ? "#333333" : "#777777";
@@ -126,8 +202,8 @@ namespace OurSonic.Level.Tiles
                         var context = canvas.Context;
                         context.Save();
 
-                        var x = (int)((numOfChunks % numWide) * 128);
-                        var y = (int)Math.Floor(numOfChunks / numWide) * 128;
+                        var x = (int) ((numOfChunks%numWide)*128);
+                        var y = (int) Math.Floor(numOfChunks/numWide)*128;
 
                         context.Translate(x, y);
                         canvas.Context.FillStyle = chunkLayer == ChunkLayer.Low ? "#333333" : "#777777";
@@ -149,8 +225,8 @@ namespace OurSonic.Level.Tiles
                         var context = canvas.Context;
                         context.Save();
 
-                        var x = (int)((numOfChunks % numWide) * 128);
-                        var y = (int)Math.Floor(numOfChunks / numWide) * 128;
+                        var x = (int) ((numOfChunks%numWide)*128);
+                        var y = (int) Math.Floor(numOfChunks/numWide)*128;
 
                         context.Translate(x, y);
                         canvas.Context.FillStyle = chunkLayer == ChunkLayer.Low ? "#333333" : "#777777";
@@ -171,10 +247,19 @@ namespace OurSonic.Level.Tiles
             canvas.Context.FillText("Number Of Chunks: " + numOfChunks, 50, 50);
             return canvas;
         }
-
-           
     }
-     
 
+    [Serializable]
+    public class TileChunkDebugDrawOptions
+    {
+        public bool ShowBaseData { get; set; }
+        public bool ShowTileAnimationData { get; set; }
+        public bool ShowPaletteAnimationData { get; set; }
+        public bool OutlineChunk { get; set; }
+        public bool OutlineTilePieces { get; set; }
+        public bool OutlineTiles { get; set; }
+        public TilePieceInfo OutlineTilePiece { get; set; }
+        public TileInfo OutlineTile { get; set; }
+    }
 }
 

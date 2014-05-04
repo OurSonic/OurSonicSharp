@@ -70,7 +70,7 @@ namespace OurSonic.UIManager
             sonicManager.OnLevelLoad += (level) => {
                 l.LevelManager.Visible = true;
                                           
-                                            new TileChunkArea(this);
+//                                            new TileChunkArea(this);
                                         };
         }
 

@@ -74,7 +74,7 @@
     <Compile Include="Level\Tiles\Tile.cs" />
     <Compile Include="Level\Tiles\TileCacheBlock.cs" />
     <Compile Include="Level\Tiles\TileChunk.cs" />
-    <Compile Include="Level\Tiles\TileItem.cs" />
+    <Compile Include="Level\Tiles\TileInfo.cs" />
     <Compile Include="Level\Tiles\TilePiece.cs" />
     <Compile Include="Level\Tiles\TilePieceInfo.cs" />
     <Compile Include="Sonic\SensorManager.cs" />
@@ -86,6 +86,7 @@
     <Compile Include="UIManager\Table.cs" />
     <Compile Include="UIManager\LayoutPanel.cs" />
     <Compile Include="UI\Controllers\AssetFrameEditorController.cs" />
+    <Compile Include="UI\Controllers\TileEditorController.cs" />
     <Compile Include="UI\Controllers\ObjectFrameworkEditorController.cs" />
     <Compile Include="UI\Controllers\LevelSelectorController.cs" />
     <Compile Include="UI\Controllers\ObjectFrameworkListController.cs" />
@@ -95,23 +96,28 @@
     <Compile Include="UI\Directives\Canvas\CanvasAssetFrameEditDirective.cs" />
     <Compile Include="UI\Directives\Canvas\CanvasPieceLayoutEditDirective.cs" />
     <Compile Include="UI\Directives\Canvas\CanvasPieceLayoutDirective.cs" />
+    <Compile Include="UI\Directives\Canvas\CanvasTileChunkDirective.cs" />
+    <Compile Include="UI\Directives\Canvas\CanvasTilePieceDirective.cs" />
     <Compile Include="UI\Directives\FancyListIndexDirective.cs" />
     <Compile Include="UI\Directives\FancyHorizontalListIndexDirective.cs" />
     <Compile Include="UI\Directives\FancyHorizontalListDirective.cs" />
     <Compile Include="UI\Directives\DraggableDirective.cs" />
     <Compile Include="UI\Directives\FloatingWindowDirective.cs" />
     <Compile Include="UI\Directives\ForNextDirective.cs" />
+    <Compile Include="UI\Filters\RoundFilter.cs" />
     <Compile Include="UI\Scope\BaseScope.cs" />
     <Compile Include="UI\Scope\Controller\AssetFrameEditorScope.cs" />
     <Compile Include="UI\Scope\Controller\LevelSelectorScope.cs" />
     <Compile Include="UI\Directives\FancyListDirective.cs" />
     <Compile Include="UI\Scope\Controller\ObjectFrameworkEditorScope.cs" />
     <Compile Include="UI\Scope\Controller\ObjectFrameworkListScope.cs" />
+    <Compile Include="UI\Scope\Controller\TileEditorScope.cs" />
     <Compile Include="UI\Scope\Directive\Canvas\CanvasAssetFramePaletteEditScope.cs" />
     <Compile Include="UI\Scope\Directive\Canvas\CanvasAssetFrameScope.cs" />
     <Compile Include="UI\Scope\Directive\Canvas\CanvasPieceScope.cs" />
     <Compile Include="UI\Scope\Directive\Canvas\CanvasAssetFrameEditScope.cs" />
     <Compile Include="UI\Scope\Directive\Canvas\CanvasPieceLayoutEditScope.cs" />
+    <Compile Include="UI\Scope\Directive\Canvas\CanvasTileChunkScope.cs" />
     <Compile Include="UI\Scope\Directive\FloatingWindowBaseScope.cs" />
     <Compile Include="UI\Scope\Directive\FloatingWindowPosition.cs" />
     <Compile Include="UI\Scope\Directive\FloatingWindowScope.cs" />
@@ -185,6 +191,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="UI\Partials\Areas\AssetFrameEditor.html" />
+    <Content Include="UI\Partials\Areas\TileEditor.html" />
     <Content Include="UI\Partials\Areas\ObjectFrameworkEditor.html" />
     <Content Include="UI\Partials\Areas\ObjectFrameworkList.html" />
     <Content Include="UI\Partials\Areas\LevelSelector.html" />

@@ -34,8 +34,9 @@ namespace OurSonic.UI.Directives
                                                   {
                                                       scope.bind = item;
                                                   });
- 
+
             scope.currentClass = new Func<dynamic, dynamic>((item) => (item == scope.bind) ? "fancy-horizontal-list-item fancy-horizontal-list-item-selected" : "fancy-horizontal-list-item ");
+
             scope.parentScope = scope["$parent"]["$parent"]["$parent"];
         }
     }

@@ -58,7 +58,7 @@ namespace OurSonic.UIManager
         {
             base.Construct();
 
-            var canv = CanvasInformation.Create(1, 1).Context;
+            var canv = CanvasInformation.Create(1, 1, false).Context;
             Button1Grad = canv.CreateLinearGradient(0, 0, 0, 1);
             Button1Grad.AddColorStop(0, "#FFFFFF");
             Button1Grad.AddColorStop(1, "#A5A5A5");

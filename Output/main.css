@@ -1,4 +1,7 @@
-﻿html,
+﻿.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+
+html,
 body
 {
     height: 100%;
@@ -13,6 +16,13 @@ body
     position: relative;
     width: 100%;
     overflow: hidden;
+}
+
+.center
+{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 body

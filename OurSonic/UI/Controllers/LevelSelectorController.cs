@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Html;
 using System.Text;
+using OurSonic.Level;
 using OurSonic.UI.Scope.Controller;
 using OurSonic.UI.Scope.Directive;
 using OurSonic.UI.Services;
@@ -12,7 +13,7 @@ using OurSonicModels.Common;
 namespace OurSonic.UI.Controllers
 {
 
-    internal class LevelSelectorController
+    internal class LevelSelectorController : IController
     {
         public const string Name = "LevelSelectorController";
         public const string View = "LevelSelector";
@@ -80,28 +81,19 @@ namespace OurSonic.UI.Controllers
             Help.DecodeString<SLData>(data.Data, (level) =>
             {
                 scope.Model.LoadingStatus = ("Loading: ");
+                SonicEngine.Instance.RunSonic(level);
 
-                var sonicManager = SonicManager.Instance;
-                sonicManager.ClearCache();
 
-                sonicManager.Load(level);
+                createUIService.CreateSingleton<TileEditorScope>(TileEditorController.View, (_scope, elem) =>
+                {
+                    _scope.Callback = new TileEditorScopeCallback();
+                    _scope.Model = new TileEditorScopeModel();
 
-                sonicManager.WindowLocation.X = 0;
-                sonicManager.WindowLocation.Y = 0;
-                sonicManager.BigWindowLocation.X = (int)(sonicManager.WindowLocation.X - sonicManager.WindowLocation.Width * 0.2);
-                sonicManager.BigWindowLocation.Y = (int)(sonicManager.WindowLocation.Y - sonicManager.WindowLocation.Height * 0.2);
+                    _scope.Model.TileChunks = SonicManager.Instance.SonicLevel.TileChunks;
+//                    _scope.Model.TilePieces = SonicManager.Instance.SonicLevel.TilePieces;
+                });
 
-                sonicManager.BigWindowLocation.Width = (int)(sonicManager.WindowLocation.Width * 1.8);
-                sonicManager.BigWindowLocation.Height = (int)(sonicManager.WindowLocation.Height * 1.8);
 
-                if (sonicManager.CurrentGameState == GameState.Playing)
-                    SonicEngine.runGame();
-                //#if RELEASE
-                SonicEngine.runGame();
-
-                sonicManager.CacheTiles();
-
-                //#endif
             });
         }
 

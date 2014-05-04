@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 namespace OurSonic.Level.Tiles
 {
-    public class TileItem
+    public class TileInfo
     {
         [IntrinsicProperty]
         public int _Tile { get; set; }

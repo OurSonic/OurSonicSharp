@@ -18,7 +18,7 @@ namespace OurSonic.Utility
             get
             {
                 if (blackPixel == null) {
-                    var m = Create(0, 0);
+                    var m = Create(0, 0,false);
 
                     m.Context.FillStyle = "black";
                     m.Context.FillRect(0, 0, 1, 1);
@@ -36,13 +36,13 @@ namespace OurSonic.Utility
             Canvas = (CanvasElement) domCanvas[0];
         }
 
-        public static CanvasInformation Create(int w, int h)
+        public static CanvasInformation Create(int w, int h, bool pixelated)
         {
             var canvas = (CanvasElement) Document.CreateElement("canvas");
-            return Create(canvas, w, h);
+            return Create(canvas, w, h,pixelated);
         }
 
-        public static CanvasInformation Create(CanvasElement canvas, int w, int h)
+        public static CanvasInformation Create(CanvasElement canvas, int w, int h,bool pixelated)
         {
             if (w == 0) w = 1;
             if (h == 0) h = 1;
@@ -50,9 +50,14 @@ namespace OurSonic.Utility
             canvas.Height = h;
 
             var ctx = (CanvasRenderingContext2D) canvas.GetContext("2d");
-            ctx.Me().webkitImageSmoothingEnabled = false;
-            ctx.Me().mozImageSmoothingEnabled = false;
-            ctx.Me().imageSmoothingEnabled = false;
+
+        
+            if (pixelated)
+            {
+                ctx.Me().webkitImageSmoothingEnabled = false;
+                ctx.Me().mozImageSmoothingEnabled = false;
+                ctx.Me().imageSmoothingEnabled = false;
+            }
             return new CanvasInformation(ctx, jQuery.FromElement(canvas));
         }
     }

@@ -77,7 +77,7 @@ namespace OurSonic.Utility
 
         public static CanvasInformation ScaleSprite(ImageElement image, Point scale)
         {
-            var canv = CanvasInformation.Create(image.Width * scale.X, image.Height * scale.Y);
+            var canv = CanvasInformation.Create(image.Width * scale.X, image.Height * scale.Y,true);
 
             canv.Context.Save();
             canv.Context.Scale(scale.X, scale.Y);
@@ -96,7 +96,7 @@ namespace OurSonic.Utility
             {
                 colors[f / 4] = (ColorObjectFromData(Uint8ClampedArray, f));
             }
-            var d = CanvasInformation.Create(1, 1).Context.CreateImageData(data.Width * scale.X, data.Height * scale.Y);
+            var d = CanvasInformation.Create(1, 1, false).Context.CreateImageData(data.Width * scale.X, data.Height * scale.Y);
             SetDataFromColors(d.Data, colors, scale, data.Width, colors[0]);
             return d;
         }
@@ -186,7 +186,7 @@ namespace OurSonic.Utility
                 colors[f] = new Color(c[0], c[1], c[2], c[3]);
             }
 
-            var dc = CanvasInformation.Create(1, 1);
+            var dc = CanvasInformation.Create(1, 1, false);
             var d = dc.Context.CreateImageData(image.Width * scale.X, image.Height * scale.Y);
             SetDataFromColors(d.Data, colors, scale, image.Width, colors[0]);
             return LoadSprite(GetBase64Image(d), complete);
@@ -366,7 +366,7 @@ namespace OurSonic.Utility
 
         public static CanvasInformation SafeResize(CanvasInformation block, int width, int height)
         {
-            var m = CanvasInformation.Create(width, height);
+            var m = CanvasInformation.Create(width, height, false);
             /*var img=block.Context.GetImageData(0, 0, block.Canvas.Width, block.Canvas.Height);
             m.Context.PutImageData(img, 0, 0);*/
             m.Context.DrawImage(block.Canvas, 0, 0);

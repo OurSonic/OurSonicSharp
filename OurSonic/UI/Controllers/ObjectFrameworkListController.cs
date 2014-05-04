@@ -13,7 +13,7 @@ using Element = OurSonic.UIManager.Element;
 
 namespace OurSonic.UI.Controllers
 {
-    internal class ObjectFrameworkListController
+    internal class ObjectFrameworkListController : IController
     {
         public const string Name = "ObjectFrameworkListController";
         public const string View = "ObjectFrameworkList";

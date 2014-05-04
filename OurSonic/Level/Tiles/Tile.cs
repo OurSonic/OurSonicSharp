@@ -51,7 +51,7 @@ namespace OurSonic.Level.Tiles
 
                 var squareSize = Colors.Length;
                 CanvasInformation j;
-                j = CanvasInformation.Create(squareSize, squareSize);
+                j = CanvasInformation.Create(squareSize, squareSize, false);
 
                 if (pos.X < 0 || pos.Y < 0)
                     return;
@@ -115,7 +115,7 @@ namespace OurSonic.Level.Tiles
             {
                 var squareSize = Colors.Length;
                 CanvasInformation j;
-                j = CanvasInformation.Create(squareSize, squareSize);
+                j = CanvasInformation.Create(squareSize, squareSize, false);
 
                 if (pos.X < 0 || pos.Y < 0)
                     return;

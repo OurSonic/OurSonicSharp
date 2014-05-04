@@ -15,7 +15,7 @@ using Element = OurSonic.UIManager.Element;
 
 namespace OurSonic.UI.Controllers
 {
-    internal class ObjectFrameworkEditorController
+    internal class ObjectFrameworkEditorController : IController
     {
         public const string Name = "ObjectFrameworkEditorController";
         public const string View = "ObjectFrameworkEditor";

@@ -22,6 +22,8 @@ namespace OurSonic.Level.Tiles
         private ChunkLayer<CanvasInformation> BaseCanvasCache;
         private ChunkLayer<JsDictionary<int, PaletteAnimationCanvasFrames>> PaletteAnimationCanvasesCache;
         private ChunkLayer<JsDictionary<int, TileAnimationCanvasFrames>> TileAnimationCanvasesCache;
+        public List<int> CurrentTileAnimationFrameIndexCache;
+        public List<int> CurrentPaletteAnimationFrameIndexCache; 
 
 
         public void InitCache()
@@ -36,6 +38,8 @@ namespace OurSonic.Level.Tiles
 
             PaletteAnimationCanvasesCache[ChunkLayer.Low] = new JsDictionary<int, PaletteAnimationCanvasFrames>();
             PaletteAnimationCanvasesCache[ChunkLayer.High] = new JsDictionary<int, PaletteAnimationCanvasFrames>();
+            CurrentTileAnimationFrameIndexCache = new List<int>();
+            CurrentPaletteAnimationFrameIndexCache = new List<int>();
         }
         public void WarmCache()
         {
@@ -59,9 +63,9 @@ namespace OurSonic.Level.Tiles
         {
             if (layer == ChunkLayer.Low ? (OnlyForeground()) : (OnlyBackground())) return;
 
-            BaseCanvasCache[layer] = CanvasInformation.Create(tilePieceSize * piecesSquareSize, tilePieceSize * piecesSquareSize);
+            BaseCanvasCache[layer] = CanvasInformation.Create(TilePieceSideLength * TilePiecesSquareSize, TilePieceSideLength * TilePiecesSquareSize, false);
 
-            drawTilePiecesBase(BaseCanvasCache[layer].Context, layer, piecesSquareSize);
+            drawTilePiecesBase(BaseCanvasCache[layer].Context, layer, TilePiecesSquareSize);
         }
 
         public void CachePaletteAnimation(ChunkLayer layer)
@@ -79,7 +83,7 @@ namespace OurSonic.Level.Tiles
 
                 TilePaletteAnimation tilePaletteAnimation = SonicManager.Instance.TilePaletteAnimationManager.Animations[paletteAnimationIndex];
 
-                paletteAnimationCanvasFrames.Position = new Point(rect.X * piecesSquareSize, rect.Y * piecesSquareSize);
+                paletteAnimationCanvasFrames.Position = new Point(rect.X * TilePiecesSquareSize, rect.Y * TilePiecesSquareSize);
 
 
 
@@ -89,15 +93,15 @@ namespace OurSonic.Level.Tiles
 
                     var paletteAnimationCanvasFrame = paletteAnimationCanvasFrames.Frames[currentFrame.FrameIndex] = new PaletteAnimationCanvasFrame();
                     currentFrame.SetPalette();
-                    var tilePaletteCanvas = CanvasInformation.Create(rect.Width * piecesSquareSize, rect.Height * piecesSquareSize);
+                    var tilePaletteCanvas = CanvasInformation.Create(rect.Width * TilePiecesSquareSize, rect.Height * TilePiecesSquareSize, false);
 
                     paletteAnimationCanvasFrame.Canvas = tilePaletteCanvas;
 
 
 
                     paletteAnimationCanvasFrame.Canvas.Context.Save();
-                    paletteAnimationCanvasFrame.Canvas.Context.Translate(-rect.X * piecesSquareSize, -rect.Y * piecesSquareSize);
-                    drawTilePiecesAnimatedPalette(tilePaletteCanvas.Context, layer, piecesSquareSize, paletteAnimationIndex);
+                    paletteAnimationCanvasFrame.Canvas.Context.Translate(-rect.X * TilePiecesSquareSize, -rect.Y * TilePiecesSquareSize);
+                    drawTilePiecesAnimatedPalette(tilePaletteCanvas.Context, layer, TilePiecesSquareSize, paletteAnimationIndex);
                     paletteAnimationCanvasFrame.Canvas.Context.Restore();
 
 
@@ -123,19 +127,19 @@ namespace OurSonic.Level.Tiles
 
                 TileAnimation tileAnimation = SonicManager.Instance.TileAnimationManager.Animations[tileAnimationIndex];
 
-                tileAnimationCanvasFrames.Position = new Point(rect.X * piecesSquareSize, rect.Y * piecesSquareSize);
+                tileAnimationCanvasFrames.Position = new Point(rect.X * TilePiecesSquareSize, rect.Y * TilePiecesSquareSize);
 
                 foreach (var currentFrame in tileAnimation.Frames)
                 {
                     var tileAnimationCanvasFrame = tileAnimationCanvasFrames.Frames[currentFrame.FrameIndex] = new TileAnimationCanvasFrame();
 
-                    var tileTileCanvas = CanvasInformation.Create(rect.Width * piecesSquareSize, rect.Height * piecesSquareSize);
+                    var tileTileCanvas = CanvasInformation.Create(rect.Width * TilePiecesSquareSize, rect.Height * TilePiecesSquareSize, false);
                     tileAnimationCanvasFrame.Canvas = tileTileCanvas;
                     tileAnimation.CurrentFrame = currentFrame.FrameIndex;
 
                     tileAnimationCanvasFrame.Canvas.Context.Save();
-                    tileAnimationCanvasFrame.Canvas.Context.Translate(-rect.X * piecesSquareSize, -rect.Y * piecesSquareSize);
-                    drawTilePiecesAnimatedTile(tileTileCanvas.Context, layer, piecesSquareSize, tileAnimationIndex);
+                    tileAnimationCanvasFrame.Canvas.Context.Translate(-rect.X * TilePiecesSquareSize, -rect.Y * TilePiecesSquareSize);
+                    drawTilePiecesAnimatedTile(tileTileCanvas.Context, layer, TilePiecesSquareSize, tileAnimationIndex);
                     tileAnimationCanvasFrame.Canvas.Context.Restore();
 
                 }
@@ -152,9 +156,9 @@ namespace OurSonic.Level.Tiles
             int highestY = int.MinValue;
 
 
-            for (int pieceY = 0; pieceY < tilePieceSize; pieceY++)
+            for (int pieceY = 0; pieceY < TilePieceSideLength; pieceY++)
             {
-                for (int pieceX = 0; pieceX < tilePieceSize; pieceX++)
+                for (int pieceX = 0; pieceX < TilePieceSideLength; pieceX++)
                 {
                     var pieceInfo = TilePieces[pieceX][pieceY];
                     var piece = pieceInfo.GetTilePiece();
@@ -191,9 +195,9 @@ namespace OurSonic.Level.Tiles
 
 
 
-            for (int pieceY = 0; pieceY < tilePieceSize; pieceY++)
+            for (int pieceY = 0; pieceY < TilePieceSideLength; pieceY++)
             {
-                for (int pieceX = 0; pieceX < tilePieceSize; pieceX++)
+                for (int pieceX = 0; pieceX < TilePieceSideLength; pieceX++)
                 {
                     var piece = TilePieces[pieceX][pieceY].GetTilePiece();
                     if (piece == null) continue;

@@ -32,15 +32,7 @@ namespace OurSonic.UI.Scope.Controller
         public Action<ModifyScript> ModifyScript { get; set; }
         public Action SaveChanges { get; set; }
     }
-    [NamedValues]
-    public enum ModifyScript
-    {
-        None,
-        Tick,
-        Init,
-        Collide,
-        Hurt
-    }
+
     [Serializable]
     public class ObjectFrameworkEditorScopeModel
     {
@@ -55,5 +47,15 @@ namespace OurSonic.UI.Scope.Controller
         public ModifyScript ModifyScript { get; set; }
         public CodeMirrorOptions CodeMirrorOptions { get; set; }
         public CodeMirror CodeMirror { get; set; }
-    } 
+    }
+
+    [NamedValues]
+    public enum ModifyScript
+    {
+        None,
+        Tick,
+        Init,
+        Collide,
+        Hurt
+    }
 }

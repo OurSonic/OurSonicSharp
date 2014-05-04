@@ -117,13 +117,13 @@ namespace OurSonic.Utility
             int cury = curY;
             if (SonicManager.Instance.DrawTickCount % 3 == 0)
                 cury++;
-            ImageData imaged = context.GetImageData(0, 0, 320, 240);
-            ImageData imaged2 = context.GetImageData(0, 0, 320, 240);
+            ImageData imaged = context.GetImageData(0, 0, 320, 224);
+            ImageData imaged2 = context.GetImageData(0, 0, 320, 224);
 
             Uint8ClampedArray imagedArray = imaged.Data;
             Uint8ClampedArray imaged2Array = imaged2.Data;
             var n = offsets_.Length;
-            for (var y = 0; y < 240; y++)
+            for (var y = 0; y < 224; y++)
             {
                 var off = -(offsets_[(((cury + y) % n) + n) % n]);
                 if (off == 0) continue;

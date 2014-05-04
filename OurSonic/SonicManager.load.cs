@@ -197,11 +197,11 @@ namespace OurSonic
                 var fc = sonicLevel.Blocks[j];
                 var mj = new TilePiece();
                 mj.Index = j;
-                mj.Tiles = new List<TileItem>();
+                mj.Tiles = new List<TileInfo>();
 
                 for (int p = 0; p < fc.Length; p++)
                 {
-                    mj.Tiles.Add(new TileItem()
+                    mj.Tiles.Add(new TileInfo()
                     {
                         _Tile = fc[p].Tile,
                         Index = p,
@@ -437,13 +437,6 @@ namespace OurSonic
         }
 
 
-        private static CanvasElement paletteToCanvas(string b)
-        {
-            var cn = CanvasInformation.Create(1, 1);
-            cn.Context.FillStyle = b;
-            cn.Context.FillRect(0, 0, 1, 1);
-            return cn.Canvas;
-        }
 
     }
 

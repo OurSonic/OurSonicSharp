@@ -131,7 +131,7 @@ namespace OurSonic.Level.Objects
 
             if (m == null)
             {
-                var mj = CanvasInformation.Create(Width, Height);
+                var mj = CanvasInformation.Create(Width, Height, false);
                 var canvas = mj.Context;
 
                 canvas.Save();

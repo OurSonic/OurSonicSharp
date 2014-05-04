@@ -14,7 +14,7 @@ using Element = OurSonic.UIManager.Element;
 
 namespace OurSonic.UI.Controllers
 {
-    internal class AssetFrameEditorController
+    internal class AssetFrameEditorController : IController
     {
         public const string Name = "AssetFrameEditorController";
         public const string View = "AssetFrameEditor";
@@ -26,6 +26,9 @@ namespace OurSonic.UI.Controllers
             this.scope.Visible = true;
             this.scope.Model.LineWidth = 1;
         } 
+    }
 
+    public interface IController
+    {
     }
 }

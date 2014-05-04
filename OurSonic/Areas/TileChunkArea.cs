@@ -13,7 +13,7 @@ namespace OurSonic.Areas
         public TileChunkArea(UIManager.UIManager uiManager)
         {
             var tileChunkArea = uiManager.UIManagerAreas.TileChunkArea = new UIArea<TileChunk>(null, 700, 500, 390, 390) {Closable = true};
-            tileChunkArea.Visible = true;
+            tileChunkArea.Visible = false;
 
             uiManager.AddArea(tileChunkArea);
             tileChunkArea.AddControl(new TextArea(30, 25, "Tile Chunks") {Color = "blue"});
@@ -25,8 +25,8 @@ namespace OurSonic.Areas
                 var tileChunk = tileChunks[index];
                 ImageButton<TileChunk> chunkButton = new ImageButton<TileChunk>(tileChunk, 0, 0, 0, 0);
                 chunkButton.OnDraw = (cnv, x, y) => {
-                                         chunkButton.Data.DrawUI(cnv, new Point(x, y), new DoublePoint(0.5d, 0.5d), 0);
-                                         chunkButton.Data.DrawUI(cnv, new Point(x, y), new DoublePoint(0.5d, 0.5d), 1);
+//                                         chunkButton.Data.DrawUI(cnv, new Point(x, y), new DoublePoint(0.5d, 0.5d), 0);
+//                                         chunkButton.Data.DrawUI(cnv, new Point(x, y), new DoublePoint(0.5d, 0.5d), 1);
                                      };
                 chunkButton.Font = UIManager.UIManager.SmallTextFont;
                 chunkButton.Text = "Chunk #" + index;
@@ -38,16 +38,16 @@ namespace OurSonic.Areas
             int areaDrawScale = 2;
             image.OnDraw += (context, x, y) => {
                                 if (tileChunkArea.Data == null) return;
-                                tileChunkArea.Data.DrawUI(context, new Point(x, y), new Point(areaDrawScale, areaDrawScale), 0);
-                                tileChunkArea.Data.DrawUI(context, new Point(x, y), new Point(areaDrawScale, areaDrawScale), 1);
+//                                tileChunkArea.Data.DrawUI(context, new Point(x, y), new Point(areaDrawScale, areaDrawScale), 0);
+//                                tileChunkArea.Data.DrawUI(context, new Point(x, y), new Point(areaDrawScale, areaDrawScale), 1);
                             };
             image.Click += (e) => {
                                if (tileChunkArea.Data == null) return;
-                               var tilePiece = tileChunkArea.Data.GetBlockAt(e.X / areaDrawScale, e.Y / areaDrawScale);
+//                               var tilePiece = tileChunkArea.Data.GetBlockAt(e.X / areaDrawScale, e.Y / areaDrawScale);
 
-                               uiManager.UIManagerAreas.TilePieceArea.Visible = false;
-                               uiManager.UIManagerAreas.TilePieceArea.Data = tilePiece;
-                               tilePieceList.ScrollIndex = Math.Max(uiManager.sonicManager.SonicLevel.TilePieces.IndexOf(tilePiece) - 1, 0);
+//                               uiManager.UIManagerAreas.TilePieceArea.Visible = false;
+//                               uiManager.UIManagerAreas.TilePieceArea.Data = tilePiece;
+//                               tilePieceList.ScrollIndex = Math.Max(uiManager.sonicManager.SonicLevel.TilePieces.IndexOf(tilePiece) - 1, 0);
                            };
             tileChunkArea.AddControl(image);
 
@@ -74,7 +74,7 @@ namespace OurSonic.Areas
         private void buildTilePiece(UIManager.UIManager uiManager)
         {
             var tilePieceArea = uiManager.UIManagerAreas.TilePieceArea = new UIArea<TilePiece>(null, 1100, 400, 390, 390) {Closable = true};
-            tilePieceArea.Visible = true;
+            tilePieceArea.Visible = false;
 
             uiManager.AddArea(tilePieceArea);
             tilePieceArea.AddControl(new TextArea(30, 25, "Tile Pieces") {Color = "blue"});
@@ -98,8 +98,8 @@ namespace OurSonic.Areas
                                              cnv.Save();
                                              cnv.Translate(x, y);
                                              cnv.Scale(4, 4);
-                                             tilePieceButton.Data.Draw(cnv, new Point(0, 0), ChunkLayer.Low, false, false, 0);
-                                             tilePieceButton.Data.Draw(cnv, new Point(0, 0), ChunkLayer.High, false, false, 0);
+//                                             tilePieceButton.Data.Draw(cnv, new Point(0, 0), ChunkLayer.Low, false, false, 0);
+//                                             tilePieceButton.Data.Draw(cnv, new Point(0, 0), ChunkLayer.High, false, false, 0);
 
                                              if (showHeightMap) {
                                                  HeightMap hmap;
@@ -125,8 +125,8 @@ namespace OurSonic.Areas
                                 context.Save();
                                 context.Translate(x, y);
                                 context.Scale(16, 16);
-                                tilePieceArea.Data.Draw(context, new Point(0, 0), ChunkLayer.Low, false, false, 0);
-                                tilePieceArea.Data.Draw(context, new Point(0, 0), ChunkLayer.High, false, false, 0);
+//                                tilePieceArea.Data.Draw(context, new Point(0, 0), ChunkLayer.Low, false, false, 0);
+//                                tilePieceArea.Data.Draw(context, new Point(0, 0), ChunkLayer.High, false, false, 0);
                                 context.Restore();
                             };
 

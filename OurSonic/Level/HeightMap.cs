@@ -74,7 +74,7 @@ namespace OurSonic.Level
             if (Index != -1 && fd.Truthy())
                 canvas.DrawImage(fd.Canvas, pos.X, pos.Y);
             else {
-                var ntcanvas = CanvasInformation.Create(16, 16);
+                var ntcanvas = CanvasInformation.Create(16, 16, false);
                 var ncanvas = ntcanvas.Context;
 
                 if (solid > 0) {
