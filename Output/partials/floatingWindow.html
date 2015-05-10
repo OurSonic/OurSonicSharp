@@ -1,0 +1,13 @@
+﻿<div draggable class="window" style="z-index: 10000; position: absolute; display: none;" ng-style="positionStyles" ng-show="visible">
+    <h1>{{windowTitle}}</h1>
+    <div class="control-buttons btn-group">
+        <button ng-click="minimize()" class="button btn  btn-xs icon-double-angle-left"></button>
+        <button ng-click="maximize()" class="button btn  btn-xs icon-plus"></button>
+        <button ng-click="close()" class="button btn  btn-xs icon-remove"></button>
+    </div>
+    <div class="inner-window">
+        <div ng-style="sizeStyle">
+            <section ng-transclude></section>
+        </div>
+    </div>
+</div>

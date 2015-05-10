@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.TypedArrays;
 using System.Html;
 using System.Html.Media.Graphics;
 using System.Runtime.CompilerServices;
@@ -10,7 +11,7 @@ using OurSonic.UIManager;
 using jQueryApi;
 namespace OurSonic.Utility
 {
-     public static class Help
+    public static class Help
     {
         private static double[] cos_table = new[] {
                                                          1.00000, 0.99970, 0.99880, 0.99729, 0.99518, 0.99248, 0.98918, 0.98528,
@@ -59,24 +60,24 @@ namespace OurSonic.Utility
 
         public static double Sin(int f)
         {
-            return cos_table[( f + 0x40 ) & 0xFF];
+            return cos_table[(f + 0x40) & 0xFF];
         }
 
         public static double Cos(int f)
         {
-            return cos_table[( f ) & 0xFF];
+            return cos_table[(f) & 0xFF];
         }
 
         public static int Mod(int j, int n)
-        { 
-            
+        {
 
-            return ( ( j % n ) + n ) % n;
+
+            return ((j % n) + n) % n;
         }
 
         public static CanvasInformation ScaleSprite(ImageElement image, Point scale)
         {
-            var canv = CanvasInformation.Create(image.Width * scale.X, image.Height * scale.Y);
+            var canv = CanvasInformation.Create(image.Width * scale.X, image.Height * scale.Y,true);
 
             canv.Context.Save();
             canv.Context.Scale(scale.X, scale.Y);
@@ -88,35 +89,41 @@ namespace OurSonic.Utility
 
         public static ImageData ScalePixelData(Point scale, ImageData data)
         {
-            PixelArray pixelArray = data.Data;
+            Uint8ClampedArray Uint8ClampedArray = data.Data;
 
-            var colors = new Color[pixelArray.Length / 4];
-            for (int f = 0; f < pixelArray.Length; f += 4) {
-                colors[f / 4] = ( ColorObjectFromData(pixelArray, f) );
+            var colors = new Color[Uint8ClampedArray.Length / 4];
+            for (int f = 0; f < Uint8ClampedArray.Length; f += 4)
+            {
+                colors[f / 4] = (ColorObjectFromData(Uint8ClampedArray, f));
             }
-            var d = CanvasInformation.Create(1, 1).Context.CreateImageData(data.Width * scale.X, data.Height * scale.Y);
+            var d = CanvasInformation.Create(1, 1, false).Context.CreateImageData(data.Width * scale.X, data.Height * scale.Y);
             SetDataFromColors(d.Data, colors, scale, data.Width, colors[0]);
             return d;
         }
 
-        private static void SetDataFromColors(PixelArray data, Color[] colors, Point scale, int width, Color transparent)
+        private static void SetDataFromColors(Uint8ClampedArray data, Color[] colors, Point scale, int width, Color transparent)
         {
-            for (int i = 0; i < colors.Length; i++) {
+            for (int i = 0; i < colors.Length; i++)
+            {
                 var curX = i % width;
                 var curY = i / width;
                 var g = colors[i];
                 var isTrans = false;
-                if (transparent.Truthy()) {
+                if (transparent.Truthy())
+                {
                     if (g.R == transparent.R && g.G == transparent.G && g.B == transparent.B)
                         isTrans = true;
                 }
 
-                for (int j = 0; j < scale.X; j++) {
-                    for (int k = 0; k < scale.Y; k++) {
-                        var x = ( curX * scale.X + j );
-                        var y = ( curY * scale.Y + k );
-                        var c = ( x + y * ( scale.X * width ) ) * 4;
-                        if (isTrans) {
+                for (int j = 0; j < scale.X; j++)
+                {
+                    for (int k = 0; k < scale.Y; k++)
+                    {
+                        var x = (curX * scale.X + j);
+                        var y = (curY * scale.Y + k);
+                        var c = (x + y * (scale.X * width)) * 4;
+                        if (isTrans)
+                        {
                             data[c + 0] = 0;
                             data[c + 1] = 0;
                             data[c + 2] = 0;
@@ -124,9 +131,9 @@ namespace OurSonic.Utility
                             continue;
                         }
 
-                        data[c] = g.R;
-                        data[c + 1] = g.G;
-                        data[c + 2] = g.B;
+                        data[c] = (byte)g.R;
+                        data[c + 1] = (byte)g.G;
+                        data[c + 2] = (byte)g.B;
                         data[c + 3] = 255;
                     }
                 }
@@ -136,33 +143,33 @@ namespace OurSonic.Utility
         private static string GetBase64Image(ImageData data)
         {
             // Create an empty canvas element
-            var canvas = (CanvasElement) Document.CreateElement("canvas");
+            var canvas = (CanvasElement)Document.CreateElement("canvas");
             canvas.Width = data.Width;
             canvas.Height = data.Height;
 
             // Copy the image contents to the canvas
-            var ctx = (CanvasContext2D) canvas.GetContext("2d");
+            var ctx = (CanvasRenderingContext2D)canvas.GetContext("2d");
             ctx.PutImageData(data, 0, 0);
             var dataURL = canvas.Me().toDataURL("image/png");
             return dataURL;
         }
 
-        private static Color ColorObjectFromData(PixelArray data, int c)
+        private static Color ColorObjectFromData(Uint8ClampedArray data, int c)
         {
-            var r = (int) data[c];
-            var g = (int) data[c + 1];
-            var b = (int) data[c + 2];
-            var a = (int) data[c + 3];
+            var r = (int)data[c];
+            var g = (int)data[c + 1];
+            var b = (int)data[c + 2];
+            var a = (int)data[c + 3];
 
             return new Color(r, g, b, a);
         }
 
         public static ImageData GetImageData(ImageElement image)
         {
-            var canvas = (CanvasElement) Document.CreateElement("canvas");
+            var canvas = (CanvasElement)Document.CreateElement("canvas");
             canvas.Width = image.Width;
             canvas.Height = image.Height;
-            CanvasContext2D ctx = (CanvasContext2D) canvas.GetContext("2d");
+            CanvasRenderingContext2D ctx = (CanvasRenderingContext2D)canvas.GetContext("2d");
             ctx.DrawImage(image, 0, 0);
             var data = ctx.GetImageData(0, 0, image.Width, image.Height);
             return data;
@@ -173,12 +180,13 @@ namespace OurSonic.Utility
             var df = image.Bytes;
             var colors = new Color[df.Length];
 
-            for (int f = 0; f < df.Length; f++) {
+            for (int f = 0; f < df.Length; f++)
+            {
                 var c = image.Palette[df[f]];
                 colors[f] = new Color(c[0], c[1], c[2], c[3]);
             }
 
-            var dc = CanvasInformation.Create(1, 1);
+            var dc = CanvasInformation.Create(1, 1, false);
             var d = dc.Context.CreateImageData(image.Width * scale.X, image.Height * scale.Y);
             SetDataFromColors(d.Data, colors, scale, image.Width, colors[0]);
             return LoadSprite(GetBase64Image(d), complete);
@@ -198,7 +206,8 @@ namespace OurSonic.Utility
         {
             var sprite1 = new ImageElement();
             sprite1.AddEventListener("load",
-                                     e => {
+                                     e =>
+                                     {
                                          sprite1.Loaded(true);
                                          if (complete.Truthy()) complete(sprite1);
                                      },
@@ -214,23 +223,26 @@ namespace OurSonic.Utility
 
         public static void DecodeString<T>(string lvl, Action<T> complete)
         {
-            if (FunctionWorker.HasWebWorker()) {
+            if (FunctionWorker.HasWebWorker())
+            {
                 new FunctionWorker("lib/FunctionWorker.js").ThreadedFunction<string, string>
-                        ((e) => {
-                             FunctionWorker.ImportScripts("RawDeflate.js");
+                        ((e) =>
+                        {
+                            FunctionWorker.ImportScripts("RawDeflate.js");
 
-                             e.Data = new Compressor().DecompressText(e.Data);
+                            e.Data = new Compressor().DecompressText(e.Data);
 
-                             e.Callback(e.Data);
-                         },
+                            e.Callback(e.Data);
+                        },
                          (e) => complete(Json.Parse<T>(e.Data)),
                          (e) => { },
                          lvl);
-            } else complete(Json.Parse<T>(new Compressor().DecompressText(lvl)));
+            }
+            else complete(Json.Parse<T>(new Compressor().DecompressText(lvl)));
         }
 
         [InlineCode("debugger")]
-        public static void Debugger() {}
+        public static void Debugger() { }
 
         [InlineCode("{o}")]
         public static bool Truthy(this object o)
@@ -246,7 +258,7 @@ namespace OurSonic.Utility
 
         public static double FixAngle(int angle)
         {
-            var fixedAng = (int) Math.Floor(( 256 - angle ) * 1.4062) % 360;
+            var fixedAng = (int)Math.Floor((256 - angle) * 1.4062) % 360;
             var flop = 360 - fixedAng;
             return DegToRad(flop);
         }
@@ -258,14 +270,14 @@ namespace OurSonic.Utility
 
         public static int Sign(double m)
         {
-            return m == 0 ? 0 : ( m < 0 ? -1 : 1 );
+            return m == 0 ? 0 : (m < 0 ? -1 : 1);
         }
 
         public static int Floor(double spinDashSpeed)
         {
             if (spinDashSpeed > 0)
                 return ~~spinDashSpeed.Me();
-            return (int) Math.Floor(spinDashSpeed);
+            return (int)Math.Floor(spinDashSpeed);
         }
 
         public static double Max(double f1, double f2)
@@ -278,10 +290,10 @@ namespace OurSonic.Utility
             return f1 > f2 ? f2 : f1;
         }
 
-        
+
         public static T Clone<T>(T o)
         {
-            return default( T );
+            return default(T);
         }
 
         /*
@@ -301,15 +313,8 @@ namespace OurSonic.Utility
                 }
         */
 
-        public static void MergeRect(Rectangle main, Rectangle small)
-        {
-            main.X = Math.Min(small.X, main.X);
-            main.Width = Math.Max(( ( small.X + small.Width ) + main.X ), main.Width);
-            main.Y = Math.Min(small.Y, main.Y);
-            main.Height = Math.Max(( ( small.Y + small.Height ) + main.Y ), main.Height);
-        }
-
-        public static void RoundRect(CanvasContext2D ctx, int x, int y, int width, int height, int radius = 5, bool fill = true, bool stroke = false)
+ 
+        public static void RoundRect(CanvasRenderingContext2D ctx, int x, int y, int width, int height, int radius = 5, bool fill = true, bool stroke = false)
         {
             ctx.Save();
             ctx.LineWidth = 3;
@@ -344,14 +349,16 @@ namespace OurSonic.Utility
         public static string Stringify(object obj)
         {
             return Json.Stringify(obj,
-                                  (key, value) => {
-                                      if (key == "image") return null;
-                                      if (key == "imageData") return null;
-                                      if (key == "oldScale") return null;
-                                      if (key == "sprite") return null;
-                                      if (key == "sprites") return null;
-                                      if (key == "index") return null;
-                                      if (key == "_style") return null;
+                                  (key, value) =>
+                                  {
+                                      if (key.IndexOf("$") == 0) return Script.Undefined;
+                                      if (key == "image") return Script.Undefined;
+                                      if (key == "imageData") return Script.Undefined;
+                                      if (key == "oldScale") return Script.Undefined;
+                                      if (key == "sprite") return Script.Undefined;
+                                      if (key == "sprites") return Script.Undefined;
+                                      if (key == "index") return Script.Undefined;
+                                      if (key == "_style") return Script.Undefined;
 
                                       else return value;
                                   }); //.replaceAll("false", "0").replaceAll("true", "1");
@@ -359,7 +366,7 @@ namespace OurSonic.Utility
 
         public static CanvasInformation SafeResize(CanvasInformation block, int width, int height)
         {
-            var m = CanvasInformation.Create(width, height);
+            var m = CanvasInformation.Create(width, height, false);
             /*var img=block.Context.GetImageData(0, 0, block.Canvas.Width, block.Canvas.Height);
             m.Context.PutImageData(img, 0, 0);*/
             m.Context.DrawImage(block.Canvas, 0, 0);
@@ -372,7 +379,8 @@ namespace OurSonic.Utility
             string queryString = Window.Location.Search.Substring(1);
             var re = new Regex("/([^&=]+)=([^&]*)/g");
             RegexMatch m;
-            while (( m = re.Exec(queryString) ) != null) {
+            while ((m = re.Exec(queryString)) != null)
+            {
                 result[Window.Instance.Me().decodeURIComponent(m[1])] = Window.Instance.Me().decodeURIComponent(m[2]);
             }
 

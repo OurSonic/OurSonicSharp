@@ -106,27 +106,9 @@ setTimeout(tim, 100);*/
             {
                 UIManager.UIManager.UpdateTitle("Loading: ");
 
-                var sonicManager = SonicManager.Instance;
-                sonicManager.ClearCache();
 
-                sonicManager.Load(level);
+                SonicEngine.Instance.RunSonic(level);
 
-                sonicManager.WindowLocation.X = 0;
-                sonicManager.WindowLocation.Y = 0;
-                sonicManager.BigWindowLocation.X = (int)(sonicManager.WindowLocation.X - sonicManager.WindowLocation.Width * 0.2);
-                sonicManager.BigWindowLocation.Y = (int)(sonicManager.WindowLocation.Y - sonicManager.WindowLocation.Height * 0.2);
-
-                sonicManager.BigWindowLocation.Width = (int)(sonicManager.WindowLocation.Width * 1.8);
-                sonicManager.BigWindowLocation.Height = (int)(sonicManager.WindowLocation.Height * 1.8);
-
-                if (sonicManager.CurrentGameState == GameState.Playing)
-                    SonicEngine.runGame();
-                //#if RELEASE
-                SonicEngine.runGame();
-
-                sonicManager.CacheTiles();
-
-                //#endif
             });
         }
     }

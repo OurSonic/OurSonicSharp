@@ -22,7 +22,7 @@ namespace OurSonic.UIManager
             oldText = "";
         }
 
-        public override void Draw(CanvasContext2D canv)
+        public override void Draw(CanvasRenderingContext2D canv)
         {
             if (!Visible) return;
             string txt = Text;

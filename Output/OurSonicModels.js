@@ -1,4 +1,4 @@
-﻿(function() {
+;(function() {
 	'use strict';
 	var $asm = {};
 	global.OurSonicModels = global.OurSonicModels || {};
@@ -22,6 +22,21 @@
 		return {};
 	};
 	global.OurSonicModels.AnimatedPalettePiece = $OurSonicModels_AnimatedPalettePiece;
+	////////////////////////////////////////////////////////////////////////////////
+	// OurSonicModels.ObjectModelData
+	var $OurSonicModels_ObjectModelData = function() {
+	};
+	$OurSonicModels_ObjectModelData.__typeName = 'OurSonicModels.ObjectModelData';
+	$OurSonicModels_ObjectModelData.createInstance = function() {
+		return $OurSonicModels_ObjectModelData.$ctor();
+	};
+	$OurSonicModels_ObjectModelData.$ctor = function() {
+		var $this = {};
+		$this.name = null;
+		$this.data = null;
+		return $this;
+	};
+	global.OurSonicModels.ObjectModelData = $OurSonicModels_ObjectModelData;
 	////////////////////////////////////////////////////////////////////////////////
 	// OurSonicModels.SaveObjectModel
 	var $OurSonicModels_SaveObjectModel = function() {
@@ -313,7 +328,7 @@
 	};
 	$OurSonicModels_Common_EnumerableExtensions.orderBy = function(T) {
 		return function(items, clause) {
-			var j = ss.arrayClone(Enumerable.from(items).toArray());
+			var j = ss.arrayClone(Array.prototype.slice.call(items));
 			j.sort(function(a, b) {
 				return ss.compare(clause(a), clause(b));
 			});
@@ -331,7 +346,7 @@
 	};
 	$OurSonicModels_Common_EnumerableExtensions.orderBy$1 = function(T) {
 		return function(items, clause) {
-			var j = ss.arrayClone(Enumerable.from(items).toArray());
+			var j = ss.arrayClone(Array.prototype.slice.call(items));
 			j.sort(function(a, b) {
 				return ss.compare(clause(a), clause(b));
 			});
@@ -349,7 +364,7 @@
 	};
 	$OurSonicModels_Common_EnumerableExtensions.orderBy$2 = function(T) {
 		return function(items, clause) {
-			var j = ss.arrayClone(Enumerable.from(items).toArray());
+			var j = ss.arrayClone(Array.prototype.slice.call(items));
 			j.sort(function(a, b) {
 				return ss.compare(clause(a), clause(b));
 			});
@@ -397,6 +412,7 @@
 	global.OurSonicModels.Common.EnumerableExtensions = $OurSonicModels_Common_EnumerableExtensions;
 	ss.initClass($OurSonicModels_AnimatedPaletteItem, $asm, {});
 	ss.initClass($OurSonicModels_AnimatedPalettePiece, $asm, {});
+	ss.initClass($OurSonicModels_ObjectModelData, $asm, {});
 	ss.initClass($OurSonicModels_SaveObjectModel, $asm, {});
 	ss.initClass($OurSonicModels_SLData, $asm, {});
 	ss.initClass($OurSonicModels_SLDataAnimation, $asm, {});

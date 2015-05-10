@@ -218,4 +218,12 @@ namespace OurSonicModels
         [ObjectLiteral]
         public SLDataPatternIndex() {}
     }
+
+    [Serializable]
+    public class ObjectModelData
+    {
+        public string Name { get; set; }
+        public string Data { get; set; }
+    }
+
 }

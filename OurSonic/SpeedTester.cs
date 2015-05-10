@@ -1,4 +1,4 @@
-﻿using System.Html;
+﻿/*using System.Html;
 using System.Html.Media.Graphics;
 using OurSonic.Utility;
 namespace OurSonic
@@ -24,10 +24,10 @@ namespace OurSonic
         private void makeit(CanvasInformation gameCanvas, CanvasInformation m)
         {
             var mc = img.Data;
-            int length = mc.Length;
+            var length = mc.Length;
             for (int i = 0; i < length; i += 4) {
                 mc[i] = 205;
-                mc[i + 1] = i % 255;
+                mc[i + 1] = (byte) (i % 255);
                 mc[i + 2] = 245;
                 mc[i + 3] = 255;
             }
@@ -44,4 +44,4 @@ namespace OurSonic
             mj.Restore();
         }
     }
-}
+}*/

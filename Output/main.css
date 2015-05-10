@@ -1,0 +1,408 @@
+﻿.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+
+html,
+body
+{
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+body
+{
+    height: 100%;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.center
+{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+body
+{
+    background-color: #012611;
+    font-family: 'Telex', sans-serif !important;
+}
+
+.window
+{
+    background-color: #444444;
+    border-radius: 5px;
+    border: 1px solid #0f1f4f;
+    padding: 15px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+    .window h1
+    {
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 28px;
+        margin: 0;
+        margin-bottom: 6px;
+        color: white;
+        font-weight: 800;
+    }
+
+    .window .inner-window
+    {
+        margin: 0px;
+        padding: 10px;
+        background-color: #EDEDED;
+        border-radius: 5px;
+        position: relative;
+    }
+
+        .window .inner-window .right
+        {
+            position: absolute;
+            right: 10px;
+        }
+
+    .window .control-buttons
+    {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
+    .window .fancy-list
+    {
+        background-color: #DADADA;
+        padding: 2px;
+        color: #DADADA;
+        position: relative;
+        overflow-x: hidden;
+        overflow-y: scroll;
+    }
+
+        .window .fancy-list .fancy-list-item
+        {
+            background-color: #0F1F4f;
+            padding: 6px;
+        }
+
+        .window .fancy-list .fancy-list-item-selected
+        {
+            background-color: #3063FC;
+        }
+
+        .window .fancy-list .button-in-listbox
+        {
+            position: absolute;
+            right: 10px;
+        }
+
+
+
+    .window .fancy-horizontal-list
+    {
+        background-color: #DADADA;
+        padding: 2px;
+        color: #DADADA;
+        position: relative;
+        white-space: nowrap;
+        overflow-y: hidden;
+        overflow-x: scroll;
+    }
+
+        .window .fancy-horizontal-list .fancy-horizontal-list-item
+        {
+            background-color: #0F1F4f;
+            padding: 6px;
+            display: inline-block;
+            height: 100%;
+        }
+
+        .window .fancy-horizontal-list .fancy-horizontal-list-item-selected
+        {
+            background-color: #3063FC;
+        }
+
+        .window .fancy-horizontal-list .button-in-listbox
+        {
+            position: absolute;
+            right: 10px;
+        }
+
+.col-main
+{
+    background-color: #3063FC !important;
+    color: #DADADA !important;
+    border: solid 1px #1F41A6;
+    font-weight: 800 !important;
+    text-transform: lowercase;
+}
+
+    .col-main:hover,
+    .col-main:focus,
+    .col-main:active
+    {
+        background-color: #1F41A6 !important;
+        color: #DADADA !important;
+        font-weight: 800 !important;
+        text-transform: lowercase;
+    }
+
+.col-second
+{
+    background-color: #327330 !important;
+    color: #DADADA !important;
+    font-weight: 800 !important;
+    text-transform: lowercase;
+}
+
+    .col-second:hover,
+    .col-second:focus,
+    .col-second:active
+    {
+        background-color: #26591e !important;
+        color: #DADADA !important;
+        font-weight: 800 !important;
+        text-transform: lowercase;
+    }
+
+.column-header
+{
+    position: relative;
+    height: 20px;
+    color: #DADADA;
+}
+
+.right-justify
+{
+    position: absolute;
+    right: 0;
+}
+
+.minimizedItem
+{
+    width: 100px;
+    height: 30px;
+    background-color: blueviolet;
+    border: solid 2px black;
+    -moz-transition: 0.5s;
+    -webkit-transition: 0.5s;
+    -o-transition: 0.5s;
+    transition: 0.5s;
+}
+
+    .minimizedItem:hover
+    {
+        width: 200px;
+        height: 30px;
+        background-color: #b17ce2;
+        border: solid 2px black;
+    }
+
+.minimizeList
+{
+    list-style: none;
+    z-index: 9999;
+    padding: 0;
+}
+
+.full-width
+{
+    width: 100%;
+}
+
+.half-width
+{
+    width: 50%;
+}
+
+.inline
+{
+    display: inline-block;
+}
+
+.almost-half-width
+{
+    width: 49%;
+}
+
+.left-side
+{
+    width: 49%;
+    float: left;
+    padding-right: 15px;
+    border-right: 1px dotted black;
+}
+
+.right-side
+{
+    padding-left: 5px;
+    width: 49%;
+    float: left;
+}
+
+.left-third
+{
+    width: 32%;
+    float: left;
+    padding-right: 15px;
+    border-right: 1px dotted black;
+}
+
+.right-two-thirds
+{
+    padding-left: 5px;
+    width: 65%;
+    float: left;
+}
+
+.left-two-thirds
+{
+    width: 65%;
+    float: left;
+    padding-right: 15px;
+    border-right: 1px dotted black;
+}
+
+.right-third
+{
+    padding-left: 5px;
+    width: 32%;
+    float: left;
+}
+
+.pad-top-medium
+{
+    margin-top: 15px;
+}
+
+.pad-top-small
+{
+    margin-top: 5px;
+}
+/* Let's get this party started */
+::-webkit-scrollbar
+{
+    width: 5px;
+}
+/* Track */
+::-webkit-scrollbar-track
+{
+    -box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+}
+/* Handle */
+::-webkit-scrollbar-thumb
+{
+    border-radius: 10px;
+    background: #a22c1c;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}
+
+.property-box
+{
+    list-style: none;
+    width: 100%;
+    background-color: #f5f5f5;
+    padding: 0px;
+    border-top: solid 1px #E0E0E0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+    .property-box > li
+    {
+        border-bottom: solid 1px #E0E0E0;
+        border-right: solid 1px #E0E0E0;
+        border-left: solid 1px #E0E0E0;
+        clear: both;
+        min-height: 37px;
+        min-width: 50%;
+        vertical-align: middle;
+    }
+
+        .property-box > li > label
+        {
+            float: left;
+            vertical-align: middle;
+            line-height: 36px;
+            margin: 0px;
+        }
+
+        .property-box > li > span
+        {
+            display: none;
+        }
+
+        .property-box > li:hover > span
+        {
+            display: none;
+        }
+
+        .property-box > li > input,
+        .property-box > li > select
+        {
+            float: right;
+            display: block;
+            width: 50%;
+            height: 36px;
+            font-size: 14px;
+            line-height: 1.428571429;
+            color: #555555;
+            vertical-align: middle;
+            background-color: #f5f5f5;
+            border: 0px solid #cccccc;
+            -webkit-box-shadow: inset 0 0px 0px rgba(0, 0, 0, 0.075);
+            box-shadow: inset 0 0px 0px rgba(0, 0, 0, 0.075);
+            -webkit-transition: border-color ease-in-out 0.15s, outline ease-out 0.15s, box-shadow ease-in-out 0.15s;
+            -moz-transition: border-color ease-in-out 0.15s, outline ease-out 0.15s, box-shadow ease-in-out 0.15s;
+            -o-transition: border-color ease-in-out 0.15s, outline ease-out 0.15s, box-shadow ease-in-out 0.15s;
+            transition: border-color ease-in-out 0.15s, outline ease-out 0.15s, box-shadow ease-in-out 0.15s;
+            margin: 0px;
+        }
+
+        .property-box > li > button
+        {
+            width: 100%;
+            line-height: 24px;
+        }
+
+        .property-box > li > input:focus,
+        .property-box > li > input:hover,
+        .property-box > li > select:focus,
+        .property-box > li > select:hover
+        {
+            outline: -webkit-focus-ring-color auto 5px;
+            outline-offset: -2px;
+        }
+
+.CodeMirror
+{
+    height: 450px !important;
+}
+
+.codemirror-highlight-line
+{
+    background-color: #444444;
+}
+
+.highlighter
+{
+    list-style-type: none;
+    background-color: antiquewhite;
+    border: solid 2px antiquewhite;
+}
+
+    .highlighter:hover
+    {
+        background-color: coral;
+        border: solid 2px black;
+    }

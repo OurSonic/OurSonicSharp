@@ -19,7 +19,7 @@ namespace OurSonic.Level.Tiles
         private bool onlyForegroundSet;
         private bool? shouldAnimate;
         [IntrinsicProperty]
-        public List<TileItem> Tiles { get; set; }
+        public List<TileInfo> Tiles { get; set; }
         [IntrinsicProperty]
         public int Index { get; set; }
         [IntrinsicProperty]
@@ -72,47 +72,10 @@ namespace OurSonic.Level.Tiles
             return (onlyForeground = true);
         }
 
-        public bool Draw(CanvasContext2D canvas,
-                         Point position,
-                         ChunkLayer layer,
-                         bool xFlip,
-                         bool yFlip,
-                         int animatedIndex)
-        {
-            var drawOrderIndex = 0;
-            drawOrderIndex = xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3);
-
-            int tilePieceLength = 8;
-
-            var ac = CanvasInformation.Create(tilePieceLength * 2, tilePieceLength * 2);
-            var i = 0;
-
-            var localPoint = new Point(0, 0);
-            foreach (TileItem tileItem in Tiles.Array())
-            {
-                var tile = tileItem.GetTile();
-                if (tile.Truthy())
-                {
-                    if (tileItem.Priority == ((int)layer == 1))
-                    {
-                        var _xf = xFlip ^ tileItem.XFlip;
-                        var _yf = yFlip ^ tileItem.YFlip;
-                        var df = DrawInfo[DrawOrder[drawOrderIndex][i]];
-                        localPoint.X = df[0] * tilePieceLength;
-                        localPoint.Y = df[1] * tilePieceLength;
-                        tile.DrawAnimatedPalette(ac.Context, localPoint, _xf, _yf, tileItem.Palette, animatedIndex);
-                    }
-                }
-                i++;
-            }
-
-            DrawIt(canvas, ac.Canvas, position);
-            return true;
-        }
 
 
 
-        public bool DrawBase(CanvasContext2D canvas,
+        public void DrawBase(CanvasRenderingContext2D canvas,
                  Point position,
                  ChunkLayer layer,
                  bool xFlip,
@@ -123,11 +86,11 @@ namespace OurSonic.Level.Tiles
 
             int tilePieceLength = 8;
 
-            var ac = CanvasInformation.Create(tilePieceLength * 2, tilePieceLength * 2);
+            var ac = CanvasInformation.Create(tilePieceLength * 2, tilePieceLength * 2, false);
             var i = 0;
 
             var localPoint = new Point(0, 0);
-            foreach (TileItem tileItem in Tiles.Array())
+            foreach (TileInfo tileItem in Tiles.Array())
             {
                 var tile = tileItem.GetTile();
                 if (tile.Truthy())
@@ -144,54 +107,75 @@ namespace OurSonic.Level.Tiles
                 }
                 i++;
             }
-
-            DrawIt(canvas, ac.Canvas, position);
-            return true;
+            canvas.DrawImage(ac.Canvas, position.X, position.Y);
+              
         }
-        public bool DrawAnimatedPalette(CanvasContext2D canvas, Point position, ChunkLayer layer, bool xFlip, bool yFlip, int animatedPaletteIndex)
+
+        private int getAnimatedPaletteCacheIndex(bool xflip, bool yflip, int animatedPaletteIndex, int frameIndex)
         {
-            var drawOrderIndex = 0;
-            drawOrderIndex = xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3);
+            return (frameIndex << 8) + (animatedPaletteIndex << 7) + ((xflip ? 1 : 0) << 5) + ((yflip ? 1 : 0) << 4);
+        }
 
-            int tilePieceLength = 8;
 
-            var ac = CanvasInformation.Create(tilePieceLength * 2, tilePieceLength * 2);
-            var i = 0;
 
-            var localPoint = new Point(0, 0);
-            foreach (TileItem tileItem in Tiles.Array())
+        private JsDictionary<int, CanvasInformation> animatedPaletteCaches = new JsDictionary<int, CanvasInformation>();
+
+
+
+        public void DrawAnimatedPalette(CanvasRenderingContext2D canvas, Point position, ChunkLayer layer, bool xFlip, bool yFlip, int animatedPaletteIndex)
+        {
+
+
+            var animatedPaletteCacheIndex = getAnimatedPaletteCacheIndex(xFlip, yFlip, animatedPaletteIndex, SonicManager.Instance.TilePaletteAnimationManager.GetPaletteAnimation(animatedPaletteIndex).CurrentFrame);
+
+
+            CanvasInformation animatedPaletteCache = animatedPaletteCaches[animatedPaletteCacheIndex];
+            if (animatedPaletteCache == null)
             {
-                var tile = tileItem.GetTile();
-                if (tile.Truthy())
+
+                var drawOrderIndex = 0;
+                drawOrderIndex = xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3);
+
+                int tilePieceLength = 8;
+
+                var ac = CanvasInformation.Create(tilePieceLength * 2, tilePieceLength * 2, false);
+                var i = 0;
+
+                var localPoint = new Point(0, 0);
+                foreach (TileInfo tileItem in Tiles.Array())
                 {
-                    if (tileItem.Priority == ((int)layer == 1))
+                    var tile = tileItem.GetTile();
+                    if (tile.Truthy())
                     {
-                        var _xf = xFlip ^ tileItem.XFlip;
-                        var _yf = yFlip ^ tileItem.YFlip;
-                        var df = DrawInfo[DrawOrder[drawOrderIndex][i]];
-                        localPoint.X = df[0] * tilePieceLength;
-                        localPoint.Y = df[1] * tilePieceLength;
-                        tile.DrawAnimatedPalette(ac.Context, localPoint, _xf, _yf, tileItem.Palette,animatedPaletteIndex);
+                        if (tileItem.Priority == ((int)layer == 1))
+                        {
+                            var _xf = xFlip ^ tileItem.XFlip;
+                            var _yf = yFlip ^ tileItem.YFlip;
+                            var df = DrawInfo[DrawOrder[drawOrderIndex][i]];
+                            localPoint.X = df[0] * tilePieceLength;
+                            localPoint.Y = df[1] * tilePieceLength;
+                            tile.DrawAnimatedPalette(ac.Context, localPoint, _xf, _yf, tileItem.Palette, animatedPaletteIndex);
+                        }
                     }
+                    i++;
                 }
-                i++;
+                animatedPaletteCaches[animatedPaletteCacheIndex] = animatedPaletteCache=ac;
             }
 
-            DrawIt(canvas, ac.Canvas, position);
-            return true;
+            canvas.DrawImage(animatedPaletteCache.Canvas, position.X, position.Y);
         }
-        public bool DrawAnimatedTile(CanvasContext2D canvas, Point position, ChunkLayer layer, bool xFlip, bool yFlip, int animatedTileIndex)
+        public void DrawAnimatedTile(CanvasRenderingContext2D canvas, Point position, ChunkLayer layer, bool xFlip, bool yFlip, int animatedTileIndex)
         {
             var drawOrderIndex = 0;
             drawOrderIndex = xFlip ? (yFlip ? 0 : 1) : (yFlip ? 2 : 3);
 
             int tilePieceLength = 8;
 
-            var ac = CanvasInformation.Create(tilePieceLength * 2, tilePieceLength * 2);
+            var ac = CanvasInformation.Create(tilePieceLength * 2, tilePieceLength * 2, false);
             var i = 0;
 
             var localPoint = new Point(0, 0);
-            foreach (TileItem tileItem in Tiles.Array())
+            foreach (TileInfo tileItem in Tiles.Array())
             {
                 var tile = tileItem.GetTile();
                 if (tile.Truthy())
@@ -208,9 +192,7 @@ namespace OurSonic.Level.Tiles
                 }
                 i++;
             }
-
-            DrawIt(canvas, ac.Canvas, position);
-            return true;
+            canvas.DrawImage(ac.Canvas, position.X, position.Y);
         }
 
 
@@ -221,7 +203,7 @@ namespace OurSonic.Level.Tiles
         {
             if (shouldAnimate == null)
             {
-                foreach (TileItem t in Tiles)
+                foreach (TileInfo t in Tiles)
                 {
                     var tile = t.GetTile();
                     if (tile.Truthy())
@@ -236,21 +218,7 @@ namespace OurSonic.Level.Tiles
         }
 
 
-        private void DrawIt(CanvasContext2D canvas, CanvasElement fd, Point position)
-        {
-            canvas.DrawImage(fd, position.X, position.Y);
-
-            UIManagerAreas areas = SonicManager.Instance.UIManager.UIManagerAreas;
-            if (areas.TilePieceArea != null && areas.TilePieceArea.Data != null && areas.TilePieceArea.Data.Index == Index)
-            {
-                canvas.Save();
-                canvas.StrokeStyle = "light green";
-                canvas.LineWidth = 2;
-                canvas.StrokeRect(position.X, position.Y, fd.Width, fd.Height);
-                canvas.Restore();
-            }
-        }
-
+ 
         public int GetLayer1Angles()
         {
             return SonicManager.Instance.SonicLevel.Angles[SonicManager.Instance.SonicLevel.CollisionIndexes1[Index]];

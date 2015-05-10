@@ -18,7 +18,7 @@ namespace OurSonic.UIManager
         public const string SmallButtonFont = "13pt Arial bold ";
         public const string TextFont = "11pt Arial bold ";
         private static string _curLevelName;
-        private readonly CanvasContext2D mainCanvas;
+        private readonly CanvasRenderingContext2D mainCanvas;
         public readonly SonicManager sonicManager;
         private List<string> messages = new List<string>();
         [IntrinsicProperty]
@@ -43,7 +43,7 @@ namespace OurSonic.UIManager
         }
         public UIManagerAreas UIManagerAreas { get; private set; }
 
-        public UIManager(SonicManager sonicManager, CanvasContext2D mainCanvas)
+        public UIManager(SonicManager sonicManager, CanvasRenderingContext2D mainCanvas)
         {
             Instance = this;
             mainCanvas.Font = TextFont;
@@ -61,16 +61,16 @@ namespace OurSonic.UIManager
 
             UIManagerAreas = new UIManagerAreas();
 
-            new LevelSelectorArea(this);
+//            new LevelSelectorArea(this);
             new ColorEditorArea(this);
-            new ObjectFrameworkArea(this);
-            new ObjectFrameworkListArea(this);
+//            new ObjectFrameworkArea(this);
+//            new ObjectFrameworkListArea(this);
             var l = new LevelManagerArea(this);
             l.LevelManager.Visible = false;
             sonicManager.OnLevelLoad += (level) => {
                 l.LevelManager.Visible = true;
                                           
-                                            new TileChunkArea(this);
+//                                            new TileChunkArea(this);
                                         };
         }
 
@@ -158,6 +158,7 @@ namespace OurSonic.UIManager
 
         public bool OnMouseScroll(jQueryEvent e)
         {
+            
             int delta = e.Me().wheelDelta ? e.Me().wheelDelta / 40 : e.Me().detail ? -e.Me().detail : 0;
 
             var cell = Help.GetCursorPosition(e);
@@ -171,7 +172,7 @@ namespace OurSonic.UIManager
             return false;
         }
 
-        public bool OnKeyDown(ElementEvent jQueryEvent)
+        public bool OnKeyDown(Event jQueryEvent)
         {
             foreach (var are in UIAreas) {
                 if (are.OnKeyDown(jQueryEvent)) return true;
@@ -192,7 +193,7 @@ namespace OurSonic.UIManager
             canvasDepths = UIAreas.OrderBy(f => f.Depth);
         }
 
-        public void Draw(CanvasContext2D canvas)
+        public void Draw(CanvasRenderingContext2D canvas)
         {
             dragger.Tick();
             canvas.Save();

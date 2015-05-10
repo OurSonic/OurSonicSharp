@@ -81,7 +81,7 @@ namespace OurSonic.UIManager
             return cachedForceRedrawing; //redraw=false,cache=false
         }
 
-        public virtual bool OnKeyDown(ElementEvent e)
+        public virtual bool OnKeyDown(Event e)
         {
             return false;
         }
@@ -123,7 +123,7 @@ namespace OurSonic.UIManager
             return false;
         }
 
-        public virtual void Draw(CanvasContext2D canv)
+        public virtual void Draw(CanvasRenderingContext2D canv)
         {
             if (IsEditMode())
                 EditorEngine.Draw(canv);

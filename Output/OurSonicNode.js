@@ -1,5 +1,5 @@
 require('./mscorlib.js');require('./lib/RawDeflate.js');require('./OurSonicModels.js');;'use strict';
-require('mscorlib');
+;
 var socketio = require('socket.io');
 var $asm = {};
 global.OurSonicNode = global.OurSonicNode || {};
@@ -110,6 +110,18 @@ var $OurSonicNode_Server = function() {
 			}), function(a2) {
 				return ss.replaceAllString(a2, '.js', '');
 			}) });
+		}));
+		socket.on('GetAllObjectsData', ss.mkdel(this, function() {
+			var dataObjects = OurSonicModels.Common.EnumerableExtensions.select$1(String, OurSonicModels.ObjectModelData).call(null, OurSonicModels.Common.EnumerableExtensions.where$1(String).call(null, this.$fs.readdirSync(this.$objDirectory), function(a3) {
+				return ss.endsWithString(a3, '.js');
+			}), ss.mkdel(this, function(a4) {
+				var $t1 = OurSonicModels.ObjectModelData.$ctor();
+				$t1.name = ss.replaceAllString(a4, '.js', '');
+				$t1.data = this.$fs.readFileSync(this.$objDirectory + a4, 'utf8');
+				return $t1;
+			}));
+			console.log('Serving objects ' + dataObjects.length);
+			socket.emit('GetAllObjectsData.Response', new (ss.makeGenericType(OurSonicModels.Common.DataObject$1, [Array]))(dataObjects));
 		}));
 	}));
 };

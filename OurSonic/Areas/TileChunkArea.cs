@@ -25,8 +25,8 @@ namespace OurSonic.Areas
                 var tileChunk = tileChunks[index];
                 ImageButton<TileChunk> chunkButton = new ImageButton<TileChunk>(tileChunk, 0, 0, 0, 0);
                 chunkButton.OnDraw = (cnv, x, y) => {
-                                         chunkButton.Data.DrawUI(cnv, new Point(x, y), new DoublePoint(0.5d, 0.5d), 0);
-                                         chunkButton.Data.DrawUI(cnv, new Point(x, y), new DoublePoint(0.5d, 0.5d), 1);
+//                                         chunkButton.Data.DrawUI(cnv, new Point(x, y), new DoublePoint(0.5d, 0.5d), 0);
+//                                         chunkButton.Data.DrawUI(cnv, new Point(x, y), new DoublePoint(0.5d, 0.5d), 1);
                                      };
                 chunkButton.Font = UIManager.UIManager.SmallTextFont;
                 chunkButton.Text = "Chunk #" + index;
@@ -38,16 +38,16 @@ namespace OurSonic.Areas
             int areaDrawScale = 2;
             image.OnDraw += (context, x, y) => {
                                 if (tileChunkArea.Data == null) return;
-                                tileChunkArea.Data.DrawUI(context, new Point(x, y), new Point(areaDrawScale, areaDrawScale), 0);
-                                tileChunkArea.Data.DrawUI(context, new Point(x, y), new Point(areaDrawScale, areaDrawScale), 1);
+//                                tileChunkArea.Data.DrawUI(context, new Point(x, y), new Point(areaDrawScale, areaDrawScale), 0);
+//                                tileChunkArea.Data.DrawUI(context, new Point(x, y), new Point(areaDrawScale, areaDrawScale), 1);
                             };
             image.Click += (e) => {
                                if (tileChunkArea.Data == null) return;
-                               var tilePiece = tileChunkArea.Data.GetBlockAt(e.X / areaDrawScale, e.Y / areaDrawScale);
+//                               var tilePiece = tileChunkArea.Data.GetBlockAt(e.X / areaDrawScale, e.Y / areaDrawScale);
 
-                               uiManager.UIManagerAreas.TilePieceArea.Visible = false;
-                               uiManager.UIManagerAreas.TilePieceArea.Data = tilePiece;
-                               tilePieceList.ScrollIndex = Math.Max(uiManager.sonicManager.SonicLevel.TilePieces.IndexOf(tilePiece) - 1, 0);
+//                               uiManager.UIManagerAreas.TilePieceArea.Visible = false;
+//                               uiManager.UIManagerAreas.TilePieceArea.Data = tilePiece;
+//                               tilePieceList.ScrollIndex = Math.Max(uiManager.sonicManager.SonicLevel.TilePieces.IndexOf(tilePiece) - 1, 0);
                            };
             tileChunkArea.AddControl(image);
 
@@ -98,8 +98,8 @@ namespace OurSonic.Areas
                                              cnv.Save();
                                              cnv.Translate(x, y);
                                              cnv.Scale(4, 4);
-                                             tilePieceButton.Data.Draw(cnv, new Point(0, 0), ChunkLayer.Low, false, false, 0);
-                                             tilePieceButton.Data.Draw(cnv, new Point(0, 0), ChunkLayer.High, false, false, 0);
+//                                             tilePieceButton.Data.Draw(cnv, new Point(0, 0), ChunkLayer.Low, false, false, 0);
+//                                             tilePieceButton.Data.Draw(cnv, new Point(0, 0), ChunkLayer.High, false, false, 0);
 
                                              if (showHeightMap) {
                                                  HeightMap hmap;
@@ -125,8 +125,8 @@ namespace OurSonic.Areas
                                 context.Save();
                                 context.Translate(x, y);
                                 context.Scale(16, 16);
-                                tilePieceArea.Data.Draw(context, new Point(0, 0), ChunkLayer.Low, false, false, 0);
-                                tilePieceArea.Data.Draw(context, new Point(0, 0), ChunkLayer.High, false, false, 0);
+//                                tilePieceArea.Data.Draw(context, new Point(0, 0), ChunkLayer.Low, false, false, 0);
+//                                tilePieceArea.Data.Draw(context, new Point(0, 0), ChunkLayer.High, false, false, 0);
                                 context.Restore();
                             };
 

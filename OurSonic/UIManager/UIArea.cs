@@ -61,13 +61,13 @@ namespace OurSonic.UIManager
             return @base;
         }
 
-        public override void Draw(CanvasContext2D canv)
+        public override void Draw(CanvasRenderingContext2D canv)
         {
             if (!Visible) return;
             canv.Save();
 
             if (CachedDrawing.Falsey()) {
-                var cg = CanvasInformation.Create(Width + 20, Height + 20);
+                var cg = CanvasInformation.Create(Width + 20, Height + 20, false);
                 var cv = cg.Context;
                 cv.Translate(10, 10);
 
@@ -121,7 +121,7 @@ namespace OurSonic.UIManager
             base.Draw(canv);
         }
 
-        private void drawCache(CanvasContext2D canv)
+        private void drawCache(CanvasRenderingContext2D canv)
         {
             canv.DrawImage(CachedDrawing.Canvas, X - 10, Y - 10);
         }

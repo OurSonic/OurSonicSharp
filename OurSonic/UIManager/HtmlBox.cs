@@ -46,7 +46,7 @@ namespace OurSonic.UIManager
             return base.OnMouseOver(e);
         }
 
-        public override void Draw(CanvasContext2D canv)
+        public override void Draw(CanvasRenderingContext2D canv)
         {
             if (!Visible) return;
             UpdatePosition(TotalX, TotalY);

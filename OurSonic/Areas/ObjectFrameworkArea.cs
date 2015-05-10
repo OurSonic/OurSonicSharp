@@ -174,6 +174,7 @@ namespace OurSonic.Areas
         private void addCodeWindow(string value, Action change)
         {
             ClearMainArea();
+/*
             objectFrameworkArea.Data.MainPanel.AddControl(new HtmlBox(15, -35) {
                                                                                        Width = 485,
                                                                                        Height = 485,
@@ -238,6 +239,7 @@ namespace OurSonic.Areas
                                                                                                    }
                                                                                                }
                                                                                });
+*/
         }
 
         public void ClearMainArea()
@@ -780,7 +782,7 @@ namespace OurSonic.Areas
                 _H.loadSprite(img, function (image) {
                     objectFrameworkArea.mainPanel.frameArea.currentFrame.uploadImage(image);
                     var ce = objectFrameworkArea.mainPanel.frameArea.colorEditor;
-                    ce.init(objectFrameworkArea.mainPanel.frameArea.currentFrame);
+                    ce.init(objectFrameworkArea.mainPanel.frameArea.currentFrame);a
                     ce.editor.showOutline = false;
                     ce.editable = false;
                     ce.click = function (e) {

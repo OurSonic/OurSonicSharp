@@ -3,8 +3,7 @@ using OurSonicModels;
 namespace OurSonic.Level.Tiles
 {
     public class TilePieceInfo
-    {
-        private TilePiece block;
+    { 
         [IntrinsicProperty]
         public int Block { get; set; }
         [IntrinsicProperty]
@@ -19,10 +18,8 @@ namespace OurSonic.Level.Tiles
         public int Index { get; set; }
 
         public TilePiece GetTilePiece()
-        {
-            if (block == null)
-                block = SonicManager.Instance.SonicLevel.GetTilePiece(Block);
-            return block;
+        { 
+            return SonicManager.Instance.SonicLevel.GetTilePiece(Block);
         }
 
         public bool SetTilePiece(TilePiece tp)
@@ -30,7 +27,6 @@ namespace OurSonic.Level.Tiles
             if (Block == tp.Index) return false;
 
             Block = tp.Index;
-            block = null;
             return true;
         }
 

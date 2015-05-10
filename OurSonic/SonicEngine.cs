@@ -35,8 +35,8 @@ namespace OurSonic
             /*var pl = @"";
             Window.Instance.Me().Global.Console.Log(new Compressor().CompressText(pl));*/
 
-            gameCanvas = CanvasInformation.Create((CanvasElement) Document.GetElementById(gameCanvasName), 0, 0);
-            uiCanvas = CanvasInformation.Create((CanvasElement) Document.GetElementById(uiCanvasName), 0, 0);
+            gameCanvas = CanvasInformation.Create((CanvasElement) Document.GetElementById(gameCanvasName), 0, 0,true);
+            uiCanvas = CanvasInformation.Create((CanvasElement)Document.GetElementById(uiCanvasName), 0, 0, true);
             //new SpeedTester(gameCanvas);return;
             canvasWidth = 0;
             canvasHeight = 0;
@@ -71,7 +71,8 @@ namespace OurSonic
             uiCanvas.DomCanvas.Bind("contextmenu", (e) => e.PreventDefault());
             bool dontPress = false;
             Document.AddEventListener("keypress",
-                                      e => {
+                                      e =>
+                                      {  
                                           //if (sonicManager.CurrentGameState == GameState.Editing)
                                           dontPress = sonicManager.UIManager.OnKeyDown(e);
                                       },
@@ -215,6 +216,7 @@ namespace OurSonic
                                                        sonicManager.BigWindowLocation.Y -= 128;
                                                        break;
                                                }
+
                                            },
                                            () => {
                                                switch (sonicManager.CurrentGameState) {
@@ -356,17 +358,19 @@ namespace OurSonic
             switch (sonicManager.CurrentGameState) {
                 case GameState.Playing:
                     sonicManager.CurrentGameState = GameState.Editing;
-                    sonicManager.Scale = new Point(2,2);
+                    sonicManager.Scale = new Point(4,4);
                     sonicManager.WindowLocation = Constants.DefaultWindowLocation(sonicManager.CurrentGameState, Instance.gameCanvas, sonicManager.Scale);
                     sonicManager.SonicToon = null;
                     break;
                 case GameState.Editing:
                     sonicManager.CurrentGameState = GameState.Playing;
-                    sonicManager.Scale = new Point(2, 2);
+                    sonicManager.Scale = new Point(4, 4);
                     sonicManager.WindowLocation = Constants.DefaultWindowLocation(sonicManager.CurrentGameState, Instance.gameCanvas, sonicManager.Scale);
                     sonicManager.SonicToon = new Sonic.Sonic();
                     break;
             }
+            sonicManager.DestroyCanvases();
+            sonicManager.ResetCanvases();
         }
 
         private void handleScroll(jQueryEvent jQueryEvent)
@@ -460,6 +464,9 @@ namespace OurSonic
                                        : new DoublePoint(0, 0);
             gameCanvas.DomCanvas.CSS("left", screenOffset.X.ToPx());
             gameCanvas.DomCanvas.CSS("top", screenOffset.Y.ToPx());
+            sonicManager.DestroyCanvases();
+            sonicManager.ResetCanvases();
+
         }
 
         public void Clear(CanvasInformation canv)
@@ -478,16 +485,14 @@ namespace OurSonic
 
         public void GameDraw()
         {
-            if (!sonicManager.InHaltMode)
-                Clear(gameCanvas);
 
 
-            sonicManager.MainDraw(gameCanvas.Context);
+            sonicManager.MainDraw(gameCanvas);
         }
 
         public void UIDraw()
         {
-            if (!sonicManager.InHaltMode)
+            //if (!sonicManager.InHaltMode)
                 Clear(uiCanvas);
             uiCanvas.Context.Me().webkitImageSmoothingEnabled = false;
 

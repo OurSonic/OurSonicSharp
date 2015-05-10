@@ -53,7 +53,7 @@ namespace OurSonic.Sonic
             return SensorResults[mn];
         }
 
-        public void Draw(CanvasContext2D canvas, Sonic sonic)
+        public void Draw(CanvasRenderingContext2D canvas, Sonic sonic)
         {
             foreach (var sensor in Sensors) {
                 sensor.Value.Draw(canvas, sonic, SensorResults[sensor.Key]);
@@ -605,7 +605,7 @@ namespace OurSonic.Sonic
         }
 
 
-        public void Draw(CanvasContext2D canvas, Sonic character, SensorM sensorResult)
+        public void Draw(CanvasRenderingContext2D canvas, Sonic character, SensorM sensorResult)
         {
             var x = Help.Floor(character.X) - SonicManager.Instance.WindowLocation.X;
             var y = Help.Floor(character.Y) - SonicManager.Instance.WindowLocation.Y;

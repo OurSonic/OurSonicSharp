@@ -39,7 +39,8 @@ namespace OurSonic
         }
 
         public void TickAnimatedPalettes()
-        { 
+        {
+            if (Animations == null) Init();
             foreach (var animation in Animations)
             {
                 TilePaletteAnimation tilePaletteAnimation = animation.Value;

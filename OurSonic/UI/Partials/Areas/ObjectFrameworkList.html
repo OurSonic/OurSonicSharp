@@ -1,0 +1,14 @@
+﻿<div ng-controller="ObjectFrameworkListController">
+    <div floating-window left="'15%'" top="'70%'" width="'360px'" height="'260px'" window-title="'Object Frameworks'" visible="visible">
+        <h3>{{model.loadingStatus}}</h3>
+
+            <button class="btn col-main full-width" ng-click="callback.createFramework()">Create Framework</button>
+
+
+        <div style="height: 210px;" class="full-width" fancy-list items="model.objects" bind="model.selectedObject">
+            <canvas-piece-layout piece-layout="item.object.pieceLayouts[0]" width="50" height="50" object-data="item.object" ></canvas-piece-layout>
+            {{item.name}} - {{item.object.description}}
+        </div>
+
+    </div>
+</div>

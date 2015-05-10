@@ -11,6 +11,10 @@ namespace OurSonic
             Document.Body.AppendChild(stats.Element);
 
             new SonicEngine();
+             
+
+            BuildAngular.Setup(); 
+
         }
 
         public static void Main()

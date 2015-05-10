@@ -77,9 +77,10 @@ namespace OurSonic
         [IntrinsicProperty]
         protected SpriteLoader SpriteLoader { get; set; }
         [IntrinsicProperty]
-        public bool TypingInEditor { get; set; }
-        [IntrinsicProperty]
         public Action<SonicLevel> OnLevelLoad { get; set; }
+
+        [IntrinsicProperty]
+        public TileChunkDebugDrawOptions TileChunkDebugDrawOptions { get; set; }
         private string Status
         {
             get { return status; }
@@ -109,8 +110,8 @@ namespace OurSonic
             this.engine.canvasWidth = jQuery.Window.GetWidth();
             this.engine.canvasHeight = jQuery.Window.GetHeight();
 
-            gameCanvas.DomCanvas[0].SetAttribute("width", this.engine.canvasWidth);
-            gameCanvas.DomCanvas[0].SetAttribute("height", this.engine.canvasHeight);
+            gameCanvas.DomCanvas[0].SetAttribute("width", this.engine.canvasWidth.ToString());
+            gameCanvas.DomCanvas[0].SetAttribute("height", this.engine.canvasHeight.ToString());
 
             jQuery.GetJsonData<JsDictionary<string, SonicImage>>("Content/sprites/sonic.js", data => { sonicSprites = data; });
 
@@ -140,8 +141,7 @@ namespace OurSonic
             ScreenOffset = new Point(mainCanvas.DomCanvas.GetWidth() / 2 - WindowLocation.Width / 2,
                                      mainCanvas.DomCanvas.GetHeight() / 2 - WindowLocation.Height / 2);
 
-            UIManager = new UIManager.UIManager(this, mainCanvas.Context);
-            //UIManager.ObjectFrameworkArea.Populate(new LevelObject("Somekey"));
+            UIManager = new UIManager.UIManager(this, mainCanvas.Context); ;
 
             ClickState = ClickState.PlaceChunk;
             tickCount = 0;
@@ -149,16 +149,17 @@ namespace OurSonic
             InHaltMode = false;
             waitingForTickContinue = false;
             waitingForDrawContinue = false;
+            TileChunkDebugDrawOptions = new TileChunkDebugDrawOptions();
         }
 
-        public bool OnClick(jQueryEvent elementEvent)
+        public bool OnClick(jQueryEvent Event)
         {
             //Help.Debugger();
             //then clicking
             //then chunk editor/tilepiece editor/tile editor/ heightmap editor/ and proper map editor;
 
             clicking = true;
-            if (effectClick(elementEvent)) return true;
+            if (effectClick(Event)) return true;
             return false;
 
             /* 
@@ -180,12 +181,12 @@ namespace OurSonic
              */
         }
 
-        private bool effectClick(jQueryEvent elementEvent)
+        private bool effectClick(jQueryEvent Event)
         {
             //    if (CurrentGameState == GameState.Playing) return false;
 
-            var e = new Point((int)((double)elementEvent.ClientX / Scale.X / RealScale.X + WindowLocation.X),
-                              (int)((double)elementEvent.ClientY / Scale.Y / RealScale.Y + WindowLocation.Y));
+            var e = new Point((int)((double)Event.ClientX / Scale.X / RealScale.X + WindowLocation.X),
+                              (int)((double)Event.ClientY / Scale.Y / RealScale.Y + WindowLocation.Y));
 
             /*if (CurrentGameState == GameState.Playing) {
                 SonicToon.X = e.X;
@@ -194,16 +195,16 @@ namespace OurSonic
             int ey;
             int ex;
 
-            if (elementEvent.CtrlKey)
+            if (Event.CtrlKey)
             {
                 ex = e.X / 128;
                 ey = e.Y / 128;
                 TileChunk ch = SonicLevel.GetChunkAt(ex, ey);
                 if (UIManager.UIManagerAreas.TilePieceArea != null)
-                    ch.SetBlockAt(e.X - ex * 128, e.Y - ey * 128, UIManager.UIManagerAreas.TilePieceArea.Data);
+                    ch.SetTilePieceAt(e.X - ex * 128, e.Y - ey * 128, UIManager.UIManagerAreas.TilePieceArea.Data,true);
                 return true;
             }
-            if (elementEvent.ShiftKey)
+            if (Event.ShiftKey)
             {
                 ex = e.X / 128;
                 ey = e.Y / 128;
@@ -213,7 +214,7 @@ namespace OurSonic
                 return true;
             }
 
-            if (elementEvent.Button == 0)
+            if (Event.Button == 0)
             {
                 switch (ClickState)
                 {
@@ -223,7 +224,7 @@ namespace OurSonic
                         ex = e.X / 128;
                         ey = e.Y / 128;
                         TileChunk ch = SonicLevel.GetChunkAt(ex, ey);
-                        TilePiece tp = ch.GetBlockAt(e.X - ex * 128, e.Y - ey * 128);
+                        TilePiece tp = ch.GetTilePieceAt(e.X - ex * 128, e.Y - ey * 128, true);
 
                         bool dontClear = false;
                         if (UIManager.UIManagerAreas.TileChunkArea != null)
@@ -368,7 +369,7 @@ throw exc;
                                                           Help.LoadSprite(spriteLocations[i],
                                                                           jd =>
                                                                           {
-                                                                              ci[i] = CanvasInformation.Create(jd.Width, jd.Height);
+                                                                              ci[i] = CanvasInformation.Create(jd.Width, jd.Height, false);
                                                                               ci[i].Context.DrawImage(jd, 0, 0);
 
                                                                               done();
@@ -421,27 +422,32 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             }
         }
 
-        public void MainDraw(CanvasContext2D canvas)
+        public void MainDraw(CanvasInformation canvas)
         {
+            var context = canvas.Context;
             if (InHaltMode)
-                if (drawHaltMode(canvas)) return;
+                if (drawHaltMode(context)) return;
+
+            engine.Clear(canvas);
             if (SonicLevel == null) return;
-            canvas.Save();
+            context.Save();
             var localPoint = new Point(0, 0);
 
             DrawTickCount++;
             if (SpriteLoader.Truthy() && !SpriteLoader.Tick() || Loading)
             {
-                drawLoading(canvas);
-                canvas.Restore();
+                drawLoading(context);
+                context.Restore();
                 return;
             }
-            updatePositions(canvas);
+            updatePositions(context);
             int w1 = WindowLocation.Width / 128 + 2;
             int h1 = WindowLocation.Height / 128 + 2; //cleaner with 2 padding on the widthheight
 
             if (CurrentGameState == GameState.Editing)
             {
+                w1 += 1;
+                h1 += 1;
                 w1 /= Scale.X;
                 h1 /= Scale.Y;
             }
@@ -454,7 +460,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             int fyP = (int)((WindowLocation.Y) / 128.0);
 
 
-            resetCanvases();
+            ResetCanvases();
 
             var zero = new Point(0, 0);
 
@@ -490,18 +496,20 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             if (!ShowHeightMap)
                 drawHighChunks(highChuckCanvas.Context, fxP, fyP, offs, zero);
 
+            drawDebugTextChunks(highChuckCanvas.Context, fxP, fyP, offs, zero);
+
+
             lowChunkCanvas.Context.OffsetPixelsForWater();
             highChuckCanvas.Context.OffsetPixelsForWater();
-            drawSonic(lowChunkCanvas.Context);
 
-            drawCanveses(canvas, localPoint);
+            drawCanveses(context, localPoint);
 
-            canvas.Restore();
+            context.Restore();
             if (CurrentGameState == GameState.Playing)
-                SonicToon.DrawUI(canvas, new Point(ScreenOffset.X, ScreenOffset.Y));
+                SonicToon.DrawUI(context, new Point(ScreenOffset.X, ScreenOffset.Y));
         }
 
-        private void drawCanveses(CanvasContext2D canvas, Point localPoint)
+        private void drawCanveses(CanvasRenderingContext2D canvas, Point localPoint)
         {
             canvas.Scale(Scale.X, Scale.Y);
             canvas.DrawImage(lowChunkCanvas.Canvas, localPoint.X, localPoint.Y);
@@ -509,14 +517,20 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             canvas.DrawImage(highChuckCanvas.Canvas, localPoint.X, localPoint.Y);
         }
 
-        private void resetCanvases()
+        public void ResetCanvases()
         {
-            lowChunkCanvas = lowChunkCanvas ?? CanvasInformation.Create(320, 240);
-            sonicCanvas = sonicCanvas ?? CanvasInformation.Create(320, 240);
-            highChuckCanvas = highChuckCanvas ?? CanvasInformation.Create(320, 240);
-            sonicCanvas.Context.ClearRect(0, 0, 320, 240);
-            highChuckCanvas.Context.ClearRect(0, 0, 320, 240);
-            lowChunkCanvas.Context.ClearRect(0, 0, 320, 240);
+            lowChunkCanvas = lowChunkCanvas ?? CanvasInformation.Create(WindowLocation.Width, WindowLocation.Height, false);
+            sonicCanvas = sonicCanvas ?? CanvasInformation.Create(WindowLocation.Width, WindowLocation.Height, true);
+            highChuckCanvas = highChuckCanvas ?? CanvasInformation.Create(WindowLocation.Width, WindowLocation.Height, false);
+            sonicCanvas.Context.ClearRect(0, 0, WindowLocation.Width, WindowLocation.Height);
+            highChuckCanvas.Context.ClearRect(0, 0, WindowLocation.Width, WindowLocation.Height);
+            lowChunkCanvas.Context.ClearRect(0, 0, WindowLocation.Width, WindowLocation.Height);
+        }
+        public void DestroyCanvases()
+        {
+            lowChunkCanvas = null;
+            sonicCanvas = null;
+            highChuckCanvas = null;
         }
 
         private static Point[] getOffs(int w1, int h1)
@@ -534,7 +548,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             return _cachedOffs[hash] = offs;
         }
 
-        private void updatePositions(CanvasContext2D canvas)
+        private void updatePositions(CanvasRenderingContext2D canvas)
         {
             ScreenOffset.X = 0;
             ScreenOffset.Y = 0;
@@ -546,7 +560,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 WindowLocation.X = 128 * SonicLevel.LevelWidth - WindowLocation.Width;*/
         }
 
-        private void updatePositionsForPlaying(CanvasContext2D canvas)
+        private void updatePositionsForPlaying(CanvasRenderingContext2D canvas)
         {
             canvas.Scale(RealScale.X, RealScale.Y);
             if (SonicToon.Ticking)
@@ -576,7 +590,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
 
         }
 
-        private static void drawLoading(CanvasContext2D canvas)
+        private static void drawLoading(CanvasRenderingContext2D canvas)
         {
             canvas.FillStyle = "white";
             canvas.FillText("Loading...   " /*+ (this.inds.tc + this.inds.tp + this.inds.t) + " / " + (this.inds.total)*/, 95, 95);
@@ -584,7 +598,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             return;
         }
 
-        private bool drawHaltMode(CanvasContext2D canvas)
+        private bool drawHaltMode(CanvasRenderingContext2D canvas)
         {
             canvas.FillStyle = "white";
             canvas.Font = "21pt arial bold";
@@ -598,7 +612,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
         }
 
 
-        private void drawLowChunks(CanvasContext2D canvas, Point localPoint, Point[] offs, int fyP, int fxP)
+        private void drawLowChunks(CanvasRenderingContext2D canvas, Point localPoint, Point[] offs, int fyP, int fxP)
         {
             foreach (Point off in offs)
             {
@@ -619,7 +633,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             }
         }
 
-        private void drawHighChunks(CanvasContext2D canvas, int fxP, int fyP, Point[] offs, Point localPoint)
+        private void drawHighChunks(CanvasRenderingContext2D canvas, int fxP, int fyP, Point[] offs, Point localPoint)
         {
             foreach (Point off in offs)
             {
@@ -657,12 +671,37 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 }
             }
         }
+        private void drawDebugTextChunks(CanvasRenderingContext2D canvas, int fxP, int fyP, Point[] offs, Point localPoint)
+        {
+            foreach (Point off in offs)
+            {
+                int _xP = fxP + off.X;
+                int _yP = fyP + off.Y;
+                int _xPreal = fxP + off.X;
+                int _yPreal = fyP + off.Y;
+                //if (_xP < 0 || _xP >= SonicLevel.LevelWidth) continue;
+                _xP = Help.Mod(_xP, SonicLevel.LevelWidth);
+                _yP = Help.Mod(_yP, SonicLevel.LevelHeight);
+                TileChunk chunk = SonicLevel.GetChunkAt(_xP, _yP);
+                if (chunk == null) continue;
+
+                localPoint.X = (_xPreal * 128) - WindowLocation.X;
+                localPoint.Y = (_yPreal * 128) - WindowLocation.Y;
+
+                if (!chunk.IsEmpty() && !chunk.OnlyForeground())
+                    chunk.DrawAnimationDebug(canvas, localPoint, ChunkLayer.Low, TileChunkDebugDrawOptions);
+
+                if (!chunk.IsEmpty() && !chunk.OnlyBackground())
+                    chunk.DrawAnimationDebug(canvas, localPoint, ChunkLayer.High, TileChunkDebugDrawOptions);
+            }
+        }
+
 
         private CanvasInformation cacheHeightMapForChunk(TileChunk chunk)
         {
             var md = chunk;
             var posj1 = new Point(0, 0);
-            var canv = CanvasInformation.Create(128, 128);
+            var canv = CanvasInformation.Create(128, 128, false);
             var ctx = canv.Context;
             engine.Clear(canv);
             for (var _y = 0; _y < 8; _y++)
@@ -713,7 +752,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                     = canv;
         }
 
-        private void drawSonic(CanvasContext2D canvas)
+        private void drawSonic(CanvasRenderingContext2D canvas)
         {
             if (CurrentGameState == GameState.Playing)
             {
@@ -727,7 +766,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             }
         }
 
-        private void drawRings(CanvasContext2D canvas, Point localPoint)
+        private void drawRings(CanvasRenderingContext2D canvas, Point localPoint)
         {
             for (int index = 0; index < SonicLevel.Rings.Count; index++)
             {
@@ -783,7 +822,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             }
         }
 
-        private void drawAnimations(CanvasContext2D canvas)
+        private void drawAnimations(CanvasRenderingContext2D canvas)
         {
             foreach (AnimationInstance ano in AnimationInstances)
             {
@@ -791,7 +830,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             }
         }
 
-        private void drawObjects(CanvasContext2D canvas, Point localPoint)
+        private void drawObjects(CanvasRenderingContext2D canvas, Point localPoint)
         {
             List<LevelObjectInfo> levelObjectInfos = SonicLevel.Objects;
             foreach (LevelObjectInfo o in levelObjectInfos)
@@ -902,14 +941,16 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
             Console.TimeEnd("tileCache");
 
 
-            Console.Time("collisionCache");
-            foreach (var chunk in SonicLevel.TileChunks)
+            if (SonicToon != null)
             {
-                SonicToon.SensorManager.BuildChunk(chunk, false);
-                SonicToon.SensorManager.BuildChunk(chunk, true);
+                Console.Time("collisionCache");
+                foreach (var chunk in SonicLevel.TileChunks)
+                {
+                    SonicToon.SensorManager.BuildChunk(chunk, false);
+                    SonicToon.SensorManager.BuildChunk(chunk, true);
+                }
+                Console.TimeEnd("collisionCache");
             }
-            Console.TimeEnd("collisionCache");
-
 
 
             if (false)
@@ -943,7 +984,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                     }
                 }
 
-                var bigOne = CanvasInformation.Create(numWide * 128, totalHeight);
+                var bigOne = CanvasInformation.Create(numWide * 128, totalHeight, false);
                 int currentPosition = 0;
                 for (int index = 0; index < debugCanvases.Count; index++)
                 {
@@ -961,7 +1002,7 @@ cji[(imd++) + " " + anni.Name + scale.x + scale.y] = _H.scaleCSImage(sonicManage
                 str += "<img src=\"" + piece + "\"/>\n";
             }
             str += "</body></html>";
-            var tx = (TextAreaElement) Window.Document.CreateElement("textarea");
+            var tx = (TextAreaElement)Window.Document.CreateElement("textarea");
             tx.Style.Position = "absolute";
             tx.Value = str;
             Window.Document.Body.AppendChild(tx);

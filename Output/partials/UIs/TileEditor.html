@@ -1,0 +1,58 @@
+﻿<div ng-controller="TileEditorController">
+    <div floating-window left="'50%'" top="'50%'" width="'700px'" height="'700px'" window-title="'Tile Editor'" visible="visible">
+        <tabset type="pills">
+            <tab heading="Tile Chunks">
+                <div class="left-third">
+                    <div style="height: 510px;" class="full-width" fancy-list items="model.tileChunks" bind="model.selectedTileChunk">
+                        <canvas-tile-chunk class="center" tile-chunk="item" width="150" height="150" edit="false" should-animate="parentScope.model.selectedTileChunk==item"></canvas-tile-chunk>
+                    </div>
+                </div>
+                <div class="right-two-thirds">
+                    <div>
+                        <canvas-tile-chunk class="center" tile-chunk="model.selectedTileChunk" edit="true" width="256" height="256" should-animate="true" debug-draw-options="model.tileChunkInfo.debugDrawOptions" draw-options="model.tileChunkInfo.drawOptions"></canvas-tile-chunk>
+                    </div>
+                    <ol class="property-box">
+                        <li>
+                            <label for-next>Outline Tile Pieces</label>
+                            <input ng-model="model.tileChunkInfo.debugDrawOptions.outlineTilePieces" type="checkbox" /> 
+                        </li>
+
+                        <li>
+                            <label for-next>Outline Tiles</label>
+                            <input ng-model="model.tileChunkInfo.debugDrawOptions.outlineTiles" type="checkbox"/> 
+                        </li>
+                        <li style="min-height: 5px;">
+                              
+                        </li>
+                        <li>
+                            <label for-next>Show Low Layer</label>
+                            <input ng-model="model.tileChunkInfo.drawOptions.showLowLayer" type="checkbox"/> 
+                        </li>
+                        <li>
+                            <label for-next>Show High Layer</label>
+                            <input ng-model="model.tileChunkInfo.drawOptions.showHighLayer" type="checkbox"/> 
+                        </li>
+                    </ol>
+                    
+                    <div style="width: 410px;" class="full-width" fancy-horizontal-list items="model.tilePieces" bind="model.tileChunkInfo.selectedTilePiece">
+                        <canvas-tile-piece class="center" tile-piece="item" width="80" height="80" edit="false" should-animate="parentScope.model.tileChunkInfo.selectedTilePiece==item"></canvas-tile-piece>
+                    </div>
+
+                </div>
+            </tab>
+            <tab heading="Tile Pieces">
+                2
+                <div class="left-third">
+                    <div style="height: 510px;" class="full-width" fancy-list items="model.tileChunks" bind="model.selectedTileChunk">
+                        <canvas-tile-chunk class="center" tile-chunk="item" width="150" height="150" is-selected="parentScope.model.selectedTileChunk==item"></canvas-tile-chunk>
+                    </div>
+                </div>
+                <div class="right-two-thirds">
+                </div>
+            </tab>
+            <tab heading="Tiles">
+                tiles 
+            </tab>
+        </tabset>
+    </div>
+</div>

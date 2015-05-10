@@ -10,7 +10,7 @@ namespace OurSonic.UIManager
     {
         private int blinkTick;
         private bool blinked;
-        private CanvasContext2D can;
+        private CanvasRenderingContext2D can;
         private string oldText;
         [IntrinsicProperty]
         public Action TextChanged { get; set; }
@@ -35,11 +35,11 @@ namespace OurSonic.UIManager
         [IntrinsicProperty]
         public int BlinkTick { get; set; }
         [IntrinsicProperty]
-        public Gradient Button1Grad { get; set; }
+        public CanvasGradient Button1Grad { get; set; }
         [IntrinsicProperty]
-        public Gradient Button2Grad { get; set; }
+        public CanvasGradient Button2Grad { get; set; }
         [IntrinsicProperty]
-        public Gradient ButtonBorderGrad { get; set; }
+        public CanvasGradient ButtonBorderGrad { get; set; }
         [IntrinsicProperty]
         public bool Can { get; set; }
 
@@ -58,7 +58,7 @@ namespace OurSonic.UIManager
         {
             base.Construct();
 
-            var canv = CanvasInformation.Create(1, 1).Context;
+            var canv = CanvasInformation.Create(1, 1, false).Context;
             Button1Grad = canv.CreateLinearGradient(0, 0, 0, 1);
             Button1Grad.AddColorStop(0, "#FFFFFF");
             Button1Grad.AddColorStop(1, "#A5A5A5");
@@ -72,8 +72,10 @@ namespace OurSonic.UIManager
             ButtonBorderGrad.AddColorStop(1, "#7a7a7a");
         }
 
-        public override bool OnKeyDown(ElementEvent e)
+        public override bool OnKeyDown(Event e)
         {
+            return false;
+/* now unsupported
             if (e.AltKey) return false;
             if (Focused) {
                 if (e.CtrlKey) {
@@ -155,6 +157,7 @@ namespace OurSonic.UIManager
                 return true;
             }
             return false;
+*/
         }
 
         public override ForceRedrawing ForceDrawing()
@@ -250,7 +253,7 @@ namespace OurSonic.UIManager
             return base.OnMouseOver(e);
         }
 
-        public override void Draw(CanvasContext2D canv)
+        public override void Draw(CanvasRenderingContext2D canv)
         {
             if (!Visible) return;
             canv.Save();

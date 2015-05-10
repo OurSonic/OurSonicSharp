@@ -24,6 +24,7 @@ namespace OurSonic.Level.Objects
                 InitScript = d.InitScript,
                 TickScript = d.TickScript
             };
+            obj.Description = d.Description;
             //d.oldKey = name;
             obj.Assets = new List<LevelObjectAsset>();
 

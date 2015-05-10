@@ -142,7 +142,7 @@ namespace OurSonic.UIManager
             base.Construct();
         }
 
-        public override bool OnKeyDown(ElementEvent e)
+        public override bool OnKeyDown(Event e)
         {
             return base.OnKeyDown(e);
         }
@@ -167,7 +167,7 @@ namespace OurSonic.UIManager
             return base.OnScroll(e);
         }
 
-        public override void Draw(CanvasContext2D canv)
+        public override void Draw(CanvasRenderingContext2D canv)
         {
             var fm = BuildSizeMap();
 
@@ -236,7 +236,7 @@ namespace OurSonic.UIManager
             base.Construct();
         }
 
-        public override bool OnKeyDown(ElementEvent e)
+        public override bool OnKeyDown(Event e)
         {
             return base.OnKeyDown(e);
         }
@@ -261,7 +261,7 @@ namespace OurSonic.UIManager
             return base.OnScroll(e);
         }
 
-        public override void Draw(CanvasContext2D canv)
+        public override void Draw(CanvasRenderingContext2D canv)
         {
             base.Draw(canv);
         }
@@ -320,7 +320,7 @@ namespace OurSonic.UIManager
             base.Construct();
         }
 
-        public override bool OnKeyDown(ElementEvent e)
+        public override bool OnKeyDown(Event e)
         {
             return base.OnKeyDown(e);
         }
@@ -345,7 +345,7 @@ namespace OurSonic.UIManager
             return base.OnScroll(e);
         }
 
-        public override void Draw(CanvasContext2D canv)
+        public override void Draw(CanvasRenderingContext2D canv)
         {
             Width = (int) (double) CellWidth;
             Height = (int) (double) CellHeight;

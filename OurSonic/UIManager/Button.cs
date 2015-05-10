@@ -25,11 +25,11 @@ namespace OurSonic.UIManager
         [IntrinsicProperty]
         private bool Clicking { get; set; }
         [IntrinsicProperty]
-        private Gradient Button2Grad { get; set; }
+        private CanvasGradient Button2Grad { get; set; }
         [IntrinsicProperty]
-        public Gradient Button1Grad { get; set; }
+        public CanvasGradient Button1Grad { get; set; }
         [IntrinsicProperty]
-        private Gradient ButtonBorderGrad { get; set; }
+        private CanvasGradient ButtonBorderGrad { get; set; }
         [IntrinsicProperty]
         public DelegateOrValue<string> Text { get; set; }
         [IntrinsicProperty]
@@ -54,7 +54,7 @@ namespace OurSonic.UIManager
         {
             base.Construct();
 
-            var canv = CanvasInformation.Create(1, 1).Context;
+            var canv = CanvasInformation.Create(1, 1,false).Context;
 
             Button1Grad = canv.CreateLinearGradient(0, 0, 0, 1);
 
@@ -104,7 +104,7 @@ namespace OurSonic.UIManager
             return base.OnMouseOver(e);
         }
 
-        public override void Draw(CanvasContext2D canv)
+        public override void Draw(CanvasRenderingContext2D canv)
         {
             if (!Visible) return;
 

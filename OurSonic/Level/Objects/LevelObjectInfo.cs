@@ -35,7 +35,7 @@ namespace OurSonic.Level.Objects
         [IntrinsicProperty]
         public int LowerNibble { get; set; }
         [IntrinsicProperty]
-        public int PieceIndex { get; set; }
+        public int PieceLayoutIndex { get; set; }
         [IntrinsicProperty]
         public List<LevelObjectPiece> Pieces { get; set; }
         [IntrinsicProperty]
@@ -77,9 +77,9 @@ namespace OurSonic.Level.Objects
 
         public void SetPieceLayoutIndex(int ind)
         {
-            PieceIndex = ind;
+            PieceLayoutIndex = ind;
 
-            var pcs = ObjectData.PieceLayouts[PieceIndex].Pieces;
+            var pcs = ObjectData.PieceLayouts[PieceLayoutIndex].Pieces;
 
             Pieces = new List<LevelObjectPiece>();
 
@@ -92,9 +92,9 @@ namespace OurSonic.Level.Objects
         {
             ObjectData = obj;
 
-            if (ObjectData.PieceLayouts.Count > PieceIndex &&
-                ObjectData.PieceLayouts[PieceIndex].Pieces.Count > 0)
-                SetPieceLayoutIndex(PieceIndex);
+            if (ObjectData.PieceLayouts.Count > PieceLayoutIndex &&
+                ObjectData.PieceLayouts[PieceLayoutIndex].Pieces.Count > 0)
+                SetPieceLayoutIndex(PieceLayoutIndex);
         }
 
         public bool Tick(LevelObjectInfo @object, SonicLevel level, Sonic.Sonic sonic)
@@ -112,7 +112,7 @@ namespace OurSonic.Level.Objects
 
         public LevelObjectPieceLayout MainPieceLayout()
         {
-            return ObjectData.PieceLayouts[PieceIndex];
+            return ObjectData.PieceLayouts[PieceLayoutIndex];
         }
 
         public Rectangle GetRect()
@@ -125,32 +125,10 @@ namespace OurSonic.Level.Objects
                 return _rect;
             }
 
-            var pcs = Pieces;
-
-            _rect.Y = 0;
-            _rect.Y = 0;
-            _rect.Width = 0;
-            _rect.Height = 0;
-
-            foreach (var j in pcs) {
-                var piece = ObjectData.Pieces[j.PieceIndex];
-                var asset = ObjectData.Assets[piece.AssetIndex];
-                if (asset.Frames.Count > 0) {
-                    var frm = asset.Frames[j.FrameIndex];
-                    Help.MergeRect(_rect, new Rectangle(frm.OffsetX + j.X, frm.OffsetY + j.Y, frm.Width, frm.Height));
-                }
-            }
-            _rect.X = _rect.X;
-            _rect.Y = _rect.Y;
-            _rect.Width -= _rect.X;
-            _rect.Height -= _rect.Y;
-
-            _rect.X += (int) X;
-            _rect.Y += (int) Y;
-            return _rect;
+            return ObjectData.PieceLayouts[PieceLayoutIndex].GetRectangle(ObjectData);
         }
 
-        public void Draw(CanvasContext2D canvas, int x, int y, bool showHeightMap)
+        public void Draw(CanvasRenderingContext2D canvas, int x, int y, bool showHeightMap)
         {
             if (Dead || ObjectData.Falsey()) return;
 
@@ -187,13 +165,13 @@ namespace OurSonic.Level.Objects
             Xflip = O.XFlip;
             Yflip = O.YFlip;
             Dead = false;
-            PieceIndex = 0; //maybe
+            PieceLayoutIndex = 0; //maybe
             Subdata = O.SubType;
             UpperNibble = Subdata >> 4;
             LowerNibble = Subdata & 0xf;
-            if (ObjectData.PieceLayouts.Count > PieceIndex &&
-                ObjectData.PieceLayouts[PieceIndex].Pieces.Count > 0)
-                SetPieceLayoutIndex(PieceIndex);
+            if (ObjectData.PieceLayouts.Count > PieceLayoutIndex &&
+                ObjectData.PieceLayouts[PieceLayoutIndex].Pieces.Count > 0)
+                SetPieceLayoutIndex(PieceLayoutIndex);
         }
 
         public LevelObjectPiece Collides(Point sonic)
@@ -229,7 +207,7 @@ namespace OurSonic.Level.Objects
                 if (asset.Frames.Count > 0) {
                     var frm = asset.Frames[j.FrameIndex];
                     var map = isHurtMap ? frm.HurtSonicMap : frm.CollisionMap;
-                    if (twoDArray(map, ( mX + frm.OffsetX + j.X ), ( mY + frm.OffsetY + j.Y ), Xflip ^ piece.Xflip, Yflip ^ piece.Yflip) == true)
+                    if (twoDArray(map, ( mX + frm.OffsetX /*+ j.X*/ ), ( mY + frm.OffsetY /*+ j.Y*/), Xflip ^ piece.Xflip, Yflip ^ piece.Yflip) == true)
                         return j;
                 }
             }

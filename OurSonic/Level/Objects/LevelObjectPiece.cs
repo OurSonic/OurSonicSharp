@@ -6,9 +6,9 @@ namespace OurSonic.Level.Objects
     {
         public int AssetIndex { get; set; }
         public int FrameIndex { get; set; }
-        public int PieceIndex { get; set; }
+        public int PieceIndex { get; set; }/*
         public int X { get; set; }
-        public int Y { get; set; }
+        public int Y { get; set; }*/
         public bool Collided { get; set; }
         public bool Xflip { get; set; }
         public bool Yflip { get; set; }
