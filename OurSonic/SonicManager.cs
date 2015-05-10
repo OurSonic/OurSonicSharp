@@ -320,8 +320,6 @@ catch (Exception exc)
 string txt = "There was an error on this page.\n\n";
 txt += "Error description: " + exc.Message + "\n\n";
 txt += "Stack: " + exc.InnerException + "\n\n"; //todo::callstack
-txt += "Click OK to continue.\n\n";
-
 
 Global.Global.Console.Log(exc.Me());
 Window.Alert(txt);

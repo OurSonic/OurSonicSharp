@@ -301,7 +301,7 @@ namespace OurSonic
                 }
             }
 
-            SonicLevel.Palette = sonicLevel.Palette.Map(a => a.Map(b => b));
+            SonicLevel.Palette = sonicLevel.Palette.Map(a => a.Map(b => "#"+b));
             SonicLevel.StartPositions = sonicLevel.StartPositions.Map(a => new Point(a.X, a.Y)).Array();
 
             SonicLevel.AnimatedPalettes = new List<PaletteItem>();
@@ -313,7 +313,7 @@ namespace OurSonic
                     AnimatedPaletteItem pal = sonicLevel.PaletteItems[0][k];
                     SonicLevel.AnimatedPalettes.Add(new PaletteItem()
                     {
-                        Palette = ((string[])Script.Eval(pal.Palette)).Map(b => b),
+                        Palette = ((string[])Script.Eval(pal.Palette)).Map(b => "#" + b),
                         SkipIndex = pal.SkipIndex,
                         TotalLength = pal.TotalLength,
                         Pieces =
